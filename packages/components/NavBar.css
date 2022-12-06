@@ -1,0 +1,6 @@
+.navButtonClosed {
+    opacity: 0.5;
+}
+.navButtonClosed:hover {
+    opacity: 1;
+}

@@ -1,0 +1,22 @@
+@media screen and (width <= 768px) {
+    .panelContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: start;
+    }
+}
+@media screen and (width > 768px) {
+    .panelContainer {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+    }
+}
+
+.panelContainer {
+    position: absolute;
+    top: 0;
+    height: 100vh;
+}

@@ -1,0 +1,73 @@
+
+@media screen and (1280px <= width) {
+    .packImage {
+        width: 128px;
+        height: 128px;
+    }
+    .packCardSizing {
+        flex-direction: row;
+    }
+    .downloadBox {
+        flex-direction: column;
+        align-items: end;
+    }
+}
+
+@media screen and (768px <= width < 1280px) {
+    .packImage {
+        width: 96px;
+        height: 96px;
+    }
+    .packCardSizing {
+        flex-direction: row;
+    }
+    .downloadBox {
+        flex-direction: column;
+        align-items: end;
+    }
+}
+
+@media screen and (0px <= width <= 768px) {
+    .packImage {
+        width: 64px;
+        height: 64px;
+    }
+    .packCardSizing {
+        flex-direction: column;
+    }
+    .downloadBox {
+        flex-direction: row;
+        width: 100%;
+    }
+}
+
+.downloadBox {
+    height: min-content;
+}
+
+.packCard {
+    display: flex;
+    align-items: flex-start;
+
+    justify-content: left;
+    gap: 16px;
+    max-width: 100%;
+    width: 100%;
+    flex-shrink: 1;
+    background-color: var(--backgroundAccent);
+    border-radius: 24px;
+    padding: 16px;
+    cursor: pointer;
+}
+
+.packCard:hover {
+    background:
+        linear-gradient(rgba(0.0, 0.0, 0.0, 0.1), rgba(0.0, 0.0, 0.0, 0.1)),
+        linear-gradient(var(--backgroundAccent), var(--backgroundAccent));
+}
+
+.packCard:active {
+    background:
+        linear-gradient(rgba(0.0, 0.0, 0.0, 0.2), rgba(0.0, 0.0, 0.0, 0.2)),
+        linear-gradient(var(--backgroundAccent), var(--backgroundAccent));
+}

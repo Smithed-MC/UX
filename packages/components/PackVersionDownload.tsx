@@ -1,0 +1,23 @@
+import { PackVersion } from "data-types";
+import React from "react";
+import DownloadButton from "./DownloadButton";
+import semver from 'semver'
+interface PackVersionDownloadProps {
+    version: PackVersion,
+    packId: string
+}
+
+export default function PackVersionDownload({ version, packId }: PackVersionDownloadProps) {
+    return <div className="container" style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between', maxWidth: 256 }}>
+        <div className="container" style={{ alignItems: 'start' }}>
+            <label style={{ fontSize: 24 }}>{version.name}</label>
+            <div className="container" style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', gap: 4}}>
+                {version.supports.sort((a,b) => semver.compare(semver.coerce(a) ?? '', semver.coerce(b) ?? '')).map(v => <div style={{ backgroundColor: 'var(--background)', padding: 8, borderRadius: 24 }}>
+                    {v}
+                </div>)}
+            </div>
+
+        </div>
+        <DownloadButton link={`https://api.smithed.dev/download?pack=${packId}@${encodeURIComponent(version.name)}`} />
+    </div>
+} 

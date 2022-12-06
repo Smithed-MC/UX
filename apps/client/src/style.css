@@ -1,0 +1,145 @@
+:root {
+    font-family: 'Inconsolata';
+    background-image: linear-gradient(var(--background), var(--backgroundDark));
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    position: absolute;
+    min-height: 100%;
+    min-width: 100%;
+
+    --background: #2a2a38;
+    --backgroundDark: #14131d;
+    --backgroundAccent: #12121f;
+    --accent: #1b48c4;
+    --accent2: #6b83c5;
+    --buttonText: #fff;
+    --text: #fff;
+    --subText: #aaa;
+    --badAccent: rgb(255, 72, 72);
+    --codeText: rgb(255, 247, 136);
+
+    --smallScreenSize: 640px;
+    overflow: hidden;
+}
+
+@font-face {
+    font-family: 'Inconsolata';
+    src: local('Inconsolata'),
+        url('./fonts/Inconsolata.otf') format('opentype')
+}
+
+div {
+    font-family: 'Inconsolata';
+    color: var(--text)
+}
+
+h1 {
+    text-decoration: underline;
+}
+
+code {
+    color: var(--codeText);
+    background-color: rgba(255, 255, 255, 0.1);
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+
+pre {
+    color: var(--codeText);
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 16px;
+    border-radius: 24px;
+}
+
+
+a {
+    color: var(--accent2);
+}
+
+a:hover {
+    filter: brightness(85%)
+}
+
+a:active {
+    filter: brightness(60%)
+}
+
+
+details {
+    background-color: var(--backgroundAccent);
+    padding: 16px;
+    border-radius: 16px;
+    margin-bottom: 4px;
+}
+summary:hover {
+    filter: brightness(80%);
+}
+summary:active {
+    filter: brightness(60%);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    /* width of the entire scrollbar */
+
+}
+
+::-webkit-scrollbar-thumb {
+    width: 4px;
+    background-color: var(--accent);
+    /* color of the scroll thumb */
+    border-radius: 20px;
+    /* roundness of the scroll thumb */
+    /* creates padding around scroll thumb */
+    border: 2px solid var(--backgroundAccent);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent2);
+}
+
+
+input, select {
+    border: none;
+    border-radius: 24px;
+    padding: 8px;
+    font-family: Inconsolata;
+    font-size: 16px;
+    border-bottom: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+}
+
+select select {
+    background-color: red;
+}
+
+input[type="email"], input[type="password"], input[type="text"], textarea, select {
+    background-color: var(--background);
+
+    color: var(--text);
+    width: 256px;
+}
+input::placeholder {
+    color: var(--subText)
+}
+
+input[type="button"] {
+    background-color: var(--accent);
+    width: 128px;
+    color: var(--buttonText);
+}
+
+input[type="button"]:hover {
+    filter: brightness(85%);
+}
+
+input[type="button"]:active {
+    filter: brightness(60%);
+    transform: scale(105%);
+}
+
+select {
+
+}
