@@ -58,3 +58,5 @@ jobs:
           platforms/desktop/src-tauri/target/release/bundle/deb/*.deb
           platforms/desktop/src-tauri/target/release/bundle/msi/*.msi
           platforms/desktop/src-tauri/target/release/*.exe
+          platforms/desktop/src-tauri/target/release/bundle/macos/*.app
+          platforms/desktop/src-tauri/target/release/bundle/smg/*.dmg
