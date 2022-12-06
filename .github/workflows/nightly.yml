@@ -23,6 +23,8 @@ jobs:
       uses: actions/setup-node@v3.5.1
       with:
         node-version: 17.x
+    - if: ${{ matrix.os == 'ubuntu-latest'}}
+      run: npm i turbo-linux-64
     - run: npm i
     - name: Build App
       run: npm run build
