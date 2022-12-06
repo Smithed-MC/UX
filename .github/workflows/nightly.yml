@@ -1,0 +1,28 @@
+# name of your github action
+name: Build Nightly
+# this will help you specify where to run 
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    # this will run on the electron branch
+      - master
+# this is where the magic happens, each job happens in parallel btw
+
+jobs:
+  publish:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ macos-latest, ubuntu-latest, windows-latest ]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v3.5.1
+      with:
+        node-version: 17.x
+    - run: npm i
+    - name: Build App
+      run: npm run build
