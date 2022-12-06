@@ -27,6 +27,8 @@ jobs:
       # You may pin to the exact commit or the version.
       # uses: raftario/setup-rust-action@f74294776374514bbcc27b4623c1b220ef9394bf
       uses: raftario/setup-rust-action@v1.0.0
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     - if: ${{ matrix.os == 'ubuntu-latest'}}
       run: |
             npm i turbo-linux-64 @tauri-apps/cli-linux-x64-gnu && 
