@@ -23,8 +23,22 @@ jobs:
       uses: actions/setup-node@v3.5.1
       with:
         node-version: 17.x
+    - name: Setup Rust environment
+      # You may pin to the exact commit or the version.
+      # uses: raftario/setup-rust-action@f74294776374514bbcc27b4623c1b220ef9394bf
+      uses: raftario/setup-rust-action@v1.0.0
     - if: ${{ matrix.os == 'ubuntu-latest'}}
-      run: npm i turbo-linux-64 @tauri-apps/cli-linux-x64-gnu
+      run: |
+            npm i turbo-linux-64 @tauri-apps/cli-linux-x64-gnu && 
+            sudo apt update &&
+            sudo apt install libwebkit2gtk-4.0-dev \
+                build-essential \
+                curl \
+                wget \
+                libssl-dev \
+                libgtk-3-dev \
+                libayatana-appindicator3-dev \
+                librsvg2-dev
     - if: ${{ matrix.os == 'macos-latest'}}
       run: npm i turbo-darwin-64 @tauri-apps/cli-darwin-x64
     - run: npm i
