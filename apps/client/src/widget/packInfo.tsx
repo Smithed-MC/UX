@@ -1,6 +1,6 @@
 import { tauri } from "@tauri-apps/api";
 import { open } from '@tauri-apps/api/shell'
-import { Spinner } from "components";
+import { markdownOptions, MarkdownRenderer, Spinner } from "components";
 import { Cross } from "components/svg";
 import { PackData, PackEntry } from "data-types";
 import Markdown, { MarkdownToJSX } from "markdown-to-jsx";
@@ -16,13 +16,6 @@ interface PackInfoProps {
     fixed: boolean
     onClose: () => void
     style?: React.CSSProperties
-}
-
-const markdownOptions: MarkdownToJSX.Options = {
-    overrides: {
-        img: ({ children, ...props }) => (<img {...props} style={{ maxWidth: "100%" }}>{children}</img>),
-        pre: ({ children, ...props }) => (<pre>{children.props.children}</pre>)
-    }
 }
 
 if (window.__TAURI_IPC__ !== undefined && markdownOptions.overrides !== undefined) {
@@ -55,10 +48,36 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
         setAuthor(data.displayName)
     }
 
+    function correctGithubLinks(url: string) {
+        const matches = /(https:\/\/)?(www\.)?github\.com\/(\S[^\/]+)\/(\S[^\/]+)\/(\S[^\/]+)\/(\S[^?\s]+)/g.exec(url)
+        console.log(matches)
+        if(matches == null || matches.length === 0)
+            return url
+        
+        matches.splice(0, 3)
+        const user = matches.shift()
+        const repo = matches.shift()
+        const method = matches.shift()
+        if(method !== 'blob')
+            return url
+        const path = matches.shift()
+
+        return `https://raw.githubusercontent.com/${user}/${repo}/${path}`
+        
+    }
+
     async function getFullViewPage(data: PackData) {
-        console.log('URL: ', data.display.webPage)
+        console.log('Initial URL: ', data.display.webPage)
         if (data.display.webPage === undefined || !data.display.webPage.startsWith('https://')) return setFullviewPage('');
-        const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(data.display.webPage)}`, {})
+        const response = await (async () => {
+
+            data.display.webPage = correctGithubLinks(data.display.webPage??'')
+            console.log('Post coercion:', data.display.webPage)
+            const resp = await fetch(data.display.webPage ?? '', {})
+            if (resp.status !== 200)
+                return await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(data.display.webPage ?? '')}`)
+            return resp
+        })()
         if (!response.ok) return setFullviewPage('')
         const text = await response.text()
         setFullviewPage(text)
@@ -97,10 +116,10 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
             backgroundColor: 'var(--backgroundAccent)', borderRadius: 24,
             padding: 16, marginTop: yOffset,
             display: 'none',
-            
+
         }} ref={parentDiv}>
             <div className="container" style={{ flexDirection: fixed ? 'column' : 'row', width: '100%', justifyContent: 'center', gap: fixed ? 0 : 16 }}>
-                <div className='container' style={{flex: '33%', width: '100%', justifyContent: fixed ? 'left' : 'right', flexDirection: 'row'}}>
+                <div className='container' style={{ flex: '33%', width: '100%', justifyContent: fixed ? 'left' : 'right', flexDirection: 'row' }}>
                     {fixed && <button className="button container wobbleHover" style={{ width: 48, height: 48, borderRadius: 24, padding: 12, backgroundColor: 'var(--badAccent)', marginBottom: -48 }} onClick={onClose}>
                         <Cross style={{ stroke: 'var(--buttonText)' }} />
                     </button>}
@@ -108,16 +127,14 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
 
                     </img>}
                 </div>
-                <a style={{ fontSize: 32, textDecoration: 'underline', color: 'var(--accent2)', width: 'max-content', textAlign: 'center'}} href={`/${id.split(':').join('/')}`}>{data?.display.name}</a>
-                <div style={{flex: '33%'}}></div>
+                <a style={{ fontSize: 32, textDecoration: 'underline', color: 'var(--accent2)', width: 'max-content', textAlign: 'center' }} href={`/${id.split(':').join('/')}`}>{data?.display.name}</a>
+                <div style={{ flex: '33%' }}></div>
             </div>
             <p style={{ backgroundColor: 'var(--background)', padding: 12, borderRadius: 24 }}>
                 {data.display.description}
             </p>
             <div style={{ width: '100%' }}>
-                {fullviewPage !== '' && <Markdown options={markdownOptions} style={{ backgroundColor: 'var(--background)', padding: 16, borderRadius: 24 }}>
-                    {fullviewPage}
-                </Markdown>}
+                {fullviewPage !== '' && <MarkdownRenderer>{fullviewPage}</MarkdownRenderer>}
             </div>
 
         </div>}

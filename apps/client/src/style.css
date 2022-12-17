@@ -13,12 +13,12 @@
     --backgroundAccent: #12121f;
     --accent: #1b48c4;
     --accent2: #6b83c5;
+    --badAccent: rgb(255, 72, 72);
+    --goodAccent: rgb(144, 255, 71);
     --buttonText: #fff;
     --text: #fff;
-    --subText: #aaa;
-    --badAccent: rgb(255, 72, 72);
     --codeText: rgb(255, 247, 136);
-
+    --subText: #aaa;
     --smallScreenSize: 640px;
     overflow: hidden;
 }
@@ -109,6 +109,7 @@ input, select {
     font-size: 16px;
     border-bottom: 2px solid var(--accent);
     border-right: 2px solid var(--accent);
+    box-sizing: border-box;
 }
 
 select select {

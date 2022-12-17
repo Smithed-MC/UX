@@ -5,5 +5,6 @@ import Spinner from './Spinner'
 import * as svg from './svg'
 import './style.css'
 import ErrorPage from './PageError'
+import MarkdownRenderer, {markdownOptions} from './MarkdownRenderer'
 
-export {NavButton, NavBar, PackCard, Spinner, PackVersionDownload, svg, ErrorPage}
+export {NavButton, NavBar, PackCard, Spinner, PackVersionDownload, svg, ErrorPage, MarkdownRenderer, markdownOptions}
