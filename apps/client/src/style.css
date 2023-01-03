@@ -20,6 +20,8 @@
     --codeText: rgb(255, 247, 136);
     --subText: #aaa;
     --smallScreenSize: 640px;
+    
+    --defaultBorderRadius: 16px;
     overflow: hidden;
 }
 
@@ -50,7 +52,7 @@ pre {
     color: var(--codeText);
     background-color: rgba(255, 255, 255, 0.1);
     padding: 16px;
-    border-radius: 24px;
+    border-radius: var(--defaultBorderRadius);
 }
 
 
@@ -70,7 +72,7 @@ a:active {
 details {
     background-color: var(--backgroundAccent);
     padding: 16px;
-    border-radius: 16px;
+    border-radius: var(--defaultBorderRadius);
     margin-bottom: 4px;
 }
 summary:hover {
@@ -88,9 +90,9 @@ summary:active {
 
 ::-webkit-scrollbar-thumb {
     width: 4px;
-    background-color: var(--accent);
+    background-color: var(--subText);
     /* color of the scroll thumb */
-    border-radius: 20px;
+    border-radius: var(--defaultBorderRadius);
     /* roundness of the scroll thumb */
     /* creates padding around scroll thumb */
     border: 2px solid var(--backgroundAccent);
@@ -103,7 +105,7 @@ summary:active {
 
 input, select {
     border: none;
-    border-radius: 24px;
+    border-radius: var(--defaultBorderRadius);
     padding: 8px;
     font-family: Inconsolata;
     font-size: 16px;
@@ -115,6 +117,7 @@ input, select {
 select select {
     background-color: red;
 }
+
 
 input[type="email"], input[type="password"], input[type="text"], textarea, select {
     background-color: var(--background);

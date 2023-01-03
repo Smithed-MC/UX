@@ -12,7 +12,7 @@ export default function PackVersionDownload({ version, packId }: PackVersionDown
         <div className="container" style={{ alignItems: 'start' }}>
             <label style={{ fontSize: 24 }}>{version.name}</label>
             <div className="container" style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', gap: 4}}>
-                {version.supports.sort((a,b) => semver.compare(semver.coerce(a) ?? '', semver.coerce(b) ?? '')).map(v => <div style={{ backgroundColor: 'var(--background)', padding: 8, borderRadius: 24 }}>
+                {version.supports.sort((a,b) => semver.compare(semver.coerce(a) ?? '', semver.coerce(b) ?? '')).map(v => <div style={{ backgroundColor: 'var(--background)', padding: 8, borderRadius: 'var(--defaultBorderRadius)' }}>
                     {v}
                 </div>)}
             </div>

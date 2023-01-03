@@ -1,7 +1,7 @@
 .statName {
     background-color: var(--background);
     padding: 16px;
-    border-radius: 24px;
+    border-radius: var(--defaultBorderRadius);
     text-align: center;
     font-size: 18px;
     color: var(--subText);

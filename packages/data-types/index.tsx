@@ -1,11 +1,29 @@
 export interface PackEntry {
     added: number,
-    downloads: {[key: string]: number}
+    downloads: { [key: string]: number }
     updated: number
     owner: string
 }
 
-export type MinecraftVersion = '1.18'|'1.18.1'|'1.18.2'|'1.19'
+export type MinecraftVersion = '1.18' | '1.18.1' | '1.18.2' | '1.19'
+
+export const packCategories = [ 
+    'Extensive' ,
+    'Lightweight' ,
+    'QoL' ,
+    'Vanilla+' ,
+    'Tech' ,
+    'Magic' ,
+    'Library' ,
+    'Exploration' ,
+    'World Overhaul' ,
+    'No Resource Pack'
+]
+
+export interface PackDependency {
+    id: string
+    version: string
+}
 
 export interface PackVersion {
     name: string
@@ -13,7 +31,8 @@ export interface PackVersion {
         datapack: string
         resourcepack: string
     }
-    supports: MinecraftVersion[]
+    supports: MinecraftVersion[],
+    dependencies: PackDependency[]
 }
 
 export interface PackData {
@@ -25,7 +44,8 @@ export interface PackData {
         hidden: boolean
         webPage?: string
     },
-    versions: PackVersion[]
+    versions: PackVersion[],
+    categories: string[]
 }
 
 export interface UserData {

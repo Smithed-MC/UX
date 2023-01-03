@@ -113,24 +113,24 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
         <div ref={spinnerDiv} className="container" key="spinner" style={{ height: fixed ? '97vh' : '100%', marginTop: yOffset }}><Spinner /></div>
         {data !== undefined && <div className="container" style={{
             justifyContent: 'start', width: fixed ? '97%' : '100%',
-            backgroundColor: 'var(--backgroundAccent)', borderRadius: 24,
+            backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)',
             padding: 16, marginTop: yOffset,
             display: 'none',
 
         }} ref={parentDiv}>
             <div className="container" style={{ flexDirection: fixed ? 'column' : 'row', width: '100%', justifyContent: 'center', gap: fixed ? 0 : 16 }}>
                 <div className='container' style={{ flex: '33%', width: '100%', justifyContent: fixed ? 'left' : 'right', flexDirection: 'row' }}>
-                    {fixed && <button className="button container wobbleHover" style={{ width: 48, height: 48, borderRadius: 24, padding: 12, backgroundColor: 'var(--badAccent)', marginBottom: -48 }} onClick={onClose}>
+                    {fixed && <button className="button container wobbleHover" style={{ width: 48, height: 48, borderRadius: '24px', padding: 12, backgroundColor: 'var(--badAccent)', marginBottom: -48 }} onClick={onClose}>
                         <Cross style={{ stroke: 'var(--buttonText)' }} />
                     </button>}
-                    {!fixed && <img src={data.display.icon} style={{ width: 96, height: 96, borderRadius: 24, border: '4px solid var(--background)' }}>
+                    {!fixed && <img src={data.display.icon} style={{ width: 96, height: 96, borderRadius: 'var(--defaultBorderRadius)', border: '4px solid var(--background)' }}>
 
                     </img>}
                 </div>
                 <a style={{ fontSize: 32, textDecoration: 'underline', color: 'var(--accent2)', width: 'max-content', textAlign: 'center' }} href={`/${id.split(':').join('/')}`}>{data?.display.name}</a>
                 <div style={{ flex: '33%' }}></div>
             </div>
-            <p style={{ backgroundColor: 'var(--background)', padding: 12, borderRadius: 24 }}>
+            <p style={{ backgroundColor: 'var(--background)', padding: 12, borderRadius: 'var(--defaultBorderRadius)' }}>
                 {data.display.description}
             </p>
             <div style={{ width: '100%' }}>

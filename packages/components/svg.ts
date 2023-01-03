@@ -8,5 +8,6 @@ import { ReactComponent as Edit } from './assets/edit.svg'
 import { ReactComponent as Info } from './assets/info.svg'
 import { ReactComponent as Left } from './assets/left.svg'
 import { ReactComponent as Right } from './assets/right.svg'
+import { ReactComponent as Trash } from './assets/trash.svg'
 
-export { MenuBars, Settings, Home, Cross, Search, Account, Edit, Info, Left, Right }
+export { MenuBars, Settings, Home, Cross, Search, Account, Edit, Info, Left, Right, Trash }

@@ -68,18 +68,18 @@ export default function Browse(props: any) {
 
             </div>}
             <div className="container packCardContainer" style={{ flex: showWidget ? '40%' : '66%', width: '40%', height: '100%' }}>
-                <div className="container" style={{ padding: 16, gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }}>
+                <div className="container" style={{ padding: '16px 24px 16px 24px', gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }}>
                     {Object.keys(packs)
                         .filter(p => packs[p].owner !== undefined)
                         .sort((a, b) => getDownloads(a) - getDownloads(b))
                         .reverse()
-                        .map(p => <PackCard id={p} packEntry={packs[p]} onClick={() => onClick(p)} />)
+                        .map(p => <PackCard id={p} packEntry={packs[p]} onClick={() => onClick(p)} style={{border: p === showWidget ? '2px solid var(--accent)' : ''}}/>)
                     }
                 </div>
             </div>
-            {showWidget && <div className="container" style={{ flex: '60%', height: '100%', width: 'min-content', justifyContent: 'safe start', alignItems: 'safe center',  }}>
-                <div className="container" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', width: '100%', height: '100%', justifyContent: 'safe start', alignItems: 'safe center', }}>
-                    <div className="container" style={{ width: '100%', padding: '16px 0px 16px 0px', justifyContent: 'safe center', alignItems: 'safe center' }}>
+            {showWidget && <div className="container" style={{ flex: '60%', height: 'max-content', maxHeight: '100%', width: 'min-content', justifyContent: 'safe start', alignItems: 'safe center', flexGrow:1,  }}>
+                <div className="container" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', justifyContent: 'safe start', alignItems: 'safe center', padding: '16px 16px 16px 16px', width: 'fit-content'}}>
+                    <div className="container" style={{ width: '100%', justifyContent: 'safe center', alignItems: 'safe center' }}>
                         <PackInfo yOffset={window.scrollY} packEntry={packs[showWidget]} id={showWidget} onClose={() => setShowWidget(undefined)} fixed={true} style={{ width: '100%' }} />
                     </div>
                 </div>

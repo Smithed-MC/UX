@@ -8,7 +8,7 @@ export const markdownOptions: MarkdownToJSX.Options = {
 }
 
 export default function MarkdownRenderer({children, ...props}: any) {
-    return <Markdown options={markdownOptions} style={{ backgroundColor: 'var(--background)', padding: 16, borderRadius: 24, ...props.style }} {...props}>
+    return <Markdown options={markdownOptions} style={{ backgroundColor: 'var(--background)', padding: 16, borderRadius: 'var(--defaultBorderRadius)', ...props.style }} {...props}>
         {children}
     </Markdown>
 }

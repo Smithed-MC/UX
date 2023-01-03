@@ -85,7 +85,7 @@ export default function User() {
     if (userStats === undefined) return <div></div>
     return <div className='container' style={{ width: 'calc(100vw - 8px)', position: 'absolute', top: 0, height: '100vh', overflowY: 'auto', overflowX: 'hidden', justifyContent: 'safe start' }}>
         <div className='container' style={{ width: '100%', gap: 32, padding: 16 }}>
-            <div className='flexDirection' style={{ width: '66%', backgroundColor: 'var(--backgroundAccent)', borderRadius: 24, padding: 32, gap: 16 }}>
+            <div className='flexDirection' style={{ width: '66%', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', padding: 32, gap: 16 }}>
                 <img src={"data:image/png;base64,"} style={{ width: 128, height: 128, imageRendering: 'pixelated' }} />
                 <div className='statContainer' style={{ padding: 16, width: '100%' }}>
                     <div className="container" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between' }}>
