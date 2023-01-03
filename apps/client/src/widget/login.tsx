@@ -16,7 +16,7 @@ export default function Login() {
     return <form className="container" style={{ backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', padding: 24, gap: 16 }}>
         <h1>Login</h1>
         <input type="email" id="" placeholder="Email..." onChange={e => setEmail(e.currentTarget.value)} value={email}/>
-        <input type="password" placeholder="Password..." onChange={e => setPassword(e.currentTarget.value)} value={password}/>
+        <input type="password" placeholder="Password..." onChange={e => setPassword(e.currentTarget.value)} value={password} onKeyDown={(e) => {if(e.key === 'Enter') login()}}/>
         <input type="button" value="Login" onClick={login}/>
     </form>
 }

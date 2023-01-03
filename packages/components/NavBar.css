@@ -4,3 +4,39 @@
 .navButtonClosed:hover {
     opacity: 1;
 }
+
+
+@keyframes navbarSlidedown {
+    0% {
+        opacity: 1;
+        transform: translateY(0px);
+        z-index: -1;
+    }
+
+    25% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        z-index: -1;
+        opacity: 0;
+        display: none;
+        transform: translateY(75px);
+    }
+}
+
+@keyframes navbarTooltipEnter {
+    0% {
+        left: 32;
+        width: 0px;
+    }
+
+    100% {
+        left: 32;
+        width: calc(100%);
+    }
+}

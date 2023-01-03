@@ -156,41 +156,6 @@
     }
 }
 
-@keyframes navbarSlidedown {
-    0% {
-        opacity: 1;
-        transform: translateY(0px);
-        z-index: -1;
-    }
-
-    25% {
-        opacity: 0.5;
-    }
-
-    50% {
-        opacity: 0;
-    }
-
-    100% {
-        z-index: -1;
-        opacity: 0;
-        display: none;
-        transform: translateY(75px);
-    }
-}
-
-@keyframes navbarTooltipEnter {
-    0% {
-        left: 0;
-        width: fit-content(0%);
-    }
-
-    100% {
-        left: 32;
-        width: fit-content(100%);
-    }
-}
-
 .fadeIn {
     animation: fadeIn;
     animation-duration: 1s;

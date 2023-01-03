@@ -66,7 +66,9 @@ export function NavOption({ SVGComponent, path, title }: NavOptionProps) {
             padding: 8, borderRadius: 16, paddingLeft: '32px', paddingRight: 12,
             color: 'white',
             animation: 'navbarTooltipEnter 0.4s 1',
-            transition: 'transform 0.4s cubic-bezier(0.85, 0, 0.15, 1)'
+            transition: 'transform 0.4s cubic-bezier(0.85, 0, 0.15, 1)',
+            width: '100%',
+            alignItems: 'end'
         }}>
             {title}
         </div>

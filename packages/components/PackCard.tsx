@@ -48,41 +48,41 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
 
     function onWindowResize() {
         if (card.current) {
-            const images = card.current.getElementsByClassName('packImage')
-            const downloadBoxes = card.current.getElementsByClassName('downloadBox')
+            // const images = card.current.getElementsByClassName('packImage')
+            // const downloadBoxes = card.current.getElementsByClassName('downloadBox')
 
-            const width = card.current.getBoundingClientRect().width
+            // const width = card.current.getBoundingClientRect().width
 
-            if (width < 480) {
-                card.current.style.setProperty('flex-direction', 'column')
-                for (let i of images) {
-                    const image = i as HTMLImageElement
-                    image.style.setProperty('width', '64px');
-                    image.style.setProperty('height', '64px');
-                }
-                for (let d of downloadBoxes) {
-                    const downloadBox = d as HTMLDivElement
-                    downloadBox.style.setProperty('flex-direction', 'row')
-                    downloadBox.style.setProperty('width', '100%')
-                    downloadBox.style.setProperty('align-items', 'center')
-                    downloadBox.style.setProperty('justify-content', 'center')
-                }
-            } else {
-                card.current.style.setProperty('flex-direction', 'row')
+            // if (width < 480) {
+            //     card.current.style.setProperty('flex-direction', 'column')
+            //     for (let i of images) {
+            //         const image = i as HTMLImageElement
+            //         image.style.setProperty('width', '64px');
+            //         image.style.setProperty('height', '64px');
+            //     }
+            //     for (let d of downloadBoxes) {
+            //         const downloadBox = d as HTMLDivElement
+            //         downloadBox.style.setProperty('flex-direction', 'row')
+            //         downloadBox.style.setProperty('width', '100%')
+            //         downloadBox.style.setProperty('align-items', 'center')
+            //         downloadBox.style.setProperty('justify-content', 'center')
+            //     }
+            // } else {
+            //     card.current.style.setProperty('flex-direction', 'row')
 
-                for (let i of images) {
-                    const image = i as HTMLImageElement
-                    image.style.setProperty('width', '128px');
-                    image.style.setProperty('height', '128px');
-                }
-                for (let d of downloadBoxes) {
-                    const downloadBox = d as HTMLDivElement
-                    downloadBox.style.setProperty('flex-direction', 'column')
-                    downloadBox.style.setProperty('width', 'min-content')
-                    downloadBox.style.setProperty('align-items', 'end')
-                    downloadBox.style.setProperty('justify-content', 'start')
-                }
-            }
+            //     for (let i of images) {
+            //         const image = i as HTMLImageElement
+            //         image.style.setProperty('width', '128px');
+            //         image.style.setProperty('height', '128px');
+            //     }
+            //     for (let d of downloadBoxes) {
+            //         const downloadBox = d as HTMLDivElement
+            //         downloadBox.style.setProperty('flex-direction', 'column')
+            //         downloadBox.style.setProperty('width', 'min-content')
+            //         downloadBox.style.setProperty('align-items', 'end')
+            //         downloadBox.style.setProperty('justify-content', 'start')
+            //     }
+            // }
         }
     }
 
@@ -119,10 +119,10 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
     if (data === undefined || (data.display.hidden && match))
         return <div style={{ display: 'none' }} />
 
-    if (!loaded) return <div className="packCard" style={{...style}}>
-        <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%'}}>
+    if (!loaded) return <div className="packCard" style={{ ...style }}>
+        <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%' }}>
             <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 16, overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
-                <div className='packImage'/>
+                <div className='packImage' />
             </div>
             <div className='container fadeOut' style={{ alignItems: 'start', flexGrow: 1, gap: 8, width: '100%' }}>
                 <label className='' style={{ fontSize: 24, backgroundColor: 'var(--background)', maxWidth: 256, width: '100%', height: 24 }} />
@@ -134,13 +134,13 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
     return <div className="packCard" key={id} ref={card} onClick={(e) => {
         if (!(e.target instanceof HTMLDivElement || e.target instanceof HTMLLabelElement)) return
         if (onClick) onClick()
-    }} style={{...style}}>
+    }} style={{ ...style }}>
         <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%' }}>
             <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 16, overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
                 {!fallback && <img src={data.display.icon} className="packImage fadeIn" style={{ aspectRatio: '1 / 1', imageRendering: 'pixelated' }} onError={() => setFallback(true)} />}
                 {fallback && <QuestionMark className="packImage" style={{ fill: "var(--text)" }} />}
             </div>
-            <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, width: '100%', fontSize: 18 }}>
+            <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, maxWidth: '100%', fontSize: 18 }}>
                 <label className='' style={{ fontSize: 24, color: 'var(--accent2)' }}>
                     {data.display.name} <a style={{ fontSize: 16, color: 'var(--subText)', cursor: 'pointer' }} href={'/' + author}>by {author}</a>
                 </label>
