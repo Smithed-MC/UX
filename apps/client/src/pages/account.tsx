@@ -19,7 +19,7 @@ export default function Account() {
     
     (async () => {
         const userData = await (await fetch('https://api.smithed.dev/getUser?uid=' + user.uid)).json()
-        navigate(`../${userData.displayName}?uid=${user.uid}`)
+        navigate(`./${userData.displayName}?uid=${user.uid}`)
     })()
 
     return <div></div>

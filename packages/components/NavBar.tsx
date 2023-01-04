@@ -43,20 +43,21 @@ export function NavButton({ onOpen, onClose }: NavButtonProps) {
 
 interface NavOptionProps {
     SVGComponent: any
-    path: string
+    path: string;
+    navigateTo?: string;
     title: string
 }
 
-export function NavOption({ SVGComponent, path, title }: NavOptionProps) {
+export function NavOption({ SVGComponent, path, title, navigateTo }: NavOptionProps) {
     const navigate = useNavigate()
     const pathMatch = useMatch(path);
+    const navigatePathMatch = navigateTo ? useMatch(navigateTo) ? true : false : false;
     const [hover, setHover] = useState(false)
     function onClick() {
-        navigate(path)
+        navigate(navigateTo ?? path);
     }
 
-    const isOpen = pathMatch ? true : false;
-    console.log(isOpen)
+    const isOpen = pathMatch || navigatePathMatch ? true : false;
     return <button className={'button container ' + (isOpen ? 'navOptionOpen' : '')} style={{ width: 48, height: 48, overflow: 'visible', zIndex: 10, borderRadius: 24 }} onClick={onClick}
         onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>
         <div className={'container'} style={{
