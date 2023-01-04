@@ -113,7 +113,7 @@ export function NavBar({children}: {children: any}) {
         <NavButton onOpen={onOpen} onClose={onClose} />
         <div ref={navBarOptions} className='container' style={{
             display: open ? 'flex' : 'none',
-            gap: 8, padding: 10, backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)',
+            gap: 8, padding: 8, backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)',
             border: '4px solid var(--background)'
         }}>
             {children}
