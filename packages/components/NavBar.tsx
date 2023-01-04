@@ -1,6 +1,6 @@
 /// <reference types="vite-plugin-svgr/client" />
 import React, { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useMatch, useNavigate, useResolvedPath } from 'react-router-dom'
 
 import './style.css'
 import './NavBar.css'
@@ -49,14 +49,17 @@ interface NavOptionProps {
 
 export function NavOption({ SVGComponent, path, title }: NavOptionProps) {
     const navigate = useNavigate()
+    const pathMatch = useMatch(path);
     const [hover, setHover] = useState(false)
     function onClick() {
         navigate(path)
     }
 
-    return <button className='button container' style={{ width: 48, height: 48, overflow: 'visible', zIndex: 10, borderRadius: 24 }} onClick={onClick}
+    const isOpen = pathMatch ? true : false;
+    console.log(isOpen)
+    return <button className={'button container ' + (isOpen ? 'navOptionOpen' : '')} style={{ width: 48, height: 48, overflow: 'visible', zIndex: 10, borderRadius: 24 }} onClick={onClick}
         onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>
-        <div className='container' style={{
+        <div className={'container'} style={{
             display: hover ? 'inherit' : 'none',
             position: 'absolute',
             placeSelf: 'start',
@@ -68,7 +71,7 @@ export function NavOption({ SVGComponent, path, title }: NavOptionProps) {
             animation: 'navbarTooltipEnter 0.4s 1',
             transition: 'transform 0.4s cubic-bezier(0.85, 0, 0.15, 1)',
             width: '100%',
-            alignItems: 'end'
+            alignItems: 'end',
         }}>
             {title}
         </div>
@@ -105,7 +108,7 @@ export function NavBar({children}: {children: any}) {
         <NavButton onOpen={onOpen} onClose={onClose} />
         <div ref={navBarOptions} className='container' style={{
             display: open ? 'flex' : 'none',
-            gap: 8, padding: 8, backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)',
+            gap: 8, padding: 10, backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)',
             border: '4px solid var(--background)'
         }}>
             {children}
