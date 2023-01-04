@@ -142,7 +142,7 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
             </div>
             <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, maxWidth: '100%', fontSize: 18 }}>
                 <label className='' style={{ fontSize: 24, color: 'var(--accent2)' }}>
-                    {data.display.name} <a style={{ fontSize: 16, color: 'var(--subText)', cursor: 'pointer' }} href={'/account/' + author}>by {author}</a>
+                    {data.display.name} <a style={{ fontSize: 16, color: 'var(--subText)', cursor: 'pointer' }} href={'/' + author}>by {author}</a>
                 </label>
                 {data.display.description}
             </div>
