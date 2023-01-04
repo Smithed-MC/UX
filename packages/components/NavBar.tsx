@@ -1,6 +1,7 @@
 /// <reference types="vite-plugin-svgr/client" />
 import React, { useRef, useState } from 'react'
-import { useMatch, useNavigate, useResolvedPath } from 'react-router-dom'
+import { useMatch, useNavigate } from 'react-router-dom'
+import { useQueryParams } from 'hooks'
 
 import './style.css'
 import './NavBar.css'
@@ -44,12 +45,15 @@ export function NavButton({ onOpen, onClose }: NavButtonProps) {
 interface NavOptionProps {
     SVGComponent: any
     path: string;
-    navigateTo?: string;
     title: string
+    navigateTo?: string;
+    withSpecialQueryParam?: string;
 }
 
-export function NavOption({ SVGComponent, path, title, navigateTo }: NavOptionProps) {
-    const navigate = useNavigate()
+export function NavOption({ SVGComponent, path, title, navigateTo, withSpecialQueryParam }: NavOptionProps) {
+    const navigate = useNavigate();
+    const queryParams = useQueryParams()
+    console.log(queryParams);
     const pathMatch = useMatch(path);
     const navigatePathMatch = navigateTo ? useMatch(navigateTo) ? true : false : false;
     const [hover, setHover] = useState(false)
@@ -57,7 +61,7 @@ export function NavOption({ SVGComponent, path, title, navigateTo }: NavOptionPr
         navigate(navigateTo ?? path);
     }
 
-    const isOpen = pathMatch || navigatePathMatch ? true : false;
+    const isOpen = ((pathMatch && (withSpecialQueryParam ? queryParams?.[withSpecialQueryParam] : true)) || navigatePathMatch) ? true : false;
     return <button className={'button container ' + (isOpen ? 'navOptionOpen' : '')} style={{ width: 48, height: 48, overflow: 'visible', zIndex: 10, borderRadius: 24 }} onClick={onClick}
         onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>
         <div className={'container'} style={{
