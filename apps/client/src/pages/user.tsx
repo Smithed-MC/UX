@@ -100,7 +100,7 @@ export default function User() {
                 </div>
             </div>
             {userStats.packs.length > 0 && <div className='container' style={{ gap: 16, width: '66%', justifyContent: 'safe start' }}>
-                {userStats?.packs?.map(p => <PackCard editable={editable} packData={p} id={userStats.id + ":" + p.id} onClick={() => { navigate('/account/' + p.id) }} />)}
+                {userStats?.packs?.map(p => <PackCard editable={editable} packData={p} id={userStats.id + ":" + p.id} onClick={() => { navigate(p.id) }} />)}
             </div>}
         </div>
     </div>
