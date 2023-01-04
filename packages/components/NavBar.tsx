@@ -75,8 +75,8 @@ export function NavOption({ SVGComponent, path, title }: NavOptionProps) {
         }}>
             {title}
         </div>
-        <div className='container' style={{ backgroundColor: 'var(--accent)', zIndex: 1, borderRadius: 24, width: 48, height: 48 }}>
-            <SVGComponent style={{ fill: "var(--buttonText)", margin: 12 }} />
+        <div className='container' style={{ backgroundColor: isOpen ? 'var(--buttonText)' : 'var(--accent)', zIndex: 1, borderRadius: 24, width: 48, height: 48 }}>
+            <SVGComponent style={{ fill: isOpen ? 'var(--accent)' : "var(--buttonText)", margin: 12 }} />
         </div>
     </button>
 }

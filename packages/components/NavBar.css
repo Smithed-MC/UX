@@ -4,22 +4,6 @@
 .navButtonClosed:hover {
     opacity: 1;
 }
-.navOptionOpen {
-    position: relative;
-}
-.navOptionOpen {
-    transform: translateX(.2rem);
-}
-.navOptionOpen::before {
-    content: '';
-    background-color: var(--buttonText);
-    width: .24rem;
-    position: absolute;
-    top: .3rem;
-    bottom: .3rem;
-    left: -.4rem;
-    border-radius: .2rem;
-}
 
 
 @keyframes navbarSlidedown {
