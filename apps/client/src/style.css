@@ -58,6 +58,7 @@ pre {
 
 a {
     color: var(--accent2);
+    cursor: pointer;
 }
 
 a:hover {

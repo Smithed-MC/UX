@@ -73,12 +73,17 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
 
             data.display.webPage = correctGithubLinks(data.display.webPage??'')
             console.log('Post coercion:', data.display.webPage)
-            const resp = await fetch(data.display.webPage ?? '', {})
+            let resp: any;
+            try {
+                resp = await fetch(data.display.webPage ?? '', {})
+            } catch (err) {
+                return;
+            }
             if (resp.status !== 200)
                 return await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(data.display.webPage ?? '')}`)
             return resp
         })()
-        if (!response.ok) return setFullviewPage('')
+        if (!response?.ok) return setFullviewPage('')
         const text = await response.text()
         setFullviewPage(text)
     }
