@@ -30,14 +30,20 @@ export default function Packs() {
         <Spinner />
     </div>
 
-    return <div className='panelContainer' style={{ height: '100%', overflowX: 'hidden', gap: 32, overflow: "hidden", width: '100vw' }}>
-        <div className="container" style={{ overflow: 'auto', height: '100%', padding: '0px 16px', justifyContent: 'safe start', alignItems: 'safe center', width: '100%' }}>
-        <div className="container" style={{ width: '100%', padding: '16px 0px 16px 0px', justifyContent: 'safe center', alignItems: 'safe center' }}>
-                <PackInfo packData={data} id={owner + ':' + id} onClose={() => { }} yOffset={0} fixed={false} style={{ flex: '66%', flexShrink: 0, width: '100%' }} />
+    return <div className='panelContainer' style={{ width: '100vw', overflowY: 'clip' }}>
+        <div className="container" style={{ overflow: 'auto', height: '100%', padding: '0px 16px', justifyContent: 'safe start', alignItems: 'safe center' }}>
+            <div className="container" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', justifyContent: 'safe start', alignItems: 'safe center', padding: '16px 16px 16px 16px' }}>
+                <div className="container" style={{ justifyContent: 'safe center', alignItems: 'safe center' }}>
+                    <PackInfo yOffset={window.scrollY} packData={data} id={owner + ':' + id} fixed={false} onClose={() => { }} style={{}} />
+                </div>
             </div>
         </div>
-        {data !== undefined && <div style={{ flex: "33%", paddingRight: 40, paddingTop: 16, overflowY: 'auto', overflowX: 'clip' }} >
-            <Download packData={data} id={owner + ':' + id} />
-        </div>}
+        {data !== undefined &&
+            <div className="container" style={{ width: 'max-content' }}>
+                <div className="container" style={{ padding: '16px 24px 16px 24px', gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100vh', width: 'max-content', justifyContent: 'safe start', alignItems: 'safe center' }}>
+                    <Download packData={data} id={owner + ':' + id} style={{ height: 'auto' }} />
+                </div>
+            </div>
+        }
     </div>
 }

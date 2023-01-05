@@ -12,7 +12,7 @@
     font-size: 24px;
 }
 
-@media screen and (width <= 868px) {
+@media screen and (max-width: 868px) {
     .statBoxes {
         flex-flow: wrap;
         justify-content: center;
@@ -29,7 +29,7 @@
         flex-direction: column;
     }
 }
-@media screen and (width > 868px) {
+@media screen and (min-width: 868px) {
     
     .statBoxes {
         flex-flow: row;

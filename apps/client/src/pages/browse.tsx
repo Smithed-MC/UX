@@ -43,8 +43,7 @@ export default function Browse(props: any) {
         setPacks(data)
     }
     function onClick(p: string) {
-        console.log(rootDiv.current?.clientWidth)
-        if (screen.width < 1024) return navigate(`../${p.split(':').join('/')}`)
+        if ((rootDiv.current?.clientWidth ?? 0) < 1024) return navigate(`../${p.split(':').join('/')}`)
         setShowWidget(showWidget === p ? undefined : p)
     }
     function getDownloads(p: string) {

@@ -30,3 +30,14 @@
         opacity: 1;
     }
 }
+
+@media screen and (max-width: 480px) {
+    .packImage {
+        display: none;
+    }
+}
+@media screen and (min-width: 480px) {
+    .packImage {
+        display: inherit;
+    }
+}

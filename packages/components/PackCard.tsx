@@ -46,50 +46,9 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
         setAuthor(data.displayName)
     }
 
-    function onWindowResize() {
-        if (card.current) {
-            // const images = card.current.getElementsByClassName('packImage')
-            // const downloadBoxes = card.current.getElementsByClassName('downloadBox')
-
-            // const width = card.current.getBoundingClientRect().width
-
-            // if (width < 480) {
-            //     card.current.style.setProperty('flex-direction', 'column')
-            //     for (let i of images) {
-            //         const image = i as HTMLImageElement
-            //         image.style.setProperty('width', '64px');
-            //         image.style.setProperty('height', '64px');
-            //     }
-            //     for (let d of downloadBoxes) {
-            //         const downloadBox = d as HTMLDivElement
-            //         downloadBox.style.setProperty('flex-direction', 'row')
-            //         downloadBox.style.setProperty('width', '100%')
-            //         downloadBox.style.setProperty('align-items', 'center')
-            //         downloadBox.style.setProperty('justify-content', 'center')
-            //     }
-            // } else {
-            //     card.current.style.setProperty('flex-direction', 'row')
-
-            //     for (let i of images) {
-            //         const image = i as HTMLImageElement
-            //         image.style.setProperty('width', '128px');
-            //         image.style.setProperty('height', '128px');
-            //     }
-            //     for (let d of downloadBoxes) {
-            //         const downloadBox = d as HTMLDivElement
-            //         downloadBox.style.setProperty('flex-direction', 'column')
-            //         downloadBox.style.setProperty('width', 'min-content')
-            //         downloadBox.style.setProperty('align-items', 'end')
-            //         downloadBox.style.setProperty('justify-content', 'start')
-            //     }
-            // }
-        }
-    }
 
     async function onLoad() {
 
-        onWindowResize()
-        window.addEventListener('resize', onWindowResize)
         if (packEntry === undefined)
             packEntry = await (await fetch(`https://api.smithed.dev/getPack?pack=${id}`)).json()
 
@@ -106,7 +65,7 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
         setLoaded(true)
     }
 
-    useEffect(() => { onLoad(); return () => window.removeEventListener('resize', onWindowResize) }, [])
+    useEffect(() => { onLoad(); }, [])
 
     function getTotalDownloads(packEntry: PackEntry) {
         let total = 0
