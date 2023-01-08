@@ -36,7 +36,7 @@ const router = createBrowserRouter([
             <NavBar>
                 <NavOption SVGComponent={HomeSvg} path='/' title='Home' />
                 <NavOption SVGComponent={SearchSvg} path='/browse' title='Browse' />
-                <NavOption SVGComponent={AccountSvg} path='/account' title='Account' />
+                <NavOption SVGComponent={AccountSvg} path='/:owner' navigateTo='/account' withSpecialQueryParam='uid' title='Account' />
                 <NavOption SVGComponent={SettingsSvg} path='/settings' title='Settings' />
             </NavBar>
             <Outlet />
@@ -63,7 +63,7 @@ const router = createBrowserRouter([
                 element: <Edit/>,
             },
             {
-                path: ":owner/",
+                path: ":owner",
                 element: <User />
             },
             {

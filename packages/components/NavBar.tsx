@@ -1,6 +1,7 @@
 /// <reference types="vite-plugin-svgr/client" />
 import React, { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useMatch, useNavigate } from 'react-router-dom'
+import { useQueryParams } from 'hooks'
 
 import './style.css'
 import './NavBar.css'
@@ -43,20 +44,27 @@ export function NavButton({ onOpen, onClose }: NavButtonProps) {
 
 interface NavOptionProps {
     SVGComponent: any
-    path: string
+    path: string;
     title: string
+    navigateTo?: string;
+    withSpecialQueryParam?: string;
 }
 
-export function NavOption({ SVGComponent, path, title }: NavOptionProps) {
-    const navigate = useNavigate()
+export function NavOption({ SVGComponent, path, title, navigateTo, withSpecialQueryParam }: NavOptionProps) {
+    const navigate = useNavigate();
+    const queryParams = useQueryParams()
+    console.log(queryParams);
+    const pathMatch = useMatch(path);
+    const navigatePathMatch = navigateTo ? useMatch(navigateTo) ? true : false : false;
     const [hover, setHover] = useState(false)
     function onClick() {
-        navigate(path)
+        navigate(navigateTo ?? path);
     }
 
-    return <button className='button container' style={{ width: 48, height: 48, overflow: 'visible', zIndex: 10, borderRadius: 24 }} onClick={onClick}
+    const isOpen = ((pathMatch && (withSpecialQueryParam ? queryParams?.[withSpecialQueryParam] : true)) || navigatePathMatch) ? true : false;
+    return <button className={'button container ' + (isOpen ? 'navOptionOpen' : '')} style={{ width: 48, height: 48, overflow: 'visible', zIndex: 10, borderRadius: 24 }} onClick={onClick}
         onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>
-        <div className='container' style={{
+        <div className={'container'} style={{
             display: hover ? 'inherit' : 'none',
             position: 'absolute',
             placeSelf: 'start',
@@ -68,12 +76,12 @@ export function NavOption({ SVGComponent, path, title }: NavOptionProps) {
             animation: 'navbarTooltipEnter 0.4s 1',
             transition: 'transform 0.4s cubic-bezier(0.85, 0, 0.15, 1)',
             width: '100%',
-            alignItems: 'end'
+            alignItems: 'end',
         }}>
             {title}
         </div>
-        <div className='container' style={{ backgroundColor: 'var(--accent)', zIndex: 1, borderRadius: 24, width: 48, height: 48 }}>
-            <SVGComponent style={{ fill: "var(--buttonText)", margin: 12 }} />
+        <div className='container' style={{ backgroundColor: isOpen ? 'var(--buttonText)' : 'var(--accent)', zIndex: 1, borderRadius: 24, width: 48, height: 48 }}>
+            <SVGComponent style={{ fill: isOpen ? 'var(--accent)' : "var(--buttonText)", margin: 12 }} />
         </div>
     </button>
 }
