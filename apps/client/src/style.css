@@ -21,7 +21,7 @@
     --subText: #aaa;
     --smallScreenSize: 640px;
     
-    --defaultBorderRadius: 16px;
+    --defaultBorderRadius: 10px;
     overflow: hidden;
 }
 
@@ -43,8 +43,10 @@ h1 {
 code {
     color: var(--codeText);
     background-color: rgba(255, 255, 255, 0.1);
-    padding-left: 4px;
-    padding-right: 4px;
+    padding: 8px;
+    box-sizing: border-box;
+    line-height: 36px;
+    border-radius: var(--defaultBorderRadius);
 }
 
 
@@ -89,6 +91,8 @@ summary:active {
 
 }
 
+::-webkit-
+
 ::-webkit-scrollbar-thumb {
     width: 4px;
     background-color: var(--subText);
@@ -113,6 +117,7 @@ input, select {
     border-bottom: 2px solid var(--accent);
     border-right: 2px solid var(--accent);
     box-sizing: border-box;
+
 }
 
 select select {
@@ -146,5 +151,10 @@ input[type="button"]:active {
 }
 
 select {
-
+    background-image: url(./assets/green_down-arrow.png);
+    background-blend-mode:overlay;
+    background-position: right;
+    background-repeat: no-repeat;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }

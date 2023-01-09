@@ -3,8 +3,9 @@
     position: absolute;
     display: grid !important;
     top: 0;
+    left: 0;
     height: 100vh;
-    place-content: safe start;
+    
 }
 @media screen and (max-width: 768px) {
     .panelContainer {
@@ -14,6 +15,6 @@
 }
 @media screen and (min-width: 768px) {
     .panelContainer {
-        grid-template-columns: auto auto;
+        grid-template-columns:auto minmax(auto, 320px);
     }
 }

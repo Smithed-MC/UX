@@ -114,14 +114,15 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
 
     useEffect(() => { onLoad() }, [id, packData])
 
-    return <div className='container' style={{ height: 'auto', ...style }}>
-        <div ref={spinnerDiv} className="container" key="spinner" style={{ height: fixed ? '97vh' : '100%', marginTop: yOffset }}><Spinner /></div>
+    return <div className='container packInfoRoot' style={{ height: 'auto', width: '100%', ...style }}>
+        <div ref={spinnerDiv} className="container" key="spinner" style={{ height: fixed ? '100%' : '100%', marginTop: yOffset, boxSizing: 'border-box' }}><Spinner /></div>
         {data !== undefined && <div className="container" style={{
             justifyContent: 'start', 
             backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)',
             padding: 16, marginTop: yOffset,
             display: 'none',
-
+            boxSizing: 'border-box',
+            width: '100%'
         }} ref={parentDiv}>
             <div className="container" style={{ flexDirection: fixed ? 'column' : 'row', width: '100%', justifyContent: 'center', gap: fixed ? 0 : 16 }}>
                 <div className='container' style={{ flex: '33%', width: '100%', justifyContent: fixed ? 'left' : 'right', flexDirection: 'row' }}>

@@ -1,12 +1,13 @@
 import { e } from '@tauri-apps/api/event-2a9960e7'
 import { ErrorPage, MarkdownRenderer, Spinner } from 'components'
-import { Cross, Info, Left, Right, Trash } from 'components/svg'
+import { Back, Cross, Info, Left, Right, Save, Trash } from 'components/svg'
 import { MinecraftVersion, PackData, PackDependency, PackVersion, packCategories } from 'data-types'
 import { formatDownloadURL } from 'formatters'
 import { useFirebaseUser, useQueryParams } from 'hooks'
 import React, { CSSProperties, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { coerce, compare, valid } from 'semver'
+import './edit.css'
 
 interface InputWithTooltipProps {
     tooltip: any,
@@ -41,8 +42,8 @@ interface EditorInputProps {
 
 function Tooltip({ description, style, offset }: { description: string, offset?: number, style?: React.CSSProperties }) {
     const [hover, setHover] = useState(false)
-    return <div style={{ width: 0, height: 0, marginBottom: 16, ...style }}>
-        <Info style={{ fill: 'var(--accent)', width: 16, height: 16, marginLeft: offset ?? -26, opacity: hover ? 1 : 0.5, backgroundColor: 'var(--buttonText)', borderRadius: 16, border: '1px solid var(--buttonText)' }} onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)} />
+    return <div style={{ width: 0, height: 0, marginBottom: 18, ...style }}>
+        <Info style={{ fill: 'var(--accent)', width: 16, height: 16, marginLeft: offset ?? -26, opacity: hover ? 1 : 0.5, backgroundColor: 'var(--buttonText)', borderRadius: 'var(--defaultBorderRadius)', border: '1px solid var(--buttonText)' }} onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)} />
         {hover && <div className="fadeIn" style={{ animationDuration: '0.3s', position: 'absolute', backgroundColor: 'var(--accent)', borderRadius: 'var(--defaultBorderRadius)', padding: 8 }}>{description}</div>}
     </div>
 
@@ -144,7 +145,7 @@ function DownloadURLInput({ reference, attr, description, header }: EditorInputP
 
                 setValid(true)
 
-            }}>Test</button>
+            }}>Validate</button>
         </div>
         {error && <label style={{ color: 'var(--badAccent)', padding: 4 }}>{error}</label>}
         {valid && <label style={{ color: 'var(--goodAccent)', padding: 4 }}>Download is working!</label>}
@@ -348,6 +349,7 @@ export default function Edit() {
     const [mcVersions, setMCVersions] = useState<string[]>([])
     const [supportedVersions, setSupportedVersions] = useState<MinecraftVersion[] | undefined>(packData?.versions[selectedVersion].supports)
     const deleteButtonRef = useRef<HTMLLabelElement>(null)
+    const saveTextRef = useRef<HTMLDivElement>(null)
     let deleteConfirmation = 0;
 
     useEffect(() => {
@@ -367,8 +369,10 @@ export default function Edit() {
     }
     useEffect(() => { onLoad() }, [pack, user])
 
-    if (user == null) return <ErrorPage title="Error 401" description='Not signed in!' returnLink='/' returnMessage='Back to Home' />
-    if (packData === undefined) return <div className="container" style={{ width: '100%', height: '95vh' }}>
+    if (user == null) return <div style={{animation: 'fadeIn 1s'}}>
+        <ErrorPage title="Error 401" description='Not signed in!' returnLink='/' returnMessage='Back to Home' />
+    </div>
+    if (packData === undefined) return <div className="container" style={{ width: '100%', height: '100vh', boxSizing: 'border-box' }}>
         <Spinner />
     </div>
 
@@ -439,18 +443,24 @@ export default function Edit() {
                 <RenderDependencies dependencies={versions[selectedVersion].dependencies ?? []} onRemoveDependency={updateVersions} />
             </Editor>
         </div >
-        <div className='container' style={{ flexDirection: 'row', position: 'fixed', bottom: 8, left: '50%', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, gap: 16, border: '4px solid var(--background)' }}>
-            <button className='button' style={{ fontSize: 16 }} onClick={() => {
+        <div className='container' style={{ flexDirection: 'row', position: 'fixed', bottom: 8, right: 8, justifySelf: 'center', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, gap: 16, border: '4px solid var(--background)', boxSizing: 'border-box' }}>
+            <button className='button' style={{ width: 36, height: 36 }} title='Back' onClick={() => {
                 navigate(-1)
-            }}>Back</button>
-            <button className='button' style={{ fontSize: 16 }} onClick={async () => {
+            }}><Back style={{ stroke: 'var(--buttonText)', fill: 'var(--buttonText)' }} /></button>
+            <button className='button' style={{ width: 36, height: 36 }} title='Save' onClick={async () => {
                 console.log(packData)
-                const resp = await fetch(`https://api.smithed.dev/setUserPack?uid=${user.uid}&pack=${pack}&token=${await user.getIdToken()}`, { method: 'POST', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" }})
-                
-                if(resp.status !== 200) {
+                const resp = await fetch(`https://api.smithed.dev/setUserPack?uid=${user.uid}&pack=${pack}&token=${await user.getIdToken()}`, { method: 'POST', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
+
+                if (resp.status !== 200) {
                     alert(await resp.text())
+                } else {
+                    saveTextRef.current?.style.setProperty('animation', 'fadeInAndOut 5s')
+                    setTimeout(() => {
+                        saveTextRef.current?.style.setProperty('animation', '')
+                    }, 5000)
                 }
-            }}>Save</button>
+            }}><Save style={{ stroke: 'var(--buttonText)' }} /></button>
         </div>
+        <div style={{ display: 'flex', position: 'fixed', bottom: 0, width: '100%', visibility: 'hidden', height: '48px', fontSize: 18, justifyContent: 'center', color: 'var(--goodAccent)' }} ref={saveTextRef}>Pack saved</div>
     </div >
 }

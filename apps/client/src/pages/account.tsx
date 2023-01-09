@@ -10,7 +10,7 @@ export default function Account() {
     const navigate = useNavigate()
 
     if(user == null) {
-        return <div className="container" style={{width: '100vw', height: '100vh', top: 0, position: 'absolute', right: 0}}>
+        return <div className="container" style={{width: '100vw', height: '100vh', top: 0, position: 'absolute', right: 0, animation: 'fadeIn 1s', boxSizing: 'border-box'}}>
             <Login/>
         </div>
     }

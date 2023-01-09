@@ -12,31 +12,7 @@ export default function Browse(props: any) {
     const rootDiv = useRef<HTMLDivElement>(null)
 
 
-
-    function onWindowResize() {
-        if (rootDiv.current) {
-            if (rootDiv.current.clientWidth < 1024) {
-                rootDiv.current.style.setProperty('flex-direction', 'column')
-                rootDiv.current.style.setProperty('justify-content', 'center')
-                rootDiv.current.style.setProperty('align-items', 'center')
-                const packCardContainer = rootDiv.current.getElementsByClassName('packCardContainer')[0] as HTMLDivElement
-                packCardContainer.style.width = '80%'
-
-                setShowWidget('')
-            }
-            else {
-                rootDiv.current.style.setProperty('flex-direction', 'row')
-                rootDiv.current.style.setProperty('align-items', 'start')
-                const packCardContainer = rootDiv.current.getElementsByClassName('packCardContainer')[0] as HTMLDivElement
-                packCardContainer.style.width = '40%'
-            }
-        }
-    }
-
     async function onLoad() {
-        onWindowResize()
-        window.addEventListener('resize', onWindowResize)
-
         const response = await fetch('https://api.smithed.dev/getPacks')
         const data = await response.json()
         // console.log(data)
@@ -53,37 +29,29 @@ export default function Browse(props: any) {
         return sum
     }
 
-    useEffect(() => { onLoad(); return () => window.removeEventListener('resize', onWindowResize) }, [])
+    useEffect(() => { onLoad(); }, [])
 
-    return <div className="mainDiv" style={{  height: '100vh', top: 0, gap: 32, position: 'absolute', width: '100vw' }}>
-        <div className='container' style={{
-            alignItems: 'safe start', justifyContent: 'safe center', gap: 32, 
-            height: '100%', width: 'calc(100vw - 24px)', 
-            flexDirection: 'row', 
-            paddingLeft: 16}} 
-            ref={rootDiv}
-        >
-            {!showWidget && <div className="container" style={{ width: '33%' }}>
+    return <div className="mainDiv" style={{ height: '100%', top: 0, gap: 32, position: 'absolute', width: '100vw' }}>
+        <div className={showWidget ? 'browserRootWidget' : 'browserRoot'} ref={rootDiv}>
+            {!showWidget && <div className="container" style={{ width: '100%' }}>
 
             </div>}
-            <div className="container packCardContainer" style={{ flex: showWidget ? '40%' : '66%', width: '40%', height: '100%' }}>
-                <div className="container" style={{ padding: '16px 24px 16px 24px', gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }}>
+            <div className="container packCardContainer" style={{height: '100vh'}}>
+                <div className="container" style={{ padding: '16px 16px 16px 16px', gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }}>
                     {Object.keys(packs)
                         .filter(p => packs[p].owner !== undefined)
                         .sort((a, b) => getDownloads(a) - getDownloads(b))
                         .reverse()
-                        .map(p => <PackCard id={p} packEntry={packs[p]} onClick={() => onClick(p)} style={{border: p === showWidget ? '2px solid var(--accent)' : ''}}/>)
+                        .map(p => <PackCard id={p} packEntry={packs[p]} onClick={() => onClick(p)} style={{ border: p === showWidget ? '2px solid var(--accent)' : '' }} />)
                     }
                 </div>
             </div>
-            {showWidget && <div className="container" style={{ flex: '60%', height: 'max-content', maxHeight: '100%', width: 'min-content', justifyContent: 'safe start', alignItems: 'safe center', flexGrow:1,  }}>
-                <div className="container" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', justifyContent: 'safe start', alignItems: 'safe center', padding: '16px 16px 16px 16px', width: 'fit-content'}}>
-                    <div className="container" style={{ width: '100%', justifyContent: 'safe center', alignItems: 'safe center' }}>
-                        <PackInfo yOffset={window.scrollY} packEntry={packs[showWidget]} id={showWidget} onClose={() => setShowWidget(undefined)} fixed={true} style={{ width: '100%' }} />
-                    </div>
+            {showWidget && <div className="container" style={{ height: '100%', boxSizing: 'border-box', justifyContent: 'safe start', alignItems: 'safe center', width: '100%' }}>
+                <div className="container" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', width: '100%', justifyContent: 'safe start', alignItems: 'safe center', padding: '16px 16px 16px 16px', boxSizing: 'border-box'}}>
+                        <PackInfo yOffset={window.scrollY} packEntry={packs[showWidget]} id={showWidget} onClose={() => setShowWidget(undefined)} fixed={true} />
                 </div>
             </div>}
-            {!showWidget && <div className="container rightPanel" style={{ width: '33%' }}>
+            {!showWidget && <div className="container" style={{ width: '100%' }}>
 
             </div>}
         </div>

@@ -41,3 +41,9 @@
         display: inherit;
     }
 }
+
+.packInfoRoot {
+    box-sizing: border-box;
+    width: 100%;
+    justify-content: safe start;
+}

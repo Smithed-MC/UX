@@ -20,27 +20,25 @@ export default function Packs() {
     useEffect(() => { onLoad() }, [owner, id])
 
 
-    if (notFound) return <div className="container" style={{ width: '100%', height: '95vh', gap: 8 }}>
+    if (notFound) return <div className="container" style={{ width: '100%', height: '95vh', gap: 8, boxSizing: 'border-box' }}>
         <h1 style={{ color: 'var(--badAccent)', marginBottom: 0 }}>Error 404</h1>
         <label style={{ fontSize: 24, marginBottom: 16 }}>That pack could not be found!</label>
-        <a className="button" href="/browse" style={{ padding: 12, borderRadius: 32 }}>Back to Browse</a>
+        <a className="button" href="/browse" style={{ padding: 12, borderRadius: 'var(--defaultBorderRadius)' }}>Back to Browse</a>
     </div>
 
     if (data === undefined) return <div className="container" style={{ width: '100%', height: '95vh' }}>
         <Spinner />
     </div>
 
-    return <div className='panelContainer' style={{ width: '100vw', overflowY: 'clip' }}>
-        <div className="container" style={{ overflow: 'auto', height: '100%', padding: '0px 16px', justifyContent: 'safe start', alignItems: 'safe center' }}>
-            <div className="container" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', justifyContent: 'safe start', alignItems: 'safe center', padding: '16px 16px 16px 16px' }}>
-                <div className="container" style={{ justifyContent: 'safe center', alignItems: 'safe center' }}>
-                    <PackInfo yOffset={window.scrollY} packData={data} id={owner + ':' + id} fixed={false} onClose={() => { }} style={{}} />
-                </div>
+    return <div className='panelContainer' style={{ width: '100vw', overflowY: 'clip', boxSizing: 'border-box' }}>
+        <div className="container" style={{ overflow: 'clip', height: '100%', padding: '0px 16px', justifyContent: 'safe start', alignItems: 'safe center', width: '100%', boxSizing: 'border-box' }}>
+            <div className="container" style={{ width: '100%',gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', justifyContent: 'safe start', alignItems: 'safe center', padding: '16px 16px 16px 16px' }}>
+                <PackInfo yOffset={window.scrollY} packData={data} id={owner + ':' + id} fixed={false} onClose={() => { }} style={{}} />
             </div>
         </div>
         {data !== undefined &&
-            <div className="container" style={{ width: 'max-content' }}>
-                <div className="container" style={{ padding: '16px 24px 16px 24px', gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100vh', width: 'max-content', justifyContent: 'safe start', alignItems: 'safe center' }}>
+            <div className="container" style={{ width: '100%' }}>
+                <div className="container" style={{ padding: '16px 16px 16px 16px', gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100vh', width: '100%', justifyContent: 'safe start', alignItems: 'safe center', boxSizing: 'border-box' }}>
                     <Download packData={data} id={owner + ':' + id} style={{ height: 'auto' }} />
                 </div>
             </div>

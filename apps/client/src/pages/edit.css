@@ -1,0 +1,17 @@
+@keyframes fadeInAndOut {
+    0% {
+        opacity: 0;
+        visibility: visible;
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        visibility: hidden;
+        
+    }
+}

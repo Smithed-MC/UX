@@ -80,7 +80,7 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
 
     if (!loaded) return <div className="packCard" style={{ ...style }}>
         <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%' }}>
-            <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 16, overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
+            <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)', overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
                 <div className='packImage' />
             </div>
             <div className='container fadeOut' style={{ alignItems: 'start', flexGrow: 1, gap: 8, width: '100%' }}>
@@ -95,7 +95,7 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
         if (onClick) onClick()
     }} style={{ ...style }}>
         <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%' }}>
-            <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 16, overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
+            <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)', overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
                 {!fallback && <img src={data.display.icon} className="packImage fadeIn" style={{ aspectRatio: '1 / 1', imageRendering: 'pixelated' }} onError={() => setFallback(true)} />}
                 {fallback && <QuestionMark className="packImage" style={{ fill: "var(--text)" }} />}
             </div>

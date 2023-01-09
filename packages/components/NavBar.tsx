@@ -35,7 +35,7 @@ export function NavButton({ onOpen, onClose }: NavButtonProps) {
     }
 
     return <button ref={button} className={"button" + (!open ? ' navButtonClosed': '')} style={{
-        width: 64, height: 64, borderRadius: 'var(--defaultBorderRadius)', padding: 12,
+        width: 48, height: 48, borderRadius: 'var(--defaultBorderRadius)', padding: 12,
     }} onClick={onInternalButtonClick}>
         <MenuBars style={{ fill: "var(--buttonText)", display: !open ? 'inherit' : 'none' }} />
         <Cross style={{ stroke: "var(--buttonText)", display: open ? 'inherit' : 'none' }} />
@@ -109,10 +109,11 @@ export function NavBar({children}: {children: any}) {
         overflowY: 'hidden',
         overflow: 'visible',
         zIndex: 100
-    }}>
+    }} onMouseLeave={() => {onClose()}}>
         <NavButton onOpen={onOpen} onClose={onClose} />
         <div ref={navBarOptions} className='container' style={{
-            display: open ? 'flex' : 'none',
+            display: 'flex',
+            visibility: open ? 'visible' : 'hidden',
             gap: 8, padding: 8, backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)',
             border: '4px solid var(--background)'
         }}>
