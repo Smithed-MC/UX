@@ -51,7 +51,6 @@ const router = createBrowserRouter([
                 element: <div>
                     <h1>Settings</h1>
                     Version: 0.3.0
-                    
                 </div>
             },
             {
