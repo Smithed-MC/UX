@@ -12,23 +12,28 @@ on:
 jobs:
   publish:
     runs-on: ${{ matrix.os }}
-
+    env:
+       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+       TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+       TURBO_REMOTE_ONLY: true
     strategy:
       matrix:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Use Node.js
       uses: actions/setup-node@v3.5.1
       with:
         node-version: 17.x
+        cache: 'npm'
     - name: Setup Rust environment
       # You may pin to the exact commit or the version.
       # uses: raftario/setup-rust-action@f74294776374514bbcc27b4623c1b220ef9394bf
       uses: raftario/setup-rust-action@v1.0.0
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+        
     - if: ${{ matrix.os == 'ubuntu-latest'}}
       run: |
             npm i turbo-linux-64 @tauri-apps/cli-linux-x64-gnu && 
