@@ -26,7 +26,9 @@ jobs:
       id: cache-cargo-deps
       uses: actions/cache@v3
       with:
-        path: platforms/desktop/src-tauri/target/release/deps
+        path: |
+          platforms/desktop/src-tauri/target/release/deps
+          platforms/desktop/src-tauri/target/release/build
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
     - name: Use Node.js
       uses: actions/setup-node@v3.5.1
