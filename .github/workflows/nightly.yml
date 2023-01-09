@@ -22,6 +22,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Cache Cargo Deps
+      id: cache-cargo-deps
+      uses: actions/cache@v3
+      with:
+        path: platforms/desktop/src-tauri/target/release/deps
+        key: ${{ runner.os }}-cargo-deps
     - name: Use Node.js
       uses: actions/setup-node@v3.5.1
       with:
