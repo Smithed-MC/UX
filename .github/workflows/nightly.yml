@@ -58,7 +58,10 @@ jobs:
       run: npm i turbo-darwin-64 @tauri-apps/cli-darwin-x64
     - run: npm i
     - name: Build App
-      run: npm run build && dir -r
+      run: npm run build
+    - name: Debug 
+      if: ${{matrix.os == 'windows-latest'}}
+      run: dir platforms/desktop/src-tauri/target -r -Exclude '*.d','*.rmeta','*.o','*.rlib','*.dll','*.exp','*.lib'
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.1
       with:
