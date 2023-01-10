@@ -61,7 +61,7 @@ jobs:
       run: npm run build
     - name: Debug 
       if: ${{matrix.os == 'windows-latest'}}
-      run: dir platforms/desktop/src-tauri/target -r -Exclude '*.d','*.rmeta','*.o','*.rlib','*.dll','*.exp','*.lib'
+      run: dir && dir ./platforms/desktop/src-tauri/target -r -Exclude '*.d','*.rmeta','*.o','*.rlib','*.dll','*.exp','*.lib'
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.1
       with:
