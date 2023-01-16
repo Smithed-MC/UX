@@ -15,8 +15,8 @@ interface InputWithTooltipProps {
     [key: string]: any
 }
 
-function Editor({ children, title, ...props }: any) {
-    return <div className='container' style={{ backgroundColor: 'var(--backgroundAccent)', width: '100%', maxWidth: 'calc(512px + 16px)', borderRadius: 'var(--defaultBorderRadius)', padding: 16 }}>
+function Editor({ children, title, style, ...props }: any) {
+    return <div className='container' style={{ backgroundColor: 'var(--backgroundAccent)', width: '100%', maxWidth: 'calc(512px + 16px)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, boxSizing: 'border-box', ...style}}>
         <h1>{title}</h1>
         <div className='container' style={{ width: '100%', height: '100%', gap: 16, alignItems: 'start' }}>{children}</div>
     </div>
@@ -36,7 +36,8 @@ interface EditorInputProps {
     reference: { [key: string]: any }
     attr: string,
     description: string,
-    header?: string
+    header?: string,
+    disabled?: boolean
 }
 
 
@@ -44,16 +45,16 @@ function Tooltip({ description, style, offset }: { description: string, offset?:
     const [hover, setHover] = useState(false)
     return <div style={{ width: 0, height: 0, marginBottom: 18, ...style }}>
         <Info style={{ fill: 'var(--accent)', width: 16, height: 16, marginLeft: offset ?? -26, opacity: hover ? 1 : 0.5, backgroundColor: 'var(--buttonText)', borderRadius: 'var(--defaultBorderRadius)', border: '1px solid var(--buttonText)' }} onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)} />
-        {hover && <div className="fadeIn" style={{ animationDuration: '0.3s', position: 'absolute', backgroundColor: 'var(--accent)', borderRadius: 'var(--defaultBorderRadius)', padding: 8 }}>{description}</div>}
+        {hover && <div className="fadeIn" style={{ animationDuration: '0.3s', position: 'absolute', backgroundColor: 'var(--accent)', borderRadius: 'var(--defaultBorderRadius)', padding: 8,zIndex: 1,border: '4px solid var(--buttonText)'}}>{description}</div>}
     </div>
 
 }
 
-function StringInput({ reference, attr, description, header }: EditorInputProps) {
+function StringInput({ reference, attr, description, header, disabled }: EditorInputProps) {
     return <EditorDiv>
-        <AttributeHeader attr={header ?? attr} />
+        {(header !== '') && <AttributeHeader attr={header ?? attr} />}
         <div className='container' style={{ width: '100%', flexDirection: 'row' }}>
-            <input style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={(e) => reference[attr] = e.currentTarget.value} defaultValue={reference[attr]} />
+            <input style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={(e) => reference[attr] = e.currentTarget.value} defaultValue={reference[attr]} disabled={disabled} />
             <Tooltip description={description} />
         </div>
     </EditorDiv>
@@ -193,7 +194,7 @@ function DropdownSelectionInput({ reference, attr, description, header, options,
     const [contained, setContained] = useState<boolean>()
 
     useEffect(() => {
-        setContained(reference[attr].includes(selectedValue))
+        setContained(reference[attr]?.includes(selectedValue))
     }, [selectedValue])
 
     const addVersion = () => {
@@ -341,35 +342,60 @@ function NewDependency({ dependencies, onAddDependency }: { dependencies: PackDe
 export default function Edit() {
     const user = useFirebaseUser()
     const navigate = useNavigate()
-    const { pack } = useQueryParams()
+    const { pack, new: isNew } = useQueryParams()
     const [packData, setPackData] = useState<PackData>()
     const [versions, setVersions] = useState<PackVersion[]>([])
     const [categories, setCategories] = useState<string[]>([])
     const [selectedVersion, setSelectedVersion] = useState(0)
     const [mcVersions, setMCVersions] = useState<string[]>([])
-    const [supportedVersions, setSupportedVersions] = useState<MinecraftVersion[] | undefined>(packData?.versions[selectedVersion].supports)
+    const [supportedVersions, setSupportedVersions] = useState<MinecraftVersion[] | undefined>([])
     const deleteButtonRef = useRef<HTMLLabelElement>(null)
     const saveTextRef = useRef<HTMLDivElement>(null)
     let deleteConfirmation = 0;
 
     useEffect(() => {
-        setSupportedVersions(packData?.versions[selectedVersion].supports)
+        if(packData)
+            packData.versions[selectedVersion].dependencies ??= []
+        setSupportedVersions(packData?.versions[selectedVersion]?.supports ?? [])
     }, [packData, selectedVersion])
 
     async function onLoad() {
         if (user == null) return
+
+        const versions: string[] = await (await fetch(`https://api.smithed.dev/getVersions`)).json()
+        setMCVersions(versions)
+
+        if (isNew) {
+            setPackData({
+                id: '',
+                display: {
+                    name: '',
+                    description: '',
+                    webPage: '',
+                    icon: '',
+                    hidden: false
+                },
+                versions: [],
+                categories: []
+            })
+            return
+        }
+
         const data: PackData = await (await fetch(`https://api.smithed.dev/getUserPack?uid=${user.uid}&pack=${pack}`)).json()
-        data.versions.sort((a, b) => compare(a.name, b.name))
+        data.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
+
+        data.versions.forEach(v => {
+            v.dependencies ??= []
+        })
+
         setPackData(data)
         setVersions(data.versions)
         setCategories(data.categories)
 
-        const versions: string[] = await (await fetch(`https://api.smithed.dev/getVersions`)).json()
-        setMCVersions(versions)
     }
     useEffect(() => { onLoad() }, [pack, user])
 
-    if (user == null) return <div style={{animation: 'fadeIn 1s'}}>
+    if (user == null) return <div style={{ animation: 'fadeIn 1s' }}>
         <ErrorPage title="Error 401" description='Not signed in!' returnLink='/' returnMessage='Back to Home' />
     </div>
     if (packData === undefined) return <div className="container" style={{ width: '100%', height: '100vh', boxSizing: 'border-box' }}>
@@ -377,16 +403,21 @@ export default function Edit() {
     </div>
 
     const updateVersions = () => { setVersions(Object.create(packData.versions)) }
-    return <div className="container" style={{ width: '100vw', height: '100vh', position: 'absolute', top: 0, left: 0, flexDirection: 'row', alignItems: 'start', justifyContent: 'flex-start' }}>
-        <div className="container" style={{ width: '100%', padding: 24, flexDirection: 'row', gap: 48, alignItems: 'start' }}>
-            <Editor title={'Display'}>
-                <StringInput description='Name of the pack' reference={packData.display} attr={'name'} />
-                <StringInput description='Short description of the pack' reference={packData.display} attr={'description'} />
-                <ImageURLInput description='URL to the icon of the pack' reference={packData.display} attr={'icon'} width={64} height={64} />
-                <MarkdownURLInput description='URL to the ReadME of the pack' reference={packData.display} attr={'webPage'} />
-                <DropdownSelectionInput description='Categories' reference={packData} attr={'categories'} options={packCategories} onChange={() => { setCategories(Object.create(packData.categories)) }} />
-                <label>{categories?.sort().join(', ')}</label>
-            </Editor>
+    return <div className="container" style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, flexDirection: 'row', alignItems: 'start', justifyContent: 'flex-start', boxSizing: 'border-box' }}>
+        <div className='editorContainer'>
+            <div className='container' style={{width:'100%', boxSizing: 'border-box', gap: 48}}>
+                <Editor title={'Id'}>
+                    <StringInput description='Unique ID that others can reference your pack by' reference={packData} attr={'id'} disabled={!isNew} header={''}/>
+                </Editor>
+                <Editor title={'Display'} style={{gridColumn: 1}}>
+                    <StringInput description='Name of the pack' reference={packData.display} attr={'name'} />
+                    <StringInput description='Short description of the pack' reference={packData.display} attr={'description'} />
+                    <ImageURLInput description='URL to the icon of the pack' reference={packData.display} attr={'icon'} width={64} height={64} />
+                    <MarkdownURLInput description='URL to the ReadME of the pack' reference={packData.display} attr={'webPage'} />
+                    <DropdownSelectionInput description='Categories' reference={packData} attr={'categories'} options={packCategories} onChange={() => { setCategories(Object.create(packData.categories)) }} />
+                    <label>{categories?.sort().join(', ')}</label>
+                </Editor>
+            </div>
             <Editor title={'Versions'}>
                 <EditorDiv style={{ alignItems: 'center' }}>
                     <EditorDiv style={{ width: 'min-content' }}>
@@ -428,19 +459,21 @@ export default function Edit() {
                         </EditorDiv>
                     </EditorDiv>
                 </EditorDiv>
-                <DownloadURLInput reference={packData.versions[selectedVersion].downloads} attr='datapack' header='Datapack Download' description='Raw URL to the download for the datapack' />
-                <DownloadURLInput reference={packData.versions[selectedVersion].downloads} attr='resourcepack' header='Resourcepack Download' description='Raw URL to the download for the resourcepack' />
-                <DropdownSelectionInput reference={packData.versions[selectedVersion]} attr='supports' description='Supported Minecraft Versions' options={mcVersions} onChange={() => {
-                    const s = packData.versions[selectedVersion].supports
-                    s.sort((a, b) => compare(coerce(a) ?? '', coerce(b) ?? ''))
-                    setSupportedVersions(Object.create(s))
-                }} />
-                <label>{supportedVersions?.map(s =>
-                    <label>- {s}<br /></label>
-                )}</label>
-                <AttributeHeader attr={'Dependencies'} />
-                <NewDependency dependencies={versions[selectedVersion].dependencies ?? []} onAddDependency={updateVersions} />
-                <RenderDependencies dependencies={versions[selectedVersion].dependencies ?? []} onRemoveDependency={updateVersions} />
+                {packData.versions.length > 0 && <EditorDiv>
+                    <DownloadURLInput reference={packData.versions[selectedVersion].downloads} attr='datapack' header='Datapack Download' description='Raw URL to the download for the datapack' />
+                    <DownloadURLInput reference={packData.versions[selectedVersion].downloads} attr='resourcepack' header='Resourcepack Download' description='Raw URL to the download for the resourcepack' />
+                    <DropdownSelectionInput reference={packData.versions[selectedVersion]} attr='supports' description='Supported Minecraft Versions' options={mcVersions} onChange={() => {
+                        const s = packData.versions[selectedVersion].supports
+                        s.sort((a, b) => compare(coerce(a) ?? '', coerce(b) ?? ''))
+                        setSupportedVersions(Object.create(s))
+                    }} />
+                    <label>{supportedVersions?.map(s =>
+                        <label>- {s}<br /></label>
+                    )}</label>
+                    <AttributeHeader attr={'Dependencies'} />
+                    <NewDependency dependencies={versions[selectedVersion].dependencies} onAddDependency={updateVersions} />
+                    <RenderDependencies dependencies={versions[selectedVersion].dependencies} onRemoveDependency={updateVersions} />
+                </EditorDiv>}
             </Editor>
         </div >
         <div className='container' style={{ flexDirection: 'row', position: 'fixed', bottom: 8, right: 8, justifySelf: 'center', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, gap: 16, border: '4px solid var(--background)', boxSizing: 'border-box' }}>

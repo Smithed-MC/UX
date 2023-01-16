@@ -3,15 +3,43 @@
         opacity: 0;
         visibility: visible;
     }
+
     20% {
         opacity: 1;
     }
+
     80% {
         opacity: 1;
     }
+
     100% {
         opacity: 0;
         visibility: hidden;
-        
+
+    }
+}
+
+.editorContainer {
+    display: grid;
+    width: 100%;
+    padding: 24px;
+    gap: 48px;
+    overflow-y: auto;
+    height: 100%;
+    box-sizing: border-box;
+    justify-content: safe center;
+    place-items: safe start;
+}
+
+@media screen and (min-width: 1024px) {
+    .editorContainer {
+        grid-template-columns: minmax(auto, 512px) minmax(auto, 512px);
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .editorContainer {
+        grid-template-columns: minmax(auto, 512px);
+        padding-bottom: 96px;
     }
 }
