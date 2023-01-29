@@ -2,6 +2,7 @@ import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import { initialize } from "database";
 import fastify from "fastify";
 import * as fs from 'fs';
+import cors from '@fastify/cors'
 
 export const API_APP = fastify().withTypeProvider<TypeBoxTypeProvider>();
 
@@ -25,13 +26,14 @@ export async function importRoutes(dirPath: string) {
 
 export async function setupApp() {
     await initialize()
-    await importRoutes('routes')
 
-    API_APP.addHook("onResponse", (response) => {
-        response.headers['Access-Control-Allow-Origin'] = '*';
-        response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
-        response.headers['Access-Control-Allow-Methods'] = '*'
+    await API_APP.register(cors, {
+        origin: false,
+        allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
+        methods: '*'
     })
+
+    await importRoutes('routes')
 
     return API_APP;
 }
