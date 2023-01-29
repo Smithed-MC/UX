@@ -28,7 +28,7 @@ export async function setupApp() {
     await initialize()
 
     await API_APP.register(cors, {
-        origin: false,
+        origin: '*',
         allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
         methods: '*'
     })
