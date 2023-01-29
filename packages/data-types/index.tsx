@@ -12,12 +12,15 @@ export interface PackEntry {
 Format.Set('semver', (v) => coerce(v) != null)
 console.log(Format.Has('semver'))
 
-const MinecraftVersionSchema = Type.Union([
-    Type.Literal('1.18'),
-    Type.Literal('1.18.1'),
-    Type.Literal('1.18.2'),
-    Type.Literal('1.19')
-])
+
+export const supportedMinecraftVersions = [
+    '1.18',
+    '1.18.1',
+    '1.18.2',
+    '1.19'
+]
+
+const MinecraftVersionSchema = Type.Union(supportedMinecraftVersions.map(v => Type.Literal(v)))
 
 export const packCategories = [ 
     'Extensive' ,

@@ -30,7 +30,7 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
 
     async function getData() {
         if (packEntry === undefined) return
-        const response = await fetch(`https://api.smithed.dev/getUserPack?uid=${packEntry.owner}&pack=${id.split(':')[1]}`)
+        const response = await fetch(`https://api.smithed.dev/packs/${id.split(':')[1]}`)
         if (!response.ok)
             return void setData(undefined)
         const data = await response.json()
@@ -39,7 +39,7 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
 
     async function getAuthor() {
         if (packEntry === undefined) return
-        const response = await fetch(`https://api.smithed.dev/getUser?uid=${packEntry.owner}`)
+        const response = await fetch(`https://api.smithed.dev/users/${packEntry.owner}`)
         if (!response.ok)
             return void setAuthor('')
         const data = await response.json()
@@ -51,7 +51,7 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
 
         try {
             if (packEntry === undefined)
-                packEntry = await (await fetch(`https://api.smithed.dev/getPack?pack=${id}`)).json()
+                packEntry = await (await fetch(`https://api.smithed.dev/packs/${id}`)).json()
         } catch {
             console.log('Pack does not exist in register')
         }

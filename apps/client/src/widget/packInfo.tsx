@@ -31,7 +31,7 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
 
     async function getData(owner: string, packId: string) {
         if (packEntry === undefined) return
-        const response = await fetch(`https://api.smithed.dev/getUserPack?username=${owner}&pack=${packId}`)
+        const response = await fetch(`https://api.smithed.dev/packs/pack=${packId}`)
         if (!response.ok)
             return void setData(undefined)
         const data = await response.json()
@@ -41,7 +41,7 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
     }
 
     async function getAuthor(owner: string) {
-        const response = await fetch(`https://api.smithed.dev/getUser?username=${owner}`)
+        const response = await fetch(`https://api.smithed.dev/users/${owner}`)
         if (!response.ok)
             return void setAuthor('')
         const data = await response.json()

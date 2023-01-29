@@ -139,7 +139,7 @@ function DownloadURLInput({ reference, attr, description, header }: EditorInputP
                 const url = reference[attr]
                 if (url === '') return void setError('No URL is specified')
 
-                const resp = await fetch(`https://api.smithed.dev/validateDownload?url=${url}`)
+                const resp = await fetch(`https://api.smithed.dev/v2/validate-download?url=${url}`)
                 const status = await resp.text()
 
                 if (status !== 'valid') return void setError(status)
@@ -362,7 +362,7 @@ export default function Edit() {
     async function onLoad() {
         if (user == null) return
 
-        const versions: string[] = await (await fetch(`https://api.smithed.dev/getVersions`)).json()
+        const versions: string[] = await (await fetch(`https://api.smithed.dev/v2/supported-versions`)).json()
         setMCVersions(versions)
 
         if (isNew) {
@@ -381,7 +381,7 @@ export default function Edit() {
             return
         }
 
-        const data: PackData = await (await fetch(`https://api.smithed.dev/getUserPack?uid=${user.uid}&pack=${pack}`)).json()
+        const data: PackData = await (await fetch(`https://api.smithed.dev/v2/packs/${pack}`)).json()
         data.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
 
         data.versions.forEach(v => {
@@ -482,7 +482,7 @@ export default function Edit() {
             }}><Back style={{ stroke: 'var(--buttonText)', fill: 'var(--buttonText)' }} /></button>
             <button className='button' style={{ width: 36, height: 36 }} title='Save' onClick={async () => {
                 console.log(packData)
-                const resp = await fetch(`https://api.smithed.dev/setUserPack?uid=${user.uid}&pack=${pack}&token=${await user.getIdToken()}`, { method: 'POST', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
+                const resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}&token=${await user.getIdToken()}`, { method: 'PATCH', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
 
                 if (resp.status !== 200) {
                     alert(await resp.text())

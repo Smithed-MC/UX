@@ -76,9 +76,9 @@ API_APP.route({
             data: PackDataSchema
         })
     },
-    handler: async (response, reply) => {
-        const {token, id} = response.query;
-        const {data} = response.body
+    handler: async (request, reply) => {
+        const {token, id} = request.query;
+        const {data} = request.body
 
         const userId = await getUIDFromToken(token)
         if(userId === undefined)

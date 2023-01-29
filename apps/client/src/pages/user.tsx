@@ -28,7 +28,7 @@ export default function User() {
     const [loaded, setLoaded] = useState<boolean>()
 
     async function getCleanName() {
-        const responseUsername = await (await fetch(`https://api.smithed.dev/getSanitizedUsername?username=${rawUserId}`)).text()
+        const responseUsername = await (await fetch(`https://api.smithed.dev/v2/sanitize?value=${rawUserId}`)).text()
 
         return responseUsername
     }
@@ -42,7 +42,7 @@ export default function User() {
 
         for (let pack of packs) {
             try {
-                const packEntry = await (await fetch(`https://api.smithed.dev/getPack?pack=${id + ':' + pack}`)).json()
+                const packEntry = await (await fetch(`https://api.smithed.dev/packs/${pack}`)).json()
                 for (let day in packEntry.downloads) {
                     total += packEntry.downloads[day]
                     if (day === today)
@@ -60,11 +60,11 @@ export default function User() {
         setLoaded(false)
         const id = await getCleanName();
 
-        const userDataResponse = await fetch(`https://api.smithed.dev/getUser?username=${id}`)
+        const userDataResponse = await fetch(`https://api.smithed.dev/v2/users/${id}`)
         if (!userDataResponse.ok) return
         const user = await userDataResponse.json()
 
-        const userPacksResponse = await fetch(`https://api.smithed.dev/getUserPacks?username=${id}`)
+        const userPacksResponse = await fetch(`https://api.smithed.dev/v2/users/${id}/packs`)
         const packs: PackData[] = userPacksResponse.ok ? (await userPacksResponse.json()) : []
 
 
