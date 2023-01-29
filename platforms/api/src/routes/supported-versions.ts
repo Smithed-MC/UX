@@ -1,6 +1,5 @@
 import { Type } from "@sinclair/typebox";
 import { API_APP } from "../app.js";
-import { BlobReader, ZipReader } from "@zip.js/zip.js";
 import { HTTPResponses, supportedMinecraftVersions } from "data-types";
 
 
