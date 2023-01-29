@@ -4,3 +4,8 @@ build/**
 target/**
 .turbo
 node_modules/**
+
+.env
+secret.json
+coverage/
+.nyc_output/

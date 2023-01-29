@@ -5,10 +5,11 @@
   "main": "index.js",
   "scripts": {
     "build": "turbo run build",
-    "test": "turbo run test",
+    "test": "turbo run test --filter=api",
     "lint": "turbo run lint",
     "tauri:dev": "turbo run dev --filter=desktop",
     "web:dev": "turbo run dev --filter=website",
+    "api:dev": "turbo run dev --filter=api",
     "sync:dev": "turbo run dev"
   },
   "author": "",
@@ -21,13 +22,32 @@
   "devDependencies": {
     "@types/pngjs": "^6.0.1",
     "@types/semver": "^7.3.13",
-    "turbo": "^1.6.3"
+    "@types/supertest": "^2.0.12",
+    "c8": "^7.12.0",
+    "concurrently": "^7.6.0",
+    "supertest": "^6.3.3",
+    "tap": "^16.3.4",
+    "ts-node": "^10.9.1",
+    "turbo": "^1.6.3",
+    "typescript": "^4.9.4"
   },
   "dependencies": {
+    "@fastify/type-provider-json-schema-to-ts": "^2.2.2",
+    "@fastify/type-provider-typebox": "^2.4.0",
+    "@sinclair/typebox": "^0.25.20",
+    "@types/express": "^4.17.15",
     "@types/react": "^18.0.25",
     "@types/react-router-dom": "^5.3.3",
+    "@types/tap": "^15.0.7",
     "buffer": "^6.0.3",
+    "dot-env": "^0.0.1",
+    "dotenv": "^16.0.3",
+    "esmock": "^2.1.0",
+    "express": "^4.18.2",
+    "fastify": "^4.11.0",
     "firebase": "^9.14.0",
+    "firebase-admin": "^11.4.1",
+    "jose": "^4.11.2",
     "markdown-to-jsx": "^7.1.7",
     "pngjs": "^6.0.0",
     "postcss": "^8.4.19",
@@ -36,6 +56,7 @@
     "react": "^18.2.0",
     "react-router-dom": "^6.4.3",
     "semver": "^7.3.8",
+    "validate": "^5.2.0",
     "vite-plugin-svgr": "^2.2.2"
   }
 }

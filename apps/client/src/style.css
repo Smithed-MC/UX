@@ -20,7 +20,7 @@
     --codeText: rgb(255, 247, 136);
     --subText: #aaa;
     --smallScreenSize: 640px;
-    
+
     --defaultBorderRadius: 10px;
     overflow: hidden;
 }
@@ -78,9 +78,11 @@ details {
     border-radius: var(--defaultBorderRadius);
     margin-bottom: 4px;
 }
+
 summary:hover {
     filter: brightness(80%);
 }
+
 summary:active {
     filter: brightness(60%);
 }
@@ -91,7 +93,6 @@ summary:active {
 
 }
 
-::-webkit-
 
 ::-webkit-scrollbar-thumb {
     width: 4px;
@@ -108,7 +109,8 @@ summary:active {
 }
 
 
-input, select {
+input,
+select {
     border: none;
     border-radius: var(--defaultBorderRadius);
     padding: 8px;
@@ -124,13 +126,22 @@ select select {
     background-color: red;
 }
 
+input:disabled {
+    color: var(--subText) !important;
+    font-style: italic;
+}
 
-input[type="email"], input[type="password"], input[type="text"], textarea, select {
+input[type="email"],
+input[type="password"],
+input[type="text"],
+textarea,
+select {
     background-color: var(--background);
 
     color: var(--text);
     width: 256px;
 }
+
 input::placeholder {
     color: var(--subText)
 }
@@ -141,20 +152,27 @@ input[type="button"] {
     color: var(--buttonText);
 }
 
-input[type="button"]:hover {
+input[type="button"]:hover,
+select:hover {
     filter: brightness(85%);
 }
 
-input[type="button"]:active {
+input[type="button"]:active,
+select:active {
     filter: brightness(60%);
+}
+
+input[type="button"]:active {
     transform: scale(105%);
 }
 
+
 select {
     background-image: url(./assets/green_down-arrow.png);
-    background-blend-mode:overlay;
+    background-blend-mode: overlay;
     background-position: right;
     background-repeat: no-repeat;
     -webkit-appearance: none;
     -moz-appearance: none;
+    cursor: pointer;
 }

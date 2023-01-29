@@ -1,4 +1,4 @@
-import { NavBar } from 'components'
+import { NavBar, RootError } from 'components'
 import React from 'react'
 import { BrowserRouter, createBrowserRouter, HashRouter, Outlet, Route, RouterProvider, Search } from 'react-router-dom'
 import { initializeApp } from 'firebase/app'
@@ -32,6 +32,7 @@ initializeApp({
 const router = createBrowserRouter([
     {
         path: "/",
+        errorElement: <RootError/>,
         element: <div style={{ height: '100%' }}>
             <NavBar>
                 <NavOption SVGComponent={HomeSvg} path='/' title='Home' />

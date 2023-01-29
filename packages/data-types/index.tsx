@@ -1,3 +1,7 @@
+import {Static, Type} from '@sinclair/typebox'
+import {Format} from '@sinclair/typebox/format'
+import { coerce } from 'semver'
+
 export interface PackEntry {
     added: number,
     downloads: { [key: string]: number }
@@ -5,7 +9,15 @@ export interface PackEntry {
     owner: string
 }
 
-export type MinecraftVersion = '1.18' | '1.18.1' | '1.18.2' | '1.19'
+Format.Set('semver', (v) => coerce(v) != null)
+console.log(Format.Has('semver'))
+
+const MinecraftVersionSchema = Type.Union([
+    Type.Literal('1.18'),
+    Type.Literal('1.18.1'),
+    Type.Literal('1.18.2'),
+    Type.Literal('1.19')
+])
 
 export const packCategories = [ 
     'Extensive' ,
@@ -20,34 +32,51 @@ export const packCategories = [
     'No Resource Pack'
 ]
 
-export interface PackDependency {
-    id: string
-    version: string
-}
+const PackDependencySchema = Type.Object({
+    id: Type.String(),
+    version: Type.String()
+})
 
-export interface PackVersion {
-    name: string
-    downloads: {
-        datapack: string
-        resourcepack: string
-    }
-    supports: MinecraftVersion[],
-    dependencies: PackDependency[]
-}
+export const PackVersionSchema = Type.Object({
+    name: Type.String(),
+    downloads: Type.Object({
+        datapack: Type.String(),
+        resourcepack: Type.String()
+    }),
+    supports: Type.Array(MinecraftVersionSchema),
+    dependencies: Type.Array(PackDependencySchema)
+})
 
-export interface PackData {
-    id: string,
-    display: {
-        name: string,
-        description: string
-        icon: string,
-        hidden: boolean
-        webPage?: string
-    },
-    versions: PackVersion[],
-    categories: string[]
-}
+export const PackDataSchema = Type.Object({
+    id: Type.String(),
+    display: Type.Object({
+        name: Type.String(),
+        description: Type.String(),
+        icon: Type.String({default: ''}),
+        hidden: Type.Boolean({default: false}),
+        webPage: Type.Optional(Type.String())
+    }),
+    versions: Type.Array(PackVersionSchema),
+    categories: Type.Array(Type.Union(packCategories.map(c => Type.Literal(c))))
+})
+
+export type MinecraftVersion = Static<typeof MinecraftVersionSchema>
+export type PackDependency = Static<typeof PackDependencySchema>
+export type PackVersion = Static<typeof PackVersionSchema>
+export type PackData = Static<typeof PackDataSchema>
 
 export interface UserData {
     displayName: string
 }
+
+export enum HTTPResponses {
+    OK = 200,
+    CREATED = 201,
+    BAD_REQUEST = 400,
+    UNAUTHORIZED = 401,
+    FORBIDDEN = 403,
+    NOT_FOUND = 404,
+    CONFLICT = 409
+}
+
+export type ReviewState = 'verified'|'pending'|'unsubmitted'|'rejected'

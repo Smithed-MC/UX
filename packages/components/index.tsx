@@ -6,5 +6,6 @@ import * as svg from './svg'
 import './style.css'
 import ErrorPage from './PageError'
 import MarkdownRenderer, {markdownOptions} from './MarkdownRenderer'
+import { RootError } from './RootError'
 
-export {NavButton, NavBar, PackCard, Spinner, PackVersionDownload, svg, ErrorPage, MarkdownRenderer, markdownOptions}
+export {NavButton, NavBar, PackCard, Spinner, PackVersionDownload, svg, ErrorPage, MarkdownRenderer, markdownOptions, RootError}

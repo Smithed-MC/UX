@@ -1,5 +1,5 @@
 {
-  "name": "data-types",
+  "name": "validators",
   "version": "0.1.0",
   "description": "",
   "main": "index.tsx",
@@ -9,6 +9,5 @@
     "lint": "tsc"
   },
   "author": "",
-  "license": "ISC",
-  "type": "module"
+  "license": "ISC"
 }

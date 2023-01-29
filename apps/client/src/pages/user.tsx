@@ -41,12 +41,17 @@ export default function User() {
 
 
         for (let pack of packs) {
-            const packEntry = await (await fetch(`https://api.smithed.dev/getPack?pack=${id + ':' + pack}`)).json()
-            for (let day in packEntry.downloads) {
-                total += packEntry.downloads[day]
-                if (day === today)
-                    daily += packEntry.downloads[day]
+            try {
+                const packEntry = await (await fetch(`https://api.smithed.dev/getPack?pack=${id + ':' + pack}`)).json()
+                for (let day in packEntry.downloads) {
+                    total += packEntry.downloads[day]
+                    if (day === today)
+                        daily += packEntry.downloads[day]
+                }
+            } catch {
+                console.log(`Pack ${pack}`)
             }
+
         }
         return [total, daily]
     }
@@ -99,6 +104,14 @@ export default function User() {
                     </div>
                 </div>
             </div>
+            {editable && <div className='container' style={{gap: 16, flexDirection: 'row', padding: 16, borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--backgroundAccent)', fontSize: 18}}>
+                Create new pack
+                <button className='button container wobbleHover' style={{fontSize: 48, width: 48, height: 48, justifyContent: 'center', borderRadius: '50%'}} onClick={() => {
+                    navigate('/edit?new=true')
+                }}>
+                    <label>+</label>
+                </button>
+            </div>}
             {userStats.packs.length > 0 && <div className='container' style={{ gap: 16, width: '100%', justifyContent: 'safe start', boxSizing: 'border-box' }}>
                 {userStats?.packs?.map(p => <PackCard editable={editable} packData={p} id={userStats.id + ":" + p.id} onClick={() => { navigate(p.id) }} />)}
             </div>}

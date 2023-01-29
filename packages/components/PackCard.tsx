@@ -49,8 +49,12 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
 
     async function onLoad() {
 
-        if (packEntry === undefined)
-            packEntry = await (await fetch(`https://api.smithed.dev/getPack?pack=${id}`)).json()
+        try {
+            if (packEntry === undefined)
+                packEntry = await (await fetch(`https://api.smithed.dev/getPack?pack=${id}`)).json()
+        } catch {
+            console.log('Pack does not exist in register')
+        }
 
         if (packData !== undefined) {
             setData(packData)
@@ -60,6 +64,9 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
         }
 
         await getAuthor()
+
+
+
         if (packEntry) await getTotalDownloads(packEntry)
 
         setLoaded(true)

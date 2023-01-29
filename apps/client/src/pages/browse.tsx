@@ -13,7 +13,7 @@ export default function Browse(props: any) {
 
 
     async function onLoad() {
-        const response = await fetch('https://api.smithed.dev/getPacks')
+        const response = await fetch('https://api.smithed.dev/packs')
         const data = await response.json()
         // console.log(data)
         setPacks(data)
