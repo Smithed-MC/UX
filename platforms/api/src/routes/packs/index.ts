@@ -45,7 +45,7 @@ API_APP.route({
         if(search !== undefined && search !== '')
             query = query.where('_indices', 'array-contains', search)
         
-        query.orderBy(getOrderField(sort), sort === SortOptions.Alphabetically ? 'asc' : 'desc').offset(start).limit(limit)
+        query = query.orderBy(getOrderField(sort), sort === SortOptions.Alphabetically ? 'asc' : 'desc').offset(start).limit(limit)
         
 
 
