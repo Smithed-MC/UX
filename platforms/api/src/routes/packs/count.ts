@@ -5,7 +5,7 @@ import { Queryable } from "../../index.js";
 
 API_APP.route({
     method: 'GET',
-    url: '/packs/count',
+    url: '/v2/packs/count',
     schema: {
         querystring: Type.Object({
             search: Type.Optional(Type.String())

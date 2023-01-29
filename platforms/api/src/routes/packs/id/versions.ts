@@ -7,7 +7,7 @@ import { getUIDFromToken } from "database";
 
 API_APP.route({
     method: 'GET',
-    url: '/packs/:id/versions',
+    url: '/v2/packs/:id/versions',
     schema: {
         params: Type.Object({
             id: Type.String()
@@ -26,7 +26,7 @@ API_APP.route({
 
 API_APP.route({
     method: 'POST',
-    url: '/packs/:id/versions',
+    url: '/v2/packs/:id/versions',
     schema: {
         params: Type.Object({
             id: Type.String()
@@ -77,7 +77,7 @@ API_APP.route({
 
 API_APP.route({
     method: 'PATCH',
-    url: '/packs/:packId/versions/:versionId',
+    url: '/v2/packs/:packId/versions/:versionId',
     schema: {
         params: Type.Object({
             packId: Type.String(),
@@ -130,7 +130,7 @@ API_APP.route({
 
 API_APP.route({
     method: 'DELETE',
-    url: '/packs/:packId/versions/:versionId',
+    url: '/v2/packs/:packId/versions/:versionId',
     schema: {
         params: Type.Object({
             packId: Type.String(),
@@ -180,7 +180,7 @@ API_APP.route({
 
 API_APP.route({
     method: 'GET',
-    url: '/packs/:id/versions/latest',
+    url: '/v2/packs/:id/versions/latest',
     schema: {
         params: Type.Object({
             id: Type.String()

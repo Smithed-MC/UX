@@ -19,7 +19,7 @@ const getOrderField = (sort) => {
 };
 API_APP.route({
     method: "GET",
-    url: '/packs',
+    url: '/v2/packs',
     schema: {
         querystring: Type.Object({
             search: Type.Optional(Type.String()),
