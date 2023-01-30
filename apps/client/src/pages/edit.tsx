@@ -290,10 +290,14 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
     const [elements, setElements] = useState<JSX.Element[]>([]);
 
     const getDeps = async () => {
+        console.log(dependencies)
         dependencies.sort((a, b) => a.id.localeCompare(b.id))
         let elements: JSX.Element[] = []
         for(let i = 0; i < dependencies.length; i++) {
             const d = dependencies[i]
+
+            const metaData = await (await fetch(`https://api.smithed.dev/v2/packs/${d.id}/meta`)).json()
+
             elements.push(<button className='button' style={{ width: 18, height: 18, backgroundColor: 'var(--badAccent)' }} onClick={() => {
                 dependencies.splice(i, 1)
                 onRemoveDependency()
@@ -302,14 +306,14 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
                     <Cross style={{ width: '12px', height: '12px', flexShrink: 0, stroke: 'var(--buttonText)' }} />
                 </div>
             </button>)
-            elements.push(<label style={{ paddingRight: 16, borderRight: '2px solid var(--background)' }}>{d.id}</label>)
+            elements.push(<label style={{ paddingRight: 16, borderRight: '2px solid var(--background)' }}>{metaData.rawId}</label>)
             elements.push(<label>{d.version}</label>)
         }
             
         setElements(elements)
     }
 
-    useEffect(() => {getDeps()}, [])
+    useEffect(() => {getDeps()}, [dependencies.length])
 
     return <div style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto', alignItems: 'center', columnGap: 16, rowGap: 8 }}>
         {elements}
@@ -327,16 +331,21 @@ function NewDependency({ dependencies, onAddDependency }: { dependencies: PackDe
             if (idRef.current == null || versionRef.current == null)
                 return
 
-            const id = idRef.current.value
+            const rawId = idRef.current.value
             const version = versionRef.current.value
 
-            if (id === '' || version === '') return
+            const metaDataResponse = await fetch(`https://api.smithed.dev/v2/packs/${rawId}/meta`)
+            if(!metaDataResponse.ok)
+                alert('Invalid pack id!')
+            const metaData = await metaDataResponse.json()
 
-            const existingDependency = dependencies.find(d => d.id === id)
+            if (rawId === '' || version === '') return
+
+            const existingDependency = dependencies.find(d => d.id === metaData.docId)
             if (existingDependency)
                 existingDependency.version = version
             else
-                dependencies.push({ id: id, version: version })
+                dependencies.push({ id: metaData.docId, version: version })
 
             idRef.current.value = ''
             versionRef.current.value = ''
@@ -491,7 +500,7 @@ export default function Edit() {
             }}><Back style={{ stroke: 'var(--buttonText)', fill: 'var(--buttonText)' }} /></button>
             <button className='button' style={{ width: 36, height: 36 }} title='Save' onClick={async () => {
                 console.log(packData)
-                const resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}&token=${await user.getIdToken()}`, { method: 'PATCH', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
+                const resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}?token=${await user.getIdToken()}`, { method: 'PATCH', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
 
                 if (resp.status !== 200) {
                     alert(await resp.text())

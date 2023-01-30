@@ -69,7 +69,7 @@ API_APP.route({
         if (doc === undefined)
             return reply.status(HTTPResponses.NOT_FOUND).send(`Pack with ID ${packId} was not found`)
 
-        if(!(await doc.get('data.contributors')).includes(userId))
+        if(!(await doc.get('contributors')).includes(userId))
             return reply.status(HTTPResponses.FORBIDDEN).send(`You are not a contributor for ${packId}`)
 
 
