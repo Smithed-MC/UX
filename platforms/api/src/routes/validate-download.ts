@@ -4,7 +4,7 @@ import { API_APP } from "../app.js";
 
 API_APP.route({
     method: 'GET',
-    url: '/v2/validate-download',
+    url: '/validate-download',
     schema: {
         querystring: Type.Object({
             url: Type.String()

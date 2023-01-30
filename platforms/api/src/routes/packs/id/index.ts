@@ -24,7 +24,7 @@ export async function getPackDoc(id: string) {
 
 API_APP.route({
     method: 'GET',
-    url: '/v2/packs/:id',
+    url: '/packs/:id',
     schema: {
         params: Type.Object({
             id: Type.String()
@@ -43,7 +43,7 @@ API_APP.route({
 
 API_APP.route({
     method: 'PATCH',
-    url: '/v2/packs/:id',
+    url: '/packs/:id',
     schema: {
         params: Type.Object({
             id: Type.String()
@@ -81,7 +81,7 @@ API_APP.route({
 
 API_APP.route({
     method: 'DELETE',
-    url: '/v2/packs/:id',
+    url: '/packs/:id',
     schema: {
         params: Type.Object({
             id: Type.String()
@@ -113,7 +113,7 @@ API_APP.route({
 
 API_APP.route({
     method: 'POST',
-    url: '/v2/packs/:id/contributors',
+    url: '/packs/:id/contributors',
     schema: {
         params: Type.Object({
             id: Type.String()
@@ -152,7 +152,7 @@ API_APP.route({
 
 API_APP.route({
     method: 'DELETE',
-    url: '/v2/packs/:id/contributors',
+    url: '/packs/:id/contributors',
     schema: {
         params: Type.Object({
             id: Type.String()
@@ -188,7 +188,7 @@ API_APP.route({
 
 API_APP.route({
     method: 'GET',
-    url: '/v2/packs/:id/meta',
+    url: '/packs/:id/meta',
     schema: {
         params: Type.Object({
             id: Type.String()

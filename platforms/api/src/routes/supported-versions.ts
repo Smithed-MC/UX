@@ -5,7 +5,7 @@ import { HTTPResponses, supportedMinecraftVersions } from "data-types";
 
 API_APP.route({
     method: 'GET',
-    url: '/v2/supported-versions',
+    url: '/supported-versions',
     schema: {
     }, 
     handler: async (request, reply) => {

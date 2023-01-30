@@ -7,7 +7,7 @@ export function sanitize(value: string) {
 
 API_APP.route({
     method: 'GET',
-    url: '/v2/sanitize',
+    url: '/sanitize',
     schema: {
         querystring: Type.Object({
             value: Type.String()
