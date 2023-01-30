@@ -36,6 +36,6 @@ API_APP.route({
 
         if(userDoc === undefined)
             return reply.status(HTTPResponses.NOT_FOUND).send('User not found')
-        return userDoc.data()
+        return {uid: userDoc.id, ...userDoc.data()}
     }
 })
