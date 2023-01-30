@@ -15,10 +15,11 @@ interface PackCardProps {
     packData?: PackData,
     editable?: boolean,
     style?: CSSProperties
-    onClick?: () => void
+    onClick?: () => void,
+    [key: string]: any
 }
 
-export default function PackCard({ id, packEntry, packData, onClick, editable, style }: PackCardProps) {
+export default function PackCard({ id, packData, onClick, editable, style, ...props }: PackCardProps) {
     const [data, setData] = useState<PackData>()
     const [downloads, setDownloads] = useState<number>(0)
     const [fallback, setFallback] = useState(false)
@@ -29,17 +30,15 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
     const navigate = useNavigate()
 
     async function getData() {
-        if (packEntry === undefined) return
-        const response = await fetch(`https://api.smithed.dev/packs/${id.split(':')[1]}`)
+        const response = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
         if (!response.ok)
             return void setData(undefined)
         const data = await response.json()
         setData(data)
     }
 
-    async function getAuthor() {
-        if (packEntry === undefined) return
-        const response = await fetch(`https://api.smithed.dev/users/${packEntry.owner}`)
+    async function getAuthor(ownerId: string) {
+        const response = await fetch(`https://api.smithed.dev/v2/users/${ownerId}`)
         if (!response.ok)
             return void setAuthor('')
         const data = await response.json()
@@ -48,44 +47,29 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
 
 
     async function onLoad() {
-
-        try {
-            if (packEntry === undefined)
-                packEntry = await (await fetch(`https://api.smithed.dev/packs/${id}`)).json()
-        } catch {
-            console.log('Pack does not exist in register')
+        const metaDataResponse = await fetch(`https://api.smithed.dev/v2/packs/${id}/meta`)
+        if (!metaDataResponse.ok) {
+            setData(undefined)
+            return
         }
+        const metaData = await metaDataResponse.json()
 
-        if (packData !== undefined) {
-            setData(packData)
-        }
-        else {
-            await getData()
-        }
-
-        await getAuthor()
+        await getData()
 
 
+        await getAuthor(metaData.owner)
 
-        if (packEntry) await getTotalDownloads(packEntry)
+        setDownloads(metaData.stats.downloads.total)
 
         setLoaded(true)
     }
 
     useEffect(() => { onLoad(); }, [])
 
-    function getTotalDownloads(packEntry: PackEntry) {
-        let total = 0
-        for (let day in packEntry.downloads) {
-            total += packEntry.downloads[day]
-        }
-        setDownloads(total)
-    }
-
     if (data === undefined || (data.display.hidden && match))
         return <div style={{ display: 'none' }} />
 
-    if (!loaded) return <div className="packCard" style={{ ...style }}>
+    if (!loaded) return <div className="packCard" style={{ ...style }} {...props}>
         <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%' }}>
             <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)', overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
                 <div className='packImage' />
@@ -100,7 +84,7 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
     return <div className="packCard" key={id} ref={card} onClick={(e) => {
         if (!(e.target instanceof HTMLDivElement || e.target instanceof HTMLLabelElement)) return
         if (onClick) onClick()
-    }} style={{ ...style }}>
+    }} style={{ ...style }} {...props}>
         <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%' }}>
             <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)', overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
                 {!fallback && <img src={data.display.icon} className="packImage fadeIn" style={{ aspectRatio: '1 / 1', imageRendering: 'pixelated' }} onError={() => setFallback(true)} />}
@@ -117,7 +101,7 @@ export default function PackCard({ id, packEntry, packData, onClick, editable, s
             <label style={{ fontSize: 24 }}>{formatDownloads(downloads)} <label style={{ fontSize: 16, color: 'var(--subText)' }}>download{downloads === 1 ? '' : 's'}</label></label>
             <div className='container' style={{ flexDirection: 'row', justifyContent: 'right', gap: 8 }}>
                 <DownloadButton link={`https://api.smithed.dev/download?pack=${id}`} />
-                {editable && <EditButton link={`../edit?pack=${id.split(':')[1]}`} />}
+                {editable && <EditButton link={`../edit?pack=${id}`} />}
             </div>
         </div>
     </div>

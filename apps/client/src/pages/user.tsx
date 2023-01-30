@@ -1,4 +1,4 @@
-import { PackData, UserData } from 'data-types'
+import { HTTPResponses, PackData, UserData } from 'data-types'
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { formatDownloads } from 'formatters'
@@ -12,12 +12,12 @@ import EditButton from 'components/EditButton'
 interface UserStats {
     totalDownloads: number,
     dailyDownloads: number
-    packs: PackData[],
+    packs: string[],
     id: string,
 }
 
 export default function User() {
-    const { owner: rawUserId } = useParams()
+    const { owner: userId } = useParams()
     const { uid } = useQueryParams()
     const firebaseUser = useFirebaseUser()
     const editable = uid !== undefined && uid === firebaseUser?.uid
@@ -26,12 +26,6 @@ export default function User() {
     const [user, setUser] = useState<UserData>()
     const [userStats, setUserStats] = useState<UserStats>()
     const [loaded, setLoaded] = useState<boolean>()
-
-    async function getCleanName() {
-        const responseUsername = await (await fetch(`https://api.smithed.dev/v2/sanitize?value=${rawUserId}`)).text()
-
-        return responseUsername
-    }
 
     async function getDownloads(id: string, packs: string[]) {
         let total = 0;
@@ -42,12 +36,9 @@ export default function User() {
 
         for (let pack of packs) {
             try {
-                const packEntry = await (await fetch(`https://api.smithed.dev/packs/${pack}`)).json()
-                for (let day in packEntry.downloads) {
-                    total += packEntry.downloads[day]
-                    if (day === today)
-                        daily += packEntry.downloads[day]
-                }
+                const packEntry = await (await fetch(`https://api.smithed.dev/v2/packs/${pack}/meta`)).json()
+                total += packEntry.stats.downloads.total
+                daily += packEntry.stats.downloads.today ?? 0
             } catch {
                 console.log(`Pack ${pack}`)
             }
@@ -58,29 +49,28 @@ export default function User() {
 
     async function getUserData() {
         setLoaded(false)
-        const id = await getCleanName();
 
-        const userDataResponse = await fetch(`https://api.smithed.dev/v2/users/${id}`)
+        const userDataResponse = await fetch(`https://api.smithed.dev/v2/users/${userId}`)
         if (!userDataResponse.ok) return
         const user = await userDataResponse.json()
 
-        const userPacksResponse = await fetch(`https://api.smithed.dev/v2/users/${id}/packs`)
-        const packs: PackData[] = userPacksResponse.ok ? (await userPacksResponse.json()) : []
+        const userPacksResponse = await fetch(`https://api.smithed.dev/v2/users/${userId}/packs`)
+        const packIds: string[] = userPacksResponse.ok ? (await userPacksResponse.json()) : []
 
 
-        const [totalDownloads, dailyDownloads] = await getDownloads(id, packs.map(p => p.id))
+        const [totalDownloads, dailyDownloads] = await getDownloads(userId ?? '', packIds)
 
         setUser(user)
         setUserStats({
-            packs: packs,
-            id: id,
+            packs: packIds,
+            id: userId ?? '',
             totalDownloads: totalDownloads,
             dailyDownloads: dailyDownloads
         })
         setLoaded(true)
     }
 
-    useEffect(() => { getUserData() }, [rawUserId])
+    useEffect(() => { getUserData() }, [userId])
 
     function Stat({ name, value }: { name: string, value: number | string | undefined }) {
         return <label className='statName'>{name}<br /><label className='statValue'>{value}</label></label>
@@ -95,7 +85,7 @@ export default function User() {
                 <div className='statContainer' style={{ padding: 16, width: '100%' }}>
                     <div className="container" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between' }}>
                         <label style={{ fontSize: 32 }}>{user?.displayName}</label>
-                        {editable && <EditButton/>}
+                        {editable && <EditButton />}
                     </div>
                     <div className='statBoxes container '>
                         <Stat name='Total Packs' value={userStats?.packs?.length ?? 0} />
@@ -104,16 +94,16 @@ export default function User() {
                     </div>
                 </div>
             </div>
-            {editable && <div className='container' style={{gap: 16, flexDirection: 'row', padding: 16, borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--backgroundAccent)', fontSize: 18}}>
+            {editable && <div className='container' style={{ gap: 16, flexDirection: 'row', padding: 16, borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--backgroundAccent)', fontSize: 18 }}>
                 Create new pack
-                <button className='button container wobbleHover' style={{fontSize: 48, width: 48, height: 48, justifyContent: 'center', borderRadius: '50%'}} onClick={() => {
+                <button className='button container wobbleHover' style={{ fontSize: 48, width: 48, height: 48, justifyContent: 'center', borderRadius: '50%' }} onClick={() => {
                     navigate('/edit?new=true')
                 }}>
                     <label>+</label>
                 </button>
             </div>}
             {userStats.packs.length > 0 && <div className='container' style={{ gap: 16, width: '100%', justifyContent: 'safe start', boxSizing: 'border-box' }}>
-                {userStats?.packs?.map(p => <PackCard editable={editable} packData={p} id={userStats.id + ":" + p.id} onClick={() => { navigate(p.id) }} />)}
+                {userStats?.packs.map(p => <PackCard editable={editable} id={p} onClick={() => { navigate(p) }} />)}
             </div>}
         </div>
     </div>

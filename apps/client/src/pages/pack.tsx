@@ -11,7 +11,7 @@ export default function Packs() {
     const [notFound, setNotFound] = useState(false)
 
     async function onLoad() {
-        const response = await fetch(`https://api.smithed.dev/packs/${id}`)
+        const response = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
         if (!response.ok) return setNotFound(true)
         const data = await response.json()
         setData(data)

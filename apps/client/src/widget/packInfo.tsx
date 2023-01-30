@@ -29,9 +29,8 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
     const parentDiv = useRef<HTMLDivElement>(null)
     const spinnerDiv = useRef<HTMLDivElement>(null)
 
-    async function getData(owner: string, packId: string) {
-        if (packEntry === undefined) return
-        const response = await fetch(`https://api.smithed.dev/packs/pack=${packId}`)
+    async function getData() {
+        const response = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
         if (!response.ok)
             return void setData(undefined)
         const data = await response.json()
@@ -40,8 +39,8 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
         return data
     }
 
-    async function getAuthor(owner: string) {
-        const response = await fetch(`https://api.smithed.dev/users/${owner}`)
+    async function getAuthor(id: string) {
+        const response = await fetch(`https://api.smithed.dev/v2/users/${id}`)
         if (!response.ok)
             return void setAuthor('')
         const data = await response.json()
@@ -51,19 +50,19 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
     function correctGithubLinks(url: string) {
         const matches = /(https:\/\/)?(www\.)?github\.com\/(\S[^\/]+)\/(\S[^\/]+)\/(\S[^\/]+)\/(\S[^?\s]+)/g.exec(url)
         console.log(matches)
-        if(matches == null || matches.length === 0)
+        if (matches == null || matches.length === 0)
             return url
-        
+
         matches.splice(0, 3)
         const user = matches.shift()
         const repo = matches.shift()
         const method = matches.shift()
-        if(method !== 'blob')
+        if (method !== 'blob')
             return url
         const path = matches.shift()
 
         return `https://raw.githubusercontent.com/${user}/${repo}/${path}`
-        
+
     }
 
     async function getFullViewPage(data: PackData) {
@@ -71,7 +70,7 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
         if (data.display.webPage === undefined || !data.display.webPage.startsWith('https://')) return setFullviewPage('');
         const response = await (async () => {
 
-            data.display.webPage = correctGithubLinks(data.display.webPage??'')
+            data.display.webPage = correctGithubLinks(data.display.webPage ?? '')
             console.log('Post coercion:', data.display.webPage)
             let resp: any;
             try {
@@ -93,16 +92,17 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
         spinnerDiv.current?.style.setProperty('animation', 'fadeIn 1s 1')
         spinnerDiv.current?.style.setProperty('display', 'inherit')
 
-        const [owner, packId] = id.split(':')
-
-        if (packData === undefined) {
-            var data = await getData(owner, packId)
-        } else {
-            data = packData
-            setData(packData)
+        const metaDataResponse = await fetch(`https://api.smithed.dev/v2/packs/${id}/meta`)
+        if(!metaDataResponse.ok) {
+            setData(undefined)
+            return
         }
+        const metaData = await metaDataResponse.json()
+
+        const data = await getData()
+
         await getFullViewPage(data)
-        await getAuthor(owner)
+        await getAuthor(metaData.owner)
 
         setTimeout(() => {
             parentDiv.current?.style.setProperty('display', 'flex')
@@ -117,7 +117,7 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
     return <div className='container packInfoRoot' style={{ height: 'auto', width: '100%', ...style }}>
         <div ref={spinnerDiv} className="container" key="spinner" style={{ height: fixed ? '100%' : '100%', marginTop: yOffset, boxSizing: 'border-box' }}><Spinner /></div>
         {data !== undefined && <div className="container" style={{
-            justifyContent: 'start', 
+            justifyContent: 'start',
             backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)',
             padding: 16, marginTop: yOffset,
             display: 'none',

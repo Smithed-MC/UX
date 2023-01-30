@@ -53,7 +53,6 @@ interface NavOptionProps {
 export function NavOption({ SVGComponent, path, title, navigateTo, withSpecialQueryParam }: NavOptionProps) {
     const navigate = useNavigate();
     const queryParams = useQueryParams()
-    console.log(queryParams);
     const pathMatch = useMatch(path);
     const navigatePathMatch = navigateTo ? useMatch(navigateTo) ? true : false : false;
     const [hover, setHover] = useState(false)

@@ -16,7 +16,7 @@ interface InputWithTooltipProps {
 }
 
 function Editor({ children, title, style, ...props }: any) {
-    return <div className='container' style={{ backgroundColor: 'var(--backgroundAccent)', width: '100%', maxWidth: 'calc(512px + 16px)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, boxSizing: 'border-box', ...style}}>
+    return <div className='container' style={{ backgroundColor: 'var(--backgroundAccent)', width: '100%', maxWidth: 'calc(512px + 16px)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, boxSizing: 'border-box', ...style }}>
         <h1>{title}</h1>
         <div className='container' style={{ width: '100%', height: '100%', gap: 16, alignItems: 'start' }}>{children}</div>
     </div>
@@ -45,7 +45,7 @@ function Tooltip({ description, style, offset }: { description: string, offset?:
     const [hover, setHover] = useState(false)
     return <div style={{ width: 0, height: 0, marginBottom: 18, ...style }}>
         <Info style={{ fill: 'var(--accent)', width: 16, height: 16, marginLeft: offset ?? -26, opacity: hover ? 1 : 0.5, backgroundColor: 'var(--buttonText)', borderRadius: 'var(--defaultBorderRadius)', border: '1px solid var(--buttonText)' }} onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)} />
-        {hover && <div className="fadeIn" style={{ animationDuration: '0.3s', position: 'absolute', backgroundColor: 'var(--accent)', borderRadius: 'var(--defaultBorderRadius)', padding: 8,zIndex: 1,border: '4px solid var(--buttonText)'}}>{description}</div>}
+        {hover && <div className="fadeIn" style={{ animationDuration: '0.3s', position: 'absolute', backgroundColor: 'var(--accent)', borderRadius: 'var(--defaultBorderRadius)', padding: 8, zIndex: 1, border: '4px solid var(--buttonText)' }}>{description}</div>}
     </div>
 
 }
@@ -287,20 +287,29 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
 }
 
 function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies: PackDependency[], onRemoveDependency: () => void }) {
-    dependencies.sort((a, b) => a.id.localeCompare(b.id))
-    let elements: JSX.Element[] = []
-    dependencies.forEach((d, i) => {
-        elements.push(<button className='button' style={{ width: 18, height: 18, backgroundColor: 'var(--badAccent)' }} onClick={() => {
-            dependencies.splice(i, 1)
-            onRemoveDependency()
-        }}>
-            <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Cross style={{ width: '12px', height: '12px', flexShrink: 0, stroke: 'var(--buttonText)' }} />
-            </div>
-        </button>)
-        elements.push(<label style={{ paddingRight: 16, borderRight: '2px solid var(--background)' }}>{d.id}</label>)
-        elements.push(<label>{d.version}</label>)
-    })
+    const [elements, setElements] = useState<JSX.Element[]>([]);
+
+    const getDeps = async () => {
+        dependencies.sort((a, b) => a.id.localeCompare(b.id))
+        let elements: JSX.Element[] = []
+        for(let i = 0; i < dependencies.length; i++) {
+            const d = dependencies[i]
+            elements.push(<button className='button' style={{ width: 18, height: 18, backgroundColor: 'var(--badAccent)' }} onClick={() => {
+                dependencies.splice(i, 1)
+                onRemoveDependency()
+            }}>
+                <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Cross style={{ width: '12px', height: '12px', flexShrink: 0, stroke: 'var(--buttonText)' }} />
+                </div>
+            </button>)
+            elements.push(<label style={{ paddingRight: 16, borderRight: '2px solid var(--background)' }}>{d.id}</label>)
+            elements.push(<label>{d.version}</label>)
+        }
+            
+        setElements(elements)
+    }
+
+    useEffect(() => {getDeps()}, [])
 
     return <div style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto', alignItems: 'center', columnGap: 16, rowGap: 8 }}>
         {elements}
@@ -354,7 +363,7 @@ export default function Edit() {
     let deleteConfirmation = 0;
 
     useEffect(() => {
-        if(packData)
+        if (packData)
             packData.versions[selectedVersion].dependencies ??= []
         setSupportedVersions(packData?.versions[selectedVersion]?.supports ?? [])
     }, [packData, selectedVersion])
@@ -405,11 +414,11 @@ export default function Edit() {
     const updateVersions = () => { setVersions(Object.create(packData.versions)) }
     return <div className="container" style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, flexDirection: 'row', alignItems: 'start', justifyContent: 'flex-start', boxSizing: 'border-box' }}>
         <div className='editorContainer'>
-            <div className='container' style={{width:'100%', boxSizing: 'border-box', gap: 48}}>
+            <div className='container' style={{ width: '100%', boxSizing: 'border-box', gap: 48 }}>
                 <Editor title={'Id'}>
-                    <StringInput description='Unique ID that others can reference your pack by' reference={packData} attr={'id'} disabled={!isNew} header={''}/>
+                    <StringInput description='Unique ID that others can reference your pack by' reference={packData} attr={'id'} disabled={!isNew} header={''} />
                 </Editor>
-                <Editor title={'Display'} style={{gridColumn: 1}}>
+                <Editor title={'Display'} style={{ gridColumn: 1 }}>
                     <StringInput description='Name of the pack' reference={packData.display} attr={'name'} />
                     <StringInput description='Short description of the pack' reference={packData.display} attr={'description'} />
                     <ImageURLInput description='URL to the icon of the pack' reference={packData.display} attr={'icon'} width={64} height={64} />

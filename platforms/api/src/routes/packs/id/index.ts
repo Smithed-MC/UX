@@ -203,6 +203,7 @@ API_APP.route({
 
         return {
             docId: doc.id,
+            rawId: await doc.get('id'),
             stats: await doc.get('stats'),
             owner: await doc.get('owner'),
             contributors: await doc.get('contributors')
