@@ -41,25 +41,25 @@ const PackDependencySchema = Type.Object({
 })
 
 export const PackVersionSchema = Type.Object({
-    name: Type.String(),
+    name: Type.String({minLength: 1}),
     downloads: Type.Object({
-        datapack: Type.String(),
+        datapack: Type.String({minLength: 1}),
         resourcepack: Type.String()
     }),
-    supports: Type.Array(MinecraftVersionSchema),
+    supports: Type.Array(MinecraftVersionSchema, {minItems: 1}),
     dependencies: Type.Array(PackDependencySchema)
 })
 
 export const PackDataSchema = Type.Object({
-    id: Type.String(),
+    id: Type.String({minLength: 3}),
     display: Type.Object({
-        name: Type.String(),
-        description: Type.String(),
+        name: Type.String({minLength: 3}),
+        description: Type.String({minLength: 3}),
         icon: Type.String({default: ''}),
         hidden: Type.Boolean({default: false}),
         webPage: Type.Optional(Type.String())
     }),
-    versions: Type.Array(PackVersionSchema),
+    versions: Type.Array(PackVersionSchema, {minItems: 1}),
     categories: Type.Array(Type.Union(packCategories.map(c => Type.Literal(c))))
 })
 

@@ -1,7 +1,7 @@
 import { e } from '@tauri-apps/api/event-2a9960e7'
 import { ErrorPage, MarkdownRenderer, Spinner } from 'components'
 import { Back, Cross, Info, Left, Right, Save, Trash } from 'components/svg'
-import { MinecraftVersion, PackData, PackDependency, PackVersion, packCategories } from 'data-types'
+import { HTTPResponses, MinecraftVersion, PackData, PackDependency, PackVersion, packCategories } from 'data-types'
 import { formatDownloadURL } from 'formatters'
 import { useFirebaseUser, useQueryParams } from 'hooks'
 import React, { CSSProperties, useEffect, useRef, useState } from 'react'
@@ -281,8 +281,8 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
         </EditorDiv>
     }
 
-    return <EditorDiv style={{ flexDirection: 'row', width: 'fit-content', justifyContent: 'left' }}>
-        <button className='button' style={{ fontSize: 16 }} onClick={toggleDisplay}>Add new version</button>
+    return <EditorDiv style={{ flexDirection: 'row', justifyContent: 'left', width: '100%' }}>
+        <button className='button' style={{ fontSize: 16, width: '100%' }} onClick={toggleDisplay}>Add new version</button>
     </EditorDiv>
 }
 
@@ -293,7 +293,7 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
         console.log(dependencies)
         dependencies.sort((a, b) => a.id.localeCompare(b.id))
         let elements: JSX.Element[] = []
-        for(let i = 0; i < dependencies.length; i++) {
+        for (let i = 0; i < dependencies.length; i++) {
             const d = dependencies[i]
 
             const metaData = await (await fetch(`https://api.smithed.dev/v2/packs/${d.id}/meta`)).json()
@@ -309,11 +309,11 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
             elements.push(<label style={{ paddingRight: 16, borderRight: '2px solid var(--background)' }}>{metaData.rawId}</label>)
             elements.push(<label>{d.version}</label>)
         }
-            
+
         setElements(elements)
     }
 
-    useEffect(() => {getDeps()}, [dependencies.length])
+    useEffect(() => { getDeps() }, [dependencies.length])
 
     return <div style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto', alignItems: 'center', columnGap: 16, rowGap: 8 }}>
         {elements}
@@ -335,7 +335,7 @@ function NewDependency({ dependencies, onAddDependency }: { dependencies: PackDe
             const version = versionRef.current.value
 
             const metaDataResponse = await fetch(`https://api.smithed.dev/v2/packs/${rawId}/meta`)
-            if(!metaDataResponse.ok)
+            if (!metaDataResponse.ok)
                 alert('Invalid pack id!')
             const metaData = await metaDataResponse.json()
 
@@ -372,7 +372,7 @@ export default function Edit() {
     let deleteConfirmation = 0;
 
     useEffect(() => {
-        if (packData)
+        if (packData && packData.versions[selectedVersion])
             packData.versions[selectedVersion].dependencies ??= []
         setSupportedVersions(packData?.versions[selectedVersion]?.supports ?? [])
     }, [packData, selectedVersion])
@@ -439,13 +439,11 @@ export default function Edit() {
             <Editor title={'Versions'}>
                 <EditorDiv style={{ alignItems: 'center' }}>
                     <EditorDiv style={{ width: 'min-content' }}>
-                        <EditorDiv style={{ flexDirection: 'row' }}>
+                        {versions.length > 1 && <EditorDiv style={{ flexDirection: 'row' }}>
                             <Selection values={versions.map(v => v.name)} onChange={setSelectedVersion} defaultValue={selectedVersion} />
-
-
-                        </EditorDiv>
-                        <EditorDiv style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <button style={{ width: 32, height: 32, backgroundColor: 'var(--badAccent)' }} className='button' onClick={() => {
+                        </EditorDiv>}
+                        <EditorDiv style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+                            {versions.length > 1 && <button style={{ width: 32, height: 32, backgroundColor: 'var(--badAccent)' }} className='button' onClick={() => {
                                 if (deleteButtonRef.current == null) return
 
                                 if (deleteConfirmation === 0) {
@@ -468,7 +466,7 @@ export default function Edit() {
                                 <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                     <Trash style={{ width: '24px', height: '24px', flexShrink: 0, stroke: 'var(--buttonText)' }} />
                                 </div>
-                            </button>
+                            </button>}
                             <label ref={deleteButtonRef} style={{ position: 'absolute', marginLeft: 84, zIndex: 10, backgroundColor: 'var(--badAccent)', padding: 8, borderRadius: 'var(--defaultBorderRadius)' }} hidden>{'Press again to confirm'}</label>
                             <NewVersion data={packData.versions} onAddVersion={() => {
                                 setVersions(Object.create(packData.versions));
@@ -477,7 +475,7 @@ export default function Edit() {
                         </EditorDiv>
                     </EditorDiv>
                 </EditorDiv>
-                {packData.versions.length > 0 && <EditorDiv>
+                {versions.length > 0 && <EditorDiv>
                     <DownloadURLInput reference={packData.versions[selectedVersion].downloads} attr='datapack' header='Datapack Download' description='Raw URL to the download for the datapack' />
                     <DownloadURLInput reference={packData.versions[selectedVersion].downloads} attr='resourcepack' header='Resourcepack Download' description='Raw URL to the download for the resourcepack' />
                     <DropdownSelectionInput reference={packData.versions[selectedVersion]} attr='supports' description='Supported Minecraft Versions' options={mcVersions} onChange={() => {
@@ -500,9 +498,16 @@ export default function Edit() {
             }}><Back style={{ stroke: 'var(--buttonText)', fill: 'var(--buttonText)' }} /></button>
             <button className='button' style={{ width: 36, height: 36 }} title='Save' onClick={async () => {
                 console.log(packData)
-                const resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}?token=${await user.getIdToken()}`, { method: 'PATCH', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
 
-                if (resp.status !== 200) {
+                if (!isNew) {
+                    var resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}?token=${await user.getIdToken()}`, { method: 'PATCH', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
+                } else {
+                    var resp = await fetch(`https://api.smithed.dev/v2/packs?token=${await user.getIdToken()}&id=${packData.id}`, {method: 'POST', body: JSON.stringify({data: packData}), headers: {
+                        "Content-Type": "application/json"
+                    }})
+                }
+
+                if (resp.status !== HTTPResponses.OK && resp.status !== HTTPResponses.CREATED) {
                     alert(await resp.text())
                 } else {
                     saveTextRef.current?.style.setProperty('animation', 'fadeInAndOut 5s')
