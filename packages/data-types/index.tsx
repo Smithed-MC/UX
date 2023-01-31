@@ -79,7 +79,8 @@ export enum HTTPResponses {
     UNAUTHORIZED = 401,
     FORBIDDEN = 403,
     NOT_FOUND = 404,
-    CONFLICT = 409
+    CONFLICT = 409,
+    
 }
 
 export type ReviewState = 'verified'|'pending'|'unsubmitted'|'rejected'

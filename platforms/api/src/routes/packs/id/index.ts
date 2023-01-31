@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox";
-import { API_APP } from "../../../app.js";
+import { API_APP, sendError } from "../../../app.js";
 import { getFirestore } from "firebase-admin/firestore";
 import { HTTPResponses, PackDataSchema } from "data-types";
 import { getUIDFromToken } from "database";
@@ -35,7 +35,7 @@ API_APP.route({
 
         const doc = await getPackDoc(id)
         if (doc === undefined)
-            return reply.status(HTTPResponses.NOT_FOUND).send(`Pack with ID ${id} was not found`)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${id} was not found`)
 
         return await doc.get('data')
     }
@@ -62,15 +62,15 @@ API_APP.route({
 
         const userId = await getUIDFromToken(token)
         if(userId === undefined)
-            return reply.status(HTTPResponses.UNAUTHORIZED).send('Invalid token')
+            return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
         
 
         const doc = await getPackDoc(packId)
         if (doc === undefined)
-            return reply.status(HTTPResponses.NOT_FOUND).send(`Pack with ID ${packId} was not found`)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
 
         if(!(await doc.get('contributors')).includes(userId))
-            return reply.status(HTTPResponses.FORBIDDEN).send(`You are not a contributor for ${packId}`)
+            return sendError(reply, HTTPResponses.FORBIDDEN, `You are not a contributor for ${packId}`)
 
 
         await doc.ref.set({data: packData}, {merge: true})
@@ -96,15 +96,15 @@ API_APP.route({
         
         const userId = await getUIDFromToken(token)
         if(userId === undefined)
-            return reply.status(HTTPResponses.UNAUTHORIZED).send('Invalid token')
+            return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
         
 
         const doc = await getPackDoc(packId)
         if (doc === undefined)
-            return reply.status(HTTPResponses.NOT_FOUND).send(`Pack with ID ${packId} was not found`)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
 
         if((await doc.get('data.owner')) !== userId)
-            return reply.status(HTTPResponses.FORBIDDEN).send(`You are not the owner of ${packId}`)
+            return sendError(reply, HTTPResponses.FORBIDDEN, `You are not the owner of ${packId}`)
 
         await doc.ref.delete()
         return reply.status(HTTPResponses.OK).send('Deleted data')
@@ -129,15 +129,15 @@ API_APP.route({
         
         const userId = await getUIDFromToken(token)
         if(userId === undefined)
-            return reply.status(HTTPResponses.UNAUTHORIZED).send('Invalid token')
+            return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
         
 
         const doc = await getPackDoc(packId)
         if (doc === undefined)
-            return reply.status(HTTPResponses.NOT_FOUND).send(`Pack with ID ${packId} was not found`)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
 
         if((await doc.get('data.owner')) !== userId)
-            return reply.status(HTTPResponses.FORBIDDEN).send(`You are not the owner of ${packId}`)
+            return sendError(reply, HTTPResponses.FORBIDDEN, `You are not the owner of ${packId}`)
 
         const existingContributors: string[] = await doc.get('contributors')
 
@@ -168,15 +168,15 @@ API_APP.route({
         
         const userId = await getUIDFromToken(token)
         if(userId === undefined)
-            return reply.status(HTTPResponses.UNAUTHORIZED).send('Invalid token')
+            return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
         
 
         const doc = await getPackDoc(packId)
         if (doc === undefined)
-            return reply.status(HTTPResponses.NOT_FOUND).send(`Pack with ID ${packId} was not found`)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
 
         if((await doc.get('data.owner')) !== userId)
-            return reply.status(HTTPResponses.FORBIDDEN).send(`You are not the owner of ${packId}`)
+            return sendError(reply, HTTPResponses.FORBIDDEN, `You are not the owner of ${packId}`)
 
         const existingContributors: string[] = await doc.get('contributors')
 
@@ -199,7 +199,7 @@ API_APP.route({
 
         const doc = await getPackDoc(id)
         if (doc === undefined)
-            return reply.status(HTTPResponses.NOT_FOUND).send(`Pack with ID ${id} was not found`)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${id} was not found`)
 
         return {
             docId: doc.id,

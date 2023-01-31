@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox";
-import { API_APP } from "../../../app.js";
+import { API_APP, sendError } from "../../../app.js";
 import { getPackDoc } from "./index.js";
 import { HTTPResponses, PackVersion, PackVersionSchema } from "data-types";
 import { coerce, compare } from "semver";
@@ -18,7 +18,7 @@ API_APP.route({
         const doc = await getPackDoc(id)
 
         if (doc === undefined)
-            return reply.status(HTTPResponses.NOT_FOUND).send(`Pack with ID ${id} was not found`)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${id} was not found`)
 
         return await doc.get('data.versions')
     }
@@ -45,23 +45,23 @@ API_APP.route({
         const {data: versionData} = response.body
 
         if(coerce(versionId) == null)
-            return reply.status(HTTPResponses.BAD_REQUEST).send('Version ID is not valid semver. Reference: https://semver.org')
+            return sendError(reply, HTTPResponses.BAD_REQUEST, 'Version ID is not valid semver. Reference: https://semver.org')
 
         const userId = await getUIDFromToken(token)
         if(userId === undefined)
-            return reply.status(HTTPResponses.UNAUTHORIZED).send('Invalid token')
+            return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
 
         const doc = await getPackDoc(packId)
         if(doc === undefined)
-            return reply.status(HTTPResponses.NOT_FOUND).send(`Pack with ID ${packId} was not found`)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
 
         if(!(await doc.get('contributors')).includes(userId))
-            return reply.status(HTTPResponses.FORBIDDEN).send(`You are not a contributor for ${packId}`)
+            return sendError(reply, HTTPResponses.FORBIDDEN, `You are not a contributor for ${packId}`)
 
         const versions: PackVersion[] = await doc.get('data.versions')
 
         if(versions.find(v => v.name === versionId))
-            return reply.status(HTTPResponses.CONFLICT).send(`Version with ID ${versionId} already exists`)
+            return sendError(reply, HTTPResponses.CONFLICT, `Version with ID ${versionId} already exists`)
 
         versions.push(versionData)
 
@@ -96,24 +96,24 @@ API_APP.route({
         const {data: versionData} = response.body
 
         if(coerce(versionId) == null)
-            return reply.status(HTTPResponses.BAD_REQUEST).send('Version ID is not valid semver. Reference: https://semver.org')
+            return sendError(reply, HTTPResponses.BAD_REQUEST, 'Version ID is not valid semver. Reference: https://semver.org')
 
         const userId = await getUIDFromToken(token)
         if(userId === undefined)
-            return reply.status(HTTPResponses.UNAUTHORIZED).send('Invalid token')
+            return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
 
         const doc = await getPackDoc(packId)
         if(doc === undefined)
-            return reply.status(HTTPResponses.NOT_FOUND).send(`Pack with ID ${packId} was not found`)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
 
         if(!(await doc.get('contributors')).includes(userId))
-            return reply.status(HTTPResponses.FORBIDDEN).send(`You are not a contributor for ${packId}`)
+            return sendError(reply, HTTPResponses.FORBIDDEN, `You are not a contributor for ${packId}`)
 
         const versions: PackVersion[] = await doc.get('data.versions')
 
         const versionIndex = versions.findIndex(v => v.name === versionId)
         if(versionIndex === -1)
-            return reply.status(HTTPResponses.CONFLICT).send(`Version with ID ${versionId} already exists`)
+            return sendError(reply, HTTPResponses.CONFLICT, `Version with ID ${versionId} already exists`)
 
         versions[versionIndex] = versionData
 
@@ -145,24 +145,24 @@ API_APP.route({
         const {token} = response.query
         
         if(coerce(versionId) == null)
-            return reply.status(HTTPResponses.BAD_REQUEST).send('Version ID is not valid semver. Reference: https://semver.org')
+            return sendError(reply, HTTPResponses.BAD_REQUEST, 'Version ID is not valid semver. Reference: https://semver.org')
 
         const userId = await getUIDFromToken(token)
         if(userId === undefined)
-            return reply.status(HTTPResponses.UNAUTHORIZED).send('Invalid token')
+            return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
 
         const doc = await getPackDoc(packId)
         if(doc === undefined)
-            return reply.status(HTTPResponses.NOT_FOUND).send(`Pack with ID ${packId} was not found`)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
 
         if(!(await doc.get('contributors')).includes(userId))
-            return reply.status(HTTPResponses.FORBIDDEN).send(`You are not a contributor for ${packId}`)
+            return sendError(reply, HTTPResponses.FORBIDDEN, `You are not a contributor for ${packId}`)
 
         const versions: PackVersion[] = await doc.get('data.versions')
 
         const versionIndex = versions.findIndex(v => v.name === versionId)
         if(versionIndex === -1)
-            return reply.status(HTTPResponses.CONFLICT).send(`Version with ID ${versionId} already exists`)
+            return sendError(reply, HTTPResponses.CONFLICT, `Version with ID ${versionId} already exists`)
 
         versions.splice(versionIndex, 1)
 
@@ -191,7 +191,7 @@ API_APP.route({
 
         const doc = await getPackDoc(id)
         if(doc === undefined)
-            return reply.status(HTTPResponses.NOT_FOUND).send(`Pack with ID ${id} was not found`)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${id} was not found`)
 
         const versions: PackVersion[] = await doc.get('data.versions')
 

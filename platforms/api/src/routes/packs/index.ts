@@ -1,5 +1,5 @@
 import {Type} from '@sinclair/typebox'
-import {API_APP} from "../../app.js";
+import {API_APP, sendError} from "../../app.js";
 import {getFirestore} from 'firebase-admin/firestore'
 import { Queryable } from '../../index.js';
 import { HTTPResponses, PackData, PackDataSchema } from 'data-types';
@@ -82,14 +82,14 @@ API_APP.route({
 
         const userId = await getUIDFromToken(token)
         if(userId === undefined)
-            return reply.status(HTTPResponses.UNAUTHORIZED).send('Invalid token')
+            return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
 
         const firestore = getFirestore()
 
         const existingCount = firestore.collection('packs').where('id', '==', id).count()
 
         if((await existingCount.get()).data().count != 0) 
-            return reply.status(HTTPResponses.CONFLICT).send(`Pack with ID ${id} already exists in the database`)
+            return sendError(reply, HTTPResponses.CONFLICT, `Pack with ID ${id} already exists in the database`)
 
 
         const documentData = {

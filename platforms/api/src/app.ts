@@ -1,11 +1,15 @@
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import { initialize } from "database";
-import fastify from "fastify";
+import fastify, { FastifyReply } from "fastify";
 import * as fs from 'fs';
 import cors from '@fastify/cors'
+import { HTTPResponses } from "data-types";
 
 export const API_APP = fastify().withTypeProvider<TypeBoxTypeProvider>();
 
+export function sendError(reply: FastifyReply, code: HTTPResponses, message: string) {
+    reply.status(code).send({statusCode: code, error: HTTPResponses[code], message: message})
+}
 
 export async function importRoutes(dirPath: string) {
     let files = fs.readdirSync('src/' + dirPath)

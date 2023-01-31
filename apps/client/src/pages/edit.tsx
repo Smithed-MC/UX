@@ -508,7 +508,12 @@ export default function Edit() {
                 }
 
                 if (resp.status !== HTTPResponses.OK && resp.status !== HTTPResponses.CREATED) {
-                    alert(await resp.text())
+                    const error = await resp.json()
+
+                    alert(`
+                    Error: ${error.error} ${error.statusCode}
+                    Message: ${error.message}
+                    `)
                 } else {
                     saveTextRef.current?.style.setProperty('animation', 'fadeInAndOut 5s')
                     setTimeout(() => {

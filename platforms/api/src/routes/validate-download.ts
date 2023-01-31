@@ -1,5 +1,6 @@
 import { Type } from "@sinclair/typebox";
-import { API_APP } from "../app.js";
+import { API_APP, sendError } from "../app.js";
+import { HTTPResponses } from "data-types";
 
 
 API_APP.route({
@@ -13,18 +14,18 @@ API_APP.route({
     handler: async (request, reply) => {
         const { url } = request.query
         if (url === undefined || url === '')
-            return reply.status(400).send('No url was specified')
+            return sendError(reply, HTTPResponses.BAD_REQUEST, "No url was specified")
     
         try {
             const resp = await fetch(url as string)
             if (!resp.ok)
-                return reply.status(200).send(resp.status)
+                return {valid: false}
         
-            return reply.status(200).send('Download was not a valid zip!')
+            return {valid: true}
             
     
         } catch {
-            reply.status(200).send('Error when fetching url!')
+            return {valid: false}
         }
     }
 })

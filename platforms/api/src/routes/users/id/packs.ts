@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox";
-import { API_APP } from "../../../app.js";
+import { API_APP, sendError } from "../../../app.js";
 import { getUserDoc } from "./index.js";
 import { HTTPResponses } from "data-types";
 import { getFirestore } from "firebase-admin/firestore";
@@ -18,7 +18,7 @@ API_APP.route({
 
         const userDoc = await getUserDoc(id)
         if(userDoc === undefined)
-            return reply.status(HTTPResponses.NOT_FOUND).send('User not found')
+            return sendError(reply, HTTPResponses.NOT_FOUND, 'User not found')
         
         const packs = getFirestore().collection('packs')
 
