@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import {cert, initializeApp} from 'firebase-admin/app'
 import {getAuth} from 'firebase-admin/auth'
+import {getFirestore} from 'firebase-admin/firestore'
+
 import { ServiceAccount } from 'firebase-admin/lib/app/credential';
 import * as jose from 'jose'
 
@@ -52,4 +54,21 @@ export async function getUIDFromToken(token: string) {
             return undefined;
         }
     }
+}
+
+export async function getPackDoc(id: string) {
+
+    const firestore = getFirestore()
+    const packs = firestore.collection('packs')
+
+    const doc = await packs.doc(id).get()
+    if (doc.exists) {
+        return doc
+    }
+    const query = await packs.where('id', '==', id).limit(1).get()
+
+    if (query.docs.length == 0)
+        return undefined
+
+    return query.docs[0]
 }

@@ -1,9 +1,8 @@
 import { Type } from "@sinclair/typebox";
 import { API_APP, sendError } from "../../../app.js";
-import { getPackDoc } from "./index.js";
 import { HTTPResponses, PackVersion, PackVersionSchema } from "data-types";
 import { coerce, compare } from "semver";
-import { getUIDFromToken } from "database";
+import { getPackDoc, getUIDFromToken } from "database";
 
 API_APP.route({
     method: 'GET',

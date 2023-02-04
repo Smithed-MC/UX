@@ -2,25 +2,10 @@ import { Type } from "@sinclair/typebox";
 import { API_APP, sendError } from "../../../app.js";
 import { getFirestore } from "firebase-admin/firestore";
 import { HTTPResponses, PackDataSchema } from "data-types";
-import { getUIDFromToken } from "database";
+import { getPackDoc, getUIDFromToken } from "database";
 
 
-export async function getPackDoc(id: string) {
 
-    const firestore = getFirestore()
-    const packs = firestore.collection('packs')
-
-    const doc = await packs.doc(id).get()
-    if (doc.exists) {
-        return doc
-    }
-    const query = await packs.where('id', '==', id).limit(1).get()
-
-    if (query.docs.length == 0)
-        return undefined
-
-    return query.docs[0]
-}
 
 API_APP.route({
     method: 'GET',

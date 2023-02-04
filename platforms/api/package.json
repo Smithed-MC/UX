@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "data-types": "*",
-    "formatters": "*"
+    "formatters": "*",
+    "downloader": "*"
   },
   "author": "",
   "license": "ISC",
