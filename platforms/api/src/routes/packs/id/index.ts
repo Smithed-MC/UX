@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox";
-import { API_APP, sendError } from "../../../app.js";
+import { API_APP, get, sendError, set } from "../../../app.js";
 import { getFirestore } from "firebase-admin/firestore";
 import { HTTPResponses, PackDataSchema } from "data-types";
 import { getPackDoc, getUIDFromToken } from "database";
@@ -18,10 +18,19 @@ API_APP.route({
     handler: async (response, reply) => {
         const { id } = response.params;
 
+        const requestIdentifier = 'GET-PACK::' + id
+        const tryCachedResult = await get(requestIdentifier)
+        if(tryCachedResult) {
+            return tryCachedResult.item
+        }
+        
+
         const doc = await getPackDoc(id)
         if (doc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${id} was not found`)
 
+
+        await set(requestIdentifier, doc.get('data'), 15*60*1000)
         return await doc.get('data')
     }
 })
@@ -182,16 +191,27 @@ API_APP.route({
     handler: async (response, reply) => {
         const { id } = response.params;
 
+        
+        const requestIdentifier = 'GET-PACK-META::' + id
+        const tryCachedResult = await get(requestIdentifier)
+        if(tryCachedResult) {
+            return tryCachedResult.item
+        }
+        
+
         const doc = await getPackDoc(id)
         if (doc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${id} was not found`)
 
-        return {
+        const data = {
             docId: doc.id,
             rawId: await doc.get('id'),
             stats: await doc.get('stats'),
             owner: await doc.get('owner'),
             contributors: await doc.get('contributors')
         }
+
+        await set(requestIdentifier, data, 10 * 60 * 1000)
+        return data
     }
 })

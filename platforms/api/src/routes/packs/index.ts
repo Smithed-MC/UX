@@ -1,5 +1,5 @@
 import {Type} from '@sinclair/typebox'
-import {API_APP, sendError} from "../../app.js";
+import {API_APP, get, sendError, set} from "../../app.js";
 import {getFirestore} from 'firebase-admin/firestore'
 import { Queryable } from '../../index.js';
 import { HTTPResponses, PackData, PackDataSchema } from 'data-types';
@@ -38,6 +38,13 @@ API_APP.route({
     handler: async (request, reply) => {
         const {search, sort, limit, start, category} = request.query;
 
+
+        const requestIdentifier = 'GET-PACKS::' + search + ',' + sort + ',' + limit + ',' + start + ',' + category
+        const tryCachedResult = await get(requestIdentifier)
+        if(tryCachedResult) {
+            return tryCachedResult.item
+        }
+        
         const firestore = getFirestore()
 
         let query: Queryable = firestore.collection('packs')
@@ -54,12 +61,14 @@ API_APP.route({
         if(results.empty)
             return []
 
-        let resolvedResults = []
+        let resolvedResults: {id: string, displayName: string}[] = []
         for(let d of results.docs) {
             if(category.length != 0 && !category.every(v => d.get('data.categories')?.includes(v)))
                 continue;
             resolvedResults.push({id: d.id, displayName: d.get('data.display.name')})
         }
+
+        await set(requestIdentifier, resolvedResults, 5*60*1000)
         return resolvedResults
     } 
 })

@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox";
-import { API_APP } from "../app.js";
+import { API_APP, REDIS, get, set } from "../app.js";
 import {DownloadRunner} from 'downloader'
 import { MinecraftVersionSchema, latestMinecraftVersion } from "data-types";
 
@@ -15,13 +15,21 @@ API_APP.route({
     }, 
     handler: async (response, reply) => {
         const {pack: packs, version, mode} = response.query
-        
+
+        if(REDIS) 
+            REDIS.getrange
+
+        const requestIdentifier = 'DOWNLOAD::' + (version ?? latestMinecraftVersion) + ',' + packs.join('-') + ',' + mode
+        const tryCachedResult = await get(requestIdentifier)
+        if(tryCachedResult) {
+            reply.type('application/zip')
+            return tryCachedResult.item
+        }
+
         const runner = new DownloadRunner()
         const result = await runner.run(packs, version ?? latestMinecraftVersion, mode)
 
-        if(result) {
-            
-        }
+        await set(requestIdentifier, result, 3600 * 1000)
         reply.type('application/zip')
         return result
     }
