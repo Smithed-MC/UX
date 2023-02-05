@@ -21,7 +21,10 @@ API_APP.route({
         if (tryCachedResult) {
             reply.type('application/zip')
             console.log(tryCachedResult.item)
-            return tryCachedResult.item
+            if(tryCachedResult.item instanceof Buffer)
+                return tryCachedResult.item
+            else
+                return Buffer.from(tryCachedResult.item.data)
         }
 
         const runner = new DownloadRunner()
