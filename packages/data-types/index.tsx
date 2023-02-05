@@ -82,6 +82,7 @@ export enum HTTPResponses {
     FORBIDDEN = 403,
     NOT_FOUND = 404,
     CONFLICT = 409,
+    SERVER_ERROR = 502
     
 }
 
