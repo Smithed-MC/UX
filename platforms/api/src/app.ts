@@ -43,7 +43,7 @@ async function registerCacheRedis() {
     REDIS = redis
 
     const abcache = abCache({
-        useAwait: true,
+        useAwait: false,
         driver: {
             name: 'abstract-cache-redis', // must be installed via `npm i`
             options: { client: redis }
