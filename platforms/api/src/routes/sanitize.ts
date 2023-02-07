@@ -2,7 +2,7 @@ import { Type } from "@sinclair/typebox";
 import { API_APP } from "../app.js";
 
 export function sanitize(value: string) {
-    return value.toLowerCase().replaceAll(' ', '-').replaceAll(/(\s+|\[|\]|{|}|\||\\|"|%|~|#|<|>|\?)/g, '');
+    return value.toLowerCase().replace(' ', '-').replace(/(\s+|\[|\]|{|}|\||\\|"|%|~|#|<|>|\?)/g, '');
 }
 
 API_APP.route({

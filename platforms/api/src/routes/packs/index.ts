@@ -8,7 +8,8 @@ import { getUIDFromToken } from 'database';
 enum SortOptions {
     Trending = "trending",
     Downloads = "downloads",
-    Alphabetically = "alphabetically"
+    Alphabetically = "alphabetically",
+    Newest = "newest"
 }
 
 const getOrderField = (sort: SortOptions) => {
@@ -19,6 +20,8 @@ const getOrderField = (sort: SortOptions) => {
             return 'stats.downloads.total'
         case SortOptions.Alphabetically:
             return 'data.display.name'
+        case SortOptions.Newest:
+            return 'stats.added'
     }
 }
 
@@ -32,11 +35,12 @@ API_APP.route({
             sort: Type.Enum(SortOptions, {default: SortOptions.Downloads}),
             limit: Type.Integer({maximum: 100, minimum: 1, default: 20}),
             start: Type.Integer({minimum: 0, default: 0}),
-            category: Type.Array(Type.String(), {default: []})
+            category: Type.Array(Type.String(), {default: []}),
+            hidden: Type.Optional(Type.Boolean({default: false}))
         })
     }, 
     handler: async (request, reply) => {
-        const {search, sort, limit, start, category} = request.query;
+        const {search, sort, limit, start, category, hidden} = request.query;
 
 
         const requestIdentifier = 'GET-PACKS::' + search + ',' + sort + ',' + limit + ',' + start + ',' + category
@@ -51,7 +55,9 @@ API_APP.route({
 
         if(search !== undefined && search !== '')
             query = query.where('_indices', 'array-contains', search)
-        
+        if(!hidden)
+            query = query.where('data.hidden', '==', false)
+            
         query = query.orderBy(getOrderField(sort), sort === SortOptions.Alphabetically ? 'asc' : 'desc').offset(start).limit(limit)
         
 
