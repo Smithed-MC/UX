@@ -40,10 +40,10 @@ API_APP.route({
         })
     }, 
     handler: async (request, reply) => {
-        const {search, sort, limit, start, category, hidden} = request.query;
+        const {search, sort, limit, start, category, hidden: includeHidden} = request.query;
 
 
-        const requestIdentifier = 'GET-PACKS::' + search + ',' + sort + ',' + limit + ',' + start + ',' + category
+        const requestIdentifier = 'GET-PACKS::' + search + ',' + sort + ',' + limit + ',' + start + ',' + category + ',' + includeHidden
         const tryCachedResult = await get(requestIdentifier)
         if(tryCachedResult) {
             return tryCachedResult.item
@@ -55,9 +55,9 @@ API_APP.route({
 
         if(search !== undefined && search !== '')
             query = query.where('_indices', 'array-contains', search)
-        if(!hidden)
-            query = query.where('data.hidden', '==', false)
-            
+        if(!includeHidden)
+            query = query.where('hidden', '==', false)
+
         query = query.orderBy(getOrderField(sort), sort === SortOptions.Alphabetically ? 'asc' : 'desc').offset(start).limit(limit)
         
 
@@ -112,6 +112,7 @@ API_APP.route({
             contributors: [userId],
             state: 'unsubmitted',
             owner: userId,
+            hidden: false,
             stats: {
                 added: Date.now(),
                 updated: Date.now(),
