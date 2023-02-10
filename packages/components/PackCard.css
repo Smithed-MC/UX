@@ -1,22 +1,32 @@
 
 
-@media screen and (max-width: 512px) {
+
+.packCard {
+    flex-direction: column;
+}
+.downloadBox {
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+@container cardContainer (max-width: 320px) {
     .packImage {
-        width: 64px;
-        height: 64px;
-    }
-    .packCard {
-        flex-direction: column;
-    }
-    .downloadBox {
-        flex-direction: row;
-        width: 100%;
-        align-items: center;
-        justify-content: center;
+        display: none;
+        width: 0px;
+        height: 0px;
     }
 }
 
-@media screen and (min-width: 512px) {
+@container cardContainer (min-width: 320px) and (max-width: 512px) {
+    .packImage {
+        width: 64px;
+        height: 64px;
+    }    
+}
+
+@container cardContainer (min-width: 512px) {
     .packImage {
         width: 128px;
         height: 128px;
@@ -46,6 +56,14 @@
     border-radius: var(--defaultBorderRadius);
     padding: 16px;
     cursor: pointer;
+}
+
+.cardContainer {
+    container-type: inline-size;
+    container-name: cardContainer;
+    
+    width: 100%;
+    height: 100%;
 }
 
 

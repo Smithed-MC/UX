@@ -8,6 +8,7 @@ import * as queryString from 'query-string'
 import { useFirebaseUser, useQueryParams } from 'hooks'
 import { Edit } from 'components/svg'
 import EditButton from 'components/EditButton'
+import { Helmet } from 'react-helmet'
 
 interface UserStats {
     totalDownloads: number,
@@ -79,6 +80,10 @@ export default function User() {
     if (!loaded) return <div className='container' style={{ width: '100%', height: '100vh', boxSizing: 'border-box' }}><Spinner /></div>
     if (userStats === undefined) return <div></div>
     return <div className='container' style={{ width: '100%', boxSizing: 'border-box', position: 'absolute', top: 0, left: 0, height: '100%', overflowY: 'auto', overflowX: 'hidden', justifyContent: 'safe start' }}>
+        <Helmet>
+            <title>{user?.displayName}</title>
+            <meta name="description" content="User page"/>
+        </Helmet>
         <div className='container userContentRoot' style={{ gap: 32, padding: 16, boxSizing: 'border-box' }}>
             <div className='flexDirection' style={{ width: '100%', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', padding: 32, gap: 16, boxSizing: 'border-box' }}>
                 <img src={"data:image/png;base64,"} style={{ width: 128, height: 128, imageRendering: 'pixelated' }} />

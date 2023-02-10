@@ -31,6 +31,13 @@
         url('./fonts/Inconsolata.otf') format('opentype')
 }
 
+
+@font-face {
+    font-family: 'DoppioOne';
+    src: local('DoppioOne'),
+        url('./fonts/DoppioOne-Regular.ttf') format('truetype')
+}
+
 div {
     font-family: 'Inconsolata';
     color: var(--text)

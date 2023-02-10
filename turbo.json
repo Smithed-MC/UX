@@ -18,6 +18,9 @@
         "test": {
             "cache": false,
             "dependsOn": ["^lint"]
+        },
+        "serve": {
+            "dependsOn": ["^build"]
         }
     }
 }

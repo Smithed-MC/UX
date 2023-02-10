@@ -108,7 +108,7 @@ export function NavBar({children}: {children: any}) {
         overflowY: 'hidden',
         overflow: 'visible',
         zIndex: 100
-    }} onMouseLeave={() => {onClose()}}>
+    }}>
         <NavButton onOpen={onOpen} onClose={onClose} />
         <div ref={navBarOptions} className='container' style={{
             display: 'flex',

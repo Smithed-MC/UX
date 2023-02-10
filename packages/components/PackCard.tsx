@@ -81,27 +81,29 @@ export default function PackCard({ id, packData, onClick, editable, style, ...pr
         </div>
     </div>
 
-    return <div className="packCard" key={id} ref={card} onClick={(e) => {
-        if (!(e.target instanceof HTMLDivElement || e.target instanceof HTMLLabelElement)) return
-        if (onClick) onClick()
-    }} style={{ ...style }} {...props}>
-        <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%' }}>
-            <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)', overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
-                {!fallback && <img src={data.display.icon} className="packImage fadeIn" style={{ aspectRatio: '1 / 1', imageRendering: 'pixelated' }} onError={() => setFallback(true)} />}
-                {fallback && <QuestionMark className="packImage" style={{ fill: "var(--text)" }} />}
+    return <div className='cardContainer'>
+        <div className="packCard" key={id} ref={card} onClick={(e) => {
+            if (!(e.target instanceof HTMLDivElement || e.target instanceof HTMLLabelElement)) return
+            if (onClick) onClick()
+        }} style={{ ...style }} {...props}>
+            <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%' }}>
+                <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)', overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
+                    {!fallback && <img src={data.display.icon} className="packImage fadeIn" style={{ aspectRatio: '1 / 1', imageRendering: 'pixelated' }} onError={() => setFallback(true)} />}
+                    {fallback && <QuestionMark className="packImage" style={{ fill: "var(--text)" }} />}
+                </div>
+                <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, maxWidth: '100%', fontSize: 18 }}>
+                    <label className='' style={{ fontSize: 24, color: 'var(--accent2)' }}>
+                        {data.display.name} <a style={{ fontSize: 16, color: 'var(--subText)', cursor: 'pointer' }} href={'/' + author}>by {author}</a>
+                    </label>
+                    {data.display.description}
+                </div>
             </div>
-            <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, maxWidth: '100%', fontSize: 18 }}>
-                <label className='' style={{ fontSize: 24, color: 'var(--accent2)' }}>
-                    {data.display.name} <a style={{ fontSize: 16, color: 'var(--subText)', cursor: 'pointer' }} href={'/' + author}>by {author}</a>
-                </label>
-                {data.display.description}
-            </div>
-        </div>
-        <div className='container downloadBox fadeIn' style={{ height: '100%', flexBasis: 'fit-content', flexShrink: 0, gap: 16 }}>
-            <label style={{ fontSize: 24 }}>{formatDownloads(downloads)} <label style={{ fontSize: 16, color: 'var(--subText)' }}>download{downloads === 1 ? '' : 's'}</label></label>
-            <div className='container' style={{ flexDirection: 'row', justifyContent: 'right', gap: 8 }}>
-                <DownloadButton link={`https://api.smithed.dev/download?pack=${id}`} />
-                {editable && <EditButton link={`../edit?pack=${id}`} />}
+            <div className='container downloadBox fadeIn' style={{ height: '100%', flexBasis: 'fit-content', flexShrink: 0, gap: 16 }}>
+                <label style={{ fontSize: 24 }}>{formatDownloads(downloads)} <label style={{ fontSize: 16, color: 'var(--subText)' }}>download{downloads === 1 ? '' : 's'}</label></label>
+                <div className='container' style={{ flexDirection: 'row', justifyContent: 'right', gap: 8 }}>
+                    <DownloadButton link={`https://api.smithed.dev/download?pack=${id}`} />
+                    {editable && <EditButton link={`../edit?pack=${id}`} />}
+                </div>
             </div>
         </div>
     </div>
