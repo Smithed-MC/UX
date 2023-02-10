@@ -38,6 +38,7 @@ a {
 
 .trendingCard {
     width: 100%;
+    box-sizing: border-box;
 }
 
 .header {

@@ -61,7 +61,7 @@ export function NavOption({ SVGComponent, path, title, navigateTo, withSpecialQu
     }
 
     const isOpen = ((pathMatch && (withSpecialQueryParam ? queryParams?.[withSpecialQueryParam] : true)) || navigatePathMatch) ? true : false;
-    return <button className={'button container ' + (isOpen ? 'navOptionOpen' : '')} style={{ width: 48, height: 48, overflow: 'visible', zIndex: 10, borderRadius: 24 }} onClick={onClick}
+    return <button className={'button container ' + (isOpen ? 'navOptionOpen' : '')} style={{ width: 48, height: 48, overflow: 'visible', zIndex: 10, borderRadius: 24, justifyContent: 'center', alignItems: 'center' }} onClick={onClick}
         onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>
         <div className={'container'} style={{
             display: hover ? 'inherit' : 'none',
@@ -79,7 +79,7 @@ export function NavOption({ SVGComponent, path, title, navigateTo, withSpecialQu
         }}>
             {title}
         </div>
-        <div className='container' style={{ backgroundColor: isOpen ? 'var(--buttonText)' : 'var(--accent)', zIndex: 1, borderRadius: 24, width: 48, height: 48 }}>
+        <div className='container' style={{ backgroundColor: isOpen ? 'var(--buttonText)' : 'var(--accent)', zIndex: 1, borderRadius: 24, width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}>
             <SVGComponent style={{ fill: isOpen ? 'var(--accent)' : "var(--buttonText)", margin: 12 }} />
         </div>
     </button>

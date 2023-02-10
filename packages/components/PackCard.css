@@ -10,6 +10,10 @@
     align-items: center;
     justify-content: center;
 }
+.packImage {
+    width: 64px;
+    height: 64px;
+}    
 
 @container cardContainer (max-width: 320px) {
     .packImage {
@@ -19,17 +23,11 @@
     }
 }
 
-@container cardContainer (min-width: 320px) and (max-width: 512px) {
-    .packImage {
-        width: 64px;
-        height: 64px;
-    }    
-}
 
 @container cardContainer (min-width: 512px) {
     .packImage {
-        width: 128px;
-        height: 128px;
+        width: 128px !important;
+        height: 128px !important;
     }
     .packCard {
         flex-direction: row;
