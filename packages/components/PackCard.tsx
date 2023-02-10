@@ -101,7 +101,7 @@ export default function PackCard({ id, packData, onClick, editable, style, ...pr
             <div className='container downloadBox fadeIn' style={{ height: '100%', flexBasis: 'fit-content', flexShrink: 0, gap: 16 }}>
                 <label style={{ fontSize: 24 }}>{formatDownloads(downloads)} <label style={{ fontSize: 16, color: 'var(--subText)' }}>download{downloads === 1 ? '' : 's'}</label></label>
                 <div className='container' style={{ flexDirection: 'row', justifyContent: 'right', gap: 8 }}>
-                    <DownloadButton link={`https://api.smithed.dev/download?pack=${id}`} />
+                    <DownloadButton link={`https://api.smithed.dev/v2/download?pack=${id}`} />
                     {editable && <EditButton link={`../edit?pack=${id}`} />}
                 </div>
             </div>
