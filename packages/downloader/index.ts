@@ -7,6 +7,7 @@ import { MinecraftVersion, PackData, PackVersion } from 'data-types'
 import { getFirestore } from 'firebase-admin/firestore'
 import { getPackDoc } from 'database'
 import { RUNNER } from './runner.js'
+import { CompactSign } from 'jose'
 
 if (!fs.existsSync('temp'))
     fs.mkdirSync('temp')
@@ -82,8 +83,12 @@ export class DownloadRunner {
     async run(packs: string[], version: MinecraftVersion, mode: 'datapack' | 'resourcepack' | 'both') {
         const path = 'temp/' + this.id
         fs.mkdirSync(path);
+        console.log('Downloading packs...')
+        console.log('Packs', packs, '\nVersion', version, '\nMode', mode)
         await this.downloadPacks(packs, version)
+        console.log('Done downloading packs!\nRunning weld...')
         await this.runWeld(mode)
+        console.log('Done running weld!')
 
         let datapack: Buffer | undefined = undefined
         let resourcepack: Buffer | undefined = undefined
@@ -96,7 +101,7 @@ export class DownloadRunner {
         else if (mode === 'both' && fs.existsSync(path + "/welded-both.zip")) {
             return fs.readFileSync(path + '/welded-both.zip')
         }
-        // fs.rmSync(path, {recursive: true, force: true})
+        fs.rmSync(path, {recursive: true, force: true})
         return undefined
     }
 }

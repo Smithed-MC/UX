@@ -18,6 +18,6 @@ export default function PackVersionDownload({ version, packId }: PackVersionDown
             </div>
 
         </div>
-        <DownloadButton link={`https://api.smithed.dev/download?pack=${packId}@${encodeURIComponent(version.name)}`} />
+        <DownloadButton link={`https://api.smithed.dev/v2/download?pack=${packId}@${encodeURIComponent(version.name)}`} />
     </div>
 } 
