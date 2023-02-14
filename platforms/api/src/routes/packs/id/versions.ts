@@ -6,7 +6,7 @@ import { getPackDoc, getUIDFromToken } from "database";
 
 API_APP.route({
     method: 'GET',
-    url: '/v2/packs/:id/versions',
+    url: '/packs/:id/versions',
     schema: {
         params: Type.Object({
             id: Type.String()
@@ -25,7 +25,7 @@ API_APP.route({
 
 API_APP.route({
     method: 'POST',
-    url: '/v2/packs/:id/versions',
+    url: '/packs/:id/versions',
     schema: {
         params: Type.Object({
             id: Type.String()
@@ -76,7 +76,7 @@ API_APP.route({
 
 API_APP.route({
     method: 'PATCH',
-    url: '/v2/packs/:packId/versions/:versionId',
+    url: '/packs/:packId/versions/:versionId',
     schema: {
         params: Type.Object({
             packId: Type.String(),
@@ -129,7 +129,7 @@ API_APP.route({
 
 API_APP.route({
     method: 'DELETE',
-    url: '/v2/packs/:packId/versions/:versionId',
+    url: '/packs/:packId/versions/:versionId',
     schema: {
         params: Type.Object({
             packId: Type.String(),
@@ -179,7 +179,7 @@ API_APP.route({
 
 API_APP.route({
     method: 'GET',
-    url: '/v2/packs/:id/versions/latest',
+    url: '/packs/:id/versions/latest',
     schema: {
         params: Type.Object({
             id: Type.String()
