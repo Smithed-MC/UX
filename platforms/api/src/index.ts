@@ -3,6 +3,7 @@ import { API_APP, importRoutes, setupApp } from './app.js'
 import { initialize } from 'database'
 import dotenv from 'dotenv'
 import { getFirestore } from 'firebase-admin/firestore'
+import { calculateDownloads } from './tasks/createMetrics.js'
 
 dotenv.config()
 
@@ -13,6 +14,14 @@ async function listen(port: number) {
 
   await setupApp()
   await API_APP.listen({ port: port, host: '127.0.0.1' })
+
+  setInterval(() => {
+    const now = new Date()
+    
+    if(now.getMinutes() % 60 === 30) {
+      calculateDownloads()
+    }
+  }, 60 * 1000)
 }
 
 if (process.env.PORT)

@@ -1,7 +1,7 @@
 import { Type } from "@sinclair/typebox";
 import { API_APP, get, sendError, set } from "../../../app.js";
 import { getFirestore } from "firebase-admin/firestore";
-import { HTTPResponses, PackDataSchema } from "data-types";
+import { HTTPResponses, PackDataSchema, PackMetaData } from "data-types";
 import { getPackDoc, getUIDFromToken } from "database";
 
 
@@ -203,7 +203,9 @@ API_APP.route({
         if (doc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${id} was not found`)
 
-        const data = {
+
+
+        const data: PackMetaData = {
             docId: doc.id,
             rawId: await doc.get('id'),
             stats: await doc.get('stats'),

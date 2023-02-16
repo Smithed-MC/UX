@@ -65,6 +65,22 @@ export const PackDataSchema = Type.Object({
     categories: Type.Array(Type.Union(packCategories.map(c => Type.Literal(c))))
 })
 
+export const MetaDataSchema = Type.Object({
+    docId: Type.String(),
+    rawId: Type.String(),
+    stats: Type.Object({
+        updated: Type.Optional(Type.Number()),
+        added: Type.Number(),
+        downloads: Type.Object({
+            total: Type.Number(),
+            today: Type.Number()
+        })
+    }),
+    owner: Type.String(),
+    contributors: Type.Array(Type.String(), {default: []})
+})
+
+export type PackMetaData = Static<typeof MetaDataSchema>
 export type MinecraftVersion = Static<typeof MinecraftVersionSchema>
 export type PackDependency = Static<typeof PackDependencySchema>
 export type PackVersion = Static<typeof PackVersionSchema>

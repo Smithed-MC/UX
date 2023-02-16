@@ -33,7 +33,7 @@ export default function Packs() {
     return <div className='panelContainer' style={{ width: '100vw', overflowY: 'clip', boxSizing: 'border-box' }}>
         <div className="container" style={{ overflow: 'clip', height: '100%', padding: '0px 16px', justifyContent: 'safe start', alignItems: 'safe center', width: '100%', boxSizing: 'border-box' }}>
             <div className="container" style={{ width: '100%',gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', justifyContent: 'safe start', alignItems: 'safe center', padding: '16px 16px 16px 16px' }}>
-                <PackInfo yOffset={window.scrollY} packData={data} id={owner + ':' + id} fixed={false} onClose={() => { }} style={{}} />
+                <PackInfo yOffset={window.scrollY} packData={data} id={id ?? ''} fixed={false} onClose={() => { }} style={{}} />
             </div>
         </div>
         {data !== undefined &&
