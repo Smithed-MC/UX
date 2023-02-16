@@ -15,6 +15,7 @@ zips = []
 for file in os.listdir(path):
     zips.append(ZipFile(path / file))
 
+
 if mode == "datapack" or mode == "both":
     with run_weld(zips, pack_types=["data_pack"]) as context:
         context.data.name = 'welded-dp'

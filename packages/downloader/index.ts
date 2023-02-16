@@ -102,7 +102,8 @@ export class DownloadRunner {
             successfullyDownloaded = await this.tryToDownload(packId + version.name + '-dp', version.downloads.datapack)
         }
         if (version.downloads.resourcepack !== undefined && version.downloads.resourcepack !== '') {
-            successfullyDownloaded ||= await this.tryToDownload(packId + version.name + '-rp', version.downloads.resourcepack)
+            let rpSuccess = await this.tryToDownload(packId + version.name + '-rp', version.downloads.resourcepack)
+            successfullyDownloaded ||= rpSuccess
         }
 
         if (successfullyDownloaded)
@@ -147,17 +148,19 @@ export class DownloadRunner {
         console.log('Done running weld!')
 
 
+        var output = undefined
+
         if (mode === 'datapack' && fs.existsSync(path + '/welded-dp.zip')) {
-            return fs.readFileSync(path + '/welded-dp.zip')
+            output = fs.readFileSync(path + '/welded-dp.zip')
         }
         else if (mode === 'resourcepack' && fs.existsSync(path + '/welded-rp.zip')) {
-            return fs.readFileSync(path + '/welded-rp.zip')
+            output = fs.readFileSync(path + '/welded-rp.zip')
         }
         else if (mode === 'both' && fs.existsSync(path + "/welded-both.zip")) {
-            return fs.readFileSync(path + '/welded-both.zip')
+            output = fs.readFileSync(path + '/welded-both.zip')
         }
         fs.rmSync(path, { recursive: true, force: true })
-        return undefined
+        return output
     }
 }
 
