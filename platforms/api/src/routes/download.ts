@@ -42,6 +42,16 @@ API_APP.route({
         
         if (result) {
             await set(requestIdentifier, result, 3600 * 1000)
+
+            let filename = ""
+            if(packs.length <= 3) 
+                filename = packs.join('-') + "-"
+            filename += (mode === 'both' ? 'all-packs' : (mode + (packs.length > 1 ? "s" : "")))
+
+            filename += ".zip"
+            
+
+            reply.header('Content-Disposition', `attachment; filename="${filename}"`)
             reply.type('application/zip')
             return result
         }
