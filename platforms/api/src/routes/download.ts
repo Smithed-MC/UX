@@ -3,7 +3,7 @@ import { API_APP, REDIS, get, sendError, set } from "../app.js";
 import { CollectedPack, DownloadRunner, collectPacks, incrementPackDownloadCount } from 'downloader'
 import { HTTPResponses, MinecraftVersionSchema, latestMinecraftVersion } from "data-types";
 import hash from 'hash.js'
-
+import * as fs from 'fs'
 
 function getFilename(packs: string[], mode: string) {
     let filename = ""
@@ -33,9 +33,10 @@ API_APP.route({
         const requestIdentifier = 'DOWNLOAD::' + (version ?? latestMinecraftVersion) + ',' + packs.join('-') + ',' + mode
         const tryCachedResult = await get(requestIdentifier)
 
-        console.log(tryCachedResult)
-
+        
         if (tryCachedResult) {
+            const filePath: string = tryCachedResult.item
+            
             reply.header('Content-Disposition', `attachment; filename="${getFilename(packs, mode)}"`).type('application/octet-stream')
             
             let foundPacks: CollectedPack[] = []
@@ -45,17 +46,17 @@ API_APP.route({
             for(let f of foundPacks)
                 await incrementPackDownloadCount(userHash, f[2] ? 1 : 3, f[0])
 
-            if(tryCachedResult.item instanceof Buffer)
-                return tryCachedResult.item
-            else
-                return tryCachedResult.item.data
+
+            // console.log(filePath)
+
+            return fs.createReadStream(filePath)
         }
 
         const runner = new DownloadRunner(userHash)
         const result = await runner.run(packs, version ?? latestMinecraftVersion, mode)
         
         if (result) {
-            await set(requestIdentifier, result, 3600 * 1000)
+            await set(requestIdentifier, result.path, 3600 * 1000)
 
             
             console.log('sending')
