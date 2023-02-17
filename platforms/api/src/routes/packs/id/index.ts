@@ -15,12 +15,12 @@ API_APP.route({
             id: Type.String()
         })
     },
-    handler: async (response, reply) => {
-        const { id } = response.params;
+    handler: async (request, reply) => {
+        const { id } = request.params;
 
         const requestIdentifier = 'GET-PACK::' + id
         const tryCachedResult = await get(requestIdentifier)
-        if(tryCachedResult) {
+        if(tryCachedResult && request.headers["cache-control"] !== 'no-cache') {
             return tryCachedResult.item
         }
         
@@ -66,6 +66,7 @@ API_APP.route({
         if(!(await doc.get('contributors')).includes(userId))
             return sendError(reply, HTTPResponses.FORBIDDEN, `You are not a contributor for ${packId}`)
 
+        
 
         await doc.ref.set({data: packData}, {merge: true})
         return reply.status(HTTPResponses.OK).send('Updated data')
@@ -188,13 +189,13 @@ API_APP.route({
             id: Type.String()
         })
     },
-    handler: async (response, reply) => {
-        const { id } = response.params;
+    handler: async (request, reply) => {
+        const { id } = request.params;
 
         
         const requestIdentifier = 'GET-PACK-META::' + id
         const tryCachedResult = await get(requestIdentifier)
-        if(tryCachedResult) {
+        if(tryCachedResult && request.headers["cache-control"] !== 'no-cache') {
             return tryCachedResult.item
         }
         

@@ -8,6 +8,7 @@ import React, { CSSProperties, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { coerce, compare, valid } from 'semver'
 import './edit.css'
+import hash from 'hash.js'
 
 interface InputWithTooltipProps {
     tooltip: any,
@@ -198,6 +199,8 @@ function DropdownSelectionInput({ reference, attr, description, header, options,
     }, [selectedValue])
 
     const addVersion = () => {
+        reference[attr] ??= []
+
         reference[attr].push(selectedValue)
         onChange()
         setContained(true)
@@ -298,7 +301,7 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
 
             const metaData = await (await fetch(`https://api.smithed.dev/v2/packs/${d.id}/meta`)).json()
 
-            elements.push(<button className='button' style={{ width: 18, height: 18, backgroundColor: 'var(--badAccent)' }} onClick={() => {
+            elements.push(<button key={"btn" + d.id + d.version} className='button' style={{ width: 18, height: 18, backgroundColor: 'var(--badAccent)' }} onClick={() => {
                 dependencies.splice(i, 1)
                 onRemoveDependency()
             }}>
@@ -306,14 +309,14 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
                     <Cross style={{ width: '12px', height: '12px', flexShrink: 0, stroke: 'var(--buttonText)' }} />
                 </div>
             </button>)
-            elements.push(<label style={{ paddingRight: 16, borderRight: '2px solid var(--background)' }}>{metaData.rawId}</label>)
-            elements.push(<label>{d.version}</label>)
+            elements.push(<label key={"id" + d.id + d.version} style={{ paddingRight: 16, borderRight: '2px solid var(--background)' }}>{metaData.rawId}</label>)
+            elements.push(<label key={"version" + d.id + d.version}>{d.version}</label>)
         }
 
         setElements(elements)
     }
 
-    useEffect(() => { getDeps() }, [dependencies.length])
+    useEffect(() => { getDeps() }, [dependencies.map(d => d.id + d.version).reduce((p, c) => p + c)])
 
     return <div style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto', alignItems: 'center', columnGap: 16, rowGap: 8 }}>
         {elements}
@@ -399,7 +402,7 @@ export default function Edit() {
             return
         }
 
-        const data: PackData = await (await fetch(`https://api.smithed.dev/v2/packs/${pack}`)).json()
+        const data: PackData = await (await fetch(`https://api.smithed.dev/v2/packs/${pack}`, {cache: 'no-cache'})).json()
         data.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
 
         data.versions.forEach(v => {
