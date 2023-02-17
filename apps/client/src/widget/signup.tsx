@@ -20,6 +20,10 @@ export default function SignUp() {
             return setError('Passwords do not match!')
 
         try {
+            const userDataResp = await fetch(`https://api.smithed.dev/v2/users/${displayName}`)
+            if(userDataResp.ok) 
+                return setError('Username taken!')
+
             const cred = await createUserWithEmailAndPassword(getAuth(), email, password)
             const token = await cred.user.getIdToken()
             const uid = cred.user.uid;
