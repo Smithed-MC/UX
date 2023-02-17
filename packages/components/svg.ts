@@ -11,5 +11,5 @@ import { ReactComponent as Right } from './assets/right.svg'
 import { ReactComponent as Trash } from './assets/trash.svg'
 import { ReactComponent as Save } from './assets/save.svg'
 import { ReactComponent as Back } from './assets/back.svg'
-
-export { MenuBars, Settings, Home, Cross, Search, Account, Edit, Info, Left, Right, Trash, Save, Back }
+import { ReactComponent as SignOut } from './assets/sign-out.svg'
+export { MenuBars, Settings, Home, Cross, Search, Account, Edit, Info, Left, Right, Trash, Save, Back, SignOut }

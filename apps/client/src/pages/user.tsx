@@ -6,9 +6,10 @@ import './user.css'
 import { PackCard, Spinner } from 'components'
 import * as queryString from 'query-string'
 import { useFirebaseUser, useQueryParams } from 'hooks'
-import { Edit } from 'components/svg'
+import { Edit, SignOut } from 'components/svg'
 import EditButton from 'components/EditButton'
 import { Helmet } from 'react-helmet'
+import { getAuth } from 'firebase/auth'
 
 interface UserStats {
     totalDownloads: number,
@@ -82,7 +83,7 @@ export default function User() {
     return <div className='container' style={{ width: '100%', boxSizing: 'border-box', position: 'absolute', top: 0, left: 0, height: '100%', overflowY: 'auto', overflowX: 'hidden', justifyContent: 'safe start' }}>
         <Helmet>
             <title>{user?.displayName}</title>
-            <meta name="description" content="User page"/>
+            <meta name="description" content="User page" />
         </Helmet>
         <div className='container userContentRoot' style={{ gap: 32, padding: 16, boxSizing: 'border-box' }}>
             <div className='flexDirection' style={{ width: '100%', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', padding: 32, gap: 16, boxSizing: 'border-box' }}>
@@ -90,7 +91,13 @@ export default function User() {
                 <div className='statContainer' style={{ padding: 16, width: '100%' }}>
                     <div className="container" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between' }}>
                         <label style={{ fontSize: 32 }}>{user?.displayName}</label>
-                        {editable && <EditButton />}
+                        {editable && <div className="container" style={{ flexDirection: 'row', gap: 8 }}>
+                            <EditButton />
+                            <a href="../account" className="button wobbleHover container" title="Sign Out" onClick={() => { getAuth().signOut() }} style={{ maxWidth: 48, maxHeight: 48, borderRadius: 24, padding: 12 }}>
+                                <SignOut style={{ width: 24, height: 24, stroke: 'var(--buttonText)' }} />
+                            </a>
+                        </div>}
+
                     </div>
                     <div className='statBoxes container '>
                         <Stat name='Total Packs' value={userStats?.packs?.length ?? 0} />

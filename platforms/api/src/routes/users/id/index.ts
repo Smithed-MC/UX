@@ -3,6 +3,7 @@ import { API_APP, sendError } from '../../../app.js'
 import { getFirestore } from 'firebase-admin/firestore'
 import { sanitize } from '../../sanitize.js'
 import { HTTPResponses } from 'data-types'
+import { getUIDFromToken } from 'database'
 
 export async function getUserDoc(id: string) {
 
@@ -37,5 +38,41 @@ API_APP.route({
         if(userDoc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, 'User not found')
         return {uid: userDoc.id, ...userDoc.data()}
+    }
+})
+
+API_APP.route({
+    method: 'GET',
+    url: '/users/:id/setup',
+    schema: {
+        params: Type.Object({
+            id: Type.String()
+        }),
+        querystring: Type.Object({
+            token: Type.String(),
+            displayName: Type.String()
+        })
+    },
+    handler: async (request, reply) => {
+        const {id} = request.params
+        const {token, displayName} = request.query
+
+        const userDoc = await getUserDoc(id)
+
+        const uidFromToken = await getUIDFromToken(token)
+
+        if(userDoc !== undefined)
+            return sendError(reply, HTTPResponses.NOT_FOUND, 'User has been setup previously')
+        else if(uidFromToken === undefined)
+            return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
+        else if (id !== uidFromToken)
+            return sendError(reply, HTTPResponses.FORBIDDEN, 'Specified user does not belong to token')
+        
+        await getFirestore().collection("users").doc(uidFromToken).set({
+            displayName: displayName,
+            cleanName: sanitize(displayName),
+            role: 'member'
+        })
+        return reply.status(HTTPResponses.CREATED).send('User account was successfully setup')
     }
 })
