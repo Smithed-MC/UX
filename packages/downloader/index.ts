@@ -94,7 +94,7 @@ export class DownloadRunner {
     }
 
     private async downloadPack(pack: CollectedPack) {
-        console.log(pack)
+        // console.log(pack)
         const [packId, version, dependency] = pack
         let successfullyDownloaded = false
 
@@ -116,8 +116,11 @@ export class DownloadRunner {
             foundPacks = foundPacks.concat(await collectPacks(pack, version, false))
         }
 
-        foundPacks = foundPacks.filter((pack, idx, arr) => arr.indexOf(pack) === idx)
-
+        foundPacks = foundPacks.filter((pack, idx, arr) => foundPacks.findIndex(curPack => {
+                return curPack[0] === pack[0] && curPack[1].name === pack[1].name
+            }) === idx
+        )
+        
         for (let pack of foundPacks)
             await this.downloadPack(pack)
     }
@@ -137,7 +140,7 @@ export class DownloadRunner {
     }
 
 
-    async run(packs: string[], version: MinecraftVersion, mode: 'datapack' | 'resourcepack' | 'both', userHash?: string) {
+    async run(packs: string[], version: MinecraftVersion, mode: 'datapack' | 'resourcepack' | 'both', userHash?: string): Promise<fs.ReadStream | undefined> {
         const path = 'temp/' + this.id
         fs.mkdirSync(path);
         console.log('Downloading packs...')
@@ -151,15 +154,17 @@ export class DownloadRunner {
         var output = undefined
 
         if (mode === 'datapack' && fs.existsSync(path + '/welded-dp.zip')) {
-            output = fs.readFileSync(path + '/welded-dp.zip')
+            output = fs.createReadStream(path + '/welded-dp.zip')
+            // console.log('Size of datapack:', output.byteLength / 1000 / 1000, 'mB')
         }
         else if (mode === 'resourcepack' && fs.existsSync(path + '/welded-rp.zip')) {
-            output = fs.readFileSync(path + '/welded-rp.zip')
+            output = fs.createReadStream(path + '/welded-rp.zip')
+            // console.log('Size of resourcepack:', output.byteLength / 1000 / 1000, 'mB')
         }
         else if (mode === 'both' && fs.existsSync(path + "/welded-both.zip")) {
-            output = fs.readFileSync(path + '/welded-both.zip')
+            output = fs.createReadStream(path + '/welded-both.zip')
+            // console.log('Size of b:', output.byteLength / 1000 / 1000, 'mB')
         }
-        fs.rmSync(path, { recursive: true, force: true })
         return output
     }
 }

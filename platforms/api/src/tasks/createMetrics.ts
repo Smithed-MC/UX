@@ -22,6 +22,7 @@ async function getDaysDownload(doc: DocumentReference, days: string[]): Promise<
 }
 
 export async function calculateDownloads() {
+    console.log('Calculating Metrics...')
     const docs = await getFirestore().collection("analytics").listDocuments()
 
     const past7Days = forLastDays(7);

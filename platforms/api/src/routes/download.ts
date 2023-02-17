@@ -21,8 +21,11 @@ API_APP.route({
 
         const requestIdentifier = 'DOWNLOAD::' + (version ?? latestMinecraftVersion) + ',' + packs.join('-') + ',' + mode
         const tryCachedResult = await get(requestIdentifier)
+
+        console.log(tryCachedResult)
+
         if (tryCachedResult) {
-            reply.type('application/zip')
+            reply.type('application/octet-stream')
 
             let foundPacks: CollectedPack[] = []
             for(let p of packs)
@@ -34,7 +37,7 @@ API_APP.route({
             if(tryCachedResult.item instanceof Buffer)
                 return tryCachedResult.item
             else
-                return Buffer.from(tryCachedResult.item.data)
+                return tryCachedResult.item.data
         }
 
         const runner = new DownloadRunner(userHash)
@@ -50,9 +53,9 @@ API_APP.route({
 
             filename += ".zip"
             
+            console.log('sending')
 
-            reply.header('Content-Disposition', `attachment; filename="${filename}"`)
-            reply.type('application/zip')
+            reply.header('Content-Disposition', `attachment; filename="${filename}"`).type('application/octet-stream')
             return result
         }
         return sendError(reply, HTTPResponses.SERVER_ERROR, 'An error occured while downloading')
