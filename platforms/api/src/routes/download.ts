@@ -4,6 +4,17 @@ import { CollectedPack, DownloadRunner, collectPacks, incrementPackDownloadCount
 import { HTTPResponses, MinecraftVersionSchema, latestMinecraftVersion } from "data-types";
 import hash from 'hash.js'
 
+
+function getFilename(packs: string[], mode: string) {
+    let filename = ""
+    if(packs.length <= 3) 
+        filename = packs.join('-') + "-"
+    filename += (mode === 'both' ? 'all-packs' : (mode + (packs.length > 1 ? "s" : "")))
+
+    filename += ".zip"
+    return filename
+}
+
 API_APP.route({
     method: 'GET',
     url: '/download',
@@ -25,8 +36,8 @@ API_APP.route({
         console.log(tryCachedResult)
 
         if (tryCachedResult) {
-            reply.type('application/octet-stream')
-
+            reply.header('Content-Disposition', `attachment; filename="${getFilename(packs, mode)}"`).type('application/octet-stream')
+            
             let foundPacks: CollectedPack[] = []
             for(let p of packs)
                 foundPacks = foundPacks.concat(await collectPacks(p, version ?? latestMinecraftVersion, false))
@@ -46,16 +57,10 @@ API_APP.route({
         if (result) {
             await set(requestIdentifier, result, 3600 * 1000)
 
-            let filename = ""
-            if(packs.length <= 3) 
-                filename = packs.join('-') + "-"
-            filename += (mode === 'both' ? 'all-packs' : (mode + (packs.length > 1 ? "s" : "")))
-
-            filename += ".zip"
             
             console.log('sending')
 
-            reply.header('Content-Disposition', `attachment; filename="${filename}"`).type('application/octet-stream')
+            reply.header('Content-Disposition', `attachment; filename="${getFilename(packs, mode)}"`).type('application/octet-stream')
             return result
         }
         return sendError(reply, HTTPResponses.SERVER_ERROR, 'An error occured while downloading')
