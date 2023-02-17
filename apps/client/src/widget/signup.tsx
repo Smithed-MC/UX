@@ -1,4 +1,4 @@
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import './login.css'
 import { FirebaseError } from "firebase/app";
@@ -14,10 +14,23 @@ export default function SignUp() {
 
 
     const signup = async () => {
-        if (email === '' || password === '') return;
+        if (email === '' || password === '' || displayName === '') return;
+
+        if(password !== confirmPassword)
+            return setError('Passwords do not match!')
 
         try {
-            const cred = await signInWithEmailAndPassword(getAuth(), email, password)
+            const cred = await createUserWithEmailAndPassword(getAuth(), email, password)
+            const token = await cred.user.getIdToken()
+            const uid = cred.user.uid;
+
+            
+
+            const resp = await fetch(`https://api.smithed.dev/v2/users/${uid}/setup?token=${token}&displayName=${displayName}`)
+
+            if(!resp.ok)
+                return setError(await resp.json())
+
         } catch (e: any) {
             const error = e as FirebaseError
             console.log(error.code)

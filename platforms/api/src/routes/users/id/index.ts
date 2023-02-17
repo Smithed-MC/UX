@@ -67,7 +67,10 @@ API_APP.route({
             return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
         else if (id !== uidFromToken)
             return sendError(reply, HTTPResponses.FORBIDDEN, 'Specified user does not belong to token')
-        
+        else if(await getUserDoc(displayName) !== undefined)
+            return sendError(reply, HTTPResponses.CONFLICT, 'User with that display name exists!')
+
+
         await getFirestore().collection("users").doc(uidFromToken).set({
             displayName: displayName,
             cleanName: sanitize(displayName),
