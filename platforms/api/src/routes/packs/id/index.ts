@@ -20,7 +20,7 @@ API_APP.route({
 
         const requestIdentifier = 'GET-PACK::' + id
         const tryCachedResult = await get(requestIdentifier)
-        if(tryCachedResult && request.headers["cache-control"] !== 'no-cache') {
+        if(tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
             return tryCachedResult.item
         }
         

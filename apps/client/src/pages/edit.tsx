@@ -316,7 +316,7 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
         setElements(elements)
     }
 
-    useEffect(() => { getDeps() }, [dependencies.map(d => d.id + d.version).reduce((p, c) => p + c)])
+    useEffect(() => { getDeps() }, [dependencies.flatMap(d => d.id + d.version).join('')])
 
     return <div style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto', alignItems: 'center', columnGap: 16, rowGap: 8 }}>
         {elements}
