@@ -49,7 +49,7 @@ export default function Browse(props: any) {
         setPacks(data)
     }
     function onClick(p: string) {
-        if ((rootDiv.current?.clientWidth ?? 0) < 1024) return navigate(`../${p.split(':').join('/')}`)
+        if ((rootDiv.current?.clientWidth ?? 0) < 1024) return navigate(`../packs/${p}`)
         setShowWidget(showWidget === p ? undefined : p)
     }
 

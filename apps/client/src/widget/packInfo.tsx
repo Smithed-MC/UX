@@ -133,7 +133,7 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
 
                     </img>}
                 </div>
-                <a style={{ fontSize: 32, textDecoration: 'underline', color: 'var(--accent2)', width: 'max-content', textAlign: 'center' }} href={`/${id.split(':').join('/')}`}>{data?.display.name}</a>
+                <a style={{ fontSize: 32, textDecoration: 'underline', color: 'var(--accent2)', width: 'max-content', textAlign: 'center' }} href={`/packs/${id}`}>{data?.display.name}</a>
                 <div style={{ flex: '33%' }}></div>
             </div>
             <p style={{ backgroundColor: 'var(--background)', padding: 12, borderRadius: 'var(--defaultBorderRadius)', maxWidth: '100%' }}>

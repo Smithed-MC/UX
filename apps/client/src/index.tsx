@@ -71,7 +71,7 @@ const router = createBrowserRouter([
                 element: <User />
             },
             {
-                path: ":owner/:id",
+                path: "packs/:id",
                 element: <Packs />
             }
         ]

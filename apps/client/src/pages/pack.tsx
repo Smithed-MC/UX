@@ -6,7 +6,7 @@ import Download from "../widget/download"
 import { Spinner } from "components"
 import './pack.css'
 export default function Packs() {
-    const { owner: owner, id: id } = useParams()
+    const { id: id } = useParams()
     const [data, setData] = useState<PackData>()
     const [notFound, setNotFound] = useState(false)
 
@@ -17,7 +17,7 @@ export default function Packs() {
         setData(data)
     }
 
-    useEffect(() => { onLoad() }, [owner, id])
+    useEffect(() => { onLoad() }, [id])
 
 
     if (notFound) return <div className="container" style={{ width: '100%', height: '95vh', gap: 8, boxSizing: 'border-box' }}>
@@ -30,17 +30,17 @@ export default function Packs() {
         <Spinner />
     </div>
 
-    return <div className='panelContainer' style={{ width: '100vw', overflowY: 'clip', boxSizing: 'border-box' }}>
-        <div className="container" style={{ overflow: 'clip', height: '100%', padding: '0px 16px', justifyContent: 'safe start', alignItems: 'safe center', width: '100%', boxSizing: 'border-box' }}>
-            <div className="container" style={{ width: '100%',gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', justifyContent: 'safe start', alignItems: 'safe center', padding: '16px 16px 16px 16px' }}>
-                <PackInfo yOffset={window.scrollY} packData={data} id={id ?? ''} fixed={false} onClose={() => { }} style={{}} />
+    return <div className='panelContainer' style={{ width: '100vw', boxSizing: 'border-box' }}>
+            <div className="container" style={{ gap: 16, height: '100%', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center', padding: 16 }}>
+                    <PackInfo yOffset={window.scrollY} id={id ?? ''} fixed={false} onClose={() => {}}/>
             </div>
-        </div>
+
         {data !== undefined &&
             <div className="container" style={{ width: '100%' }}>
                 <div className="container" style={{ padding: '16px 16px 16px 16px', gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100vh', width: '100%', justifyContent: 'safe start', alignItems: 'safe center', boxSizing: 'border-box' }}>
-                    <Download packData={data} id={owner + ':' + id} style={{ height: 'auto' }} />
+                    <Download packData={data} id={id ?? ''} style={{ height: 'auto' }} />
                 </div>
+
             </div>
         }
     </div>
