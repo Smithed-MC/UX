@@ -28,8 +28,6 @@ export default function SignUp() {
             const token = await cred.user.getIdToken()
             const uid = cred.user.uid;
 
-            
-
             const resp = await fetch(`https://api.smithed.dev/v2/users/${uid}/setup?token=${token}&displayName=${displayName}`)
 
             if(!resp.ok)
