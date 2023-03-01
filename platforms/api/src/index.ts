@@ -5,6 +5,7 @@ import dotenv from 'dotenv'
 import { getFirestore } from 'firebase-admin/firestore'
 import { calculateDownloads } from './tasks/createMetrics.js'
 import { deleteTempFiles } from './tasks/deleteTempFiles.js'
+import { checkIndices } from './tasks/checkIndices.js'
 
 dotenv.config()
 
@@ -17,6 +18,7 @@ function executeTasks() {
     
   if(now.getMinutes() % 60 === 30) {
     calculateDownloads()
+    checkIndices();
   }
 
   deleteTempFiles()
