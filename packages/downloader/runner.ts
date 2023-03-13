@@ -3,6 +3,10 @@ import io
 import sys
 import os
 
+sys.stdin.reconfigure(encoding='utf-8')
+sys.stdout.reconfigure(encoding='utf-8')
+
+
 from pathlib import Path
 from zipfile import ZipFile
 from weld import run_weld

@@ -4,11 +4,21 @@ import { CollectedPack, DownloadRunner, collectPacks, incrementPackDownloadCount
 import { HTTPResponses, MinecraftVersionSchema, latestMinecraftVersion } from "data-types";
 import hash from 'hash.js'
 import * as fs from 'fs'
+import fetch from "node-fetch";
 
-function getFilename(packs: string[], mode: string) {
+async function getFilename(packs: string[], mode: string) {
     let filename = ""
-    if(packs.length <= 3) 
-        filename = packs.join('-') + "-"
+    if(packs.length <= 3) {
+        const promises = packs.map(p => {
+            return (async () => {
+                const resp = await fetch('https://api.smithed.dev/v2/packs/' + p +'/meta')
+                return ((await resp.json()) as {rawId: string}).rawId
+            })()
+        })
+        const ids = await Promise.all(promises)
+        
+        filename = ids.join('-') + "-"
+    }
     filename += (mode === 'both' ? 'all-packs' : (mode + (packs.length > 1 ? "s" : "")))
 
     filename += ".zip"
@@ -37,7 +47,7 @@ API_APP.route({
         if (tryCachedResult) {
             const filePath: string = tryCachedResult.item
             
-            reply.header('Content-Disposition', `attachment; filename="${getFilename(packs, mode)}"`).type('application/octet-stream')
+            reply.header('Content-Disposition', `attachment; filename="${await getFilename(packs, mode)}"`).type('application/octet-stream')
             
             let foundPacks: CollectedPack[] = []
             for(let p of packs)
@@ -61,7 +71,7 @@ API_APP.route({
             
             console.log('sending')
 
-            reply.header('Content-Disposition', `attachment; filename="${getFilename(packs, mode)}"`).type('application/octet-stream')
+            reply.header('Content-Disposition', `attachment; filename="${await getFilename(packs, mode)}"`).type('application/octet-stream')
             return result
         }
         return sendError(reply, HTTPResponses.SERVER_ERROR, 'An error occured while downloading')
