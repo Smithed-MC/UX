@@ -15,25 +15,46 @@ function SectionContainer({ children, style, className }: { children?: any, styl
 function PackPreview({ type }: { type: 'trending' | 'downloads' | 'newest' }) {
     const [ids, setIds] = useState<string[] | undefined>(undefined)
     const [current, setCurrent] = useState(0)
+    const [timer, setTimer] = useState<number | NodeJS.Timer | undefined>(undefined)
+
+    const cardRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         (async () => {
-            const results: { id: string, displayName: string }[] = (await (await fetch('https://api.smithed.dev/v2/packs?limit=1&hidden=false&sort=' + type)).json()).slice(0, 5)
+            const results: { id: string, displayName: string }[] = (await (await fetch('https://api.smithed.dev/v2/packs?limit=10&hidden=false&sort=' + type)).json()).slice(0, 5)
+
+            results.sort((a, b) => (Math.random() - 0.5) * 2)
 
             setIds(results.map(m => m.id))
-            setInterval(function () {
-                setCurrent((current + 1) % (ids?.length ?? 1))
-            }, 3000)
+
         })()
     }, [])
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+
+            cardRef.current?.style.setProperty('animation', 'fadeOut 2s')
+            setTimeout(() =>
+                setCurrent((prevCounter) => (prevCounter + 1) % (ids?.length ?? 1)), 1900
+            )
+        }, 8000);
+
+        return () => clearInterval(interval);
+    }, [ids]);
 
     if (ids === undefined) {
         return <div></div>
     }
-    return <PackCard id={ids[current]} style={{ width: '100%', height: '100%' }} />
+
+    return <div key={current} ref={cardRef} style={{ flexGrow: 1, width: '100%', animation: 'fadeIn 2s' }}>
+        <PackCard id={ids[current]} style={{ width: '100%', height: '100%', boxSizing: 'border-box' }} />
+    </div>
 }
 
 function HomeBody() {
+
+
+
     return <div className="container">
         <div className="container fadeIn homePageIntroPanel" style={{ justifyContent: 'center', flexDirection: 'row', animationDuration: '3s' }}>
             <SectionContainer className="imageContainer" style={{ gridArea: 'logo' }}>
@@ -45,7 +66,7 @@ function HomeBody() {
             </p>
             <a className='button' href="https://smithed.dev/discord" style={{ padding: 16, gridArea: 'footer', width: 'fit-content', placeSelf: 'center' }}>Join the Discord</a>
         </div>
-        <div className="container fadeIn trendingContainer" style={{ width: '100%', animationDuration: '4s' }}>
+        <div className="container fadeIn trendingContainer" style={{ width: '100%', animationDuration: '4s', height: 384 }}>
             <SectionContainer className="trendingCard">
                 <h2>Top Downloaded</h2>
                 <PackPreview type="downloads" />

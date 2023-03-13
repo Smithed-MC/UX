@@ -33,12 +33,13 @@ a {
 
 .trendingContainer {
     flex-direction: column;
-    height: fit-content;
 }
 
 .trendingCard {
     width: 100%;
     box-sizing: border-box;
+    height: 100%;
+    justify-content: start;
 }
 
 .header {

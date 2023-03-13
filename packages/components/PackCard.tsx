@@ -62,9 +62,10 @@ export default function PackCard({ id, packData, onClick, editable, style, ...pr
         setDownloads(metaData.stats.downloads.total)
 
         setLoaded(true)
+        setFallback(false)
     }
 
-    useEffect(() => { onLoad(); }, [])
+    useEffect(() => { onLoad(); }, [id])
 
     if (data === undefined || (data.display.hidden && match))
         return <div style={{ display: 'none' }} />
@@ -88,7 +89,7 @@ export default function PackCard({ id, packData, onClick, editable, style, ...pr
         }} style={{ ...style }} {...props}>
             <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%' }}>
                 <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)', overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
-                    {!fallback && <img src={data.display.icon} className="packImage fadeIn" style={{ aspectRatio: '1 / 1', imageRendering: 'pixelated' }} onError={() => setFallback(true)} />}
+                    {!fallback && <img src={data.display.icon} key={data.id} className="packImage fadeIn" style={{ aspectRatio: '1 / 1', imageRendering: 'pixelated' }} onError={() => setFallback(true)} />}
                     {fallback && <QuestionMark className="packImage" style={{ fill: "var(--text)" }} />}
                 </div>
                 <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, maxWidth: '100%', fontSize: 18 }}>
