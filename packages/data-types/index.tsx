@@ -17,9 +17,10 @@ export const supportedMinecraftVersions = [
     '1.18',
     '1.18.1',
     '1.18.2',
-    '1.19'
+    '1.19',
+    '1.19.4'
 ]
-export const latestMinecraftVersion = '1.19'
+export const latestMinecraftVersion = '1.19.4'
 
 
 export const MinecraftVersionSchema = Type.Union(supportedMinecraftVersions.map(v => Type.Literal(v)))
