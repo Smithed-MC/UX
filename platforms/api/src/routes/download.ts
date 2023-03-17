@@ -11,7 +11,7 @@ async function getFilename(packs: string[], mode: string) {
     if(packs.length <= 3) {
         const promises = packs.map(p => {
             return (async () => {
-                const resp = await fetch('https://api.smithed.dev/v2/packs/' + p +'/meta')
+                const resp = await fetch('https://api.smithed.dev/v2/packs/' + p.split('@')[0] +'/meta')
                 return ((await resp.json()) as {rawId: string}).rawId
             })()
         })

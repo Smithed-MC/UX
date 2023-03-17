@@ -111,16 +111,39 @@ export class DownloadRunner {
     }
 
     private async downloadPacks(packs: string[], version: MinecraftVersion) {
+        if (packs.length === 1) {
+            console.log('Single pack, finding game version')
+            console.log(`https://api.smithed.dev/v2/packs/${packs[0].split('@')[0]}`)
+            const resp = await fetch(`https://api.smithed.dev/v2/packs/${packs[0].split('@')[0]}`)
+            if (!resp.ok)
+                return
+
+            const data: PackData = (await resp.json()) as any;
+
+            const packVersion = packs[0].split('@')[1]
+            var versionData = data.versions
+                .filter((v) =>                                  // Filter out all packs that don't satisfy the supplied pack 
+                    semver.satisfies(v.name, packVersion ?? '*', { includePrerelease: true }) // version and that don't support the supplied game version
+                )
+                .sort((a, b) => semver.compare(a.name, b.name)).reverse()[0]
+
+            console.log('Found version', packVersion)
+
+            if (versionData) 
+                version = versionData.supports[0]
+            console.log('Download set to ', version)
+        }
+
         let foundPacks: CollectedPack[] = []
         for (let pack of packs) {
             foundPacks = foundPacks.concat(await collectPacks(pack, version, false))
         }
 
         foundPacks = foundPacks.filter((pack, idx, arr) => foundPacks.findIndex(curPack => {
-                return curPack[0] === pack[0] && curPack[1].name === pack[1].name
-            }) === idx
+            return curPack[0] === pack[0] && curPack[1].name === pack[1].name
+        }) === idx
         )
-        
+
         for (let pack of foundPacks)
             await this.downloadPack(pack)
     }
