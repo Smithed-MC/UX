@@ -3,7 +3,7 @@ import { API_APP, get, sendError, set } from "../../../app.js";
 import { getFirestore } from "firebase-admin/firestore";
 import { HTTPResponses, PackDataSchema, PackMetaData } from "data-types";
 import { getPackDoc, getUIDFromToken } from "database";
-
+import {FastifyRequest, FastifyReply} from 'fastify'
 
 
 
@@ -35,6 +35,29 @@ API_APP.route({
     }
 })
 
+const setPack = async (response: any, reply: any) => {
+    const { id: packId } = response.params;
+    const { token } = response.query
+    const { data: packData } = response.body;
+
+    const userId = await getUIDFromToken(token)
+    if(userId === undefined)
+        return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
+    
+
+    const doc = await getPackDoc(packId)
+    if (doc === undefined)
+        return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
+
+    if(!(await doc.get('contributors')).includes(userId))
+        return sendError(reply, HTTPResponses.FORBIDDEN, `You are not a contributor for ${packId}`)
+
+    
+
+    await doc.ref.set({data: packData}, {merge: true})
+    return reply.status(HTTPResponses.OK).send('Updated data')
+}
+
 API_APP.route({
     method: 'PATCH',
     url: '/packs/:id',
@@ -46,32 +69,32 @@ API_APP.route({
             token: Type.String()
         }),
         body: Type.Object({
-            data: PackDataSchema
-        })
+            data: Type.Partial(Type.Object({
+                ...PackDataSchema.properties,
+                display: Type.Partial(PackDataSchema.properties.display)
+            }))
+        }, {})
     },
-    handler: async (response, reply) => {
-        const { id: packId } = response.params;
-        const { token } = response.query
-        const { data: packData } = response.body;
-
-        const userId = await getUIDFromToken(token)
-        if(userId === undefined)
-            return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
-        
-
-        const doc = await getPackDoc(packId)
-        if (doc === undefined)
-            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
-
-        if(!(await doc.get('contributors')).includes(userId))
-            return sendError(reply, HTTPResponses.FORBIDDEN, `You are not a contributor for ${packId}`)
-
-        
-
-        await doc.ref.set({data: packData}, {merge: true})
-        return reply.status(HTTPResponses.OK).send('Updated data')
-    }
+    handler: setPack
 })
+
+API_APP.route({
+    method: 'PUT',
+    url: '/packs/:id',
+    schema: {
+        params: Type.Object({
+            id: Type.String()
+        }),
+        querystring: Type.Object({
+            token: Type.String()
+        }),
+        body: Type.Object({
+            data: PackDataSchema
+        }, {})
+    },
+    handler: setPack
+})
+
 
 
 API_APP.route({
