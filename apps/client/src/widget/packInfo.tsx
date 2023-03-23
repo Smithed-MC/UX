@@ -106,7 +106,7 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
 
         setTimeout(() => {
             parentDiv.current?.style.setProperty('display', 'flex')
-            parentDiv.current?.style.setProperty('animation', fixed ? 'pullIn 1s' : 'pullInLeft 1s')
+            parentDiv.current?.style.setProperty('animation', fixed ? 'pullIn 0.75s ease-in-out' : 'pullInLeft 0.75s')
             spinnerDiv.current?.style.setProperty('animation', '')
             spinnerDiv.current?.style.setProperty('display', 'none')
         }, 100)
@@ -136,11 +136,11 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
                 <a style={{ fontSize: 32, textDecoration: 'underline', color: 'var(--accent2)', width: 'max-content', textAlign: 'center' }} href={`/packs/${id}`}>{data?.display.name}</a>
                 <div style={{ flex: '33%' }}></div>
             </div>
-            <p style={{ backgroundColor: 'var(--background)', padding: 12, borderRadius: 'var(--defaultBorderRadius)', maxWidth: '100%' }}>
+            <p style={{ backgroundColor: 'var(--background)', padding: 12, borderRadius: 'var(--defaultBorderRadius)', maxWidth: '100%', fontSize: 18 }}>
                 {data.display.description}
             </p>
-            <div style={{ width: '100%' }}>
-                {fullviewPage !== '' && <MarkdownRenderer>{fullviewPage}</MarkdownRenderer>}
+            <div style={{ width: '100%', fontSize: 18 }}>
+                {fullviewPage !== '' && <MarkdownRenderer style={{fontSize: 18}}>{fullviewPage}</MarkdownRenderer>}
             </div>
 
         </div>}
