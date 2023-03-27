@@ -68,7 +68,7 @@ export default function PackCard({ id, packData, onClick, editable, style, ...pr
     useEffect(() => { onLoad(); }, [id])
 
     if (data === undefined || (data.display.hidden && match))
-        return <div style={{ display: 'none' }} />
+        return <div style={{ ...style }} />
 
     if (!loaded) return <div className="packCard" style={{ ...style }} {...props}>
         <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%' }}>
@@ -92,11 +92,13 @@ export default function PackCard({ id, packData, onClick, editable, style, ...pr
                     {!fallback && <img src={data.display.icon} key={data.id} className="packImage fadeIn" style={{ aspectRatio: '1 / 1', imageRendering: 'pixelated' }} onError={() => setFallback(true)} />}
                     {fallback && <QuestionMark className="packImage" style={{ fill: "var(--text)" }} />}
                 </div>
-                <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, maxWidth: '100%', fontSize: 18, height: '100%', boxSizing: 'border-box' }}>
+                <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, maxWidth: '100%', fontSize: 18, height: '100%', justifyContent: 'start', boxSizing: 'border-box' }}>
                     <label className='' style={{ fontSize: 24, color: 'var(--accent2)' }}>
                         {data.display.name} <a style={{ fontSize: 16, color: 'var(--subText)', cursor: 'pointer' }} href={'/' + author}>by {author}</a>
                     </label>
-                    {data.display.description}
+                    <label className='packDescription'>
+                        {data.display.description}
+                    </label>
                     <div style={{display: 'flex', flexDirection: 'row', alignItems: 'end', gap: 8, height: 'max-content'}}>
                         {/* {data.categories?.map(c => <div style={{borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--accent2)', padding: 8}}>{c}</div>)} */}
                     </div>

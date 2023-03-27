@@ -43,11 +43,11 @@ function PackPreview({ type }: { type: 'trending' | 'downloads' | 'newest' }) {
     }, [ids]);
 
     if (ids === undefined) {
-        return <div></div>
+        return <div style={{height: 256}}></div>
     }
 
     return <div key={current} ref={cardRef} style={{ flexGrow: 1, width: '100%', animation: 'fadeIn 2s' }}>
-        <PackCard id={ids[current]} style={{ width: '100%', height: '100%', boxSizing: 'border-box' }} />
+        <PackCard id={ids[current]} style={{ width: '100%', height: '256px', boxSizing: 'border-box' }} />
     </div>
 }
 
@@ -66,7 +66,7 @@ function HomeBody() {
             </p>
             <a className='button' href="https://smithed.dev/discord" style={{ padding: 16, gridArea: 'footer', width: 'fit-content', placeSelf: 'center' }}>Join the Discord</a>
         </div>
-        <div className="container fadeIn trendingContainer" style={{ width: '100%', animationDuration: '4s', height: 384 }}>
+        <div className="container fadeIn trendingContainer" style={{ width: '100%', animationDuration: '4s' }}>
             <SectionContainer className="trendingCard">
                 <h2>Top Downloaded</h2>
                 <PackPreview type="downloads" />
