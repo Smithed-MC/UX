@@ -13,7 +13,7 @@ const TEST_PACK_DATA: PackData = {
     display: {
         name: "Smithed Testing",
         description: 'test',
-        hidden: false,
+        hidden: true,
         icon: ''
     },
     versions: [
@@ -22,8 +22,7 @@ const TEST_PACK_DATA: PackData = {
             dependencies: [],
             supports: ['1.19'],
             downloads: {
-                datapack: '',
-                resourcepack: ''
+                datapack: 'https://example.com'
             }
         }
     ],
@@ -34,8 +33,7 @@ const TEST_VERSION_DATA: PackVersion = {
     name: '0.0.2',
     dependencies: [],
     downloads: {
-        datapack: '',
-        resourcepack: ''
+        datapack: 'https://example.com'
     },
     supports: ['1.19']
 }
@@ -110,7 +108,7 @@ test('POST /packs (w/ invalid token)', async t => {
             data: TEST_PACK_DATA
         }
     })
-    t.equal(r.statusCode, HTTPResponses.UNAUTHORIZED, 'Unauthorized, invalid token')
+    t.equal(r.statusCode, HTTPResponses.UNAUTHORIZED, HTTPResponses[r.statusCode] + ', Unauthorized, invalid token')
 })
 
 test('POST /packs (w/ valid token)', async t => {
@@ -125,7 +123,10 @@ test('POST /packs (w/ valid token)', async t => {
             data: TEST_PACK_DATA
         }
     })
-    t.equal(r.statusCode, HTTPResponses.CREATED, 'Pack created')
+    const pass = t.equal(r.statusCode, HTTPResponses.CREATED, HTTPResponses[r.statusCode] + ', Pack created')
+    if(!pass) {
+        console.log(r.statusCode, await r.json())
+    }
 })
 
 test('POST /packs/:pack/versions (w/ invalid token)', async t => {
@@ -158,4 +159,15 @@ test('POST /packs/:pack/versions (w/ valid token)', async t => {
     })
     
     t.equal(r.statusCode, HTTPResponses.CREATED, 'Created, new version')
+})
+
+test('DELETE /packs/:pack', async t => {
+    const r = await API.inject({
+        method: 'DELETE',
+        path: '/packs/smithed_testing',
+        query: {
+            token: TOKEN
+        }
+    })
+    t.equal(r.statusCode, HTTPResponses.OK, r.statusCode + ', Deleted pack')
 })
