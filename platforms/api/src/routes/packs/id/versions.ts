@@ -161,7 +161,7 @@ API_APP.route({
 
         const versionIndex = versions.findIndex(v => v.name === versionId)
         if(versionIndex === -1)
-            return sendError(reply, HTTPResponses.CONFLICT, `Version with ID ${versionId} already exists`)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Version with ID ${versionId} doesn't exist`)
 
         versions.splice(versionIndex, 1)
 

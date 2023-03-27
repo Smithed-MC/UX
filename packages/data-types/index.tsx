@@ -14,6 +14,8 @@ console.log(Format.Has('semver'))
 
 
 export const supportedMinecraftVersions = [
+    '1.17',
+    '1.17.1',
     '1.18',
     '1.18.1',
     '1.18.2',
@@ -45,10 +47,10 @@ const PackDependencySchema = Type.Object({
 
 export const PackVersionSchema = Type.Object({
     name: Type.String({minLength: 1}),
-    downloads: Type.Object({
+    downloads: Type.Partial(Type.Object({
         datapack: Type.String({minLength: 1}),
-        resourcepack: Type.String()
-    }),
+        resourcepack: Type.String({minLength: 1})
+    }), {minProperties: 1}),
     supports: Type.Array(MinecraftVersionSchema, {minItems: 1}),
     dependencies: Type.Array(PackDependencySchema)
 })
