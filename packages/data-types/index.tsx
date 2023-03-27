@@ -48,8 +48,8 @@ const PackDependencySchema = Type.Object({
 export const PackVersionSchema = Type.Object({
     name: Type.String({minLength: 1}),
     downloads: Type.Partial(Type.Object({
-        datapack: Type.String({minLength: 1}),
-        resourcepack: Type.String({minLength: 1})
+        datapack: Type.String(),
+        resourcepack: Type.String()
     }), {minProperties: 1}),
     supports: Type.Array(MinecraftVersionSchema, {minItems: 1}),
     dependencies: Type.Array(PackDependencySchema)
