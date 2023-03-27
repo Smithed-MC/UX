@@ -4,6 +4,8 @@ import { fileURLToPath } from 'url'
 import express from 'express'
 import { createServer as createViteServer } from 'vite'
 import fetch from 'node-fetch'
+import dotenv from 'dotenv'
+dotenv.config()
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -80,7 +82,7 @@ async function createServer() {
     app.get('*', handleMetadata)
 
 
-    app.listen(5173)
+    app.listen(process.env.PORT)
 }
 
 createServer()
