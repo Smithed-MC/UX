@@ -29,15 +29,15 @@ export async function calculateDownloads() {
     const past30days = forLastDays(30);
     const today = new Date().toLocaleDateString().replaceAll("/", "-");
 
-    for (const doc of docs) {
-        const past7DayDownloads = await getDaysDownload(doc, past7Days)
+    for (const packDoc of docs) {
+        const past7DayDownloads = await getDaysDownload(packDoc, past7Days)
 
-        await getFirestore().collection("packs").doc(doc.id).set({
+        await getFirestore().collection("packs").doc(packDoc.id).set({
             stats: {
                 downloads: {
                     pastWeek: past7DayDownloads,
-                    total: (await doc.collection('downloads').doc('total').get()).data()?.value ?? 0,
-                    today: (await doc.collection('downloads').doc(today).get()).data()?.total ?? 0
+                    total: (await packDoc.collection('downloads').doc('total').get()).data()?.value ?? 0,
+                    today: (await packDoc.collection('downloads').doc(today).get()).data()?.total ?? 0
                 }
             }
         }, { merge: true })

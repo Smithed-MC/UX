@@ -86,7 +86,7 @@ API_APP.route({
             token: Type.String()
         }),
         body: Type.Object({
-            data: PackVersionSchema
+            data: Type.Partial(PackVersionSchema)
         })
     },
     handler: async (response, reply) => {
@@ -114,8 +114,11 @@ API_APP.route({
         if(versionIndex === -1)
             return sendError(reply, HTTPResponses.CONFLICT, `Version with ID ${versionId} already exists`)
 
-        versions[versionIndex] = versionData
-
+        versions[versionIndex].dependencies = versionData.dependencies ?? versions[versionIndex].dependencies
+        versions[versionIndex].name = versionData.name ?? versions[versionIndex].name
+        versions[versionIndex].supports = versionData.supports ?? versions[versionIndex].supports
+        versions[versionIndex].downloads = versionData.downloads ?? versions[versionIndex].downloads
+        
         await doc.ref.set({
             data: {
                 versions: versions

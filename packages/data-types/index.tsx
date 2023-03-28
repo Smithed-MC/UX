@@ -83,11 +83,20 @@ export const MetaDataSchema = Type.Object({
     contributors: Type.Array(Type.String(), {default: []})
 })
 
+export const BundleSchema = Type.Object({
+    owner: Type.String(),
+    name: Type.String(),
+    version: MinecraftVersionSchema,
+    packs: Type.Array(PackDependencySchema),
+    public: Type.Boolean()
+})
+
 export type PackMetaData = Static<typeof MetaDataSchema>
 export type MinecraftVersion = Static<typeof MinecraftVersionSchema>
 export type PackDependency = Static<typeof PackDependencySchema>
 export type PackVersion = Static<typeof PackVersionSchema>
 export type PackData = Static<typeof PackDataSchema>
+export type PackBundle = Static<typeof BundleSchema>
 
 export interface UserData {
     displayName: string
