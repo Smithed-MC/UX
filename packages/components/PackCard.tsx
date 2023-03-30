@@ -1,5 +1,5 @@
 import React, { CSSProperties, RefObject, useEffect, useRef, useState } from 'react'
-import { PackData, PackEntry } from 'data-types'
+import { PackBundle, PackData, PackEntry, PackVersion } from 'data-types'
 import { formatDownloads } from 'formatters'
 import { ReactComponent as QuestionMark } from './assets/question-mark.svg'
 import { ReactComponent as Download } from './assets/download.svg'
@@ -8,25 +8,30 @@ import './PackCard.css'
 import DownloadButton from './DownloadButton'
 import Spinner from './Spinner'
 import EditButton from './EditButton'
-import AddButton from './AddButton'
+import AddRemovePackButton from './AddRemovePackButton'
+import { compare, coerce } from 'semver'
+import { User } from 'firebase/auth'
 
 interface PackCardProps {
     id: string,
     packEntry?: PackEntry,
     packData?: PackData,
-    state?: 'editable'|'add',
+    state?: 'editable' | 'add',
     style?: CSSProperties
+    bundleData?: PackBundle
+    user?: User | null
     onClick?: () => void,
-    onAddClick?: () => void,
     [key: string]: any
 }
 
-export default function PackCard({ id, packData, onClick, onAddClick, state, style, ...props }: PackCardProps) {
+export default function PackCard({ id, packData, onClick, state, style, bundleData, user, ...props }: PackCardProps) {
     const [data, setData] = useState<PackData>()
     const [downloads, setDownloads] = useState<number>(0)
     const [fallback, setFallback] = useState(false)
     const [author, setAuthor] = useState('')
     const [loaded, setLoaded] = useState(false)
+    const [contained, setContained] = useState(false)
+
     const match = useMatch('/browse')
     const card = useRef<HTMLDivElement>(null)
     const navigate = useNavigate()
@@ -64,6 +69,35 @@ export default function PackCard({ id, packData, onClick, onAddClick, state, sty
         setFallback(false)
     }
 
+    async function onAddClick() {
+        console.log('ran')
+        if (bundleData === undefined || user == null || packData === undefined)
+            return
+
+        console.log(id, bundleData.packs)
+
+        if (bundleData.packs.map(p => p.id).includes(id)) {
+            bundleData.packs.splice(bundleData.packs.findIndex(p => p.id === id), 1)
+            setContained(false)
+        } else {
+            setContained(true)
+            const latestVersion = packData?.versions
+                .filter(v => v.supports.includes(bundleData.version))
+                .sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
+                .reverse()[0]
+
+            bundleData.packs.push({
+                id: id,
+                version: latestVersion.name
+            })
+        }
+
+        const token = await user.getIdToken()
+
+        await fetch(`https://api.smithed.dev/v2/bundles/${bundleData.uid}?token=${token}`, { method: 'PUT', headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data: bundleData }) })
+    }
+
+    useEffect(() => { setContained(bundleData?.packs.find(p => p.id === id) !== undefined)}, [bundleData])
     useEffect(() => { onLoad(); }, [id])
 
     if (data === undefined || (data.display.hidden && match))
@@ -98,7 +132,7 @@ export default function PackCard({ id, packData, onClick, onAddClick, state, sty
                     <label className='packDescription'>
                         {data.display.description}
                     </label>
-                    <div style={{display: 'flex', flexDirection: 'row', alignItems: 'end', gap: 8, height: 'max-content'}}>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'end', gap: 8, height: 'max-content' }}>
                         {/* {data.categories?.map(c => <div style={{borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--accent2)', padding: 8}}>{c}</div>)} */}
                     </div>
                 </div>
@@ -107,7 +141,7 @@ export default function PackCard({ id, packData, onClick, onAddClick, state, sty
                 <label style={{ fontSize: 24 }}>{formatDownloads(downloads)} <label style={{ fontSize: 16, color: 'var(--subText)' }}>download{downloads === 1 ? '' : 's'}</label></label>
                 <div className='container' style={{ flexDirection: 'row', justifyContent: 'right', gap: 8 }}>
                     {state !== 'add' && <DownloadButton link={`https://api.smithed.dev/v2/download?pack=${id}`} />}
-                    {state === 'add' && <AddButton onClick={onAddClick} />}
+                    {state === 'add' && <AddRemovePackButton add={!contained} onClick={onAddClick} disabled={bundleData !== undefined && packData?.versions.findIndex(v => v.supports.includes(bundleData.version)) === -1}/>}
                     {state === 'editable' && <EditButton link={`../edit?pack=${id}`} />}
                 </div>
             </div>

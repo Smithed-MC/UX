@@ -13,5 +13,23 @@ import { ReactComponent as Save } from './assets/save.svg'
 import { ReactComponent as Back } from './assets/back.svg'
 import { ReactComponent as SignOut } from './assets/sign-out.svg'
 import { ReactComponent as AddToBundle } from './assets/add-to-bundle.svg'
+import { ReactComponent as RemoveFromBundle } from './assets/remove-from-bundle.svg'
 
-export { MenuBars, Settings, Home, Cross, Search, Account, Edit, Info, Left, Right, Trash, Save, Back, SignOut, AddToBundle }
+export { 
+    Account, 
+    AddToBundle, 
+    Back, 
+    Cross, 
+    Edit, 
+    Home, 
+    Info, 
+    Left, 
+    MenuBars, 
+    RemoveFromBundle, 
+    Right, 
+    Save, 
+    Search, 
+    Settings, 
+    SignOut, 
+    Trash, 
+}

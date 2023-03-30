@@ -74,7 +74,7 @@ function Bundle({ id }: { id: string }) {
                 </label>
             </div>
             <label style={{ fontSize: 18 }}>Contained Packs</label>
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
                 {containedPacks?.map(p => <div style={{ display: 'flex', fontSize: 18, backgroundColor: 'var(--background)', alignItems: 'center', gap: 8, padding: 8, borderRadius: 'var(--defaultBorderRadius)' }}>
                     <a style={{ fontSize: 18 }} href={`/packs/${p[0]}`}>{p[1]}</a>
                     v{p[2]}

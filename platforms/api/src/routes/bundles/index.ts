@@ -139,6 +139,7 @@ API_APP.route({
         if (bundleData.owner !== uid)
             return sendError(reply, HTTPResponses.FORBIDDEN, 'Bundle is not owned by your token')
 
+        data.uid &&= undefined
         await bundleDoc.ref.set(data, { merge: true })
         reply.status(HTTPResponses.OK).send('Bundle updated successfully')
     }

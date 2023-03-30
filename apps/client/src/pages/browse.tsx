@@ -6,11 +6,11 @@ import { useNavigate } from "react-router-dom";
 import './browse.css'
 import { useFirebaseUser, useQueryParams } from "hooks";
 import { Left } from "components/svg";
-import { compare } from "semver";
+import { coerce, compare } from "semver";
 import { getAuth } from "firebase/auth";
 
 export default function Browse(props: any) {
-    
+
     const { search, category, bundleId } = useQueryParams()
 
     const [categories, setCategories] = useState(new Set(category != null ? typeof category === 'string' ? [category] : category : []))
@@ -22,11 +22,15 @@ export default function Browse(props: any) {
     const rootDiv = useRef<HTMLDivElement>(null)
 
 
-    async function updateUrl(search: string | null | (string|null)[]) {
+    async function updateUrl(search: string | null | (string | null)[]) {
         let url = '?'
         if (search != null && search !== '')
             url += 'search=' + search + '&'
-        for(let c of categories.values())
+
+        if (bundleId != null)
+            url += 'bundleId=' + bundleId + '&'
+
+        for (let c of categories.values())
             url += 'category=' + c + '&'
         navigate(url)
     }
@@ -39,10 +43,7 @@ export default function Browse(props: any) {
         if (search != null && search !== '')
             query.push('search=' + search as string)
 
-        if (bundleId != null)
-            query.push('bundleId=' + bundleId)
-
-        for(let c of categories.values())
+        for (let c of categories.values())
             query.push('category=' + encodeURIComponent(c as string))
 
         const url = 'https://api.smithed.dev/v2/packs?' + query.join('&')
@@ -64,7 +65,7 @@ export default function Browse(props: any) {
 
     async function fetchData() {
         await Promise.all([
-            getPacksFromAPI(), 
+            getPacksFromAPI(),
             bundleId != null ? getBundleData() : undefined
         ])
     }
@@ -76,45 +77,52 @@ export default function Browse(props: any) {
         setShowWidget(showWidget === p ? undefined : p)
     }
 
-    async function onAddClick(p: string) {
-        console.log('ran')
-        if(bundleData === undefined || user == null)
-            return
-
-        if(bundleData.packs.map(p => p.id).includes(p))
-            return
-
-        const resp = await fetch(`https://api.smithed.dev/v2/packs/${p}/versions`)
-        const versions: PackVersion[] = await resp.json();
-
-        const latestVersion = versions
-            .filter(v => v.supports.includes(bundleData.version))
-            .sort((a, b) => compare(a.name, b.name))
-            .reverse()[0]
-
-        bundleData.packs.push({
-            id: p,
-            version: latestVersion.name
-        })
-
-        const token = await user.getIdToken()
-
-        await fetch(`https://api.smithed.dev/v2/bundles/${bundleId}?token=${token}`, {method: 'PATCH', body: JSON.stringify({data: bundleData})})
-    }
 
     useEffect(() => { fetchData(); }, [search, categories.size])
 
-    return <div className="mainDiv" style={{ height: '100vh', top: 0, gap: 32, position: 'absolute', width: '100vw' }}>
-        <div className="container">
-            <a href="/account" className="button">
-                <Left style={{fill: 'var(--text)'}}/>
+    // return <div className="container" style={{ 
+    //     height: '100%', width: '100%', 
+    //     position: 'absolute', backgroundColor: 'red', top: 0, left: 0,
+    //     justifyContent: 'safe start',
+    //     alignItems: 'safe start'
+    // }}>
+    //     <div className="container" style={{justifyContent: 'safe start', height: '100%', overflow: 'hidden'}}>
+    //         <div>
+    //             Search stuff here
+    //         </div>
+    //         <div className="container" style={{flexGrow: 1, overflow: 'auto', justifyContent: 'safe start'}}>
+    //             Scrollable<br/>
+    //             Last Scrollable<br/>
+    //         </div>
+    //     </div>
+    // </div>
+
+
+    return <div className="container" style={{
+        height: '100%', width: '100%',
+        position: 'absolute', top: 0, left: 0,
+        justifyContent: 'safe start',
+        alignItems: 'safe start',
+        boxSizing: 'border-box',
+    }}>
+        <div className="container" style={{
+            boxSizing: 'border-box', minHeight: 48,
+            height: 'max(3vw, 3vh)', width: '100%', flexDirection: 'row', gap: 8, justifyContent: 'left',
+            paddingLeft: 8,
+            display: bundleId != null ? 'flex' : 'none'
+        }}>
+            <a href="/account" className="button container" style={{ minHeight: 32, height: 'max(2vw, 2vh)', minWidth: 32, width: 'max(2vw, 2vh)', boxSizing: 'border-box' }}>
+                <Left style={{ fill: 'var(--text)', height: '100%', width: '100%', position: 'absolute', marginRight: 4 }} />
             </a>
+            <h3>Back to Account</h3>
         </div>
-        <div className={showWidget ? 'browserRootWidget' : 'browserRoot'} ref={rootDiv}>
+        <div className={showWidget ? 'browserRootWidget' : 'browserRoot'} ref={rootDiv} style={{
+            paddingBottom: bundleId != null ? 'max(3vw, 3vh)' : ''
+        }}>
             {!showWidget && <div className="container" style={{ width: '100%' }}>
 
             </div>}
-            <div className="container packCardContainer" style={{ height: '100vh', padding: 16, gap: 16 }}>
+            <div className="container packCardContainer" style={{ padding: 16, gap: 16, overflow: 'hidden', justifyContent: 'safe start', alignItems: 'safe center', height: '100%' }}>
                 <div className="container" style={{ width: '100%', maxWidth: 512, boxSizing: "border-box", gap: 16 }}>
                     <input placeholder="Search..." style={{ backgroundColor: 'var(--backgroundAccent)', width: '100%', color: 'var(--text)' }} defaultValue={search != null ? search as string : undefined} onChange={(e) => {
 
@@ -124,7 +132,7 @@ export default function Browse(props: any) {
                     <div className="container" style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' }}>
                         {packCategories.map((c) => <div style={{ display: 'flex', alignItems: 'baseline', flexDirection: 'row' }}><input type="checkbox" defaultChecked={categories.has(c)} onChange={(e) => {
                             const val = e.currentTarget.checked;
-                            if(val)
+                            if (val)
                                 categories.add(c)
                             else
                                 categories.delete(c);
@@ -132,22 +140,24 @@ export default function Browse(props: any) {
                         }} />{c}</div>)}
                     </div>
                 </div>
-                <div className="container" id="packCardContainer" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }}>
+                <div className="container" id="packCardContainer" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }}>
                     {packs
-                        .map(p => <PackCard tag="browsePackCard" 
-                            key={p.id} id={p.id} state={bundleId != null ? 'add' : undefined} 
-                            onClick={() => onClick(p.id)} 
+                        .map(p => <PackCard tag="browsePackCard"
+                            key={p.id} id={p.id} state={bundleId != null ? 'add' : undefined}
+                            onClick={() => onClick(p.id)}
                             style={{ border: p.id === showWidget ? '2px solid var(--accent)' : '' }}
-                            onAddClick={bundleId == null ? undefined : () => onAddClick(p.id)}
+                            bundleData={bundleData}
+                            user={user}
                         />)
                     }
                 </div>
             </div>
-            {showWidget && <div className="container packCardContainer" style={{ height: '100vh', padding: 16, gap: 16 }}>
-                <div className="container" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }}>
-                    <PackInfo yOffset={window.scrollY} id={showWidget} onClose={() => setShowWidget(undefined)} fixed={true} />
-                </div>
-            </div>}
+            {showWidget &&
+                <div className="container packCardContainer" style={{ padding: 16, gap: 16, overflow: 'hidden', justifyContent: 'safe start', alignItems: 'safe center', height: '100%' }}>
+                    <div className="container" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }}>
+                        <PackInfo yOffset={window.scrollY} id={showWidget} onClose={() => setShowWidget(undefined)} fixed={true} />
+                    </div>
+                </div>}
             {!showWidget && <div className="container" style={{ width: '100%' }}>
 
             </div>}

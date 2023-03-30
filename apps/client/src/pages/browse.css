@@ -1,38 +1,50 @@
-.browserRoot, .browserRootWidget {
+.browserRoot,
+.browserRootWidget {
     display: grid;
 
     height: 100%;
     width: 100%;
     box-sizing: border-box;
     padding-right: 12px;
-
 }
+
 .packCardContainer {
     box-sizing: border-box;
 }
 
 @media screen and (max-width: 1024px) {
-    .browserRoot, .browserRootWidget {
+
+    .browserRoot,
+    .browserRootWidget {
         columns: 1;
         grid-template-columns: 100%;
         flex-direction: column !important;
         place-items: safe center !important;
         align-items: safe center !important;
     }
+
     .packCardContainer {
         width: fit-content;
     }
 }
+
 @media screen and (min-width: 1024px) {
+    .browserRoot, .browserRootWidget {
+        flex-direction: row !important;
+        align-items: safe start !important;
+        justify-content: safe start !important;
+    }
+    
     .browserRoot {
         columns: 3;
         grid-template-columns: 20% 60% 20%;
-        flex-direction: row !important;
-        align-items: start !important;
     }
+
     .browserRootWidget {
-        grid-template-columns: 40% 60% ;
+        columns: 2;
+        grid-template-columns: 40% 60%;
     }
+
     .packCardContainer {
         width: 100%;
         padding: 0px 16px 0px 16px;

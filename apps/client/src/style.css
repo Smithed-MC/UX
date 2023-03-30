@@ -44,8 +44,15 @@ div {
 }
 
 h1 {
-    text-decoration: underline;
+    font-size: max(3.5vw, 3.5vh);
     font-family: DoppioOne;
+    letter-spacing: 2px;
+}
+
+h2 {
+    font-size: max(3vw, 3vh);
+    font-family: DoppioOne;
+    font-weight: normal;
 }
 
 code {
