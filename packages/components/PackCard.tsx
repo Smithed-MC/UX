@@ -31,6 +31,9 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
     const [author, setAuthor] = useState('')
     const [loaded, setLoaded] = useState(false)
     const [contained, setContained] = useState(false)
+    const [validForBundle, setValidForBundle] = useState(false)
+
+    console.log(validForBundle)
 
     const match = useMatch('/browse')
     const card = useRef<HTMLDivElement>(null)
@@ -71,7 +74,7 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
 
     async function onAddClick() {
         console.log('ran')
-        if (bundleData === undefined || user == null || packData === undefined)
+        if (bundleData === undefined || user == null || data === undefined)
             return
 
         console.log(id, bundleData.packs)
@@ -81,7 +84,7 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
             setContained(false)
         } else {
             setContained(true)
-            const latestVersion = packData?.versions
+            const latestVersion = data?.versions
                 .filter(v => v.supports.includes(bundleData.version))
                 .sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
                 .reverse()[0]
@@ -98,6 +101,9 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
     }
 
     useEffect(() => { setContained(bundleData?.packs.find(p => p.id === id) !== undefined)}, [bundleData])
+    useEffect(() => {
+        setValidForBundle(bundleData !== undefined && data?.versions.findIndex(v => v.supports.includes(bundleData.version)) === -1)
+    }, [bundleData, data])
     useEffect(() => { onLoad(); }, [id])
 
     if (data === undefined || (data.display.hidden && match))
@@ -141,7 +147,7 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
                 <label style={{ fontSize: 24 }}>{formatDownloads(downloads)} <label style={{ fontSize: 16, color: 'var(--subText)' }}>download{downloads === 1 ? '' : 's'}</label></label>
                 <div className='container' style={{ flexDirection: 'row', justifyContent: 'right', gap: 8 }}>
                     {state !== 'add' && <DownloadButton link={`https://api.smithed.dev/v2/download?pack=${id}`} />}
-                    {state === 'add' && <AddRemovePackButton add={!contained} onClick={onAddClick} disabled={bundleData !== undefined && packData?.versions.findIndex(v => v.supports.includes(bundleData.version)) === -1}/>}
+                    {state === 'add' && <AddRemovePackButton add={!contained} onClick={onAddClick} disabled={validForBundle}/>}
                     {state === 'editable' && <EditButton link={`../edit?pack=${id}`} />}
                 </div>
             </div>
