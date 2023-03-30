@@ -8,18 +8,20 @@ import './PackCard.css'
 import DownloadButton from './DownloadButton'
 import Spinner from './Spinner'
 import EditButton from './EditButton'
+import AddButton from './AddButton'
 
 interface PackCardProps {
     id: string,
     packEntry?: PackEntry,
     packData?: PackData,
-    editable?: boolean,
+    state?: 'editable'|'add',
     style?: CSSProperties
     onClick?: () => void,
+    onAddClick?: () => void,
     [key: string]: any
 }
 
-export default function PackCard({ id, packData, onClick, editable, style, ...props }: PackCardProps) {
+export default function PackCard({ id, packData, onClick, onAddClick, state, style, ...props }: PackCardProps) {
     const [data, setData] = useState<PackData>()
     const [downloads, setDownloads] = useState<number>(0)
     const [fallback, setFallback] = useState(false)
@@ -54,10 +56,7 @@ export default function PackCard({ id, packData, onClick, editable, style, ...pr
         }
         const metaData = await metaDataResponse.json()
 
-        await getData()
-
-
-        await getAuthor(metaData.owner)
+        await Promise.all([getData(), getAuthor(metaData.owner)])
 
         setDownloads(metaData.stats.downloads.total)
 
@@ -107,8 +106,9 @@ export default function PackCard({ id, packData, onClick, editable, style, ...pr
             <div className='container downloadBox fadeIn' style={{ height: '100%', flexBasis: 'fit-content', flexShrink: 0, gap: 16 }}>
                 <label style={{ fontSize: 24 }}>{formatDownloads(downloads)} <label style={{ fontSize: 16, color: 'var(--subText)' }}>download{downloads === 1 ? '' : 's'}</label></label>
                 <div className='container' style={{ flexDirection: 'row', justifyContent: 'right', gap: 8 }}>
-                    <DownloadButton link={`https://api.smithed.dev/v2/download?pack=${id}`} />
-                    {editable && <EditButton link={`../edit?pack=${id}`} />}
+                    {state !== 'add' && <DownloadButton link={`https://api.smithed.dev/v2/download?pack=${id}`} />}
+                    {state === 'add' && <AddButton onClick={onAddClick} />}
+                    {state === 'editable' && <EditButton link={`../edit?pack=${id}`} />}
                 </div>
             </div>
         </div>

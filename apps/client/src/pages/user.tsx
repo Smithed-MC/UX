@@ -1,4 +1,4 @@
-import { HTTPResponses, PackData, UserData } from 'data-types'
+import { HTTPResponses, PackBundle, PackData, PackDependency, UserData } from 'data-types'
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { formatDownloads } from 'formatters'
@@ -10,12 +10,83 @@ import { Edit, SignOut } from 'components/svg'
 import EditButton from 'components/EditButton'
 import { Helmet } from 'react-helmet'
 import { getAuth } from 'firebase/auth'
+import DownloadButton from 'components/DownloadButton'
+import Browse from './browse'
 
 interface UserStats {
     totalDownloads: number,
     dailyDownloads: number
     packs: string[],
+    bundles: string[],
     id: string,
+}
+
+function CreationButton({ text, onPress }: { text: string, onPress: () => void }) {
+    return <div className='container' style={{ gap: 16, flexDirection: 'row', padding: 16, borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--backgroundAccent)', fontSize: 18 }}>
+        {text}
+        <button className='button container wobbleHover' style={{ fontSize: 48, width: 48, height: 48, justifyContent: 'center', borderRadius: '50%' }} onClick={onPress}>
+            <label>+</label>
+        </button>
+    </div>
+}
+
+function Bundle({ id }: { id: string }) {
+    const [rawBundleData, setRawBundleData] = useState<PackBundle | undefined>()
+    const [containedPacks, setContainedPacks] = useState<[string, string, string][]>()
+    const [showBrowse, setShowBrowse] = useState<boolean>(false)
+
+    async function getPackName(pack: PackDependency): Promise<[string, string, string] | undefined> {
+        const resp = await fetch(`https://api.smithed.dev/v2/packs/${pack.id}`)
+        if (!resp.ok)
+            return undefined
+        const data: PackData = await resp.json()
+
+        return [pack.id, data.display.name, pack.version];
+    }
+
+    async function loadBundleData() {
+        const resp = await fetch(`https://api.smithed.dev/v2/bundles/${id}`)
+
+        if (!resp.ok)
+            return
+
+        const data: PackBundle = await resp.json()
+
+        const promises = data.packs.map(p => getPackName(p))
+        const results = (await Promise.all(promises)).filter(r => r !== undefined)
+
+        setRawBundleData(data)
+        setContainedPacks(results as [string, string, string][])
+    }
+
+    useEffect(() => { loadBundleData() }, [id])
+
+    if (rawBundleData === undefined) return <div style={{ display: 'none' }} />
+
+    return <div className='container' style={{flexDirection: 'row', width: '100%', padding: 16, borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--backgroundAccent)', boxSizing: 'border-box', gap: 16}}>
+        
+        <div className='container' style={{ alignItems: 'start', gap: 8, flexGrow: 1 }}>
+            <label style={{ fontSize: 24, color: 'var(--accent2)' }}>{rawBundleData.name}</label>
+            <div style={{ display: 'flex', fontSize: 18, alignItems: 'center', gap: 8 }}>
+                Minecraft Version
+                <label style={{ backgroundColor: 'var(--background)', padding: 8, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)' }}>
+                    {rawBundleData.version}
+                </label>
+            </div>
+            <label style={{ fontSize: 18 }}>Contained Packs</label>
+            <div style={{ display: 'flex' }}>
+                {containedPacks?.map(p => <div style={{ display: 'flex', fontSize: 18, backgroundColor: 'var(--background)', alignItems: 'center', gap: 8, padding: 8, borderRadius: 'var(--defaultBorderRadius)' }}>
+                    <a style={{ fontSize: 18 }} href={`/packs/${p[0]}`}>{p[1]}</a>
+                    v{p[2]}
+                </div>)}
+            </div>
+        </div>
+        <div className='container' style={{gridArea: 'options', gap: 16}}>
+            <DownloadButton link={`https://api.smithed.dev/v2/bundles/${rawBundleData.uid}/download`}/>
+            <EditButton link={`/browse?bundleId=${rawBundleData.uid}`}/>
+        </div>
+
+    </div>
 }
 
 export default function User() {
@@ -59,12 +130,15 @@ export default function User() {
         const userPacksResponse = await fetch(`https://api.smithed.dev/v2/users/${userId}/packs`)
         const packIds: string[] = userPacksResponse.ok ? (await userPacksResponse.json()) : []
 
+        const userBundlesResponse = await fetch(`https://api.smithed.dev/v2/users/${userId}/bundles`)
+        const bundleIds: string[] = userBundlesResponse.ok ? (await userBundlesResponse.json()) : []
 
         const [totalDownloads, dailyDownloads] = await getDownloads(userId ?? '', packIds)
 
         setUser(user)
         setUserStats({
             packs: packIds,
+            bundles: bundleIds,
             id: userId ?? '',
             totalDownloads: totalDownloads,
             dailyDownloads: dailyDownloads
@@ -106,16 +180,18 @@ export default function User() {
                     </div>
                 </div>
             </div>
-            {editable && <div className='container' style={{ gap: 16, flexDirection: 'row', padding: 16, borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--backgroundAccent)', fontSize: 18 }}>
-                Create new pack
-                <button className='button container wobbleHover' style={{ fontSize: 48, width: 48, height: 48, justifyContent: 'center', borderRadius: '50%' }} onClick={() => {
-                    navigate('/edit?new=true')
-                }}>
-                    <label>+</label>
-                </button>
-            </div>}
+            {editable && <CreationButton text={'Create a new pack'} onPress={() => {
+                navigate('/edit?new=true')
+            }} />}
             {userStats.packs.length > 0 && <div className='container' style={{ gap: 16, width: '100%', justifyContent: 'safe start', boxSizing: 'border-box' }}>
-                {userStats?.packs.map(p => <PackCard editable={editable} id={p} onClick={() => { navigate(p) }} />)}
+                {userStats?.packs.map(p => <PackCard state={editable ? 'editable' : undefined} id={p} onClick={() => { navigate(p) }} />)}
+            </div>}
+            {editable && <div className='container' style={{ paddingBottom: 64, width: '100%', gap: 32 }}>
+                <h1 style={{ margin: 0 }}>My Pack Bundles</h1>
+                <CreationButton text={'Create a new bundle'} onPress={() => {
+
+                }} />
+                {userStats.bundles?.map(b => <Bundle key={b} id={b} />)}
             </div>}
         </div>
     </div>

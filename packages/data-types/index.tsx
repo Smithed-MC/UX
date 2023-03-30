@@ -88,7 +88,8 @@ export const BundleSchema = Type.Object({
     name: Type.String(),
     version: MinecraftVersionSchema,
     packs: Type.Array(PackDependencySchema),
-    public: Type.Boolean()
+    public: Type.Boolean(),
+    uid: Type.Optional(Type.String())
 })
 
 export type PackMetaData = Static<typeof MetaDataSchema>

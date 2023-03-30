@@ -55,7 +55,7 @@ export async function collectPacks(pack: string, gameVersion: MinecraftVersion, 
             semver.satisfies(v.name, packVersion ?? '*', { includePrerelease: true }) &&    // version and that don't support the supplied game version
             v.supports.includes(gameVersion)
         )
-        .sort((a, b) => semver.compare(a.name, b.name)) // Sort and reverse to the latest version is at index 0
+        .sort((a, b) => semver.compare(a.name, b.name)) // Sort and reverse so the latest version is at index 0
         .reverse()                                      // If an exact value was specified, only one version will be left after
     // the initial filtering
 

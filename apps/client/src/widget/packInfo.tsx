@@ -140,7 +140,7 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
                 {data.display.description}
             </p>
             <div style={{ width: '100%', fontSize: 18 }}>
-                {fullviewPage !== '' && <MarkdownRenderer style={{fontSize: 18}}>{fullviewPage}</MarkdownRenderer>}
+                {fullviewPage !== '' && <MarkdownRenderer style={{fontSize: 18}}>{fullviewPage.replace(/<!-- HIDE -->([^]*?)<!-- HIDE END -->\n?/g, '')}</MarkdownRenderer>}
             </div>
 
         </div>}
