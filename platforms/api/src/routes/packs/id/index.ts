@@ -31,7 +31,7 @@ API_APP.route({
             return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${id} was not found`)
 
 
-        await set(requestIdentifier, doc.get('data'), 15*60*1000)
+        await set(requestIdentifier, doc.get('data'), 60*60*1000)
         return await doc.get('data')
     }
 })
