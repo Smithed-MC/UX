@@ -54,7 +54,9 @@ const setPack = async (response: any, reply: any) => {
         return sendError(reply, HTTPResponses.FORBIDDEN, `You are not a contributor for ${packId}`)
 
     
-
+    const requestIdentifier = 'GET-PACK::' + packId
+    await set(requestIdentifier, undefined, 1)        
+    
     await doc.ref.set({data: packData}, {merge: true})
     return reply.status(HTTPResponses.OK).send('Updated data')
 }

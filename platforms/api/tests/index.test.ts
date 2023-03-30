@@ -129,6 +129,26 @@ test('POST /packs (w/ valid token)', async t => {
     }
 })
 
+
+test('PATCH /packs/smithed_testing', async t => {
+    TEST_PACK_DATA.display.name = "Something else"
+    const r = await API.inject({
+        method: 'PATCH',
+        path: '/packs/smithed_testing',
+        payload: {
+            data: TEST_PACK_DATA
+        },
+        query: {
+            token: TOKEN
+        }
+    })
+    const pass = t.equal(r.statusCode, HTTPResponses.OK, HTTPResponses[r.statusCode] + ', Pack created')
+    if(!pass) {
+        console.log(r.statusCode, await r.json())
+    }
+})
+
+
 test('POST /packs/:pack/versions (w/ invalid token)', async t => {
     const r = await API.inject({
         method: 'POST',
