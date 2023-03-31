@@ -12,6 +12,7 @@ import { Helmet } from 'react-helmet'
 import { getAuth } from 'firebase/auth'
 import DownloadButton from 'components/DownloadButton'
 import Browse from './browse'
+import AddRemovePackButton from 'components/AddRemovePackButton'
 
 interface UserStats {
     totalDownloads: number,
@@ -83,7 +84,7 @@ function Bundle({ id }: { id: string }) {
         </div>
         <div className='container' style={{gridArea: 'options', gap: 16}}>
             <DownloadButton link={`https://api.smithed.dev/v2/bundles/${rawBundleData.uid}/download`}/>
-            <EditButton link={`/browse?bundleId=${rawBundleData.uid}`}/>
+            <AddRemovePackButton add={true} link={`/browse?bundleId=${rawBundleData.uid}`}/>
         </div>
 
     </div>

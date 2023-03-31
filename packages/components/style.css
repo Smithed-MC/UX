@@ -62,8 +62,11 @@
     filter: brightness(60%);
 }
 
-.wobbleHover:hover:enabled {
+.wobbleHover:hover {
     animation: wobble 0.5s infinite linear;
+}
+.wobbleHover:hover:disabled {
+    animation: none !important;
 }
 
 .underlineHover:hover {

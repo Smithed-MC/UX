@@ -33,7 +33,6 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
     const [contained, setContained] = useState(false)
     const [validForBundle, setValidForBundle] = useState(false)
 
-    console.log(validForBundle)
 
     const match = useMatch('/browse')
     const card = useRef<HTMLDivElement>(null)
@@ -102,6 +101,8 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
 
     useEffect(() => { setContained(bundleData?.packs.find(p => p.id === id) !== undefined)}, [bundleData])
     useEffect(() => {
+        if(data === undefined || !(data.versions instanceof Array))
+            return
         setValidForBundle(bundleData !== undefined && data?.versions.findIndex(v => v.supports.includes(bundleData.version)) === -1)
     }, [bundleData, data])
     useEffect(() => { onLoad(); }, [id])
@@ -154,3 +155,13 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
         </div>
     </div>
 }
+
+// 3_4_0
+// breaking
+// true
+// downloads
+// datapack
+// "https://github.com/ICY105/Datapack-Utilities/releases/download/3.4.0/DatapackUtilities_v3.4.0.zip"
+// supports
+// 0
+// "1.18"

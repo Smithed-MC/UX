@@ -20,6 +20,9 @@ export default function Browse(props: any) {
     const navigate = useNavigate()
     const user = useFirebaseUser()
     const rootDiv = useRef<HTMLDivElement>(null)
+    
+    let currentLoaded = 0;
+    let updatingPacks = false;
 
 
     async function updateUrl(search: string | null | (string | null)[]) {
@@ -36,17 +39,7 @@ export default function Browse(props: any) {
     }
 
     async function getPacksFromAPI() {
-        const query: string[] = [
-            'limit=20'
-        ]
-
-        if (search != null && search !== '')
-            query.push('search=' + search as string)
-
-        for (let c of categories.values())
-            query.push('category=' + encodeURIComponent(c as string))
-
-        const url = 'https://api.smithed.dev/v2/packs?' + query.join('&')
+        const url = createUrlFromVariables();
         console.log(url)
         const response = await fetch(url)
         const data = await response.json()
@@ -56,6 +49,22 @@ export default function Browse(props: any) {
         //     e.remove()
         // }
         setPacks(data)
+    }
+
+    function createUrlFromVariables() {
+        const query: string[] = [
+            'limit=20',
+            'start=' + currentLoaded
+        ];
+
+        if (search != null && search !== '')
+            query.push('search=' + search as string);
+
+        for (let c of categories.values())
+            query.push('category=' + encodeURIComponent(c as string));
+
+        const url = 'https://api.smithed.dev/v2/packs?' + query.join('&');
+        return url;
     }
 
     async function getBundleData() {
@@ -70,13 +79,34 @@ export default function Browse(props: any) {
         ])
     }
 
+    async function onScroll(e: React.UIEvent<HTMLDivElement, UIEvent>) {
+        if(updatingPacks)
+            return
+        const scrollPosition = e.currentTarget.scrollTop
+        const scrollHeight = e.currentTarget.scrollHeight
+        console.log(e.currentTarget.offsetHeight, scrollHeight, scrollPosition)
 
+        if (scrollPosition/scrollHeight < 0.60)
+            return
+
+        updatingPacks = true;
+
+        currentLoaded += 20
+        const url = createUrlFromVariables()
+
+        const response = await fetch(url)
+        const data: {id: string, displayName: string}[] = (await response.json())
+        
+        if(data.filter(d => packs.find(p => p.id === d.id) === undefined).length === data.length) {
+            updatingPacks = false;
+            setPacks(packs.concat(data))
+        }
+    }
 
     function onClick(p: string) {
         if ((rootDiv.current?.clientWidth ?? 0) < 1024) return navigate(`../packs/${p}`)
         setShowWidget(showWidget === p ? undefined : p)
     }
-
 
     useEffect(() => { fetchData(); }, [search, categories.size])
 
@@ -140,7 +170,7 @@ export default function Browse(props: any) {
                         }} />{c}</div>)}
                     </div>
                 </div>
-                <div className="container" id="packCardContainer" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }}>
+                <div className="container" id="packCardContainer" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }} onScroll={(e) => onScroll(e)}>
                     {packs
                         .map(p => <PackCard tag="browsePackCard"
                             key={p.id} id={p.id} state={bundleId != null ? 'add' : undefined}
