@@ -1,5 +1,5 @@
 :root {
-    font-family: 'Inconsolata';
+    font-family: "Comic Sans MS", "Comic Sans", 'Inconsolata';
     background-image: linear-gradient(var(--background), var(--backgroundDark));
     background-repeat: no-repeat;
     background-size: cover;
@@ -39,19 +39,19 @@
 }
 
 div {
-    font-family: 'Inconsolata';
+    font-family: "Comic Sans MS", "Comic Sans", Inconsolata;
     color: var(--text)
 }
 
 h1 {
     font-size: max(3.5vw, 3.5vh);
-    font-family: DoppioOne;
+    font-family: "Comic Sans MS", "Comic Sans", DoppioOne;
     letter-spacing: 2px;
 }
 
 h2 {
     font-size: max(3vw, 3vh);
-    font-family: DoppioOne;
+    font-family: "Comic Sans MS", "Comic Sans", DoppioOne;
     font-weight: normal;
 }
 
@@ -129,7 +129,7 @@ select {
     border: none;
     border-radius: var(--defaultBorderRadius);
     padding: 8px;
-    font-family: Inconsolata;
+    font-family: "Comic Sans MS", "Comic Sans", Inconsolata;
     font-size: 16px;
     border-bottom: 2px solid var(--accent);
     border-right: 2px solid var(--accent);

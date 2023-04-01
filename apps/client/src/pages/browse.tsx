@@ -171,8 +171,8 @@ export default function Browse(props: any) {
                     </div>
                 </div>
                 <div className="container" id="packCardContainer" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }} onScroll={(e) => onScroll(e)}>
-                    {packs
-                        .map(p => <PackCard tag="browsePackCard"
+                    {
+                        packs.map(p => <PackCard tag="browsePackCard"
                             key={p.id} id={p.id} state={bundleId != null ? 'add' : undefined}
                             onClick={() => onClick(p.id)}
                             style={{ border: p.id === showWidget ? '2px solid var(--accent)' : '' }}

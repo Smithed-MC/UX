@@ -1,6 +1,6 @@
 :root {
     --accent: #1b48c4;
-    font-family: Inconsolata;
+    font-family: "Comic Sans MS", "Comic Sans", Inconsolata;
     text-rendering: optimizeLegibility;
 }
 
@@ -26,7 +26,7 @@
     border-width: 0;
     background-color: var(--accent);
     filter: brightness(100%);
-    font-family: 'Inconsolata';
+    font-family: "Comic Sans MS", "Comic Sans", 'Inconsolata';
     cursor: pointer;
     color: var(--buttonText);
     padding: 8px;

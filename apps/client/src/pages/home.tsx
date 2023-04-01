@@ -60,7 +60,7 @@ function HomeBody() {
             <SectionContainer className="imageContainer" style={{ gridArea: 'logo' }}>
                 <Logo className="logo" style={{ fill: 'var(--text)', width: '100%', borderRadius: '50%' }} />
             </SectionContainer>
-            <h1 style={{ textDecoration: 'none', fontFamily: 'DoppioOne', marginBottom: 0, gridArea: 'header', width: '100%', textAlign: 'center' }}>WHAT IS <label className="accentText">SMITHED</label>?</h1>
+            <h1 style={{ textDecoration: 'none', fontFamily: '"Comic Sans MS", "Comic Sans", DoppioOne', marginBottom: 0, gridArea: 'header', width: '100%', textAlign: 'center' }}>WHAT IS <label className="accentText">SMITHED</label>?</h1>
             <p style={{ color: 'var(--subText)', width: '100%', gridArea: 'content' }}>
                 Smithed is a set of projects with the express purpose of making datapacks more compatible, easier to manage, and fool proof to install. Smithed is not only a project but a community of passionate people.
             </p>
@@ -84,7 +84,7 @@ function HomeBody() {
             <SectionContainer className="imageContainer" style={{ height: '100%', alignItems: 'center', gridArea: 'screenshot' }}>
                 <img style={{ width: '100%', border: '4px solid var(--accent)', borderRadius: 'var(--defaultBorderRadius)' }} src={LauncherScreenshot} />
             </SectionContainer>
-            <h1 style={{ textDecoration: 'none', fontFamily: 'DoppioOne', marginBottom: 0, gridArea: 'header' }}>THE <label className="accentText">LAUNCHER</label></h1>
+            <h1 style={{ textDecoration: 'none', fontFamily: '"Comic Sans MS", "Comic Sans", DoppioOne', marginBottom: 0, gridArea: 'header' }}>THE <label className="accentText">LAUNCHER</label></h1>
             <p style={{ color: 'var(--subText)', gridArea: 'content1' }}>
                 Tired of having to manually update your datapacks? Merging all the ones you want to play? What about filtering through tons of incompatible content? The Smithed launcher allows you to play datapacks just like you would mods! By using the launcher, conflicts between datapacks are automatically resolved, resourcepacks are automatically applied and everything is kept separate from your base game. No more cluttered resourcepack folders.
             </p>
@@ -126,7 +126,7 @@ export default function Home(props: any) {
 
     return <div className="container" style={{ width: '100%', boxSizing: 'border-box', position: 'absolute', top: 0, left: 0, height: '100%', overflowY: 'auto', overflowX: 'hidden', justifyContent: 'safe start', gap: 32, paddingLeft: 16, paddingRight: 16 }}>
         <header className="header" >
-            {"<"}<div ref={textDivRef}><label className="accentText" style={{ fontFamily: 'DoppioOne' }}>{smithedText}</label></div><div className="cursor" ref={cursorRef}></div>{"/>"}
+            {"<"}<div ref={textDivRef}><label className="accentText" style={{ fontFamily: '"Comic Sans MS", "Comic Sans", DoppioOne' }}>{smithedText}</label></div><div className="cursor" ref={cursorRef}></div>{"/>"}
         </header>
         {showBody && <HomeBody />}
     </div>
