@@ -34,7 +34,7 @@ a {
 .header {
     box-sizing: border-box;
     font-weight: bolder;
-    font-family: "Comic Sans MS", "Comic Sans", DoppioOne;
+    font-family: DoppioOne;
     padding: 16px;
     border-radius: var(--defaultBorderRadius);
     /* animation: headerIntro 2s; */
