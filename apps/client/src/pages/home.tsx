@@ -118,10 +118,12 @@ export default function Home(props: any) {
             }, startTime)
         }
         setTimeout(() => {
+            setShowBody(true)
+        }, (text.length / 3) * delay)
+        setTimeout(() => {
             if (cursorRef.current)
                 cursorRef.current.hidden = true
             textDivRef.current?.style.setProperty('animation', '')
-            setShowBody(true)
 
         }, (text.length + 1) * delay - 20)
     }, [])
