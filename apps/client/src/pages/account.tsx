@@ -17,10 +17,10 @@ export default function Account() {
             <div className='container' style={{backgroundColor: 'var(--backgroundAccent)', padding: 12, borderRadius: 'var(--defaultBorderRadius)', gap: 32, maxWidth: 384, width: '100%', maxHeight: 384, height: '100%', justifyContent: 'start'}}>
                 <div className="container" style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', alignItems: 'start' }}>
                     <label className="clickable" onClick={() => setTab('login')} style={
-                        {fontSize: 24, width: '100%', textAlign: 'center', borderBottom: tab === 'login' ? '4px solid var(--accent)' : '' }
+                        {fontSize: '1.5rem', width: '100%', textAlign: 'center', borderBottom: tab === 'login' ? '4px solid var(--accent)' : '' }
                     }>Login</label>
                     <label className="clickable" onClick={() => setTab('signup')} style={
-                        {fontSize: 24, width: '100%', textAlign: 'center', borderBottom: tab === 'signup' ? '4px solid var(--accent)' : '' }
+                        {fontSize: '1.5rem', width: '100%', textAlign: 'center', borderBottom: tab === 'signup' ? '4px solid var(--accent)' : '' }
                     }>Sign up</label>
                 </div>
                 <div className="container" style={{justifyContent: 'center', height: '100%'}}>

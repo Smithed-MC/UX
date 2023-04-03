@@ -116,8 +116,8 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
                 <div className='packImage' />
             </div>
             <div className='container fadeOut' style={{ alignItems: 'start', flexGrow: 1, gap: 8, width: '100%' }}>
-                <label className='' style={{ fontSize: 24, backgroundColor: 'var(--background)', maxWidth: 256, width: '100%', height: 24 }} />
-                <label className='' style={{ fontSize: 24, backgroundColor: 'var(--background)', width: '100%', height: 16 }} />
+                <label className='' style={{ fontSize: '1.5rem', backgroundColor: 'var(--background)', maxWidth: 256, width: '100%', height: 24 }} />
+                <label className='' style={{ fontSize: '1.5rem', backgroundColor: 'var(--background)', width: '100%', height: 16 }} />
             </div>
         </div>
     </div>
@@ -132,9 +132,9 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
                     {!fallback && <img src={data.display.icon} key={data.id} className="packImage fadeIn" style={{ aspectRatio: '1 / 1', imageRendering: 'pixelated' }} onError={() => setFallback(true)} />}
                     {fallback && <QuestionMark className="packImage" style={{ fill: "var(--text)" }} />}
                 </div>
-                <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, maxWidth: '100%', fontSize: 18, overflow: 'hidden', justifyContent: 'start', boxSizing: 'border-box' }}>
-                    <label className='' style={{ fontSize: 24, color: 'var(--accent2)' }}>
-                        {data.display.name} <a style={{ fontSize: 16, color: 'var(--subText)', cursor: 'pointer' }} href={'/' + author}>by {author}</a>
+                <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, maxWidth: '100%', fontSize: '1.125rem', overflow: 'hidden', justifyContent: 'start', boxSizing: 'border-box' }}>
+                    <label className='' style={{ fontSize: '1.5rem', color: 'var(--accent2)' }}>
+                        {data.display.name} <a style={{ fontSize: '1rem', color: 'var(--subText)', cursor: 'pointer' }} href={'/' + author}>by {author}</a>
                     </label>
                     <div className='packDescription'>
                         {data.display.description}
@@ -145,7 +145,7 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
                 </div>
             </div>
             <div className='container downloadBox fadeIn' style={{ height: '100%', flexBasis: 'fit-content', flexShrink: 0, gap: 16 }}>
-                <label style={{ fontSize: 24 }}>{formatDownloads(downloads)} <label style={{ fontSize: 16, color: 'var(--subText)' }}>download{downloads === 1 ? '' : 's'}</label></label>
+                <label style={{ fontSize: '1.5rem' }}>{formatDownloads(downloads)} <label style={{ fontSize: '1rem', color: 'var(--subText)' }}>download{downloads === 1 ? '' : 's'}</label></label>
                 <div className='container' style={{ flexDirection: 'row', justifyContent: 'right', gap: 8 }}>
                     {state !== 'add' && <DownloadButton link={`https://api.smithed.dev/v2/download?pack=${id}`} />}
                     {state === 'add' && <AddRemovePackButton add={!contained} onClick={onAddClick} disabled={validForBundle}/>}

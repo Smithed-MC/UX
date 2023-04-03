@@ -32,7 +32,7 @@
 }
 
 .packDescription {
-    font-size: 18px;
+    font-size: 1.125rem;
     width: calc('100%');
     display: inline-block;
     text-overflow: ellipsis;
@@ -45,7 +45,7 @@
         height: 0px;
     }
     .packDescription {
-        font-size: 16px !important;
+        font-size: 1rem !important;
     }
 }
 

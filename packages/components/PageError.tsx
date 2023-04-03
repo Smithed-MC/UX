@@ -10,7 +10,7 @@ interface ErrorPageProps {
 export default function ErrorPage({title, description, returnMessage, returnLink}: ErrorPageProps) {
     return <div className="container" style={{ width: '100vw', height: '100vh', gap: 8, position: 'absolute', top: 0, right: 0 }}>
         <h1 style={{ color: 'var(--badAccent)', marginBottom: 0 }}>{title}</h1>
-        <label style={{ fontSize: 24, marginBottom: 16 }}>{description}</label>
+        <label style={{ fontSize: '1.5rem', marginBottom: 16 }}>{description}</label>
         <a className="button" href={returnLink} style={{ padding: 12, borderRadius: 'var(--defaultBorderRadius)' }}>{returnMessage}</a>
     </div>
 }

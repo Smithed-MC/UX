@@ -23,7 +23,7 @@ interface UserStats {
 }
 
 function CreationButton({ text, onPress }: { text: string, onPress: () => void }) {
-    return <div className='container' style={{ gap: 16, flexDirection: 'row', padding: 16, borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--backgroundAccent)', fontSize: 18 }}>
+    return <div className='container' style={{ gap: 16, flexDirection: 'row', padding: 16, borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--backgroundAccent)', fontSize: '1.125rem' }}>
         {text}
         <button className='button container wobbleHover' style={{ fontSize: 48, width: 48, height: 48, justifyContent: 'center', borderRadius: '50%' }} onClick={onPress}>
             <label>+</label>
@@ -67,17 +67,17 @@ function Bundle({ id }: { id: string }) {
     return <div className='container' style={{flexDirection: 'row', width: '100%', padding: 16, borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--backgroundAccent)', boxSizing: 'border-box', gap: 16}}>
         
         <div className='container' style={{ alignItems: 'start', gap: 8, flexGrow: 1 }}>
-            <label style={{ fontSize: 24, color: 'var(--accent2)' }}>{rawBundleData.name}</label>
-            <div style={{ display: 'flex', fontSize: 18, alignItems: 'center', gap: 8 }}>
+            <label style={{ fontSize: '1.5rem', color: 'var(--accent2)' }}>{rawBundleData.name}</label>
+            <div style={{ display: 'flex', fontSize: '1.125rem', alignItems: 'center', gap: 8 }}>
                 Minecraft Version
                 <label style={{ backgroundColor: 'var(--background)', padding: 8, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)' }}>
                     {rawBundleData.version}
                 </label>
             </div>
-            <label style={{ fontSize: 18 }}>Contained Packs</label>
+            <label style={{ fontSize: '1.125rem' }}>Contained Packs</label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
-                {containedPacks?.map(p => <div style={{ display: 'flex', fontSize: 18, backgroundColor: 'var(--background)', alignItems: 'center', gap: 8, padding: 8, borderRadius: 'var(--defaultBorderRadius)' }}>
-                    <a style={{ fontSize: 18 }} href={`/packs/${p[0]}`}>{p[1]}</a>
+                {containedPacks?.map(p => <div style={{ display: 'flex', fontSize: '1.125rem', backgroundColor: 'var(--background)', alignItems: 'center', gap: 8, padding: 8, borderRadius: 'var(--defaultBorderRadius)' }}>
+                    <a style={{ fontSize: '1.125rem' }} href={`/packs/${p[0]}`}>{p[1]}</a>
                     v{p[2]}
                 </div>)}
             </div>

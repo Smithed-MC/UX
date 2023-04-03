@@ -10,7 +10,7 @@ interface PackVersionDownloadProps {
 export default function PackVersionDownload({ version, packId }: PackVersionDownloadProps) {
     return <div className="container" style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between', maxWidth: 256 }}>
         <div className="container" style={{ alignItems: 'start' }}>
-            <label style={{ fontSize: 24 }}>{version.name}</label>
+            <label style={{ fontSize: '1.5rem' }}>{version.name}</label>
             <div className="container" style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', gap: 4}}>
                 {version.supports.sort((a,b) => semver.compare(semver.coerce(a) ?? '', semver.coerce(b) ?? '')).map(v => <div style={{ backgroundColor: 'var(--background)', padding: 8, borderRadius: 'var(--defaultBorderRadius)' }}>
                     {v}

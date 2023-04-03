@@ -3,13 +3,13 @@
     padding: 16px;
     border-radius: var(--defaultBorderRadius);
     text-align: center;
-    font-size: 18px;
+    font-size: 1.125rem;
     color: var(--subText);
 }
 
 .statValue {
     color: var(--text);
-    font-size: 24px;
+    font-size: 1.5rem;
 }
 
 @media screen and (max-width: 868px) {

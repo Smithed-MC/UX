@@ -1,10 +1,10 @@
 header {
-    font-size: max(4vw, 4vh);
+    font-size: clamp(3.5rem, 4.5rem , 4.5rem);
 }
 
 p,
 a {
-    font-size: 24px;
+    font-size: 1.5rem;
 }
 
 :root {
@@ -128,12 +128,12 @@ a {
 
 @keyframes headerIntro {
     0% {
-        font-size: max(6vw, 6vh);
+        font-size: clamp(4rem, 5rem , 5rem);
         opacity: 0%;
     }
 
     10% {
-        font-size: max(6vw, 6vh);
+        font-size: clamp(5rem, 6rem , 6rem);
     }
 
     20% {
@@ -147,14 +147,14 @@ a {
     }
 
     60% {
-        font-size: max(6vw, 6vh);
+        font-size: clamp(5rem, 6rem , 6rem);;
         rotate: 0deg;
     }
 
     65% {}
 
     100% {
-        font-size: max(4vw, 4vh);
+        font-size: clamp(3.5rem, 4.5rem , 4.5rem);;
         margin-top: 0%;
     }
 }
@@ -181,15 +181,15 @@ a {
 
 @keyframes pulse {
     0% {
-        font-size: max(4vw, 4vh);
+        font-size: clamp(4rem, 4.5rem , 4.5rem);
     }
 
     33% {
-        font-size: max(4.2vw, 4.2vh);
+        font-size: clamp(4.2rem, 4.7rem , 4.7rem);
     }
 
     66% {
-        font-size: max(4vw, 4vh);
+        font-size: clamp(4rem, 4.5rem , 4.5rem);
     }
 }
 

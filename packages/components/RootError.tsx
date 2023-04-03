@@ -8,7 +8,7 @@ export function RootError() {
     console.log(Object.keys(error))
     return <div className="container" style={{gap: 32, padding: 32, height: '100vh', justifyContent: 'start'}}>
         <h1 style={{color: 'var(--badAccent)', marginBottom: -32}}>Error</h1>
-        <p style={{fontSize: 18, marginBottom: -16}}>
+        <p style={{fontSize: '1.125rem', marginBottom: -16}}>
         Sorry, we've encountered an error on our end!<br/>
         Report it to the <a href="https://github.com/Smithed-MC/UX">github</a>. 
         </p>

@@ -113,7 +113,7 @@ function MarkdownURLInput({ reference, attr, description }: EditorInputProps) {
                 <div className='container' style={{ backgroundColor: 'var(--backgroundAccent)', width: '100%', maxWidth: 720, padding: 16, height: '100%', borderRadius: 'var(--defaultBorderRadius)', border: '2px solid var(--accent)' }}>
                     <MarkdownRenderer style={{ flexGrow: 1, width: '100%' }}>{showPreview}
                     </MarkdownRenderer>
-                    <button className='button' style={{ width: 128, fontSize: 18, backgroundColor: 'var(--badAccent)' }} onClick={() => { setShowPreview(undefined) }}>Close</button>
+                    <button className='button' style={{ width: 128, fontSize: '1.125rem', backgroundColor: 'var(--badAccent)' }} onClick={() => { setShowPreview(undefined) }}>Close</button>
                 </div>
 
             </div>}
@@ -220,11 +220,11 @@ function DropdownSelectionInput({ reference, attr, description, header, options,
                 <option selected value={'_placeholder'} hidden>{description + '...'} </option>
             </select>
             {selectedValue !== undefined && ((
-                !contained && <button className='button' style={{ width: 32, height: 32, fontSize: 24, borderRadius: '50%', flexShrink: 0 }} onClick={addVersion}>
+                !contained && <button className='button' style={{ width: 32, height: 32, fontSize: '1.5rem', borderRadius: '50%', flexShrink: 0 }} onClick={addVersion}>
                     <div className='container' style={{ width: '100%', height: '100%' }}>+</div>
                 </button>
             ) || (
-                    <button className='button' style={{ width: 32, height: 32, fontSize: 24, borderRadius: '50%', flexShrink: 0, backgroundColor: 'var(--badAccent)' }} onClick={removeVersion}>
+                    <button className='button' style={{ width: 32, height: 32, fontSize: '1.5rem', borderRadius: '50%', flexShrink: 0, backgroundColor: 'var(--badAccent)' }} onClick={removeVersion}>
                         <div className='container' style={{ width: '100%', height: '100%' }}>-</div>
                     </button>
                 ))}
@@ -276,7 +276,7 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
         return <EditorDiv style={{ alignItems: 'center', width: '100%' }} >
             <EditorDiv style={{ flexDirection: 'row', width: '100%', alignItems: 'center' }} onMouseLeave={() => setAddNewVersion(false)}>
                 <input style={{ backgroundColor: 'var(--background)', color: 'var(--text)' }} placeholder='Version Number...' ref={versionName} onMouseEnter={() => versionName.current?.select()} />
-                <button className='button' style={{ width: 32, height: 32, fontSize: 24 }} onClick={addVersion}>
+                <button className='button' style={{ width: 32, height: 32, fontSize: '1.5rem' }} onClick={addVersion}>
                     <div className='container' style={{ width: '100%', height: '100%' }}>+</div>
                 </button>
             </EditorDiv>
@@ -285,7 +285,7 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
     }
 
     return <EditorDiv style={{ flexDirection: 'row', justifyContent: 'left', width: '100%' }}>
-        <button className='button' style={{ fontSize: 16, width: '100%' }} onClick={toggleDisplay}>Add new version</button>
+        <button className='button' style={{ fontSize: '1rem', width: '100%' }} onClick={toggleDisplay}>Add new version</button>
     </EditorDiv>
 }
 
@@ -330,7 +330,7 @@ function NewDependency({ dependencies, onAddDependency }: { dependencies: PackDe
     return <EditorDiv style={{ flexDirection: 'row', alignItems: 'center' }}>
         <input ref={idRef} style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white' }} placeholder='Dependency (<Owner>:<ID>)...' />
         <input ref={versionRef} style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white' }} placeholder='Version...' />
-        <button className='button' style={{ width: 32, height: 32, fontSize: 24, borderRadius: '50%', flexShrink: 0 }} onClick={async () => {
+        <button className='button' style={{ width: 32, height: 32, fontSize: '1.5rem', borderRadius: '50%', flexShrink: 0 }} onClick={async () => {
             if (idRef.current == null || versionRef.current == null)
                 return
 
@@ -525,6 +525,6 @@ export default function Edit() {
                 }
             }}><Save style={{ stroke: 'var(--buttonText)' }} /></button>
         </div>
-        <div style={{ display: 'flex', position: 'fixed', bottom: 0, width: '100%', visibility: 'hidden', height: '48px', fontSize: 18, justifyContent: 'center', color: 'var(--goodAccent)' }} ref={saveTextRef}>Pack saved</div>
+        <div style={{ display: 'flex', position: 'fixed', bottom: 0, width: '100%', visibility: 'hidden', height: '48px', fontSize: '1.125rem', justifyContent: 'center', color: 'var(--goodAccent)' }} ref={saveTextRef}>Pack saved</div>
     </div >
 }

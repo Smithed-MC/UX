@@ -22,7 +22,7 @@ export default function Packs() {
 
     if (notFound) return <div className="container" style={{ width: '100%', height: '95vh', gap: 8, boxSizing: 'border-box' }}>
         <h1 style={{ color: 'var(--badAccent)', marginBottom: 0 }}>Error 404</h1>
-        <label style={{ fontSize: 24, marginBottom: 16 }}>That pack could not be found!</label>
+        <label style={{ fontSize: '1.5rem', marginBottom: 16 }}>That pack could not be found!</label>
         <a className="button" href="/browse" style={{ padding: 12, borderRadius: 'var(--defaultBorderRadius)' }}>Back to Browse</a>
     </div>
 
