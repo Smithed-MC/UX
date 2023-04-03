@@ -1,5 +1,5 @@
 /// <reference types="vite-plugin-svgr/client" />
-import React, { useRef, useState } from 'react'
+import React, { CSSProperties, useRef, useState } from 'react'
 import { useMatch, useNavigate } from 'react-router-dom'
 import { useQueryParams } from 'hooks'
 
@@ -9,12 +9,13 @@ import { Cross, MenuBars } from './svg'
 
 interface NavButtonProps {
     onOpen: () => void
-    onClose: () => void
+    onClose: () => void,
+    style?: CSSProperties
 }
 
 var previousState = false;
 
-export function NavButton({ onOpen, onClose }: NavButtonProps) {
+export function NavButton({ onOpen, onClose, style }: NavButtonProps) {
     const [open, setOpen] = useState(previousState)
     const button = useRef<HTMLButtonElement>(null)
     const animationDuration = 0.5
@@ -35,7 +36,7 @@ export function NavButton({ onOpen, onClose }: NavButtonProps) {
     }
 
     return <button ref={button} className={"button" + (!open ? ' navButtonClosed': '')} style={{
-        width: 48, height: 48, borderRadius: 'var(--defaultBorderRadius)', padding: 12,
+        width: 48, height: 48, borderRadius: 'var(--defaultBorderRadius)', padding: 12, ...style
     }} onClick={onInternalButtonClick}>
         <MenuBars style={{ fill: "var(--buttonText)", display: !open ? 'inherit' : 'none' }} />
         <Cross style={{ stroke: "var(--buttonText)", display: open ? 'inherit' : 'none' }} />
@@ -107,16 +108,17 @@ export function NavBar({children}: {children: any}) {
         gap: 16,
         overflowY: 'hidden',
         overflow: 'visible',
-        zIndex: 100
+        zIndex: 100,
+        width: 64
     }}>
-        <NavButton onOpen={onOpen} onClose={onClose} />
-        <div ref={navBarOptions} className='container' style={{
+        <NavButton onOpen={onOpen} onClose={onClose}/>
+        {open && <div ref={navBarOptions} className='container' style={{
             display: 'flex',
-            visibility: open ? 'visible' : 'hidden',
+            animation: 'navbarPullup 0.5s 1',
             gap: 8, padding: 8, backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)',
-            border: '4px solid var(--background)'
-        }}>
+            border: '4px solid var(--background)', boxSizing: 'border-box'
+        }} unselectable={open ? 'off' : 'on'}>
             {children}
-        </div>
+        </div>}
     </div>)
 }

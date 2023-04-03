@@ -127,18 +127,18 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
             if (!(e.target instanceof HTMLDivElement || e.target instanceof HTMLLabelElement)) return
             if (onClick) onClick()
         }} style={{ ...style }} {...props}>
-            <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%', height: '100%' }}>
+            <div className='container' style={{ flexDirection: 'row', alignItems: 'safe flex-start', gap: 16, width: '100%', flexGrow: 1, overflow: 'hidden'}}>
                 <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)', overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
                     {!fallback && <img src={data.display.icon} key={data.id} className="packImage fadeIn" style={{ aspectRatio: '1 / 1', imageRendering: 'pixelated' }} onError={() => setFallback(true)} />}
                     {fallback && <QuestionMark className="packImage" style={{ fill: "var(--text)" }} />}
                 </div>
-                <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, maxWidth: '100%', fontSize: 18, height: '100%', justifyContent: 'start', boxSizing: 'border-box' }}>
+                <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, maxWidth: '100%', fontSize: 18, overflow: 'hidden', justifyContent: 'start', boxSizing: 'border-box' }}>
                     <label className='' style={{ fontSize: 24, color: 'var(--accent2)' }}>
                         {data.display.name} <a style={{ fontSize: 16, color: 'var(--subText)', cursor: 'pointer' }} href={'/' + author}>by {author}</a>
                     </label>
-                    <label className='packDescription'>
+                    <div className='packDescription'>
                         {data.display.description}
-                    </label>
+                    </div>
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'end', gap: 8, height: 'max-content' }}>
                         {/* {data.categories?.map(c => <div style={{borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--accent2)', padding: 8}}>{c}</div>)} */}
                     </div>

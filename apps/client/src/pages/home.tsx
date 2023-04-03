@@ -5,6 +5,7 @@ import { PackData } from "data-types";
 import { ReactComponent as Logo } from '../assets/logo_box.svg'
 
 import './home.css'
+import { useNavigate } from "react-router-dom";
 
 function SectionContainer({ children, style, className }: { children?: any, style?: React.CSSProperties, className?: string }) {
     return <div className={"container " + className} style={{ padding: 16, ...style }}>
@@ -16,7 +17,7 @@ function PackPreview({ type }: { type: 'trending' | 'downloads' | 'newest' }) {
     const [ids, setIds] = useState<string[] | undefined>(undefined)
     const [current, setCurrent] = useState(0)
     const [timer, setTimer] = useState<number | NodeJS.Timer | undefined>(undefined)
-
+    const navigate = useNavigate()
     const cardRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -46,8 +47,9 @@ function PackPreview({ type }: { type: 'trending' | 'downloads' | 'newest' }) {
         return <div style={{height: 256}}></div>
     }
 
+    
     return <div key={current} ref={cardRef} style={{ flexGrow: 1, width: '100%', animation: 'fadeIn 2s' }}>
-        <PackCard id={ids[current]} style={{ width: '100%', height: '256px', boxSizing: 'border-box' }} />
+        <PackCard id={ids[current]} style={{ width: '100%', height: '256px', boxSizing: 'border-box' }} onClick={() => navigate(`/packs/${ids[current]}`)}/>
     </div>
 }
 
