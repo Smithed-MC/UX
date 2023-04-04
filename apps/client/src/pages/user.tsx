@@ -29,10 +29,10 @@ function CreationButton({ text, onPress }: { text: string, onPress: () => void }
     </div>
 }
 
-function Bundle({ id }: { id: string }) {
+export function Bundle({ id, editable, showOwner }: { id: string, editable: boolean, showOwner?: boolean }) {
     const [rawBundleData, setRawBundleData] = useState<PackBundle | undefined>()
     const [containedPacks, setContainedPacks] = useState<[string, string, string][]>()
-    const [showBrowse, setShowBrowse] = useState<boolean>(false)
+    const [ownerName, setOwnerName] = useState('')
 
     async function getPackName(pack: PackDependency): Promise<[string, string, string] | undefined> {
         const resp = await fetch(`https://api.smithed.dev/v2/packs/${pack.id}`)
@@ -41,6 +41,15 @@ function Bundle({ id }: { id: string }) {
         const data: PackData = await resp.json()
 
         return [pack.id, data.display.name, pack.version];
+    }
+    async function getOwnerName(uid: string) {
+        const resp = await fetch(`https://api.smithed.dev/v2/users/${uid}`)
+        if (!resp.ok)
+            return
+        
+        const data: {displayName: string} = await resp.json()
+
+        setOwnerName(data.displayName)
     }
 
     async function loadBundleData() {
@@ -53,6 +62,9 @@ function Bundle({ id }: { id: string }) {
 
         const promises = data.packs.map(p => getPackName(p))
         const results = (await Promise.all(promises)).filter(r => r !== undefined)
+
+        if (showOwner)
+            await getOwnerName(data.owner)
 
         setRawBundleData(data)
         setContainedPacks(results as [string, string, string][])
@@ -67,6 +79,12 @@ function Bundle({ id }: { id: string }) {
         <div className='container' style={{ alignItems: 'start', gap: 8, flexGrow: 1 }}>
             <label style={{ fontSize: '1.5rem', color: 'var(--accent2)' }}>{rawBundleData.name}</label>
             <div style={{ display: 'flex', fontSize: '1.125rem', alignItems: 'center', gap: 8 }}>
+                Created By
+                <label style={{ backgroundColor: 'var(--background)', padding: 8, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)' }}>
+                    {ownerName}
+                </label>
+            </div>
+            <div style={{ display: 'flex', fontSize: '1.125rem', alignItems: 'center', gap: 8 }}>
                 Minecraft Version
                 <label style={{ backgroundColor: 'var(--background)', padding: 8, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)' }}>
                     {rawBundleData.version}
@@ -76,13 +94,13 @@ function Bundle({ id }: { id: string }) {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
                 {containedPacks?.map(p => <div style={{ display: 'flex', fontSize: '1.125rem', backgroundColor: 'var(--background)', alignItems: 'center', gap: 8, padding: 8, borderRadius: 'var(--defaultBorderRadius)' }}>
                     <a style={{ fontSize: '1.125rem' }} href={`/packs/${p[0]}`}>{p[1]}</a>
-                    v{p[2]}
+                    {p[2].startsWith('v') ? '' : 'v'}{p[2]}
                 </div>)}
             </div>
         </div>
         <div className='container' style={{gridArea: 'options', gap: 16}}>
             <DownloadButton link={`https://api.smithed.dev/v2/bundles/${rawBundleData.uid}/download`}/>
-            <AddRemovePackButton add={true} link={`/browse?bundleId=${rawBundleData.uid}`}/>
+            {editable && <AddRemovePackButton add={true} link={`/browse?bundleId=${rawBundleData.uid}`}/>}
         </div>
 
     </div>
@@ -269,7 +287,7 @@ export default function User() {
                     userStats.bundles.push(value.uid ?? '')
                     setUserStats(Object.create(userStats))
                 }} user={firebaseUser}/>}
-                {userStats.bundles?.map(b => <Bundle key={b} id={b} />)}
+                {userStats.bundles?.map(b => <Bundle key={b} id={b} editable/>)}
             </div>}
         </div>
     </div>

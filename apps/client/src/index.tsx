@@ -13,6 +13,7 @@ import { Search as SearchSvg, Home as HomeSvg, Settings as SettingsSvg, Account 
 import Account from './pages/account'
 import { getAuth, browserLocalPersistence } from 'firebase/auth'
 import Edit from './pages/edit'
+import Bundles from './pages/bundle'
 
 interface ClientProps {
     platform: 'desktop' | 'website'
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
             {
                 path: "packs/:id",
                 element: <Packs />
+            },
+            {
+                path: 'bundles/:bundleId',
+                element: <Bundles/>
             }
         ]
     }
