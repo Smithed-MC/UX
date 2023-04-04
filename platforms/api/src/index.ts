@@ -30,7 +30,7 @@ async function listen(port: number) {
   await setupApp()
   await API_APP.listen({ port: port, host: '127.0.0.1' })
 
-  executeTasks(true)
+  executeTasks()
   setInterval(executeTasks, 60 * 1000)
 }
 
