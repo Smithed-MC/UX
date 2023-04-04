@@ -31,6 +31,18 @@ async function getMetadata(url='') {
             description: data.display.description,
             image: data.display.icon ?? undefined
         }
+    } else if (url.match(/bundles\/.+/g)) {
+        const bundleId = url.split('/')[2]
+
+        const resp = await fetch('https://api.smithed.dev/v2/bundles/' + bundleId)
+        if(!resp.ok)
+            return undefined;
+        const data = await resp.json();
+
+        return {
+            siteName: 'Smithed Bundle',
+            title: data.name
+        }
     }
     
 } 
