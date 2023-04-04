@@ -1,10 +1,10 @@
 header {
-    font-size: clamp(3.5rem, 4.5rem , 4.5rem);
+    font-size: clamp(calc(3.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)));
 }
 
 p,
 a {
-    font-size: 1.5rem;
+    font-size: calc(1.5rem * (var(--headerModifier) + .2));
 }
 
 :root {
@@ -45,18 +45,16 @@ a {
     overflow: visible;
 }
 
+
+
 .homePageIntroPanel,
 .homePageLauncherPanel,
 .genericPanel {
     display: grid;
+    grid-template-columns: 50% 50%;
     place-items: center;
     width: 75%;
     column-gap: 32px;
-}
-
-.homePageIntroPanel,
-.homePageLauncherPanel {
-    grid-template-columns: 50% 50%;
 }
 
 .homePageIntroPanel {
@@ -86,10 +84,18 @@ a {
     height: '100%'
 }
 
+:root {
+    --headerModifier: 1;
+}
+
 @media screen and (max-width: 1024px) {
+    :root {
+        --headerModifier: .6;
+    }
 
     .homePageIntroPanel,
-    .homePageLauncherPanel {
+    .homePageLauncherPanel,
+    .genericPanel {
         width: 100%;
         padding: 16px;
         box-sizing: border-box;
@@ -133,12 +139,12 @@ a {
 
 @keyframes headerIntro {
     0% {
-        font-size: clamp(4rem, 5rem , 5rem);
+        font-size: clamp(calc(4rem * var(--headerModifier)), calc(5rem * var(--headerModifier)), calc(5rem * var(--headerModifier)));
         opacity: 0%;
     }
 
     10% {
-        font-size: clamp(5rem, 6rem , 6rem);
+        font-size: clamp(calc(5rem * var(--headerModifier)), calc(6rem * var(--headerModifier)), calc(6rem * var(--headerModifier)));
     }
 
     20% {
@@ -152,14 +158,14 @@ a {
     }
 
     60% {
-        font-size: clamp(5rem, 6rem , 6rem);;
+        font-size: clamp(calc(5rem * var(--headerModifier)), calc(6rem * var(--headerModifier)), calc(6rem * var(--headerModifier)));;
         rotate: 0deg;
     }
 
     65% {}
 
     100% {
-        font-size: clamp(3.5rem, 4.5rem , 4.5rem);;
+        font-size: clamp(calc(3.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)));;
         margin-top: 0%;
     }
 }
@@ -186,15 +192,15 @@ a {
 
 @keyframes pulse {
     0% {
-        font-size: clamp(4rem, 4.5rem , 4.5rem);
+        font-size: clamp(calc(4rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)));
     }
 
     33% {
-        font-size: clamp(4.2rem, 4.7rem , 4.7rem);
+        font-size: clamp(calc(4.2rem * var(--headerModifier)), calc(4.7rem * var(--headerModifier)), calc(4.7rem * var(--headerModifier)));
     }
 
     66% {
-        font-size: clamp(4rem, 4.5rem , 4.5rem);
+        font-size: clamp(calc(4rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)));
     }
 }
 

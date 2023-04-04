@@ -44,12 +44,12 @@ function PackPreview({ type }: { type: 'trending' | 'downloads' | 'newest' }) {
     }, [ids]);
 
     if (ids === undefined) {
-        return <div style={{height: 256}}></div>
+        return <div style={{ height: 256 }}></div>
     }
 
-    
+
     return <div key={current} ref={cardRef} style={{ flexGrow: 1, width: '100%', animation: 'fadeIn 2s' }}>
-        <PackCard id={ids[current]} style={{ width: '100%', height: '256px', boxSizing: 'border-box' }} onClick={() => navigate(`/packs/${ids[current]}`)}/>
+        <PackCard id={ids[current]} style={{ width: '100%', height: '256px', boxSizing: 'border-box' }} onClick={() => navigate(`/packs/${ids[current]}`)} />
     </div>
 }
 
@@ -57,7 +57,7 @@ function HomeBody() {
 
 
 
-    return <div className="container">
+    return <div className="container" style={{ boxSizing: 'border-box', gap: 32 }}>
         <div className="container fadeIn homePageIntroPanel" style={{ justifyContent: 'center', flexDirection: 'row', animationDuration: '3s' }}>
             <SectionContainer className="imageContainer" style={{ gridArea: 'logo' }}>
                 <Logo className="logo" style={{ fill: 'var(--text)', width: '100%', borderRadius: '50%' }} />
@@ -97,13 +97,23 @@ function HomeBody() {
             </p>
             <a className='button' href="/browse" style={{ padding: 16, gridArea: 'footer2' }}>Take me to the app!</a>
         </div>
-        
-        <div className="container fadeIn genericPanel">
-            <h1 style={{ textDecoration: 'none', fontFamily: 'DoppioOne', marginBottom: 0, gridArea: 'header' }}>THE <label className="accentText">LIBRARIES</label></h1>
-            <p style={{ color: 'var(--subText)', gridArea: 'content1' }}>
-                Tired of having to maintain annoying code across all your packs? Want to left your users all their items in the same place? Check out our collection of community maintained libraries!
-            </p>
-            <a className='button' href="/smithed" style={{ padding: 16, gridArea: 'footer1' }}>Whatcha got</a>
+        <div className="container" style={{ backgroundColor: 'var(--backgroundAccent)', paddingBottom: 32    }}>
+            <div className="container genericPanel" style={{ alignItems: 'start' }}>
+                <div className="container" style={{ padding: 16 }}>
+                    <h1 style={{ textDecoration: 'none', fontFamily: 'DoppioOne', margin: 0, gridArea: 'header' }}>THE <label className="accentText">LIBRARIES</label></h1>
+                    <p style={{ color: 'var(--subText)', gridArea: 'content1' }}>
+                        Tired of having to maintain annoying code across all your packs? Want to let your users craft all their items across packs in the same place? Check out our collection of awesome community maintained libraries!
+                    </p>
+                    <a className='button' href="/smithed" style={{ padding: 16, gridArea: 'footer1' }}>Whatcha got!</a>
+                </div>
+                <div className="container" style={{ padding: 16 }}>
+                    <h1 style={{ textDecoration: 'none', fontFamily: 'DoppioOne', margin: 0, gridArea: 'header' }}>THE <label className="accentText">WIKI</label></h1>
+                    <p style={{ color: 'var(--subText)', gridArea: 'content1' }}>
+                        What are libraries without some documentation? The answer: an unusable mess of code. Thankfully, we have some!
+                    </p>
+                    <a className='button' href="https://wiki.smithed.dev" style={{ padding: 16, gridArea: 'footer1' }}>Take me away</a>
+                </div>
+            </div>
         </div>
     </div>
 }
@@ -136,7 +146,7 @@ export default function Home(props: any) {
         }, (text.length + 1) * delay - 20)
     }, [])
 
-    return <div className="container" style={{ width: '100%', boxSizing: 'border-box', position: 'absolute', top: 0, left: 0, height: '100%', overflowY: 'auto', overflowX: 'hidden', justifyContent: 'safe start', gap: 32, paddingLeft: 16, paddingRight: 16 }}>
+    return <div className="container" style={{ width: '100%', boxSizing: 'border-box', position: 'absolute', top: 0, left: 0, height: '100%', overflowY: 'auto', overflowX: 'hidden', justifyContent: 'safe start', gap: 32 }}>
         <header className="header" >
             {"<"}<div ref={textDivRef}><label className="accentText" style={{ fontFamily: 'DoppioOne' }}>{smithedText}</label></div><div className="cursor" ref={cursorRef}></div>{"/>"}
         </header>
