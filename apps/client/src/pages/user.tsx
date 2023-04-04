@@ -1,4 +1,4 @@
-import { HTTPResponses, PackBundle, PackData, PackDependency, UserData, supportedMinecraftVersions } from 'data-types'
+import { HTTPResponses, MinecraftVersion, PackBundle, PackData, PackDependency, UserData, supportedMinecraftVersions } from 'data-types'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { formatDownloads } from 'formatters'
@@ -88,9 +88,9 @@ function Bundle({ id }: { id: string }) {
     </div>
 }
 
-function CreateBundle({user, showModal}: {user: FirebaseUser, showModal: (value: boolean)=>void}) {
+function CreateBundle({user, showModal, addPack}: {user: FirebaseUser, showModal: (value: boolean)=>void, addPack: (value: PackBundle) => void}) {
     const [name, setName] = useState<string|undefined>(undefined)
-    const [version, setVersion] = useState<string|undefined>(undefined)
+    const [version, setVersion] = useState<MinecraftVersion|undefined>(undefined)
 
     const navigate = useNavigate()
 
@@ -100,32 +100,40 @@ function CreateBundle({user, showModal}: {user: FirebaseUser, showModal: (value:
         showModal(false)
     }
     const finish = async () => {
+        close()
+        if(version === undefined || name === undefined)
+            return undefined
+
+        const bundleData: PackBundle = {
+            owner: user.uid,
+            version: version,
+            name: name,
+            packs: [],
+            public: false
+        }
+
         const resp = await fetch(`https://api.smithed.dev/v2/bundles?token=${await user.getIdToken()}`, {
             method: 'POST', 
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                data: {
-                    owner: user.uid,
-                    version: version,
-                    name: name,
-                    packs: [],
-                    public: false
-                } as PackBundle
+                data: bundleData
             }) 
         })
 
         if(resp.status !== HTTPResponses.CREATED)
-            return
+            return undefined
 
         const {uid} = await resp.json()
-
-        close()
+        bundleData.uid = uid
+        addPack(bundleData)
         return uid
     }
     const finishAndEdit = async () => {
         const uid = await finish()
+        if(uid === undefined)
+            return
         navigate(`/browse?bundleId=${uid}`)
     }
 
@@ -257,7 +265,10 @@ export default function User() {
                 <CreationButton text={'Create a new bundle'} onPress={() => {
                     setShowBundleCreationModal(true)
                 }} />
-                {showBundleCreationModal && <CreateBundle showModal={setShowBundleCreationModal} user={firebaseUser}/>}
+                {showBundleCreationModal && <CreateBundle showModal={setShowBundleCreationModal} addPack={(value: PackBundle) => {
+                    userStats.bundles.push(value.uid ?? '')
+                    setUserStats(Object.create(userStats))
+                }} user={firebaseUser}/>}
                 {userStats.bundles?.map(b => <Bundle key={b} id={b} />)}
             </div>}
         </div>
