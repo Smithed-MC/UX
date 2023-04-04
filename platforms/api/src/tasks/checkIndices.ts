@@ -32,8 +32,7 @@ export async function checkIndices() {
         const packData = (await doc.get()).data()
         if (packData === undefined)
             continue;
-
-        if (packData['_indices'] == undefined) {
+        if (packData['_indices'] == undefined && packData.data !== undefined) {
             packData['_indices'] = indexData(packData.data.display.name, packData.id);
             await doc.set(packData)
         }

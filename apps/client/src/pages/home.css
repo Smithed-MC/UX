@@ -46,12 +46,17 @@ a {
 }
 
 .homePageIntroPanel,
-.homePageLauncherPanel {
+.homePageLauncherPanel,
+.genericPanel {
     display: grid;
-    grid-template-columns: 50% 50%;
     place-items: center;
     width: 75%;
     column-gap: 32px;
+}
+
+.homePageIntroPanel,
+.homePageLauncherPanel {
+    grid-template-columns: 50% 50%;
 }
 
 .homePageIntroPanel {

@@ -97,6 +97,14 @@ function HomeBody() {
             </p>
             <a className='button' href="/browse" style={{ padding: 16, gridArea: 'footer2' }}>Take me to the app!</a>
         </div>
+        
+        <div className="container fadeIn genericPanel">
+            <h1 style={{ textDecoration: 'none', fontFamily: 'DoppioOne', marginBottom: 0, gridArea: 'header' }}>THE <label className="accentText">LIBRARIES</label></h1>
+            <p style={{ color: 'var(--subText)', gridArea: 'content1' }}>
+                Tired of having to maintain annoying code across all your packs? Want to left your users all their items in the same place? Check out our collection of community maintained libraries!
+            </p>
+            <a className='button' href="/smithed" style={{ padding: 16, gridArea: 'footer1' }}>Whatcha got</a>
+        </div>
     </div>
 }
 

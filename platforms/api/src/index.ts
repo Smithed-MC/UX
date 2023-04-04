@@ -12,11 +12,11 @@ dotenv.config()
 export type Queryable = FirebaseFirestore.Query | FirebaseFirestore.CollectionReference;
 
 
-function executeTasks() {
+async function executeTasks(ignoreTime?: boolean) {
   console.log('Running tasks...')
   const now = new Date()
     
-  if(now.getMinutes() % 60 === 30) {
+  if(now.getMinutes() % 60 === 30 || ignoreTime) {
     calculateDownloads()
     checkIndices();
   }
@@ -30,7 +30,7 @@ async function listen(port: number) {
   await setupApp()
   await API_APP.listen({ port: port, host: '127.0.0.1' })
 
-  executeTasks()
+  executeTasks(true)
   setInterval(executeTasks, 60 * 1000)
 }
 
