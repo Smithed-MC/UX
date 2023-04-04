@@ -172,7 +172,7 @@ API_APP.route({
         const bundleData = data as PackBundle
         bundleData.owner = uid;
 
-        await getFirestore().collection('bundles').add(bundleData)
-        reply.status(HTTPResponses.CREATED).send('Bundle created successfully')
+        const createdDoc = await getFirestore().collection('bundles').add(bundleData)
+        reply.status(HTTPResponses.CREATED).send({uid: createdDoc.id})
     }
 })
