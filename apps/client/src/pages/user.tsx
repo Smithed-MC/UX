@@ -1,19 +1,17 @@
-import { HTTPResponses, PackBundle, PackData, PackDependency, UserData } from 'data-types'
-import React, { useEffect, useState } from 'react'
-import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { HTTPResponses, PackBundle, PackData, PackDependency, UserData, supportedMinecraftVersions } from 'data-types'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { formatDownloads } from 'formatters'
 import './user.css'
 import { PackCard, Spinner } from 'components'
-import * as queryString from 'query-string'
 import { useFirebaseUser, useQueryParams } from 'hooks'
-import { Edit, SignOut } from 'components/svg'
+import { SignOut } from 'components/svg'
 import EditButton from 'components/EditButton'
 import { Helmet } from 'react-helmet'
 import { getAuth } from 'firebase/auth'
 import DownloadButton from 'components/DownloadButton'
-import Browse from './browse'
 import AddRemovePackButton from 'components/AddRemovePackButton'
-
+import { User as FirebaseUser} from 'firebase/auth'
 interface UserStats {
     totalDownloads: number,
     dailyDownloads: number
@@ -90,6 +88,72 @@ function Bundle({ id }: { id: string }) {
     </div>
 }
 
+function CreateBundle({user, showModal}: {user: FirebaseUser, showModal: (value: boolean)=>void}) {
+    const [name, setName] = useState<string|undefined>(undefined)
+    const [version, setVersion] = useState<string|undefined>(undefined)
+
+    const navigate = useNavigate()
+
+    const isEnabled = name !== undefined && version !== undefined
+
+    const close = () => {
+        showModal(false)
+    }
+    const finish = async () => {
+        const resp = await fetch(`https://api.smithed.dev/v2/bundles?token=${await user.getIdToken()}`, {
+            method: 'POST', 
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                data: {
+                    owner: user.uid,
+                    version: version,
+                    name: name,
+                    packs: [],
+                    public: false
+                } as PackBundle
+            }) 
+        })
+
+        if(resp.status !== HTTPResponses.CREATED)
+            return
+
+        const {uid} = await resp.json()
+
+        close()
+        return uid
+    }
+    const finishAndEdit = async () => {
+        const uid = await finish()
+        navigate(`/browse?bundleId=${uid}`)
+    }
+
+    return <div className="container" style={{position: 'fixed', width: '100%', height: '100%', top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 50%)', animation: 'fadeInBackground 0.5s'}}>
+        <div className='container' style={{backgroundColor: 'var(--backgroundAccent)', border: '4px solid var(--background)', boxSizing: 'border-box', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 0.5s ease-in-out'}}>
+            <h2 style={{margin: 0}}>Create a bundle</h2>
+            <input type="text" placeholder='Name...' onChange={(e) => setName(e.currentTarget?.value)}/>
+            <select onChange={(e) => setVersion(e.currentTarget?.value)}>
+                <option value="none" hidden style={{color: 'var(--subText)'}}>
+                    Select a version...
+                </option>
+                {supportedMinecraftVersions.map(v => <option value={v}>{v}</option>)}
+            </select>
+            <div className='container' style={{flexDirection: 'row', width: '100%', gap: 16}}>
+                <button className='button' style={{backgroundColor:'var(--badAccent)', width: '33%'}} onClick={close}>
+                    Cancel
+                </button>
+                <button className='button' style={{width: '33%'}} disabled={!isEnabled} onClick={finish}>
+                    Finish
+                </button>
+                <button className='button' style={{width: '33%'}} disabled={!isEnabled} onClick={finishAndEdit}>
+                    Finish & Edit
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
 export default function User() {
     const { owner: userId } = useParams()
     const { uid } = useQueryParams()
@@ -100,6 +164,7 @@ export default function User() {
     const [user, setUser] = useState<UserData>()
     const [userStats, setUserStats] = useState<UserStats>()
     const [loaded, setLoaded] = useState<boolean>()
+    const [showBundleCreationModal, setShowBundleCreationModal] = useState(false)
 
     async function getDownloads(id: string, packs: string[]) {
         let total = 0;
@@ -190,8 +255,9 @@ export default function User() {
             {editable && <div className='container' style={{ paddingBottom: 64, width: '100%', gap: 32 }}>
                 <h1 style={{ margin: 0 }}>My Pack Bundles</h1>
                 <CreationButton text={'Create a new bundle'} onPress={() => {
-
+                    setShowBundleCreationModal(true)
                 }} />
+                {showBundleCreationModal && <CreateBundle showModal={setShowBundleCreationModal} user={firebaseUser}/>}
                 {userStats.bundles?.map(b => <Bundle key={b} id={b} />)}
             </div>}
         </div>

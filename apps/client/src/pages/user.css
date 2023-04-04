@@ -63,3 +63,21 @@
     gap: 16px;
     height: min-content;
 }
+
+@keyframes fadeInBackground {
+    0% {
+        background-color: rgba(0,0,0,0%);
+    }
+    100% {
+        background-color: rgba(0,0,0,50%);
+    }
+}
+
+@keyframes slideInContent {
+    0% {
+        margin-top: 100vh;
+    }
+    100% {
+        margin-top: 0;
+    }
+}
