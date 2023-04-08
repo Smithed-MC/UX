@@ -1,0 +1,29 @@
+.filter-button {
+    border: 1px solid var(--subText);
+    border-radius: 10px;
+    color: var(--subText);
+    background: transparent;
+    opacity: 0.5;
+    padding: 5px 13px;
+    margin: 2px;
+    cursor: pointer;
+    font-size: revert; /* why are "a" links too large?? */
+    user-select: none;
+    transition: all 100ms ease-in-out;
+}
+
+.filter-button:hover {
+    opacity: 1;
+}
+
+.filter-button.selected {
+    opacity: 1;
+    background: var(--accent);
+    color: var(--buttonText);
+    border: 1px solid var(--accent);
+}
+
+.filter-button.selected:hover {
+    background: var(--accent2);
+    border: 1px solid var(--accent2);
+}

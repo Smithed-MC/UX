@@ -7,5 +7,6 @@ import './style.css'
 import ErrorPage from './PageError'
 import MarkdownRenderer, {markdownOptions} from './MarkdownRenderer'
 import { RootError } from './RootError'
+import FilterButton from './FilterButton'
 
-export {NavButton, NavBar, PackCard, Spinner, PackVersionDownload, svg, ErrorPage, MarkdownRenderer, markdownOptions, RootError}
+export {NavButton, NavBar, PackCard, Spinner, PackVersionDownload, svg, ErrorPage, MarkdownRenderer, markdownOptions, RootError, FilterButton}
