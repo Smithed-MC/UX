@@ -1,4 +1,4 @@
-import { NavBar, NavButton, PackCard } from "components";
+import { NavBar, NavButton, PackCard, FilterButton } from "components";
 import React, { useEffect, useRef, useState } from "react";
 import { PackBundle, PackEntry, PackVersion, packCategories } from "data-types"
 import PackInfo from "../widget/packInfo";
@@ -27,23 +27,26 @@ export default function Browse(props: any) {
 
     async function updateUrl(search: string | null | (string | null)[]) {
         let url = '?'
+        let searchUrl = []
         if (search != null && search !== '')
-            url += 'search=' + search + '&'
+            searchUrl.push('search=' + search)
 
+        let bundleIdUrl = []
         if (bundleId != null)
-            url += 'bundleId=' + bundleId + '&'
+            bundleIdUrl.push('bundleId=' + bundleId)
 
+        let categoriesurl = []
         for (let c of categories.values())
-            url += 'category=' + c + '&'
+            categoriesurl.push('category=' + c)
+
+        url += searchUrl.join('&') + bundleIdUrl.join('&') + categoriesurl.join('&')
         navigate(url)
     }
 
     async function getPacksFromAPI() {
         const url = createUrlFromVariables();
-        console.log(url)
         const response = await fetch(url)
         const data = await response.json()
-        console.log(data)
         // const elements = document.getElementsByTagName("browsePackCard")
         // for(let e of elements) {
         //     e.remove()
@@ -160,14 +163,16 @@ export default function Browse(props: any) {
 
                     }} />
                     <div className="container" style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' }}>
-                        {packCategories.map((c) => <div style={{ display: 'flex', alignItems: 'baseline', flexDirection: 'row' }}><input type="checkbox" defaultChecked={categories.has(c)} onChange={(e) => {
-                            const val = e.currentTarget.checked;
-                            if (val)
-                                categories.add(c)
+                        {packCategories.map((cat) => <FilterButton onClick={() => {
+                            console.log(categories);
+                            const val = categories.has(cat)
+                            console.log(val)
+                            if (!val)
+                                categories.add(cat)
                             else
-                                categories.delete(c);
+                                categories.delete(cat);
                             updateUrl(search)
-                        }} />{c}</div>)}
+                        }} >{cat}</FilterButton>)}
                     </div>
                 </div>
                 <div className="container" id="packCardContainer" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }} onScroll={(e) => onScroll(e)}>
