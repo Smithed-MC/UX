@@ -1,5 +1,5 @@
 import React from "react";
-import './filterButton.css'
+import './FilterButton.css'
 
 interface FilterButtonProps {
     children: React.ReactNode,
