@@ -139,8 +139,8 @@ export default function PackInfo({ yOffset, packEntry, packData, id, fixed, onCl
             <p style={{ backgroundColor: 'var(--background)', padding: 12, borderRadius: 'var(--defaultBorderRadius)', maxWidth: '100%', fontSize: '1.125rem' }}>
                 {data.display.description}
             </p>
-            <div style={{ width: '100%', fontSize: '1.125rem' }}>
-                {fullviewPage !== '' && <MarkdownRenderer style={{fontSize: '1.125rem'}}>{fullviewPage.replace(/<!-- HIDE -->([^]*?)<!-- HIDE END -->\n?/g, '')}</MarkdownRenderer>}
+            <div style={{ width: '100%'}}>
+                {fullviewPage !== '' && <MarkdownRenderer style={{}}>{fullviewPage.replace(/<!-- HIDE -->([^]*?)<!-- HIDE END -->\n?/g, '')}</MarkdownRenderer>}
             </div>
 
         </div>}

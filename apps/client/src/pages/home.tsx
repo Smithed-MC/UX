@@ -63,10 +63,10 @@ function HomeBody() {
                 <Logo className="logo" style={{ fill: 'var(--text)', width: '100%', borderRadius: '50%' }} />
             </SectionContainer>
             <h1 style={{ textDecoration: 'none', fontFamily: 'DoppioOne', marginBottom: 0, gridArea: 'header', width: '100%', textAlign: 'center' }}>WHAT IS <label className="accentText">SMITHED</label>?</h1>
-            <p style={{ color: 'var(--subText)', width: '100%', gridArea: 'content' }}>
+            <p className='pageText' style={{ color: 'var(--subText)', width: '100%', gridArea: 'content' }}>
                 Smithed is a set of projects with the express purpose of making datapacks more compatible, easier to manage, and fool proof to install. Smithed is not only a project but a community of passionate people.
             </p>
-            <a className='button' href="https://smithed.dev/discord" style={{ padding: 16, gridArea: 'footer', width: 'fit-content', placeSelf: 'center' }}>Join the Discord</a>
+            <a className='button pageText' href="https://smithed.dev/discord" style={{ padding: 16, gridArea: 'footer', width: 'fit-content', placeSelf: 'center' }}>Join the Discord</a>
         </div>
         <div className="container fadeIn trendingContainer" style={{ width: '100%', animationDuration: '4s' }}>
             <SectionContainer className="trendingCard">
@@ -87,31 +87,31 @@ function HomeBody() {
                 <img style={{ width: '100%', border: '4px solid var(--accent)', borderRadius: 'var(--defaultBorderRadius)' }} src={LauncherScreenshot} />
             </SectionContainer>
             <h1 style={{ textDecoration: 'none', fontFamily: 'DoppioOne', marginBottom: 0, gridArea: 'header' }}>THE <label className="accentText">LAUNCHER</label></h1>
-            <p style={{ color: 'var(--subText)', gridArea: 'content1' }}>
+            <p className='pageText' style={{ color: 'var(--subText)', gridArea: 'content1' }}>
                 Tired of having to manually update your datapacks? Merging all the ones you want to play? What about filtering through tons of incompatible content? The Smithed launcher allows you to play datapacks just like you would mods! By using the launcher, conflicts between datapacks are automatically resolved, resourcepacks are automatically applied and everything is kept separate from your base game. No more cluttered resourcepack folders.
             </p>
-            <a className='button' href="/download" style={{ padding: 16, gridArea: 'footer1' }}>Download</a>
+            <a className='button pageText' href="/download" style={{ padding: 16, gridArea: 'footer1' }}>Download</a>
             <h2 style={{ marginBottom: 0, gridArea: 'subheading' }}>BUT WAIT</h2>
-            <p style={{ color: 'var(--subText)', gridArea: 'content2' }}>
+            <p className='pageText' style={{ color: 'var(--subText)', gridArea: 'content2' }}>
                 The majority of the launcher is accessible entirely in your browser, if all you want to do is create and browse, no need to install even more programs!
             </p>
-            <a className='button' href="/browse" style={{ padding: 16, gridArea: 'footer2' }}>Take me to the app!</a>
+            <a className='button pageText' href="/browse" style={{ padding: 16, gridArea: 'footer2' }}>Take me to the app!</a>
         </div>
         <div className="container" style={{ backgroundColor: 'var(--backgroundAccent)', paddingBottom: 32    }}>
             <div className="container genericPanel" style={{ alignItems: 'start' }}>
                 <div className="container" style={{ padding: 16 }}>
                     <h1 style={{ textDecoration: 'none', fontFamily: 'DoppioOne', margin: 0, gridArea: 'header' }}>THE <label className="accentText">LIBRARIES</label></h1>
-                    <p style={{ color: 'var(--subText)', gridArea: 'content1' }}>
+                    <p className='pageText' style={{ color: 'var(--subText)', gridArea: 'content1' }}>
                         Tired of having to maintain annoying code across all your packs? Want to let your users craft all their items across packs in the same place? Check out our collection of awesome community maintained libraries!
                     </p>
-                    <a className='button' href="/smithed" style={{ padding: 16, gridArea: 'footer1' }}>Whatcha got!</a>
+                    <a className='button pageText' href="/smithed" style={{ padding: 16, gridArea: 'footer1' }}>Whatcha got!</a>
                 </div>
                 <div className="container" style={{ padding: 16 }}>
                     <h1 style={{ textDecoration: 'none', fontFamily: 'DoppioOne', margin: 0, gridArea: 'header' }}>THE <label className="accentText">WIKI</label></h1>
-                    <p style={{ color: 'var(--subText)', gridArea: 'content1' }}>
+                    <p className='pageText' style={{ color: 'var(--subText)', gridArea: 'content1' }}>
                         What are libraries without some documentation? The answer: an unusable mess of code. Thankfully, we have some!
                     </p>
-                    <a className='button' href="https://wiki.smithed.dev" style={{ padding: 16, gridArea: 'footer1' }}>Take me away</a>
+                    <a className='button pageText' href="https://wiki.smithed.dev" style={{ padding: 16, gridArea: 'footer1' }}>Take me away</a>
                 </div>
             </div>
         </div>

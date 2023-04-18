@@ -48,12 +48,13 @@ API_APP.route({
             id: Type.String()
         }),
         querystring: Type.Object({
-            token: Type.Optional(Type.String())
+            token: Type.Optional(Type.String()),
+            mode: Type.Union([Type.Literal('datapack'), Type.Literal('resourcepack'), Type.Literal('both')], { default: 'both' })
         })
     },
     handler: async (request, reply) => {
         const { id } = request.params
-        const { token } = request.query
+        const { token, mode } = request.query
 
         const bundleDoc = await getBundleDoc(id)
         if (bundleDoc === undefined)
@@ -61,7 +62,7 @@ API_APP.route({
 
         const bundleData = bundleDoc.data() as PackBundle
 
-        const resp = await API_APP.inject(`/download?${bundleData.packs.map(p => `pack=${p.id}@${p.version}`).join('&')}&version=${bundleData.version}`)
+        const resp = await API_APP.inject(`/download?${bundleData.packs.map(p => `pack=${p.id}@${p.version}`).join('&')}&version=${bundleData.version}&mode=${mode}`)
 
         if (resp.statusCode !== HTTPResponses.OK)
             return sendError(reply, resp.statusCode, 'Error while downloading bundle, ' + resp.statusMessage);
@@ -152,7 +153,7 @@ API_APP.route({
     url: '/bundles',
     schema: {
         querystring: Type.Object({
-            token: Type.String()
+            token: Type.String(),
         }),
         body: Type.Object({
             data: Type.Omit(BundleSchema, ['owner'])

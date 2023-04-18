@@ -2,8 +2,7 @@ header {
     font-size: clamp(calc(3.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)));
 }
 
-p,
-a {
+.pageText {
     font-size: calc(1.5rem * (var(--headerModifier) + .2));
 }
 
