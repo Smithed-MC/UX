@@ -12,7 +12,6 @@ export interface PackEntry {
 Format.Set('semver', (v) => coerce(v) != null)
 console.log(Format.Has('semver'))
 
-
 export const supportedMinecraftVersions = [
     '1.17',
     '1.17.1',
@@ -40,10 +39,12 @@ export const packCategories = [
     'No Resource Pack'
 ]
 
-const PackDependencySchema = Type.Object({
+export const PackReferenceSchema = Type.Object({
     id: Type.String(),
     version: Type.String()
 })
+
+export const PackCategorySchema = Type.Union(packCategories.map(c => Type.Literal(c)))
 
 export const PackVersionSchema = Type.Object({
     name: Type.String({minLength: 1}),
@@ -52,7 +53,7 @@ export const PackVersionSchema = Type.Object({
         resourcepack: Type.String()
     }), {minProperties: 1}),
     supports: Type.Array(MinecraftVersionSchema, {minItems: 1}),
-    dependencies: Type.Array(PackDependencySchema)
+    dependencies: Type.Array(PackReferenceSchema)
 })
 
 export const PackDataSchema = Type.Object({
@@ -65,7 +66,7 @@ export const PackDataSchema = Type.Object({
         webPage: Type.Optional(Type.String())
     }),
     versions: Type.Array(PackVersionSchema, {minItems: 1}),
-    categories: Type.Array(Type.Union(packCategories.map(c => Type.Literal(c))))
+    categories: Type.Array(PackCategorySchema)
 })
 
 export const MetaDataSchema = Type.Object({
@@ -87,21 +88,33 @@ export const BundleSchema = Type.Object({
     owner: Type.String(),
     name: Type.String(),
     version: MinecraftVersionSchema,
-    packs: Type.Array(PackDependencySchema),
+    packs: Type.Array(PackReferenceSchema),
     public: Type.Boolean(),
     uid: Type.Optional(Type.String())
 })
 
+export const UserDataSchema = Type.Object({
+    displayName: Type.String(),
+    cleanName: Type.String(),
+    uid: Type.String()
+})
+
+export enum SortOptions {
+    Trending = "trending",
+    Downloads = "downloads",
+    Alphabetically = "alphabetically",
+    Newest = "newest"
+}
+export const SortSchema = Type.Enum(SortOptions, {default: SortOptions.Downloads})
+
 export type PackMetaData = Static<typeof MetaDataSchema>
 export type MinecraftVersion = Static<typeof MinecraftVersionSchema>
-export type PackDependency = Static<typeof PackDependencySchema>
+export type PackDependency = Static<typeof PackReferenceSchema>
 export type PackVersion = Static<typeof PackVersionSchema>
 export type PackData = Static<typeof PackDataSchema>
 export type PackBundle = Static<typeof BundleSchema>
 
-export interface UserData {
-    displayName: string
-}
+export type UserData = Static<typeof UserDataSchema>
 
 export enum HTTPResponses {
     OK = 200,
@@ -111,8 +124,7 @@ export enum HTTPResponses {
     FORBIDDEN = 403,
     NOT_FOUND = 404,
     CONFLICT = 409,
-    SERVER_ERROR = 500
-    
+    SERVER_ERROR = 500   
 }
 
 export type ReviewState = 'verified'|'pending'|'unsubmitted'|'rejected'

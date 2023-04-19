@@ -1,0 +1,7 @@
+{
+    "targets": [
+        "../../platforms/api/src/routes"
+    ],
+    "outDir": "B:/Projects/Docs/Smithed Docs/docs/api/generated",
+    "extensions": "/ts/g"
+}
