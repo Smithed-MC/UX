@@ -7,6 +7,19 @@ import {FastifyRequest, FastifyReply} from 'fastify'
 
 
 
+/*
+ * @route GET /packs/:id
+ * Retrieve a pack's data
+ * 
+ * @param id
+ * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
+ *
+ * @return OK: PackData
+ * @return NOT_FOUND: ApiError
+ * 
+ * @example Fetch a packs's data
+ * fetch('https://api.smithed.dev/v2/packs/coc')
+ */
 API_APP.route({
     method: 'GET',
     url: '/packs/:id',
@@ -61,6 +74,30 @@ const setPack = async (response: any, reply: any) => {
     return reply.status(HTTPResponses.OK).send('Updated data')
 }
 
+/*
+ * @route PATCH/PUT /packs/:id
+ * Update a pack's data
+ * 
+ * @param id
+ * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
+ *
+ * @query token: string
+ * Either Firebase Id Token or a valid PAT
+ *
+ * @body data: PackData
+ * 
+ * @return OK: string
+ * @return NOT_FOUND: ApiError
+ * @return UNAUTHORIZED: ApiError
+ * @return FORBIDDEN: ApiError
+ *  
+ * @example Set a packs's data
+ * fetch('https://api.smithed.dev/v2/packs/coc?token=NOT_TODAY_HAHA', {
+ *   method:'PATCH', 
+ *   body: {data: <Pack Data>},
+ *   headers: {'Content-Type': 'application/json'}
+ * })
+ */
 API_APP.route({
     method: 'PATCH',
     url: '/packs/:id',
@@ -80,7 +117,9 @@ API_APP.route({
     },
     handler: setPack
 })
-
+/*
+ * Same as the above.
+*/
 API_APP.route({
     method: 'PUT',
     url: '/packs/:id',
@@ -100,6 +139,26 @@ API_APP.route({
 
 
 
+/*
+ * @route DELETE /packs/:id
+ * Delete a specific pack
+ * 
+ * @param id
+ * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
+ *
+ * @query token: string
+ * Either Firebase Id Token or a valid PAT
+ * 
+ * @return OK: string
+ * @return NOT_FOUND: ApiError
+ * @return UNAUTHORIZED: ApiError
+ * @return FORBIDDEN: ApiError
+ *  
+ * @example Set a packs's data
+ * fetch('https://api.smithed.dev/v2/packs/coc?token=NOT_TODAY_HAHA', {
+ *   method:'DELETE'
+ * })
+ */
 API_APP.route({
     method: 'DELETE',
     url: '/packs/:id',
@@ -132,6 +191,28 @@ API_APP.route({
     }
 })
 
+
+/*
+ * @route POST /packs/:id/contributors
+ * Add a list of contributors to a pack
+ * 
+ * @param id
+ * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
+ *
+ * @query token: string
+ * Either Firebase Id Token or a valid PAT
+ * @query contributors: string[]
+ * 
+ * @return OK: string
+ * @return NOT_FOUND: ApiError
+ * @return UNAUTHORIZED: ApiError
+ * @return FORBIDDEN: ApiError
+ *  
+ * @example Set a packs's data
+ * fetch('https://api.smithed.dev/v2/packs/coc/contributors?token=NOT_TODAY_HAHA&contributors=CreeperMagnet_', {
+ *   method:'POST'
+ * })
+ */
 API_APP.route({
     method: 'POST',
     url: '/packs/:id/contributors',
@@ -171,6 +252,28 @@ API_APP.route({
     }
 })
 
+
+/*
+ * @route DELETE /packs/:id/contributors
+ * Remove a list of contributors from a pack
+ * 
+ * @param id
+ * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
+ *
+ * @query token: string
+ * Either Firebase Id Token or a valid PAT
+ * @query contributors: string[]
+ * 
+ * @return OK: string
+ * @return NOT_FOUND: ApiError
+ * @return UNAUTHORIZED: ApiError
+ * @return FORBIDDEN: ApiError
+ *  
+ * @example Set a packs's data
+ * fetch('https://api.smithed.dev/v2/packs/coc/contributors?token=NOT_TODAY_HAHA&contributors=CreeperMagnet_', {
+ *   method:'DELETE'
+ * })
+ */
 API_APP.route({
     method: 'DELETE',
     url: '/packs/:id/contributors',
@@ -207,6 +310,20 @@ API_APP.route({
     }
 })
 
+
+/*
+ * @route GET /packs/:id/meta
+ * Retrieve a pack's metadata
+ * 
+ * @param id
+ * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
+ * 
+ * @return OK: PackMetaData
+ * @return NOT_FOUND: ApiError
+ *  
+ * @example Set a packs's data
+ * fetch('https://api.smithed.dev/v2/packs/coc/meta')
+ */
 API_APP.route({
     method: 'GET',
     url: '/packs/:id/meta',
@@ -240,7 +357,7 @@ API_APP.route({
             contributors: await doc.get('contributors')
         }
 
-        await set(requestIdentifier, data, 10 * 60 * 1000)
+        await set(requestIdentifier, data, 60 * 60 * 1000)
         return data
     }
 })

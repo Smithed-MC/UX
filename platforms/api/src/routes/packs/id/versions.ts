@@ -1,9 +1,23 @@
 import { Type } from "@sinclair/typebox";
 import { API_APP, sendError } from "../../../app.js";
-import { HTTPResponses, PackVersion, PackVersionSchema } from "data-types";
+import { HTTPResponses, MinecraftVersionSchema, PackVersion, PackVersionSchema } from "data-types";
 import { coerce, compare } from "semver";
 import { getPackDoc, getUIDFromToken } from "database";
 
+
+/*
+ * @route GET /packs/:id/versions
+ * Get the list of a pack's versions
+ * 
+ * @param id
+ * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
+ *
+ * @return OK: PackVersion
+ * @return NOT_FOUND: ApiError
+ *  
+ * @example Get a pack's versions
+ * fetch('https://api.smithed.dev/v2/packs/coc/versions')
+ */
 API_APP.route({
     method: 'GET',
     url: '/packs/:id/versions',
@@ -23,6 +37,34 @@ API_APP.route({
     }
 })
 
+
+/*
+ * @route POST /packs/:id/versions
+ * Add to the list of a pack's versions
+ * 
+ * @param id
+ * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
+ *
+ * @body data: PackVersion
+ * The data to add to the list
+ * 
+ * @query token: string
+ * Either Firebase Id Token or a valid PAT
+ * @query version: string
+ * The valid semver version number to assign
+ * 
+ * @return OK: string
+ * @return NOT_FOUND: ApiError
+ * @return UNAUTHORIZED: ApiError
+ * @return FORBIDDEN: ApiError
+ *  
+ * @example Add a version to a pack
+ * fetch('https://api.smithed.dev/v2/packs/coc/versions?token=FOO&version=0.0.1', {
+ *   method: 'POST',
+ *   body: {data: <PackVersion>},
+ *   headers: {'Content-Type': 'application/json'}
+ * })
+ */
 API_APP.route({
     method: 'POST',
     url: '/packs/:id/versions',
@@ -74,6 +116,33 @@ API_APP.route({
     }
 })
 
+/*
+ * @route PATCH /packs/:id/versions/:versionId
+ * Add to the list of a pack's versions
+ * 
+ * @param id
+ * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
+ * @param versionId
+ * The version number to target
+ * 
+ * @body data: PackVersion
+ * The data to merge/overwrite with
+ * 
+ * @query token: string
+ * Either Firebase Id Token or a valid PAT
+ *
+ * @return OK: string
+ * @return NOT_FOUND: ApiError
+ * @return UNAUTHORIZED: ApiError
+ * @return FORBIDDEN: ApiError
+ *  
+ * @example Add a version to a pack
+ * fetch('https://api.smithed.dev/v2/packs/coc/versions/0.0.1?token=FOO', {
+ *   method: 'PATCH',
+ *   body: {data: <PackVersion>},
+ *   headers: {'Content-Type': 'application/json'}
+ * })
+ */
 API_APP.route({
     method: 'PATCH',
     url: '/packs/:packId/versions/:versionId',
@@ -130,6 +199,28 @@ API_APP.route({
 })
 
 
+/*
+ * @route DELETE /packs/:id/versions/:versionId
+ * Add to the list of a pack's versions
+ * 
+ * @param id
+ * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
+ * @param versionId
+ * The version number to target
+ * 
+ * @query token: string
+ * Either Firebase Id Token or a valid PAT
+ * 
+ * @return OK: string
+ * @return NOT_FOUND: ApiError
+ * @return UNAUTHORIZED: ApiError
+ * @return FORBIDDEN: ApiError
+ *  
+ * @example Delete a version
+ * fetch('https://api.smithed.dev/v2/packs/coc/versions/0.0.1?token=FOO', {
+ *   method: 'DELETE',
+ * })
+ */
 API_APP.route({
     method: 'DELETE',
     url: '/packs/:packId/versions/:versionId',
@@ -179,17 +270,36 @@ API_APP.route({
 })
 
 
-
+/*
+ * @route DELETE /packs/:id/versions/latest
+ * Returns the latest version of the specified pack
+ * 
+ * @param id
+ * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
+ *  
+ * @query version: MinecraftVersion?
+ * Optionally, get the latest version for the specified game version
+ * 
+ * @return OK: PackVersion
+ * @return NOT_FOUND: ApiError
+ *  
+ * @example Get the latest version for 1.19
+ * fetch('https://api.smithed.dev/v2/packs/coc/versions/latest?version=1.19', {})
+ */
 API_APP.route({
     method: 'GET',
     url: '/packs/:id/versions/latest',
     schema: {
         params: Type.Object({
             id: Type.String()
+        }),
+        querystring: Type.Object({
+            version: Type.Optional(MinecraftVersionSchema)
         })
     },
     handler: async (response, reply) => {
         const {id} = response.params
+        const {version: gameVersion} = response.query
 
         const doc = await getPackDoc(id)
         if(doc === undefined)
@@ -197,7 +307,7 @@ API_APP.route({
 
         const versions: PackVersion[] = await doc.get('data.versions')
 
-        const latestVersion = versions.sort((a,b) => compare(a.name, b.name)).reverse()[0]
+        const latestVersion = versions.filter(v => gameVersion !== undefined ? v.supports.includes(gameVersion) : true).sort((a,b) => compare(a.name, b.name)).reverse()[0]
 
         return latestVersion
     }

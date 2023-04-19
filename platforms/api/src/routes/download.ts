@@ -25,6 +25,25 @@ async function getFilename(packs: string[], mode: string) {
     return filename
 }
 
+/*
+ * @route GET /download 
+ * This route facilitates the download and merging of packs off of the platform.
+ * 
+ * @query pack: string
+ * The ID (uid or plaintext) of the pack to merge. A specific version can be specified with the following format `<id>@<version>`. Version can be a semver comparison.
+ * Many packs can be downloaded by specifiying the parameter multiple times
+ * @query version: MinecraftVersion?
+ * The targeted version of Minecraft. Any packs that do not have atleast 1 version supporting this will be skipped.
+ * 
+ * @query mode: 'datapack'|'resourcepack'|'both' = 'both'
+ * What should be downloaded, if both is specified then the datapack and resourcepack are served zipped within the download.
+ * 
+ * @return OK: ArrayBuffer
+ * @return SERVER_ERROR: ApiError
+ * 
+ * @example Download packs
+ * fetch('https://api.smithed.dev/v2/download?pack=tcc&pack=manic&version=1.19)
+ */
 API_APP.route({
     method: 'GET',
     url: '/download',

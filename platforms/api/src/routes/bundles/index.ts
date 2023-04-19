@@ -17,6 +17,19 @@ export async function getBundleDoc(id: string) {
     return undefined
 }
 
+/*
+ * @route GET /bundles/:id
+ * Retrieve a bundle's data
+ * 
+ * @param id
+ * The bundle's UID, unlike packs and users, bundles do not have a plaintext ID
+ * 
+ * @return OK: PackBundle
+ * @return NOT_FOUND: ApiError
+ *  
+ * @example Retrieve a bundle
+ * fetch('https://api.smithed.dev/v2/bundles/123456789')
+ */
 API_APP.route({
     method: 'GET',
     url: '/bundles/:id',
@@ -40,6 +53,22 @@ API_APP.route({
     }
 })
 
+/*
+ * @route GET /bundles/:id/download
+ * Download a pack bundle. This route wraps `/download` and returns the same information.
+ * 
+ * @param id
+ * The bundle's UID, unlike packs and users, bundles do not have a plaintext ID
+ * 
+ * @query mode: 'datapack' | 'resourcepack' | 'both' = 'both'
+ * Which files should be downloaded from the API. 
+ * 
+ * @return OK: ArrayBuffer
+ * @return NOT_FOUND: ApiError
+ *  
+ * @example Download a bundle's resourcepack
+ * fetch('https://api.smithed.dev/v2/bundles/123456789/download?mode=resourcepack')
+ */
 API_APP.route({
     method: 'GET',
     url: '/bundles/:id/download',
@@ -74,6 +103,24 @@ API_APP.route({
     }
 })
 
+/*
+ * @route DELETE /bundles/:id
+ * Delete a bundle from the database
+ *  
+ * @param id
+ * The bundle's UID, unlike packs and users, bundles do not have a plaintext ID
+ * 
+ * @query token: string
+ * Either Firebase Id Token or a valid PAT
+ * 
+ * @return OK: string
+ * @return NOT_FOUND: ApiError
+ * @return UNAUTHORIZED: ApiError
+ * @return FORBIDDEN: ApiError
+ *  
+ * @example Delete a bundle
+ * fetch('https://api.smithed.dev/v2/bundles/123456789?token=ILOVESMITHED', {method: 'DELETE'})
+ */
 API_APP.route({
     method: 'DELETE',
     url: '/bundles/:id',
@@ -108,6 +155,35 @@ API_APP.route({
     }
 })
 
+/*
+ * @route PUT /bundles/:id
+ * Update an existing bundle
+ *  
+ * @param id
+ * The bundle's UID, unlike packs and users, bundles do not have a plaintext ID
+ * 
+ * @query token: string
+ * Either Firebase Id Token or a valid PAT
+ * 
+ * @body data: PackBundle
+ * The data to replace the existing with, omitting the `owner` field.
+ * 
+ * @return OK: string
+ * @return NOT_FOUND: ApiError
+ * @return UNAUTHORIZED: ApiError
+ * @return FORBIDDEN: ApiError
+ *  
+ * @example Update a bundle
+ * fetch('https://api.smithed.dev/v2/bundles/123456789', {
+ *   method: 'PUT',
+ *   body: {
+ *      data: <PackBundle> 
+ *   },
+ *   headers: {
+ *      "Content-Type": "application/json"
+ *   }
+ * })
+ */
 API_APP.route({
     method: 'PUT',
     url: '/bundles/:id',
@@ -148,6 +224,30 @@ API_APP.route({
     }
 })
 
+/*
+ * @route POST /bundles
+ * Update an existing bundle
+ * 
+ * @query token: string
+ * Either Firebase Id Token or a valid PAT
+ * 
+ * @body data: PackBundle
+ * The data to replace the existing with, omitting the `owner` field.
+ * 
+ * @return CREATED: string
+ * @return UNAUTHORIZED: ApiError
+ *  
+ * @example Upload a new bundle
+ * fetch('https://api.smithed.dev/v2/bundles', {
+ *   method: 'PUT',
+ *   body: {
+ *      data: <PackBundle> 
+ *   },
+ *   headers: {
+ *      "Content-Type": "application/json"
+ *   }
+ * })
+ */
 API_APP.route({
     method: 'POST',
     url: '/bundles',

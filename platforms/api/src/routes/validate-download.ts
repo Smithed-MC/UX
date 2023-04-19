@@ -3,6 +3,20 @@ import { API_APP, sendError } from "../app.js";
 import { HTTPResponses } from "data-types";
 
 
+/*
+ * @route GET /validate-download
+ * This route is used to ensure that a download url is valid and reachable by the Smithed servers.
+ * 
+ * @query url: string
+ * The download url
+ * 
+ * @return OK: {valid: boolean}
+ *  
+ * @example Validate a github url
+ * fetch('https://api.smithed.dev/v2/validate-download?url=' + encodeURIComponent(
+ *   'https://github.com/TheNuclearNexus/CallOfChaos/releases/download/0.0.5/Call.of.Chaos.0.0.5.zip'
+ * ))
+ */
 API_APP.route({
     method: 'GET',
     url: '/validate-download',

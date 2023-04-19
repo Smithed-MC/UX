@@ -22,6 +22,20 @@ export async function getUserDoc(id: string) {
     return query.docs[0]
 }
 
+
+/*
+ * @route GET /users/:id 
+ * Retrieve a specific users information
+ * 
+ * @param id
+ * The user's UID or plaintext username. Using UID is more performant as it is a direct lookup.
+ *
+ * @return OK: {uid: string, cleanName: string, displayName: string, role: string}
+ * @return NOT_FOUND: ApiError
+ * 
+ * @example Fetch a user's data
+ * fetch('https://api.smithed.dev/v2/users/TheNuclearNexus')
+ */
 API_APP.route({
     method: 'GET',
     url: '/users/:id',
@@ -41,6 +55,9 @@ API_APP.route({
     }
 })
 
+/*
+ * Not documented since is mainly just for interal use
+ */
 API_APP.route({
     method: 'GET',
     url: '/users/:id/setup',
