@@ -123,6 +123,9 @@ function extract(t: string, config: Config) {
             '<br/>\n\n'
         ].join('\n') + '\n'
 
+        if(parsedDirectives['route'] === undefined || parsedDirectives['route'].length === 0)
+            continue
+
         const routeGroup = parsedDirectives['route'][0]
         const route = routeGroup[1]
 

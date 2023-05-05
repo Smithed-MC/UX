@@ -21,6 +21,21 @@ header {
 
 .trendingContainer {
     flex-direction: column;
+    display: inline-grid;
+    /* grid-template-rows: auto auto; */
+    /* grid-template-columns: 1fr 1fr 1fr; */
+    place-items: center;
+    place-content: center;
+    justify-content: space-evenly;
+    box-sizing: border-box;
+    width: 100%;
+    column-gap: 32px;
+    padding: 32px;
+
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas: 
+        'downloadsHeader trendingHeader newestHeader'
+        'downloadsPreview trendingPreview newestPreview';
 }
 
 .trendingCard {
@@ -121,15 +136,22 @@ header {
     .imageContainer {
         display: none;
     }
+
+    .trendingContainer {
+        row-gap: 32px;
+        grid-template-columns: 100%;
+        grid-template-areas: 
+            'downloadsHeader' 
+            'downloadsPreview'
+            'trendingHeader' 
+            'trendingPreview' 
+            'newestHeader'
+            'newestPreview';
+    }
 }
 
 
 @media screen and (min-width: 1024px) {
-    .trendingContainer {
-        flex-direction: row;
-        align-items: start;
-    }
-
     .trendingCard {
         width: 33%;
     }

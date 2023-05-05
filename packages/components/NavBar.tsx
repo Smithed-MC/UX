@@ -68,15 +68,16 @@ export function NavOption({ SVGComponent, path, title, navigateTo, withSpecialQu
             display: hover ? 'inherit' : 'none',
             position: 'absolute',
             placeSelf: 'start',
-            left: 30,
+            left: 36,
             zIndex: -2,
             backgroundColor: 'var(--accent)',
-            padding: 8, borderRadius: 16, paddingLeft: '32px', paddingRight: 12,
+            padding: 8, borderRadius: '0 16px 16px 0', paddingLeft: '32px', paddingRight: 12,
             color: 'white',
             animation: 'navbarTooltipEnter 0.4s 1',
             transition: 'transform 0.4s cubic-bezier(0.85, 0, 0.15, 1)',
             width: '100%',
             alignItems: 'end',
+            fontSize: '1rem'
         }}>
             {title}
         </div>

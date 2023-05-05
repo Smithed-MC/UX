@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import LauncherScreenshot from '../assets/launcher_screenshot.png'
 import { PackData } from "data-types";
 import { ReactComponent as Logo } from '../assets/logo_box.svg'
+import { Download as DownloadIcon } from 'components/svg'
 
 import './home.css'
 import { useNavigate } from "react-router-dom";
@@ -48,7 +49,7 @@ function PackPreview({ type }: { type: 'trending' | 'downloads' | 'newest' }) {
     }
 
 
-    return <div key={current} ref={cardRef} style={{ flexGrow: 1, width: '100%', animation: 'fadeIn 2s' }}>
+    return <div key={current} ref={cardRef} style={{ flexGrow: 1, width: '100%', animation: 'fadeIn 2s', gridArea: type + 'Preview' }}>
         <PackCard id={ids[current]} style={{ width: '100%', height: '256px', boxSizing: 'border-box' }} onClick={() => navigate(`/packs/${ids[current]}`)} />
     </div>
 }
@@ -68,19 +69,13 @@ function HomeBody() {
             </p>
             <a className='button pageText' href="https://smithed.dev/discord" style={{ padding: 16, gridArea: 'footer', width: 'fit-content', placeSelf: 'center' }}>Join the Discord</a>
         </div>
-        <div className="container fadeIn trendingContainer" style={{ width: '100%', animationDuration: '4s' }}>
-            <SectionContainer className="trendingCard">
-                <h2>Top Downloaded</h2>
+        <div className="fadeIn trendingContainer" style={{ animationDuration: '4s' }}>
+                <h2 style={{marginBottom: '0.33em', gridArea: 'downloadsHeader',textAlign: 'center'}}>Top Downloaded</h2>
+                <h2 style={{marginBottom: '0.33em', gridArea: 'trendingHeader',textAlign: 'center'}}>Trending Today</h2>
+                <h2 style={{marginBottom: '0.33em', gridArea: 'newestHeader',textAlign: 'center'}}>Recently Added</h2>
                 <PackPreview type="downloads" />
-            </SectionContainer>
-            <SectionContainer className="trendingCard">
-                <h2>Trending Today</h2>
                 <PackPreview type="trending" />
-            </SectionContainer>
-            <SectionContainer className="trendingCard">
-                <h2>Recently Added</h2>
                 <PackPreview type="newest" />
-            </SectionContainer>
         </div>
         <div className="container fadeIn homePageLauncherPanel">
             <SectionContainer className="imageContainer" style={{ height: '100%', alignItems: 'center', gridArea: 'screenshot' }}>
@@ -90,7 +85,7 @@ function HomeBody() {
             <p className='pageText' style={{ color: 'var(--subText)', gridArea: 'content1' }}>
                 Tired of having to manually update your datapacks? Merging all the ones you want to play? What about filtering through tons of incompatible content? The Smithed launcher allows you to play datapacks just like you would mods! By using the launcher, conflicts between datapacks are automatically resolved, resourcepacks are automatically applied and everything is kept separate from your base game. No more cluttered resourcepack folders.
             </p>
-            <a className='button pageText' href="/download" style={{ padding: 16, gridArea: 'footer1' }}>Download</a>
+            <a className='button pageText' href="https://nightly.link/Smithed-MC/UX/workflows/nightly/master" style={{ display: 'flex', padding: 16, gridArea: 'footer1', flexDirection: 'row' }}><DownloadIcon style={{fill: 'var(--text)', width: 32, marginRight: 16}}/>Experimental Build</a>
             <h2 style={{ marginBottom: 0, gridArea: 'subheading' }}>BUT WAIT</h2>
             <p className='pageText' style={{ color: 'var(--subText)', gridArea: 'content2' }}>
                 The majority of the launcher is accessible entirely in your browser, if all you want to do is create and browse, no need to install even more programs!

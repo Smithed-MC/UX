@@ -1,5 +1,5 @@
 import React from 'react'
-import { ReactComponent as Download } from './assets/download.svg'
+import { Download } from './svg'
 
 interface DownloadButtonProps {
     link: string

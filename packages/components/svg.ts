@@ -14,6 +14,7 @@ import { ReactComponent as Back } from './assets/back.svg'
 import { ReactComponent as SignOut } from './assets/sign-out.svg'
 import { ReactComponent as AddToBundle } from './assets/add-to-bundle.svg'
 import { ReactComponent as RemoveFromBundle } from './assets/remove-from-bundle.svg'
+import { ReactComponent as Download } from './assets/download.svg'
 
 export { 
     Account, 
@@ -32,4 +33,5 @@ export {
     Settings, 
     SignOut, 
     Trash, 
+    Download
 }
