@@ -8,5 +8,6 @@ import ErrorPage from './PageError'
 import MarkdownRenderer, {markdownOptions} from './MarkdownRenderer'
 import { RootError } from './RootError'
 import FilterButton from './FilterButton'
+import SvgButton from './SvgButton'
 
-export {NavButton, NavBar, PackCard, Spinner, PackVersionDownload, svg, ErrorPage, MarkdownRenderer, markdownOptions, RootError, FilterButton}
+export {NavButton, NavBar, PackCard, Spinner, PackVersionDownload, svg, ErrorPage, MarkdownRenderer, markdownOptions, RootError, FilterButton, SvgButton}

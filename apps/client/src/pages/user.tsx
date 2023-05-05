@@ -1,17 +1,17 @@
 import { HTTPResponses, MinecraftVersion, PackBundle, PackData, PackDependency, UserData, supportedMinecraftVersions } from 'data-types'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { formatDownloads } from 'formatters'
 import './user.css'
-import { PackCard, Spinner } from 'components'
+import { PackCard, Spinner, SvgButton } from 'components'
 import { useFirebaseUser, useQueryParams } from 'hooks'
-import { SignOut } from 'components/svg'
+import { SignOut, Trash } from 'components/svg'
 import EditButton from 'components/EditButton'
 import { Helmet } from 'react-helmet'
 import { getAuth } from 'firebase/auth'
 import DownloadButton from 'components/DownloadButton'
 import AddRemovePackButton from 'components/AddRemovePackButton'
-import { User as FirebaseUser} from 'firebase/auth'
+import { User as FirebaseUser } from 'firebase/auth'
 interface UserStats {
     totalDownloads: number,
     dailyDownloads: number
@@ -33,6 +33,9 @@ export function Bundle({ id, editable, showOwner }: { id: string, editable: bool
     const [rawBundleData, setRawBundleData] = useState<PackBundle | undefined>()
     const [containedPacks, setContainedPacks] = useState<[string, string, string][]>()
     const [ownerName, setOwnerName] = useState('')
+    const [showConfirmation, setShowConfirmation] = useState<boolean>(false)
+    const parentElement = useRef<HTMLDivElement>(null)
+    const firebaseUser = useFirebaseUser()
 
     async function getPackName(pack: PackDependency): Promise<[string, string, string] | undefined> {
         const resp = await fetch(`https://api.smithed.dev/v2/packs/${pack.id}`)
@@ -46,8 +49,8 @@ export function Bundle({ id, editable, showOwner }: { id: string, editable: bool
         const resp = await fetch(`https://api.smithed.dev/v2/users/${uid}`)
         if (!resp.ok)
             return
-        
-        const data: {displayName: string} = await resp.json()
+
+        const data: { displayName: string } = await resp.json()
 
         setOwnerName(data.displayName)
     }
@@ -74,16 +77,16 @@ export function Bundle({ id, editable, showOwner }: { id: string, editable: bool
 
     if (rawBundleData === undefined) return <div style={{ display: 'none' }} />
 
-    return <div className='container' style={{flexDirection: 'row', width: '100%', padding: 16, borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--backgroundAccent)', boxSizing: 'border-box', gap: 16}}>
-        
-        <div className='container' style={{ alignItems: 'start', gap: 8, flexGrow: 1 }}>
+    return <div className='container' style={{ flexDirection: 'row', width: '100%', padding: 16, borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--backgroundAccent)', boxSizing: 'border-box', gap: 16 }} ref={parentElement}>
+
+        <div className='container' style={{ alignItems: 'start', gap: 8, flexGrow: 1, justifyContent: 'start', height: '100%' }}>
             <label style={{ fontSize: '1.5rem', color: 'var(--accent2)' }}>{rawBundleData.name}</label>
-            <div style={{ display: 'flex', fontSize: '1.125rem', alignItems: 'center', gap: 8 }}>
+            {showOwner === true && <div style={{ display: 'flex', fontSize: '1.125rem', alignItems: 'center', gap: 8 }}>
                 Created By
                 <label style={{ backgroundColor: 'var(--background)', padding: 8, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)' }}>
                     {ownerName}
                 </label>
-            </div>
+            </div>}
             <div style={{ display: 'flex', fontSize: '1.125rem', alignItems: 'center', gap: 8 }}>
                 Minecraft Version
                 <label style={{ backgroundColor: 'var(--background)', padding: 8, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)' }}>
@@ -96,19 +99,41 @@ export function Bundle({ id, editable, showOwner }: { id: string, editable: bool
                     <a style={{ fontSize: '1.125rem' }} href={`/packs/${p[0]}`}>{p[1]}</a>
                     {p[2].startsWith('v') ? '' : 'v'}{p[2]}
                 </div>)}
+                {(containedPacks === undefined || containedPacks.length === 0) && <label style={{ color: 'var(--subText)' }}>No packs added</label>}
             </div>
         </div>
-        <div className='container' style={{gridArea: 'options', gap: 16}}>
-            <DownloadButton link={`https://api.smithed.dev/v2/bundles/${rawBundleData.uid}/download`}/>
-            {editable && <AddRemovePackButton add={true} link={`/browse?bundleId=${rawBundleData.uid}`}/>}
+        <div className='container' style={{ gridArea: 'options', gap: 16, display: 'grid', gridTemplateRows: 'auto auto' }}>
+            <DownloadButton link={`https://api.smithed.dev/v2/bundles/${rawBundleData.uid}/download`} />
+            {editable && <AddRemovePackButton add={true} link={`/browse?bundleId=${rawBundleData.uid}`} />}
+            {editable && <SvgButton svg={Trash} buttonStyle={{ backgroundColor: 'var(--badAccent)' }} svgStyle={{ stroke: 'var(--buttonText)' }} onClick={() => {
+                setShowConfirmation(true)
+            }} />}
         </div>
-
+        {showConfirmation && <div className='container' style={{ position: 'fixed', zIndex: 100, backgroundColor: 'rgba(0,0,0,0.5)', width: '100%', height: '100%', top: 0, left: 0, justifyContent: 'center', animation: 'fadeInBackground 1s' }}>
+            <div className='container' style={{backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, animation: 'slideInContent 0.5s ease-in-out', border: '4px solid var(--background)', gap: 16}}>
+                <h3 style={{margin: 4}}>Are you sure you want to remove "{rawBundleData.name}"?</h3>
+                <div className='container' style={{flexDirection: 'row', gap: 16}}>
+                    <button className='button' onClick={() => setShowConfirmation(false)}>Cancel</button>
+                    <button className='button' onClick={async () => {
+                        if(firebaseUser == null)
+                            return setShowConfirmation(false)
+                        const resp = await fetch(`https://api.smithed.dev/v2/bundles/${rawBundleData.uid}?token=${await firebaseUser.getIdToken()}`, {method: 'DELETE'})
+                        if(!resp.ok) {
+                            alert(resp.statusText)
+                        } else {
+                            parentElement.current?.style.setProperty('display', 'none');
+                        }
+                        setShowConfirmation(false)
+                    }} style={{backgroundColor: 'var(--badAccent)'}}>Confirm</button>
+                </div>         
+            </div>
+        </div>}
     </div>
 }
 
-function CreateBundle({user, showModal, addPack}: {user: FirebaseUser, showModal: (value: boolean)=>void, addPack: (value: PackBundle) => void}) {
-    const [name, setName] = useState<string|undefined>(undefined)
-    const [version, setVersion] = useState<MinecraftVersion|undefined>(undefined)
+function CreateBundle({ user, showModal, addPack }: { user: FirebaseUser, showModal: (value: boolean) => void, addPack: (value: PackBundle) => void }) {
+    const [name, setName] = useState<string | undefined>(undefined)
+    const [version, setVersion] = useState<MinecraftVersion | undefined>(undefined)
 
     const navigate = useNavigate()
 
@@ -119,7 +144,7 @@ function CreateBundle({user, showModal, addPack}: {user: FirebaseUser, showModal
     }
     const finish = async () => {
         close()
-        if(version === undefined || name === undefined)
+        if (version === undefined || name === undefined)
             return undefined
 
         const bundleData: PackBundle = {
@@ -131,48 +156,48 @@ function CreateBundle({user, showModal, addPack}: {user: FirebaseUser, showModal
         }
 
         const resp = await fetch(`https://api.smithed.dev/v2/bundles?token=${await user.getIdToken()}`, {
-            method: 'POST', 
+            method: 'POST',
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 data: bundleData
-            }) 
+            })
         })
 
-        if(resp.status !== HTTPResponses.CREATED)
+        if (resp.status !== HTTPResponses.CREATED)
             return undefined
 
-        const {uid} = await resp.json()
+        const { uid } = await resp.json()
         bundleData.uid = uid
         addPack(bundleData)
         return uid
     }
     const finishAndEdit = async () => {
         const uid = await finish()
-        if(uid === undefined)
+        if (uid === undefined)
             return
         navigate(`/browse?bundleId=${uid}`)
     }
 
-    return <div className="container" style={{position: 'fixed', width: '100%', height: '100%', top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 50%)', animation: 'fadeInBackground 0.5s'}}>
-        <div className='container' style={{backgroundColor: 'var(--backgroundAccent)', border: '4px solid var(--background)', boxSizing: 'border-box', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 0.5s ease-in-out'}}>
-            <h2 style={{margin: 0}}>Create a bundle</h2>
-            <input type="text" placeholder='Name...' onChange={(e) => setName(e.currentTarget?.value)}/>
+    return <div className="container" style={{ position: 'fixed', width: '100%', height: '100%', top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 50%)', animation: 'fadeInBackground 0.5s' }}>
+        <div className='container' style={{ backgroundColor: 'var(--backgroundAccent)', border: '4px solid var(--background)', boxSizing: 'border-box', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 0.5s ease-in-out' }}>
+            <h2 style={{ margin: 0 }}>Create a bundle</h2>
+            <input type="text" placeholder='Name...' onChange={(e) => setName(e.currentTarget?.value)} />
             <select onChange={(e) => setVersion(e.currentTarget?.value)}>
-                <option value="none" hidden style={{color: 'var(--subText)'}}>
+                <option value="none" hidden style={{ color: 'var(--subText)' }}>
                     Select a version...
                 </option>
                 {supportedMinecraftVersions.map(v => <option value={v}>{v}</option>)}
             </select>
-            <div className='container' style={{flexDirection: 'row', width: '100%', gap: 16}}>
-                <button className='button' style={{backgroundColor:'var(--badAccent)', width: '33%'}} onClick={close}>
+            <div className='container' style={{ flexDirection: 'row', width: '100%', gap: 16 }}>
+                <button className='button' style={{ backgroundColor: 'var(--badAccent)', width: '33%' }} onClick={close}>
                     Cancel
                 </button>
-                <button className='button' style={{width: '33%'}} disabled={!isEnabled} onClick={finish}>
+                <button className='button' style={{ width: '33%' }} disabled={!isEnabled} onClick={finish}>
                     Finish
                 </button>
-                <button className='button' style={{width: '33%'}} disabled={!isEnabled} onClick={finishAndEdit}>
+                <button className='button' style={{ width: '33%' }} disabled={!isEnabled} onClick={finishAndEdit}>
                     Finish & Edit
                 </button>
             </div>
@@ -286,8 +311,8 @@ export default function User() {
                 {showBundleCreationModal && <CreateBundle showModal={setShowBundleCreationModal} addPack={(value: PackBundle) => {
                     userStats.bundles.push(value.uid ?? '')
                     setUserStats(Object.create(userStats))
-                }} user={firebaseUser}/>}
-                {userStats.bundles?.map(b => <Bundle key={b} id={b} editable/>)}
+                }} user={firebaseUser} />}
+                {userStats.bundles?.map(b => <Bundle key={b} id={b} editable />)}
             </div>}
         </div>
     </div>

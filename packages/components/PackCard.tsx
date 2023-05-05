@@ -32,7 +32,7 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
     const [loaded, setLoaded] = useState(false)
     const [contained, setContained] = useState(false)
     const [validForBundle, setValidForBundle] = useState(false)
-
+    const [showInvalidTooltip, setShowInvalidTooltip] = useState(false)
 
     const match = useMatch('/browse')
     const card = useRef<HTMLDivElement>(null)
@@ -99,9 +99,9 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
         await fetch(`https://api.smithed.dev/v2/bundles/${bundleData.uid}?token=${token}`, { method: 'PUT', headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data: bundleData }) })
     }
 
-    useEffect(() => { setContained(bundleData?.packs.find(p => p.id === id) !== undefined)}, [bundleData])
+    useEffect(() => { setContained(bundleData?.packs.find(p => p.id === id) !== undefined) }, [bundleData])
     useEffect(() => {
-        if(data === undefined || !(data.versions instanceof Array))
+        if (data === undefined || !(data.versions instanceof Array))
             return
         setValidForBundle(bundleData !== undefined && data?.versions.findIndex(v => v.supports.includes(bundleData.version)) === -1)
     }, [bundleData, data])
@@ -127,7 +127,7 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
             if (!(e.target instanceof HTMLDivElement || e.target instanceof HTMLLabelElement)) return
             if (onClick) onClick()
         }} style={{ ...style }} {...props}>
-            <div className='container' style={{ flexDirection: 'row', alignItems: 'safe flex-start', gap: 16, width: '100%', flexGrow: 1, overflow: 'hidden'}}>
+            <div className='container' style={{ flexDirection: 'row', alignItems: 'safe flex-start', gap: 16, width: '100%', flexGrow: 1, overflow: 'hidden' }}>
                 <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)', overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
                     {!fallback && <img src={data.display.icon} key={data.id} className="packImage fadeIn" style={{ aspectRatio: '1 / 1', imageRendering: 'pixelated' }} onError={() => setFallback(true)} />}
                     {fallback && <QuestionMark className="packImage" style={{ fill: "var(--text)" }} />}
@@ -148,7 +148,12 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
                 <label style={{ fontSize: '1.5rem' }}>{formatDownloads(downloads)} <label style={{ fontSize: '1rem', color: 'var(--subText)' }}>download{downloads === 1 ? '' : 's'}</label></label>
                 <div className='container' style={{ flexDirection: 'row', justifyContent: 'right', gap: 8 }}>
                     {state !== 'add' && <DownloadButton link={`https://api.smithed.dev/v2/download?pack=${id}`} />}
-                    {state === 'add' && <AddRemovePackButton add={!contained} onClick={onAddClick} disabled={validForBundle}/>}
+                    {showInvalidTooltip && <div style={{ position: 'fixed', animation: 'fadeIn 0.5s', marginRight: 40, backgroundColor: 'var(--accent)', padding: 8, paddingRight: 16, borderRadius: 'var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius)' }}>Pack does not support {bundleData?.version}</div>}
+                    {state === 'add' && <AddRemovePackButton add={!contained} onClick={onAddClick} disabled={validForBundle} onMouseOver={() => {
+                        if (validForBundle) setShowInvalidTooltip(true)
+                    }} onMouseOut={() => {
+                        if (validForBundle) setShowInvalidTooltip(false)
+                    }} />}
                     {state === 'editable' && <EditButton link={`../edit?pack=${id}`} />}
                 </div>
             </div>
