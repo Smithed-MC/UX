@@ -66,7 +66,11 @@ API_APP.route({
         if (tryCachedResult) {
             const filePath: string = tryCachedResult.item
             
-            reply.header('Content-Disposition', `attachment; filename="${await getFilename(packs, mode)}"`).type('application/octet-stream')
+            
+            reply
+                .header('Access-Control-Expose-Headers', 'Content-Disposition')
+                .header('Content-Disposition', `attachment; filename="${await getFilename(packs, mode)}"`)
+                .type('application/octet-stream')
             
             let foundPacks: CollectedPack[] = []
             for(let p of packs)
@@ -90,7 +94,10 @@ API_APP.route({
             
             console.log('sending')
 
-            reply.header('Content-Disposition', `attachment; filename="${await getFilename(packs, mode)}"`).type('application/octet-stream')
+            reply
+                .header('Access-Control-Expose-Headers', 'Content-Disposition')    
+                .header('Content-Disposition', `attachment; filename="${await getFilename(packs, mode)}"`)
+                .type('application/octet-stream')
             return result
         }
         return sendError(reply, HTTPResponses.SERVER_ERROR, 'An error occured while downloading')
