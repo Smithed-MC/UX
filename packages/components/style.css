@@ -88,6 +88,7 @@
     width: 120px;
     height: 120px;
     animation: spinFull 2s linear infinite;
+    box-sizing: border-box;
 }
 
 @keyframes spinFull {
