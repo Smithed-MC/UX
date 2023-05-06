@@ -277,10 +277,10 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
     }
 
     if (addNewVersion) {
-        return <EditorDiv style={{ alignItems: 'center', padding: '16px 0px', marginTop: -8, width:'fit-content' }} onMouseLeave={() => setAddNewVersion(false)}>
+        return <EditorDiv style={{ alignItems: 'center', padding: '16px 0px', marginTop: -8, width: 'fit-content' }} onMouseLeave={() => setAddNewVersion(false)}>
             <EditorDiv style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <input style={{ backgroundColor: 'var(--background)', color: 'var(--text)' }} placeholder='Version Number...' ref={versionName} onMouseEnter={() => versionName.current?.select()} onKeyDown={(e) => {
-                    if(e.key === 'Enter') {
+                    if (e.key === 'Enter') {
                         addVersion()
                     }
                 }} />
@@ -368,6 +368,75 @@ function NewDependency({ dependencies, onAddDependency }: { dependencies: PackDe
     </EditorDiv>
 }
 
+interface SavingState {
+    mode: 'off' | 'saving' | 'saved' | 'error'
+    error?: {
+        error: string,
+        statusCode: number,
+        message: string
+    }
+}
+
+function SavingModal({state, changeState}: {state: SavingState, changeState: (state: SavingState) => void}) {
+    const modalContainer = useRef<HTMLDivElement>(null)
+    const modalBody = useRef<HTMLDivElement>(null)
+    
+
+    const closeModal = (initialDelay: number) => setTimeout(async () => {
+        const delay = (delay: number) => new Promise((resolve) => {setTimeout(resolve, delay)})
+        
+        // Have to reset these first for some reason
+        modalBody.current?.style.setProperty('animation', '')
+        modalContainer.current?.style.setProperty('animation', '')
+        await delay(10)
+        modalBody.current?.style.setProperty('animation', 'slideInContent 0.6s reverse')
+        modalContainer.current?.style.setProperty('animation', 'fadeInBackground 1s ease-in-out reverse')
+        await delay(0.6 * 1000 - 10)
+        changeState({mode: 'off'})
+       
+    }, initialDelay)
+
+    useEffect(() => {
+        if(state.mode === 'saved') {
+            var timeout = closeModal(2000)
+        }
+        return () => {
+            clearTimeout(timeout)
+        }
+    }, [state])
+
+    if(state.mode === 'off')
+        return <div style={{display: 'none', position: 'absolute'}}/>
+
+
+
+    return <div style={{ display: 'flex', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', fontSize: '1.125rem', justifyContent: 'center', alignItems: 'center', color: 'var(--goodAccent)', backgroundColor: 'rgba(0,0,0,0.5)', animation: 'fadeInBackground 1s ease-in-out' }} ref={modalContainer}>
+        <div className='container' style={{ backgroundColor: 'var(--backgroundAccent)', border: '4px solid var(--background)', width: '100%', maxWidth: 384, aspectRatio: '2 / 1', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 1s', transition: 'transform 0.6s cubic-bezier(0.87, 0, 0.13, 1)' }} ref={modalBody}>
+            
+            {state.mode === 'saving' && <div>
+                <h3 style={{ margin: 0 }}>Saving pack...</h3>
+                <Spinner />
+            </div>}
+            {state.mode === 'saved' && <div>
+                <label style={{ margin: 0, fontSize: '2rem', color: 'var(--goodAccent)' }}>Pack saved!</label>
+            </div>}
+            {state.mode === 'error' && <div className='container' style={{alignItems: 'center', height: '100%'}}>
+                <h3 style={{margin: 0, width: '100%', textAlign: 'center'}}>An error occured</h3>
+                <label style={{color: 'var(--subText)', width: '100%', textAlign: 'center'}}>
+                    {state.error?.error}
+                    <label style={{color: 'var(--badAccent)'}}> {state.error?.statusCode}</label>
+                </label>
+                <p style={{flexGrow: 1, width:'100%'}}>
+                    {state.error?.message.replace('body/data/', '')}
+                </p>
+                <button className='button' onClick={() => closeModal(0)}>
+                    Close
+                </button>
+            </div>}
+        </div>
+    </div>
+}
+
 export default function Edit() {
     const user = useFirebaseUser()
     const navigate = useNavigate()
@@ -378,6 +447,7 @@ export default function Edit() {
     const [selectedVersion, setSelectedVersion] = useState(0)
     const [mcVersions, setMCVersions] = useState<string[]>([])
     const [supportedVersions, setSupportedVersions] = useState<MinecraftVersion[] | undefined>([])
+    const [savingState, setSavingState] = useState<SavingState>({ mode: 'off' })
     const deleteButtonRef = useRef<HTMLLabelElement>(null)
     const saveTextRef = useRef<HTMLDivElement>(null)
     let deleteConfirmation = 0;
@@ -476,7 +546,7 @@ export default function Edit() {
                             }}>
                                 <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                     <Trash style={{ width: '24px', height: '24px', flexShrink: 0, stroke: 'var(--buttonText)' }} />
-                                    <label ref={deleteButtonRef} style={{ position: 'absolute', marginTop: -84, zIndex: 10, backgroundColor: 'var(--backgroundAccent)', border: '4px solid var(--background)', padding: 8, borderRadius: 'var(--defaultBorderRadius)', animation: 'fadeIn 0.25s ease-in-out', width: 'max-content', fontSize:'1rem' }} hidden>{'Press again to confirm'}</label>
+                                    <label ref={deleteButtonRef} style={{ position: 'absolute', marginTop: -84, zIndex: 10, backgroundColor: 'var(--backgroundAccent)', border: '4px solid var(--background)', padding: 8, borderRadius: 'var(--defaultBorderRadius)', animation: 'fadeIn 0.25s ease-in-out', width: 'max-content', fontSize: '1rem' }} hidden>{'Press again to confirm'}</label>
                                 </div>
                             </button>}
                             <NewVersion data={packData.versions} onAddVersion={() => {
@@ -510,6 +580,9 @@ export default function Edit() {
             <button className='button' style={{ width: 36, height: 36 }} title='Save' onClick={async () => {
                 console.log(packData)
 
+                setSavingState({ mode: 'saving' })
+
+
                 if (!isNew) {
                     var resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}?token=${await user.getIdToken()}`, { method: 'PATCH', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
                 } else {
@@ -523,18 +596,12 @@ export default function Edit() {
                 if (resp.status !== HTTPResponses.OK && resp.status !== HTTPResponses.CREATED) {
                     const error = await resp.json()
 
-                    alert(`
-                    Error: ${error.error} ${error.statusCode}
-                    Message: ${error.message}
-                    `)
+                    setSavingState({ mode: 'error', error: error })
                 } else {
-                    saveTextRef.current?.style.setProperty('animation', 'fadeInAndOut 5s')
-                    setTimeout(() => {
-                        saveTextRef.current?.style.setProperty('animation', '')
-                    }, 5000)
+                    setSavingState({ mode: 'saved' })
                 }
             }}><Save style={{ stroke: 'var(--buttonText)' }} /></button>
         </div>
-        <div style={{ display: 'flex', position: 'fixed', bottom: 0, width: '100%', visibility: 'hidden', height: '48px', fontSize: '1.125rem', justifyContent: 'center', color: 'var(--goodAccent)' }} ref={saveTextRef}>Pack saved</div>
+        <SavingModal state={savingState} changeState={setSavingState}/>
     </div >
 }
