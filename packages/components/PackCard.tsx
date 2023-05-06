@@ -134,7 +134,7 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
                 </div>
                 <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, maxWidth: '100%', fontSize: '1.125rem', overflow: 'hidden', justifyContent: 'start', boxSizing: 'border-box' }}>
                     <label className='' style={{ fontSize: '1.5rem', color: 'var(--accent2)' }}>
-                        {data.display.name} <a style={{ fontSize: '1rem', color: 'var(--subText)', cursor: 'pointer' }} href={'/' + author}>by {author}</a>
+                        {data.display.name} <a className='' style={{ fontSize: '1rem', color: 'var(--subText)', cursor: 'pointer' }} href={'/' + author}>by {author}</a>
                     </label>
                     <div className='packDescription'>
                         {data.display.description}

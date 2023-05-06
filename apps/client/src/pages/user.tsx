@@ -301,7 +301,7 @@ export default function User() {
                 navigate('/edit?new=true')
             }} />}
             {userStats.packs.length > 0 && <div className='container' style={{ gap: 16, width: '100%', justifyContent: 'safe start', boxSizing: 'border-box' }}>
-                {userStats?.packs.map(p => <PackCard state={editable ? 'editable' : undefined} id={p} onClick={() => { navigate(p) }} />)}
+                {userStats?.packs.map(p => <PackCard state={editable ? 'editable' : undefined} id={p} onClick={() => { navigate(`../packs/${p}`) }} />)}
             </div>}
             {editable && <div className='container' style={{ paddingBottom: 64, width: '100%', gap: 32 }}>
                 <h1 style={{ margin: 0 }}>My Pack Bundles</h1>
