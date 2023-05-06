@@ -281,7 +281,7 @@ export default function User() {
                 <img src={"data:image/png;base64,"} style={{ width: 128, height: 128, imageRendering: 'pixelated' }} />
                 <div className='statContainer' style={{ padding: 16, width: '100%' }}>
                     <div className="container" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <label style={{ fontSize: 32 }}>{user?.displayName}</label>
+                        <label style={{ fontSize: '2rem' }}>{user?.displayName}</label>
                         {editable && <div className="container" style={{ flexDirection: 'row', gap: 8 }}>
                             <EditButton />
                             <a href="../account" className="button wobbleHover container" title="Sign Out" onClick={() => { getAuth().signOut() }} style={{ maxWidth: 48, maxHeight: 48, borderRadius: 24, padding: 12 }}>

@@ -55,7 +55,7 @@ function StringInput({ reference, attr, description, header, disabled }: EditorI
     return <EditorDiv>
         {(header !== '') && <AttributeHeader attr={header ?? attr} />}
         <div className='container' style={{ width: '100%', flexDirection: 'row' }}>
-            <input style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={(e) => reference[attr] = e.currentTarget.value} defaultValue={reference[attr]} disabled={disabled} />
+            <input style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={(e) => reference[attr] = e.currentTarget.value} defaultValue={reference !== undefined ? reference[attr] : ''} disabled={disabled} />
             <Tooltip description={description} />
         </div>
     </EditorDiv>
@@ -72,7 +72,7 @@ function ImageURLInput({ reference, attr, width, height, description, header }: 
     return <EditorDiv>
         <AttributeHeader attr={header ?? attr} />
         <div className='container' style={{ width: '100%', flexDirection: 'row' }}>
-            <input style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={async (e) => { reference[attr] = await formatDownloadURL(e.currentTarget.value); setSrc(reference[attr]) }} defaultValue={reference[attr]} />
+            <input style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={async (e) => { reference[attr] = await formatDownloadURL(e.currentTarget.value); setSrc(reference[attr]) }} defaultValue={reference !== undefined ? reference[attr] : ''} />
             <Tooltip description={description} />
         </div>
 
@@ -86,7 +86,7 @@ function MarkdownURLInput({ reference, attr, description }: EditorInputProps) {
     return <EditorDiv>
         <AttributeHeader attr={attr} />
         <div className='container' style={{ width: '100%', flexDirection: 'row' }}>
-            <input style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={(e) => { reference[attr] = e.currentTarget.value; }} defaultValue={reference[attr]} />
+            <input style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={(e) => { reference[attr] = e.currentTarget.value; }} defaultValue={reference !== undefined ? reference[attr] : ''} />
             <Tooltip description={description} />
             <button className='button' style={{ marginLeft: 8 }} onClick={async () => {
                 setError('')
@@ -250,6 +250,9 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
         if (valid(name) == null) {
             return setError('Version name is not valid SemVer')
         }
+        if (data.findIndex(d => d.name === name) != -1) {
+            return setError(`${name} has already been added`)
+        }
 
         versionName.current.value = ''
 
@@ -264,6 +267,7 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
         })
 
         console.log(data)
+        setAddNewVersion(false)
         onAddVersion()
     }
 
@@ -273,9 +277,13 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
     }
 
     if (addNewVersion) {
-        return <EditorDiv style={{ alignItems: 'center', width: '100%' }} >
-            <EditorDiv style={{ flexDirection: 'row', width: '100%', alignItems: 'center' }} onMouseLeave={() => setAddNewVersion(false)}>
-                <input style={{ backgroundColor: 'var(--background)', color: 'var(--text)' }} placeholder='Version Number...' ref={versionName} onMouseEnter={() => versionName.current?.select()} />
+        return <EditorDiv style={{ alignItems: 'center', padding: '16px 0px', marginTop: -8, width:'fit-content' }} onMouseLeave={() => setAddNewVersion(false)}>
+            <EditorDiv style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <input style={{ backgroundColor: 'var(--background)', color: 'var(--text)' }} placeholder='Version Number...' ref={versionName} onMouseEnter={() => versionName.current?.select()} onKeyDown={(e) => {
+                    if(e.key === 'Enter') {
+                        addVersion()
+                    }
+                }} />
                 <button className='button' style={{ width: 32, height: 32, fontSize: '1.5rem' }} onClick={addVersion}>
                     <div className='container' style={{ width: '100%', height: '100%' }}>+</div>
                 </button>
@@ -284,8 +292,8 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
         </EditorDiv>
     }
 
-    return <EditorDiv style={{ flexDirection: 'row', justifyContent: 'left', width: '100%' }}>
-        <button className='button' style={{ fontSize: '1rem', width: '100%' }} onClick={toggleDisplay}>Add new version</button>
+    return <EditorDiv style={{ flexDirection: 'row', justifyContent: 'center', width: 'fit-content' }}>
+        <button className='button' style={{ fontSize: '1rem', width: '100%', maxWidth: '196px' }} onClick={toggleDisplay}>Add new version</button>
     </EditorDiv>
 }
 
@@ -402,7 +410,7 @@ export default function Edit() {
             return
         }
 
-        const data: PackData = await (await fetch(`https://api.smithed.dev/v2/packs/${pack}`, {cache: 'no-cache'})).json()
+        const data: PackData = await (await fetch(`https://api.smithed.dev/v2/packs/${pack}`, { cache: 'no-cache' })).json()
         data.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
 
         data.versions.forEach(v => {
@@ -441,8 +449,8 @@ export default function Edit() {
             </div>
             <Editor title={'Versions'}>
                 <EditorDiv style={{ alignItems: 'center' }}>
-                    <EditorDiv style={{ width: 'min-content' }}>
-                        {versions.length > 1 && <EditorDiv style={{ flexDirection: 'row' }}>
+                    <EditorDiv style={{ width: '100%' }}>
+                        {versions.length != 0 && <EditorDiv style={{ flexDirection: 'row' }}>
                             <Selection values={versions.map(v => v.name)} onChange={setSelectedVersion} defaultValue={selectedVersion} />
                         </EditorDiv>}
                         <EditorDiv style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
@@ -460,7 +468,7 @@ export default function Edit() {
                                     deleteConfirmation = 0;
                                     deleteButtonRef.current.hidden = true
                                 }
-                            }} onMouseOut={() => {
+                            }} onMouseLeave={() => {
                                 deleteConfirmation = 0;
                                 if (deleteButtonRef.current != null) {
                                     deleteButtonRef.current.hidden = true
@@ -468,9 +476,9 @@ export default function Edit() {
                             }}>
                                 <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                     <Trash style={{ width: '24px', height: '24px', flexShrink: 0, stroke: 'var(--buttonText)' }} />
+                                    <label ref={deleteButtonRef} style={{ position: 'absolute', marginTop: -84, zIndex: 10, backgroundColor: 'var(--backgroundAccent)', border: '4px solid var(--background)', padding: 8, borderRadius: 'var(--defaultBorderRadius)', animation: 'fadeIn 0.25s ease-in-out', width: 'max-content', fontSize:'1rem' }} hidden>{'Press again to confirm'}</label>
                                 </div>
                             </button>}
-                            <label ref={deleteButtonRef} style={{ position: 'absolute', marginLeft: 84, zIndex: 10, backgroundColor: 'var(--badAccent)', padding: 8, borderRadius: 'var(--defaultBorderRadius)' }} hidden>{'Press again to confirm'}</label>
                             <NewVersion data={packData.versions} onAddVersion={() => {
                                 setVersions(Object.create(packData.versions));
                                 setSelectedVersion(packData.versions.length - 1)
@@ -479,8 +487,8 @@ export default function Edit() {
                     </EditorDiv>
                 </EditorDiv>
                 {versions.length > 0 && <EditorDiv>
-                    <DownloadURLInput reference={packData.versions[selectedVersion].downloads} attr='datapack' header='Datapack Download' description='Raw URL to the download for the datapack' />
-                    <DownloadURLInput reference={packData.versions[selectedVersion].downloads} attr='resourcepack' header='Resourcepack Download' description='Raw URL to the download for the resourcepack' />
+                    <DownloadURLInput reference={packData.versions[selectedVersion]?.downloads} attr='datapack' header='Datapack Download' description='Raw URL to the download for the datapack' />
+                    <DownloadURLInput reference={packData.versions[selectedVersion]?.downloads} attr='resourcepack' header='Resourcepack Download' description='Raw URL to the download for the resourcepack' />
                     <DropdownSelectionInput reference={packData.versions[selectedVersion]} attr='supports' description='Supported Minecraft Versions' options={mcVersions} onChange={() => {
                         const s = packData.versions[selectedVersion].supports
                         s.sort((a, b) => compare(coerce(a) ?? '', coerce(b) ?? ''))
@@ -505,9 +513,11 @@ export default function Edit() {
                 if (!isNew) {
                     var resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}?token=${await user.getIdToken()}`, { method: 'PATCH', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
                 } else {
-                    var resp = await fetch(`https://api.smithed.dev/v2/packs?token=${await user.getIdToken()}&id=${packData.id}`, {method: 'POST', body: JSON.stringify({data: packData}), headers: {
-                        "Content-Type": "application/json"
-                    }})
+                    var resp = await fetch(`https://api.smithed.dev/v2/packs?token=${await user.getIdToken()}&id=${packData.id}`, {
+                        method: 'POST', body: JSON.stringify({ data: packData }), headers: {
+                            "Content-Type": "application/json"
+                        }
+                    })
                 }
 
                 if (resp.status !== HTTPResponses.OK && resp.status !== HTTPResponses.CREATED) {
