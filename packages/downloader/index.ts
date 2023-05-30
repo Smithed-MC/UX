@@ -59,10 +59,21 @@ export async function collectPacks(pack: string, gameVersion: MinecraftVersion, 
         .reverse()                                      // If an exact value was specified, only one version will be left after
     // the initial filtering
 
-    const version = filteredVersions[0]
+    let version: PackVersion|undefined = filteredVersions[0]
     if (version === undefined) {
-        console.log('No version statisfies', packVersion ?? '*', 'or no version supports', gameVersion, 'for pack', packId);
-        return []
+        if (packVersion !== undefined) {
+            version = packVersions.find(v => v.name === packVersion)
+
+            if (version === undefined) {
+                console.log('No version matches', packVersion)
+                return []
+            }
+
+            console.log('Using version', packVersion, 'for', packId, 'but it does not explicitly support', gameVersion)
+        } else {
+            console.log('No version supports', gameVersion, 'for pack', packId);
+            return []
+        }
     }
 
     let packs: CollectedPack[] = [[packDoc.id, version, dependency]]
@@ -141,8 +152,10 @@ export class DownloadRunner {
 
         foundPacks = foundPacks.filter((pack, idx, arr) => foundPacks.findIndex(curPack => {
             return curPack[0] === pack[0] && curPack[1].name === pack[1].name
-        }) === idx
-        )
+        }) === idx)
+
+        if (foundPacks.length == 0)
+            throw new Error("No packs found meeting all specified criteria!")
 
         for (let pack of foundPacks)
             await this.downloadPack(pack)
