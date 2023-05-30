@@ -34,7 +34,7 @@ export default function DownloadButton({ link }: DownloadButtonProps) {
             setDownloading(false)
         }}>
             {!downloading && <Download style={{ fill: 'var(--buttonText)' }} />}
-            { downloading && <Spinner style={{width: 32, height: 32, position: 'absolute', border: '4px solid var(--subText)', borderTop:'4px solid var(--buttonText)'}}/>}
+            { downloading && <Spinner style={{width: 32, height: 32, position: 'absolute', border: '4px solid var(--subText)', borderTop:'4px solid var(--buttonText)', boxSizing: 'border-box', top: 8, left: 8}}/>}
         </a>
     </div>
 }
