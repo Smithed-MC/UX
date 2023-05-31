@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox";
-import { API_APP, sendError } from "../../../app.js";
+import { API_APP, get, sendError, set } from "../../../app.js";
 import { HTTPResponses, MinecraftVersionSchema, PackVersion, PackVersionSchema } from "data-types";
 import { coerce, compare } from "semver";
 import { getPackDoc, getUIDFromToken } from "database";
@@ -26,14 +26,23 @@ API_APP.route({
             id: Type.String()
         })
     },
-    handler: async (response, reply) => {
-        const { id } = response.params
+    handler: async (request, reply) => {
+        const { id } = request.params
         const doc = await getPackDoc(id)
+
+        const requestIdentifier = 'GET-PACK-VERSIONS::' + id
+        const tryCachedResult = await get(requestIdentifier)
+        if(tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
+            console.log('served cached /packs/', id, '/versions')
+            return tryCachedResult.item
+        }
 
         if (doc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${id} was not found`)
 
-        return await doc.get('data.versions')
+        const data = await doc.get('data.versions')
+        await set(requestIdentifier, data, 60*60*1000)
+        return data
     }
 })
 

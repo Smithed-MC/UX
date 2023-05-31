@@ -1,5 +1,5 @@
 import { Type } from '@sinclair/typebox'
-import { API_APP, sendError } from '../../../app.js'
+import { API_APP, get, sendError, set } from '../../../app.js'
 import { getFirestore } from 'firebase-admin/firestore'
 import { sanitize } from '../../sanitize.js'
 import { HTTPResponses } from 'data-types'
@@ -47,11 +47,21 @@ API_APP.route({
     handler: async (request, reply) => {
         const {id} = request.params
 
+        const requestIdentifier = 'GET-USER::' + id
+        const tryCachedResult = await get(requestIdentifier)
+        if(tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
+            console.log('served cached /users/', id)
+            return tryCachedResult.item
+        }
+
         const userDoc = await getUserDoc(id)
 
         if(userDoc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, 'User not found')
-        return {uid: userDoc.id, ...userDoc.data()}
+
+        const data = {uid: userDoc.id, ...userDoc.data()}
+        await set(requestIdentifier, data, 60*60*1000)
+        return data
     }
 })
 

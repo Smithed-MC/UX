@@ -34,7 +34,7 @@ API_APP.route({
         const requestIdentifier = 'GET-PACK::' + id
         const tryCachedResult = await get(requestIdentifier)
         if(tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
-            console.log('served cached result')
+            console.log('served cached /packs/', id)
             return tryCachedResult.item
         }
         
@@ -338,7 +338,8 @@ API_APP.route({
         
         const requestIdentifier = 'GET-PACK-META::' + id
         const tryCachedResult = await get(requestIdentifier)
-        if(tryCachedResult && request.headers["cache-control"] !== 'no-cache') {
+        if(tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
+            console.log('served cached /packs/', id, '/meta')
             return tryCachedResult.item
         }
         
