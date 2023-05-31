@@ -10,6 +10,7 @@ export async function getUserDoc(id: string) {
     const firestore = getFirestore()
     const packs = firestore.collection('users')
 
+    console.log('Querying for user', id)
     const doc = await packs.doc(id).get()
     if (doc.exists) {
         return doc
