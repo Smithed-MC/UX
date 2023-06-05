@@ -14,6 +14,7 @@ import Account from './pages/account'
 import { getAuth, browserLocalPersistence } from 'firebase/auth'
 import Edit from './pages/edit'
 import Bundles from './pages/bundle'
+import Settings from './pages/settings'
 
 interface ClientProps {
     platform: 'desktop' | 'website'
@@ -50,10 +51,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "settings",
-                element: <div>
-                    <h1>Settings</h1>
-                    Version: 0.3.0
-                </div>
+                element: <Settings/>
             },
             {
                 path: "browse",

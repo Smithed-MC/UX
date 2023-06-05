@@ -1,6 +1,6 @@
 import { NavBar, NavButton, PackCard, FilterButton } from "components";
 import React, { useEffect, useRef, useState } from "react";
-import { PackBundle, PackEntry, PackVersion, packCategories } from "data-types"
+import { PackBundle, PackEntry, PackVersion, SortOptions, packCategories } from "data-types"
 import PackInfo from "../widget/packInfo";
 import { useNavigate } from "react-router-dom";
 import './browse.css'
@@ -11,35 +11,37 @@ import { getAuth } from "firebase/auth";
 
 export default function Browse(props: any) {
 
-    const { search, category, bundleId } = useQueryParams()
+    const { search, category, bundleId, sort } = useQueryParams()
 
     const [categories, setCategories] = useState(new Set(category != null ? typeof category === 'string' ? [category] : category : []))
     const [packs, setPacks] = useState<{ id: string, displayName: string }[]>([])
     const [showWidget, setShowWidget] = useState<string | undefined>(undefined)
     const [bundleData, setBundleData] = useState<PackBundle>()
+    const [packSort, setPackSort] = useState(sort)
     const navigate = useNavigate()
     const user = useFirebaseUser()
     const rootDiv = useRef<HTMLDivElement>(null)
-    
+
     let currentLoaded = 0;
     let updatingPacks = false;
 
 
     async function updateUrl(search: string | null | (string | null)[]) {
         let url = '?'
-        let searchUrl = []
+        let queries = []
         if (search != null && search !== '')
-            searchUrl.push('search=' + search)
+            queries.push('search=' + search)
 
-        let bundleIdUrl = []
         if (bundleId != null)
-            bundleIdUrl.push('bundleId=' + bundleId)
+            queries.push('bundleId=' + bundleId)
 
-        let categoriesurl = []
+        if (packSort != null)
+            queries.push('sort=' + packSort)
+
         for (let c of categories.values())
-            categoriesurl.push('category=' + c)
+            queries.push('category=' + c)
 
-        url += searchUrl.join('&') + bundleIdUrl.join('&') + categoriesurl.join('&')
+        url += queries.join('&')
         navigate(url)
     }
 
@@ -66,6 +68,9 @@ export default function Browse(props: any) {
         for (let c of categories.values())
             query.push('category=' + encodeURIComponent(c as string));
 
+        if (packSort != null && packSort !== '')
+            query.push('sort=' + packSort)
+
         const url = 'https://api.smithed.dev/v2/packs?' + query.join('&');
         return url;
     }
@@ -83,13 +88,13 @@ export default function Browse(props: any) {
     }
 
     async function onScroll(e: React.UIEvent<HTMLDivElement, UIEvent>) {
-        if(updatingPacks)
+        if (updatingPacks)
             return
         const scrollPosition = e.currentTarget.scrollTop
         const scrollHeight = e.currentTarget.scrollHeight
         console.log(e.currentTarget.offsetHeight, scrollHeight, scrollPosition)
 
-        if (scrollPosition/scrollHeight < 0.60)
+        if (scrollPosition / scrollHeight < 0.60)
             return
 
         updatingPacks = true;
@@ -98,9 +103,9 @@ export default function Browse(props: any) {
         const url = createUrlFromVariables()
 
         const response = await fetch(url)
-        const data: {id: string, displayName: string}[] = (await response.json())
-        
-        if(data.filter(d => packs.find(p => p.id === d.id) === undefined).length === data.length) {
+        const data: { id: string, displayName: string }[] = (await response.json())
+
+        if (data.filter(d => packs.find(p => p.id === d.id) === undefined).length === data.length) {
             updatingPacks = false;
             setPacks(packs.concat(data))
         }
@@ -111,7 +116,7 @@ export default function Browse(props: any) {
         setShowWidget(showWidget === p ? undefined : p)
     }
 
-    useEffect(() => { fetchData(); }, [search, categories.size])
+    useEffect(() => { fetchData(); updateUrl(search) }, [search, categories.size, packSort])
 
     // return <div className="container" style={{ 
     //     height: '100%', width: '100%', 
@@ -156,12 +161,19 @@ export default function Browse(props: any) {
 
             </div>}
             <div className="container packCardContainer" style={{ padding: 16, gap: 16, overflow: 'hidden', justifyContent: 'safe start', alignItems: 'safe center', height: '100%' }}>
-                <div className="container" style={{ width: '100%', maxWidth: 512, boxSizing: "border-box", gap: 16 }}>
-                    <input placeholder="Search..." style={{ backgroundColor: 'var(--backgroundAccent)', width: '100%', color: 'var(--text)' }} defaultValue={search != null ? search as string : undefined} onChange={(e) => {
+                <div className="container" style={{ width: '100%', maxWidth: 640, boxSizing: "border-box", gap: 16 }}>
+                    <div className="container" style={{flexDirection: 'row', width: '100%', gap: 16}}>
+                        <input placeholder="Search..." style={{ backgroundColor: 'var(--backgroundAccent)', width: '100%', color: 'var(--text)' }} defaultValue={search != null ? search as string : undefined} onChange={(e) => {
 
-                        updateUrl(e.target.value.replaceAll(' ', '+'));
+                            updateUrl(e.target.value.replaceAll(' ', '+'));
 
-                    }} />
+                        }} />
+                        Sort: <select defaultValue={(packSort as string) ?? 'downloads'} style={{ backgroundColor: 'var(--backgroundAccent)', width: 'max-content', paddingRight: 24 }} onChange={(v) => {
+                            setPackSort(v.target.value)
+                        }}>
+                            {Object.keys(SortOptions).map(v => <option value={v.toLowerCase()}>{v}</option>)}
+                        </select>
+                    </div>
                     <div className="container" style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' }}>
                         {packCategories.map((cat) => <FilterButton onClick={() => {
                             console.log(categories);

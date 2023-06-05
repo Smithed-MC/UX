@@ -9,7 +9,7 @@ import { getUIDFromToken } from 'database';
 const getOrderField = (sort: SortOptions) => {
     switch(sort) {
         case SortOptions.Trending:
-            return 'stats.downloads.today'
+            return 'stats.score'
         case SortOptions.Downloads:
             return 'stats.downloads.total'
         case SortOptions.Alphabetically:

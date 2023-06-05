@@ -61,6 +61,7 @@ export async function getPackDoc(id: string) {
     const firestore = getFirestore()
     const packs = firestore.collection('packs')
 
+    console.log('Querying for pack',id)
     const doc = await packs.doc(id).get()
     if (doc.exists) {
         return doc

@@ -29,17 +29,40 @@ export async function calculateDownloads() {
     const past30days = forLastDays(30);
     const today = new Date().toLocaleDateString().replaceAll("/", "-");
 
-    for (const packDoc of docs) {
-        const past7DayDownloads = await getDaysDownload(packDoc, past7Days)
+    for (const packAnalyticDoc of docs) {
+        const packDataDoc = getFirestore().collection("packs").doc(packAnalyticDoc.id)
+        
 
-        await getFirestore().collection("packs").doc(packDoc.id).set({
-            stats: {
-                downloads: {
-                    pastWeek: past7DayDownloads,
-                    total: (await packDoc.collection('downloads').doc('total').get()).data()?.value ?? 0,
-                    today: (await packDoc.collection('downloads').doc(today).get()).data()?.total ?? 0
-                }
-            }
+
+        const past7DayDownloads = await getDaysDownload(packAnalyticDoc, past7Days)
+
+
+        const docSnapshot = await packDataDoc.get()
+
+        const stats = docSnapshot.get('stats')
+        
+        stats.downloads = {
+            pastWeek: past7DayDownloads,
+            total: (await packAnalyticDoc.collection('downloads').doc('total').get()).data()?.value ?? 0,
+            today: (await packAnalyticDoc.collection('downloads').doc(today).get()).data()?.total ?? 0
+        }
+        
+        const packCategories: string[]|undefined = docSnapshot.get('data.categories')
+
+        if (packCategories?.find(f => f == 'Library'))
+            stats.score = 0
+        else {
+            const recentThreshold = 7 * 24 * 60 * 60 * 1000
+            let recentModifer = (Date.now() - (stats.updated ?? stats.added)) / recentThreshold
+
+            recentModifer = Math.min(recentModifer, 1)
+            recentModifer = 5 * (1 - recentModifer) + 1
+
+            stats.score = Math.ceil((past7DayDownloads + (stats.downloads.today * 100)) * recentModifer)
+        }
+
+        await packDataDoc.set({
+            stats: stats
         }, { merge: true })
     }
 }
