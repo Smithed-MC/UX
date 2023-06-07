@@ -58,7 +58,9 @@ export async function calculateDownloads() {
             recentModifer = Math.min(recentModifer, 1)
             recentModifer = 5 * (1 - recentModifer) + 1
 
-            stats.score = Math.ceil((past7DayDownloads + (stats.downloads.today * 100)) * recentModifer)
+            let impactModifier = 1 + (stats.downloads.today / stats.downloads.total)
+
+            stats.score = Math.ceil((past7DayDownloads + (stats.downloads.today * 100)) * recentModifer * impactModifier)
         }
 
         await packDataDoc.set({
