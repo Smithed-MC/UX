@@ -15,23 +15,33 @@ import { ReactComponent as SignOut } from './assets/sign-out.svg'
 import { ReactComponent as AddToBundle } from './assets/add-to-bundle.svg'
 import { ReactComponent as RemoveFromBundle } from './assets/remove-from-bundle.svg'
 import { ReactComponent as Download } from './assets/download.svg'
+import { ReactComponent as Browse } from './assets/browse.svg'
+import { ReactComponent as Discord } from './assets/discord.svg'
+import { ReactComponent as Globe } from './assets/globe.svg'
+import { ReactComponent as Clock } from './assets/clock.svg'
+import { ReactComponent as Logo } from './assets/logo.svg'
 
-export { 
-    Account, 
-    AddToBundle, 
-    Back, 
-    Cross, 
-    Edit, 
-    Home, 
-    Info, 
-    Left, 
-    MenuBars, 
-    RemoveFromBundle, 
-    Right, 
-    Save, 
-    Search, 
-    Settings, 
-    SignOut, 
-    Trash, 
-    Download
+export {
+    Account,
+    AddToBundle,
+    Back,
+    Browse,
+    Cross,
+    Download,
+    Discord,
+    Edit,
+    Home,
+    Info,
+    Left,
+    MenuBars,
+    RemoveFromBundle,
+    Right,
+    Save,
+    Search,
+    Settings,
+    SignOut,
+    Trash,
+    Globe,
+    Clock,
+    Logo
 }

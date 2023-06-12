@@ -1,27 +1,35 @@
 :root {
-    font-family: 'Inconsolata';
-    background-image: linear-gradient(var(--background), var(--backgroundDark));
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: fixed;
+    font-family: 'Lexend';
     position: absolute;
     min-height: 100%;
     min-width: 100%;
+    background: var(--background);
 
-    --background: #2a2a38;
-    --backgroundDark: #1b1924;
-    --backgroundAccent: #12121f;
+    --bold: #080809;
+    --background: #121213;
+    --section: #1D1F21;
+    --highlight: #2E2E31;
+    --border: #2E2E31;
+    --foreground: #FFF8F0;
     --accent: #1b48c4;
-    --accent2: #6b83c5;
+    --accent2: #23A3FF;
+    
+    --warning: #E8AA03;
+    --distrubing: #C41B48;
+    --success: #1BC443;
+    --secondary: #C41B9C;
+
+    --backgroundDark: #1b1924;
+
     --badAccent: rgb(255, 72, 72);
     --goodAccent: rgb(144, 255, 71);
-    --buttonText: #fff;
+    --foreground: #fff;
     --text: #fff;
     --codeText: rgb(255, 247, 136);
     --subText: #aaa;
     --smallScreenSize: 640px;
 
-    --defaultBorderRadius: 10px;
+    --defaultBorderRadius: 16px;
     overflow: hidden;
 }
 
@@ -38,8 +46,14 @@
         url('./fonts/DoppioOne-Regular.ttf') format('truetype')
 }
 
+@font-face {
+    font-family: 'Lexend';
+    src: local('Lexend'),
+        url('./fonts/Lexend-VariableFont_wght.ttf') format('truetype')
+}
+
 div {
-    font-family: Inconsolata;
+    font-family: Lexend;
     color: var(--text)
 }
 
@@ -72,23 +86,8 @@ pre {
     border-radius: var(--defaultBorderRadius);
 }
 
-
-a {
-    color: var(--accent2);
-    cursor: pointer;
-}
-
-a:hover {
-    filter: brightness(85%)
-}
-
-a:active {
-    filter: brightness(60%)
-}
-
-
 details {
-    background-color: var(--backgroundAccent);
+    background-color: var(--section);
     padding: 16px;
     border-radius: var(--defaultBorderRadius);
     margin-bottom: 4px;
@@ -116,7 +115,7 @@ summary:active {
     border-radius: var(--defaultBorderRadius);
     /* roundness of the scroll thumb */
     /* creates padding around scroll thumb */
-    border: 2px solid var(--backgroundAccent);
+    border: 2px solid var(--section);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -129,12 +128,20 @@ select {
     border: none;
     border-radius: var(--defaultBorderRadius);
     padding: 8px;
-    font-family: Inconsolata;
+    font-family: Lexend;
     font-size: 1rem;
-    border-bottom: 2px solid var(--accent);
-    border-right: 2px solid var(--accent);
+    border: 2px solid transparent;
     box-sizing: border-box;
+}
 
+
+input:focus, select:focus {
+    outline: none;
+    border: 2px solid var(--accent);
+}
+
+input:hover, select:hover {
+    border: 2px solid var(--border);
 }
 
 select select {
@@ -151,20 +158,22 @@ input[type="password"],
 input[type="text"],
 textarea,
 select {
-    background-color: var(--background);
+    background-color: var(--section);
 
-    color: var(--text);
+    color: var(--foreground);
     width: 256px;
 }
 
 input::placeholder {
-    color: var(--subText)
+    color: var(--foreground);
+    opacity: 0.5;
 }
+
 
 input[type="button"] {
     background-color: var(--accent);
     width: 128px;
-    color: var(--buttonText);
+    color: var(--foreground);
 }
 
 input[type="button"]:hover,
@@ -191,3 +200,124 @@ select {
     -moz-appearance: none;
     cursor: pointer;
 }
+
+button, .buttonLike {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 16px;
+    gap: 16px;
+    
+    height: 36px;
+    
+    text-decoration: none;
+    /* Section */
+
+    white-space: nowrap;
+    
+    box-sizing: border-box;
+    background: var(--section);
+    border-radius: 16px;
+    border: 2px solid transparent;
+
+    
+    font-family: 'Lexend';
+    font-size: 1rem;
+    
+    color: var(--foreground);
+
+    transition: background-color, border 0.1s;
+    cursor: pointer;
+}
+button:hover, .buttonLike:hover {
+    /* Highlight */
+
+    background: var(--section);
+    /* Border */
+
+    border: 2px solid var(--border);
+}
+
+button:focus, .buttonLike:focus {
+    outline: none;
+    border: 2px solid var(--foreground);
+}
+
+
+button:active, .buttonLike:active {
+    filter: brightness(90%);
+}
+
+.accentedButtonLike {
+    background-color: var(--accent);
+}
+
+.disturbingButtonLike {
+    background-color: var(--distrubing);
+}
+
+.successButtonLike {
+    background-color: var(--success);
+}
+
+.secondaryButtonLike {
+    background-color: var(--secondary);
+}
+
+
+.footerContainer {
+    display: grid;
+    grid-template: auto / 66% 16% 16%;
+    padding: 64px 0px;
+    box-sizing: border-box;
+}
+
+.footerLargeGroup,
+.footerSmallGroup {
+    justify-content: start;
+}
+
+.footerSmallGroup {
+    width: 100%;
+    gap: 16px;
+}
+
+.footerLargeGroup {
+    width: 100%;
+    align-items: start;
+}
+
+
+@media screen and (max-width: 70rem) { 
+    .main {
+        padding: 0px 16px !important;
+    }   
+    .footerContainer {
+        padding: 64px 16px !important;
+        grid-template: auto auto auto / auto;
+        align-items: center;
+        gap: 64px;
+    }
+
+    .footerLargeGroup {
+        align-items: center;
+        text-align: center;
+        grid-row: 3;
+    }
+}
+
+.compactButton { 
+    color: var(--foreground);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.compactButton:hover[href] {
+    text-decoration: underline;
+}
+
+.compactButton:active[href] {
+    opacity: 0.9;
+}
+

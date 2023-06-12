@@ -3,9 +3,9 @@ import React, { CSSProperties, useRef, useState } from 'react'
 import { useMatch, useNavigate } from 'react-router-dom'
 import { useQueryParams } from 'hooks'
 
-import './style.css'
-import './NavBar.css'
-import { Cross, MenuBars } from './svg'
+require('./style.css')
+require('./NavBar.css')
+import { Cross, MenuBars } from './svg.js'
 
 interface NavButtonProps {
     onOpen: () => void
@@ -35,11 +35,11 @@ export function NavButton({ onOpen, onClose, style }: NavButtonProps) {
         setOpen(!open)
     }
 
-    return <button ref={button} className={"button" + (!open ? ' navButtonClosed': '')} style={{
+    return <button ref={button} className={"button" + (!open ? ' navButtonClosed' : '')} style={{
         width: 48, height: 48, borderRadius: 'var(--defaultBorderRadius)', padding: 12, ...style
     }} onClick={onInternalButtonClick}>
-        <MenuBars style={{ fill: "var(--buttonText)", display: !open ? 'inherit' : 'none' }} />
-        <Cross style={{ stroke: "var(--buttonText)", display: open ? 'inherit' : 'none' }} />
+        <MenuBars style={{ fill: "var(--foreground)", display: !open ? 'inherit' : 'none' }} />
+        <Cross style={{ stroke: "var(--foreground)", display: open ? 'inherit' : 'none' }} />
     </button>
 }
 
@@ -81,13 +81,13 @@ export function NavOption({ SVGComponent, path, title, navigateTo, withSpecialQu
         }}>
             {title}
         </div>
-        <div className='container' style={{ backgroundColor: isOpen ? 'var(--buttonText)' : 'var(--accent)', zIndex: 1, borderRadius: 24, width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}>
-            <SVGComponent style={{ fill: isOpen ? 'var(--accent)' : "var(--buttonText)", margin: 12 }} />
+        <div className='container' style={{ backgroundColor: isOpen ? 'var(--foreground)' : 'var(--accent)', zIndex: 1, borderRadius: 24, width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}>
+            <SVGComponent style={{ fill: isOpen ? 'var(--accent)' : "var(--foreground)", margin: 12 }} />
         </div>
     </button>
 }
 
-export function NavBar({children}: {children: any}) {
+export function NavBar({ children }: { children: any }) {
     const [open, setOpen] = useState(previousState)
     const navBarOptions = useRef<HTMLDivElement>(null)
 
@@ -103,23 +103,11 @@ export function NavBar({children}: {children: any}) {
         setTimeout(() => { if (navBarOptions.current?.style.animationName === 'navbarSlidedown') setOpen(false) }, duration * 1000 - 100)
     }
 
-    return (<div className='container' style={{
-        position: 'fixed', bottom: 16, left: 16,
-        flexDirection: 'column-reverse',
-        gap: 16,
-        overflowY: 'hidden',
-        overflow: 'visible',
-        zIndex: 100,
-        width: 64
-    }}>
-        <NavButton onOpen={onOpen} onClose={onClose}/>
-        {open && <div ref={navBarOptions} className='container' style={{
-            display: 'flex',
-            animation: 'navbarPullup 0.5s 1',
-            gap: 8, padding: 8, backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)',
-            border: '4px solid var(--background)', boxSizing: 'border-box'
-        }} unselectable={open ? 'off' : 'on'}>
+    return (
+        <div className="container" style={{flexDirection: 'row', gap: 32, width: '100%', boxSizing: 'border-box', justifyContent: 'safe start'}}>
+            <a style={{fontSize: '24px', lineHeight: '30px', fontWeight: '700', fontFamily: 'Lexend', color: 'var(--foreground)', textDecoration: 'none'}} href="/">Smithed</a>
+            <div style={{width: 1, height: 36, background: 'var(--foreground)'}}/>
             {children}
-        </div>}
-    </div>)
+        </div>
+    )
 }

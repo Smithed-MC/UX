@@ -1,11 +1,11 @@
 import { NavBar, NavButton, PackCard, FilterButton } from "components";
 import React, { useEffect, useRef, useState } from "react";
 import { PackBundle, PackEntry, PackVersion, SortOptions, packCategories } from "data-types"
-import PackInfo from "../widget/packInfo";
+import PackInfo from "../widget/packInfo.js";
 import { useNavigate } from "react-router-dom";
-import './browse.css'
+require('./browse.css')
 import { useFirebaseUser, useQueryParams } from "hooks";
-import { Left } from "components/svg";
+import { Left } from "components/svg.js";
 import { coerce, compare } from "semver";
 import { getAuth } from "firebase/auth";
 
@@ -136,14 +136,9 @@ export default function Browse(props: any) {
     // </div>
 
 
-    return <div className="container" style={{
-        height: '100%', width: '100%',
-        position: 'absolute', top: 0, left: 0,
-        justifyContent: 'safe start',
-        alignItems: 'safe start',
-        boxSizing: 'border-box',
-    }}>
+    return <div className="container" style={{ width: '100%', boxSizing: 'border-box', height: '100%', overflow: 'hidden', justifyContent: 'safe start', gap: 32 }}>
         <div className="container" style={{
+            position: 'absolute',
             boxSizing: 'border-box', minHeight: 48,
             height: 'max(3vw, 3vh)', width: '100%', flexDirection: 'row', gap: 8, justifyContent: 'left',
             paddingLeft: 8,
@@ -163,12 +158,12 @@ export default function Browse(props: any) {
             <div className="container packCardContainer" style={{ padding: 16, gap: 16, overflow: 'hidden', justifyContent: 'safe start', alignItems: 'safe center', height: '100%' }}>
                 <div className="container" style={{ width: '100%', maxWidth: 640, boxSizing: "border-box", gap: 16 }}>
                     <div className="container" style={{flexDirection: 'row', width: '100%', gap: 16}}>
-                        <input placeholder="Search..." style={{ backgroundColor: 'var(--backgroundAccent)', width: '100%', color: 'var(--text)' }} defaultValue={search != null ? search as string : undefined} onChange={(e) => {
+                        <input placeholder="Search..." type="text" style={{ width: '100%' }} defaultValue={search != null ? search as string : undefined} onChange={(e) => {
 
                             updateUrl(e.target.value.replaceAll(' ', '+'));
 
                         }} />
-                        Sort: <select defaultValue={(packSort as string) ?? 'downloads'} style={{ backgroundColor: 'var(--backgroundAccent)', width: 'max-content', paddingRight: 24 }} onChange={(v) => {
+                        Sort: <select defaultValue={(packSort as string) ?? 'downloads'} style={{ width: 'max-content', paddingRight: 24 }} onChange={(v) => {
                             setPackSort(v.target.value)
                         }}>
                             {Object.keys(SortOptions).map(v => <option value={v.toLowerCase()}>{v}</option>)}

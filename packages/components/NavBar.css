@@ -39,6 +39,6 @@
     100% {
         left: 32;
         width: calc(100%);
-        color: var(--buttonText);
+        color: var(--foreground);
     }
 }
