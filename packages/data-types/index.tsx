@@ -19,7 +19,8 @@ export const supportedMinecraftVersions = [
     '1.18.1',
     '1.18.2',
     '1.19',
-    '1.19.4'
+    '1.19.4',
+    '1.20'
 ]
 export const latestMinecraftVersion = '1.19.4'
 
