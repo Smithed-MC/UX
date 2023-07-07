@@ -62,7 +62,7 @@ API_APP.route({
         if(userDoc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, 'User not found')
 
-        const data = {uid: userDoc.id, creationTime: new Date((await getAuth().getUser(userDoc.id)).metadata.creationTime ?? 0).getSeconds(), ...userDoc.data()}
+        const data = {uid: userDoc.id, creationTime: new Date((await getAuth().getUser(userDoc.id)).metadata.creationTime ?? 0).getTime(), ...userDoc.data()}
         await set(requestIdentifier, data, 60*60*1000)
         return data
     }
