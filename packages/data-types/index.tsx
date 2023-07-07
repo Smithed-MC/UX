@@ -98,6 +98,7 @@ export const BundleSchema = Type.Object({
 export const UserDataSchema = Type.Object({
     displayName: Type.String(),
     cleanName: Type.String(),
+    creationTime: Type.Number(),
     uid: Type.String()
 })
 
