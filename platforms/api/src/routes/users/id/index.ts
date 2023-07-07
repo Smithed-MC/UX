@@ -4,6 +4,8 @@ import { getFirestore } from 'firebase-admin/firestore'
 import { sanitize } from '../../sanitize.js'
 import { HTTPResponses, UserData } from 'data-types'
 import { getUIDFromToken } from 'database'
+import { getAuth } from 'firebase-admin/auth'
+import { useId } from 'react'
 
 export async function getUserDoc(id: string) {
 
@@ -60,7 +62,7 @@ API_APP.route({
         if(userDoc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, 'User not found')
 
-        const data = {uid: userDoc.id, creationTime: userDoc.createTime?.seconds ?? 0, ...userDoc.data()}
+        const data = {uid: userDoc.id, creationTime: (await getAuth().getUser(userDoc.id)).metadata.creationTime ?? 0, ...userDoc.data()}
         await set(requestIdentifier, data, 60*60*1000)
         return data
     }
