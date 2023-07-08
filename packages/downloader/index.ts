@@ -94,9 +94,9 @@ export class DownloadRunner {
         this.userHash = userHash
     }
 
-    private runWeld(mode: string) {
+    private runWeld(mode: string, version: string) {
         return new Promise<void>((resolve, reject) => {
-            const python = PythonShell.runString(RUNNER, { mode: 'text', args: [this.id, mode], pythonOptions: ['-u'] }, () => { })
+            const python = PythonShell.runString(RUNNER, { mode: 'text', args: [this.id, mode, version], pythonOptions: ['-u'] }, () => { })
             python.on('error', (error) => { console.error(error); reject(error) })
             python.on('pythonError', (error) => { console.error(error); reject(error) })
             python.on('message', (c) => console.log(c))
@@ -127,7 +127,7 @@ export class DownloadRunner {
             console.log(`https://api.smithed.dev/v2/packs/${packs[0].split('@')[0]}`)
             const resp = await fetch(`https://api.smithed.dev/v2/packs/${packs[0].split('@')[0]}`)
             if (!resp.ok)
-                return
+                return version
 
             const data: PackData = (await resp.json()) as any;
 
@@ -159,6 +159,8 @@ export class DownloadRunner {
 
         for (let pack of foundPacks)
             await this.downloadPack(pack)
+
+        return version
     }
 
     private async tryToDownload(filename: string, url: string) {
@@ -181,9 +183,9 @@ export class DownloadRunner {
         fs.mkdirSync(path);
         console.log('Downloading packs...')
         console.log('Packs', packs, '\nVersion', version, '\nMode', mode)
-        await this.downloadPacks(packs, version)
+        let activeVersion = await this.downloadPacks(packs, version)
         console.log('Done downloading packs!\nRunning weld...')
-        await this.runWeld(mode)
+        await this.runWeld(mode, activeVersion)
         console.log('Done running weld!')
 
 
