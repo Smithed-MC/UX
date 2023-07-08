@@ -100,7 +100,7 @@ async function setUserData(request: any, reply: any) {
         userData.cleanName = sanitize(userData.displayName)
     }
 
-    if(userData.pfp && Buffer.from(userData.pfp).byteLength >= 10240)
+    if(userData.pfp && Buffer.from(userData.pfp).byteLength >= 1024 * 1024)
         return sendError(reply, HTTPResponses.BAD_REQUEST, 'Supplied PFP exceeds 10KB') 
     
     await doc.ref.set(userData, {merge: true})
