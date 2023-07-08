@@ -103,7 +103,7 @@ async function setUserData(request: any, reply: any) {
     if(userData.pfp && Buffer.from(userData.pfp).byteLength >= 10240)
         return sendError(reply, HTTPResponses.BAD_REQUEST, 'Supplied PFP exceeds 10KB') 
     
-    await doc.ref.set({data: userData}, {merge: true})
+    await doc.ref.set(userData, {merge: true})
     return reply.status(HTTPResponses.OK).send('Updated data')
 }
 
