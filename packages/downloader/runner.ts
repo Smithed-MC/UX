@@ -35,5 +35,5 @@ if mode == "resourcepack" or mode == "both":
 if mode == "both": 
     with ZipFile(path / 'welded-both.zip', 'w') as zip:
         zip.write(path / 'welded-dp.zip', arcname='datapacks.zip')
-        zip.write(path / 'welded-rp.zip', arcname='resourcepacks.zip')w
+        zip.write(path / 'welded-rp.zip', arcname='resourcepacks.zip')
 `
