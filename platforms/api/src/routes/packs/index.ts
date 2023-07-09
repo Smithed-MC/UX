@@ -193,7 +193,9 @@ async function queryPacks(search: string | undefined, includeHidden: boolean | u
     });
 
     if (category.length > 0)
-        packs = packs.filter(p => p.docData.data?.categories?.every(c => category.includes(c)));
+        packs = packs.filter(p => {
+            return category.every(c => p.docData.data.categories?.includes(c))
+        });
     if (version.length > 0)
         packs = packs.filter(p => p.docData.data?.versions.find(v => v.supports.findIndex(mcV => version.includes(mcV)) !== -1))
 
