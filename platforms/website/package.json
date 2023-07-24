@@ -12,8 +12,5 @@
   },
   "dependencies": {
     "client": "*"
-  },
-  "devDependencies": {
-
   }
 }

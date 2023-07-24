@@ -4,7 +4,7 @@ import removeComments from 'remark-remove-comments'
 import rehypeRaw from 'rehype-raw'
 import remarkGFM from 'remark-gfm'
 import remarkLink from 'remark-inline-links'
-import remarkDefsplit from 'remark-defsplit'
+// import remarkDefsplit from 'remark-defsplit'
 import rehypeSanitize from 'rehype-sanitize'
 import remarkHTML from 'remark-html'
 
@@ -86,7 +86,7 @@ function featureTemplate() {
 
 
 export default function MarkdownRenderer({ children, ...props }: any) {
-    return <ReactMarkdown components={markdownComponents} remarkPlugins={[removeComments, remarkGFM, remarkLink, remarkDefsplit]} rehypePlugins={[rehypeRaw, rehypeSanitize, featureTemplate]} style={{ ...props.style }} {...props}>
+    return <ReactMarkdown components={markdownComponents} remarkPlugins={[removeComments, remarkGFM, remarkLink]} rehypePlugins={[rehypeRaw, rehypeSanitize, featureTemplate]} style={{ ...props.style }} {...props}>
         {children}
     </ReactMarkdown>
 }

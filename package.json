@@ -76,7 +76,6 @@
     "redux-persist": "^6.0.0",
     "rehype-raw": "^6.1.1",
     "rehype-sanitize": "^5.0.1",
-    "remark-defsplit": "^4.0.1",
     "remark-gfm": "^3.0.1",
     "remark-html": "^15.0.2",
     "remark-inline-links": "^6.0.1",
