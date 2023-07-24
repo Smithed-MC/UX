@@ -4,7 +4,7 @@
     color: var(--highlight);
     background-color: var(--section);
     opacity: 1;
-    padding: 5px 13px;
+    padding: 8px 16px;
     margin: 2px;
     cursor: pointer;
     font-size: revert; /* why are "a" links too large?? */
@@ -18,12 +18,12 @@
 
 .filter-button.selected {
     opacity: 1;
-    background: var(--accent);
+    background: var(--success);
     color: var(--foreground);
-    border: 2px solid var(--accent);
+    border: 2px solid var(--success);
 }
 
 .filter-button.selected:hover {
-    background: var(--accent);
-    border: 2px solid var(--accent2);
+    background: var(--section);
+    border: 2px solid var(--border);
 }

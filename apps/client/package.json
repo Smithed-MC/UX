@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/index.tsx",
   "types": "src/index.tsx",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,7 +14,8 @@
     "data-types": "*",
     "image-encode": "*",
     "formatters": "*",
-    "hooks": "*"
+    "hooks": "*",
+    "store": "*"
   },
   "author": "",
   "license": "ISC",

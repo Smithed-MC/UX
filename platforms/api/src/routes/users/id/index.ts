@@ -4,6 +4,7 @@ import { getFirestore } from 'firebase-admin/firestore'
 import { sanitize } from '../../sanitize.js'
 import { HTTPResponses } from 'data-types'
 import { getUIDFromToken } from 'database'
+import { getAuth } from 'firebase-admin/auth'
 
 export async function getUserDoc(id: string) {
 

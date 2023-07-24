@@ -1,14 +1,14 @@
 import { IconTextButton, NavBar, NavButton, PackCard } from "components";
 import React, { useEffect, useRef, useState } from "react";
 import { PackData } from "data-types";
-import { Browse, Clock, Download, Download as DownloadIcon, Globe, Search } from 'components/svg.js'
+import { Browse, Clock, Download, Download as DownloadIcon, Globe, Search, Smithed } from 'components/svg.js'
 
-const logo = require('../assets/logo.png')
-const launcher_graphic = require('../assets/launcher_graphic.png')
-const libraries_box = require('../assets/libraries_box.png')
-const wiki_books = require('../assets/wiki_books.png')
+import logo from '../assets/logo.png'
+import launcher_graphic from '../assets/launcher_graphic.png'
+import libraries_box from '../assets/libraries_box.png'
+import wiki_books from '../assets/wiki_books.png'
 
-require('./home.css')
+import './home.css'
 
 import { useNavigate } from "react-router-dom";
 
@@ -70,15 +70,15 @@ const Divider = () => <div style={{ width: '100%', padding: '32px 0px' }}>
 </div>
 
 export default function Home(props: any) {
-    return <div className="container" style={{ width: '100%', boxSizing: 'border-box', justifyContent: 'safe start', gap: 32 }}>
+    return <div className="container" style={{ width: '100%', boxSizing: 'border-box', justifyContent: 'safe start', gap: 32, paddingBottom: 80 }}>
 
         <div className="cardCarousel">
             <CategoryHeader icon={Download} text={"Top downloads"} color="success" />
-            <PackCard id="tcc" />
+            <PackCard id="tcc" style={{border: '2px solid var(--border)'}}/>
             <CategoryHeader icon={Globe} text={"Trending today"} color="warning" />
-            <PackCard id="tcc" />
+            <PackCard id="tcc" style={{border: '2px solid var(--border)'}}/>
             <CategoryHeader icon={Clock} text={"Recently added"} color="secondary" />
-            <PackCard id="tcc" />
+            <PackCard id="tcc" style={{border: '2px solid var(--border)'}}/>
         </div>
 
         <div className="container homeSectionContainer">
@@ -90,7 +90,7 @@ export default function Home(props: any) {
                     We are a set of projects with the express purpose of making datapacks more compatible, easier to manage, and fool proof to install. Smithed is not only a project but a community of passionate people.
                 </div>
                 <div className="homeImageContainer">
-                    <img src={logo} />
+                    <Smithed style={{strokeWidth: 3, stroke: 'black', width: '12rem'}}/>
                 </div>
             </div>
             <IconTextButton className="accentedButtonLike" text={"Join the community"} icon={"@"} style={{ width: 'fit-content' }} href="https://smithed.dev/discord" />
@@ -102,7 +102,7 @@ export default function Home(props: any) {
             <div className="container" style={{ flexDirection: 'row' }}>
                 <div className='container homeTextContainer'>
                     <label className="homeSectionHeader">
-                        THE <label style={{ color: "var(--distrubing)" }}>LAUNCHER</label>
+                        THE <label style={{ color: "var(--disturbing)" }}>LAUNCHER</label>
                     </label>
                     Tired of having to manually update your datapacks? Merging all the ones you want to play? What about filtering through tons of incompatible content?
                     <br />

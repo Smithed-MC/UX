@@ -1,10 +1,10 @@
 import React, { CSSProperties, RefObject, useEffect, useRef, useState } from 'react'
-import { PackBundle, PackData, PackEntry, PackVersion } from 'data-types'
-import { formatDownloads } from 'formatters'
+import { PackBundle, PackData, PackEntry, PackMetaData, PackVersion } from 'data-types'
+import { formatDownloads, prettyTimeDifference } from 'formatters'
 import { ReactComponent as QuestionMark } from './assets/question-mark.svg'
 import { ReactComponent as Download } from './assets/download.svg'
 import { useMatch, useNavigate } from 'react-router-dom'
-require('./PackCard.css')
+import './PackCard.css'
 import DownloadButton from './DownloadButton.js'
 import Spinner from './Spinner.js'
 import EditButton from './EditButton.js'
@@ -12,23 +12,25 @@ import AddRemovePackButton from './AddRemovePackButton.js'
 import { compare, coerce } from 'semver'
 import { User } from 'firebase/auth'
 import { IconTextButton } from './IconTextButton.js'
-import { Right } from './svg.js'
+import { Edit, Right } from './svg.js'
 
 interface PackCardProps {
     id: string,
     packEntry?: PackEntry,
     packData?: PackData,
     state?: 'editable' | 'add',
-    style?: CSSProperties
+    style?: CSSProperties,
+    parentStyle?: CSSProperties,
     bundleData?: PackBundle
     user?: User | null
     onClick?: () => void,
+    addWidget?: JSX.Element
     [key: string]: any
 }
 
-export default function PackCard({ id, packData, onClick, state, style, bundleData, user, ...props }: PackCardProps) {
+export default function PackCard({ id, packData, onClick, state, style, parentStyle, bundleData, user, addWidget, ...props }: PackCardProps) {
     const [data, setData] = useState<PackData>()
-    const [downloads, setDownloads] = useState<number>(0)
+    const [metaData, setMetaData] = useState<PackMetaData>()
     const [fallback, setFallback] = useState(false)
     const [author, setAuthor] = useState('')
     const [loaded, setLoaded] = useState(false)
@@ -67,7 +69,7 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
 
         await Promise.all([getData(), getAuthor(metaData.owner)])
 
-        setDownloads(metaData.stats.downloads.total)
+        setMetaData(metaData)
 
         setLoaded(true)
         setFallback(false)
@@ -107,6 +109,7 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
             return
         setValidForBundle(bundleData !== undefined && data?.versions.findIndex(v => v.supports.includes(bundleData.version)) === -1)
     }, [bundleData, data])
+
     useEffect(() => { onLoad(); }, [id])
 
     if (data === undefined || (data.display.hidden && match))
@@ -124,22 +127,37 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
         </div>
     </div>
 
-    return <div className='cardContainer'>
+    return <div className='cardContainer' style={{ ...parentStyle }}>
         <div className="packCard" key={id} ref={card} onClick={(e) => {
             if (!(e.target instanceof HTMLDivElement || e.target instanceof HTMLLabelElement)) return
-            if (onClick) onClick()
+            // if (onClick) onClick()
         }} style={{ ...style }} {...props}>
-            <div className='container' style={{ flexDirection: 'row', gap: 16 }}>
-                <img className="packCardImage" src={data.display.icon}/>
-                <label style={{ fontWeight: 700 }}>{data.display.name}</label>
+            <div className='container packCardDetails'>
+                {!fallback && <img className="packCardImage" src={data.display.icon} onError={() => setFallback(true)} />}
+                {fallback && <div className='container packCardImage' style={{ fontSize: '4rem' }}>?</div>}
+                <label className='packCardName' style={{ fontWeight: 700 }}>{data.display.name}</label>
+                <p className='packCardDescription'>{data.display.description}</p>
             </div>
-            <p style={{ lineHeight: '20px', WebkitLineClamp: 2, margin: 0, maxHeight: 40, textOverflow: 'ellipsis', display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{data.display.description}</p>
-            <div className='container' style={{ width: '100%', flexBasis: 'fit-content', flexShrink: 0, gap: 16, flexDirection: 'row', justifyContent: 'space-between'}}>
-                <p style={{ fontSize: '.75rem', opacity: '0.25', margin: 0 }}>
-                    by {author}<br/>
-                    {formatDownloads(downloads)} Download{downloads === 1 ? '' : 's'}
-                </p>
-                <IconTextButton className="accentedButtonLike" text={"Open"} icon={Right} reverse={true}/>
+            <div className='container' style={{ width: '100%', flexBasis: 'fit-content', flexShrink: 0, gap: '1rem', flexDirection: 'row', position: 'relative' }}>
+                <div className='packCardInfo'>
+                    by {author}<br />
+                    <span className="packCardInfoSeperator">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
+                            <circle cx="2" cy="2" r="2" fill="#FFF8F0" />
+                        </svg>
+                    </span>
+                    {formatDownloads(metaData?.stats.downloads.total ?? 0)} Download{metaData?.stats.downloads.total === 1 ? '' : 's'}
+                    <span className="packCardInfoSeperator">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
+                            <circle cx="2" cy="2" r="2" fill="#FFF8F0" />
+                        </svg>
+                    </span>
+                    <span className='packCardUpdateInfo'>{prettyTimeDifference(metaData?.stats.updated ?? metaData?.stats.added ?? 0)} ago</span>
+                </div>
+                <div style={{ flexGrow: 1 }} />
+                {state === 'editable' && <a className='buttonLike accentedButtonLike' href={`/edit?pack=${id}`}><Edit /></a>}
+                {state === 'add' && addWidget}
+                <IconTextButton className="accentedButtonLike" text={"Open"} icon={Right} reverse={true} href={`/packs/${id}`} />
             </div>
         </div>
     </div>

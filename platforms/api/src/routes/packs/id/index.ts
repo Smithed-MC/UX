@@ -1,9 +1,10 @@
 import { Type } from "@sinclair/typebox";
 import { API_APP, get, sendError, set } from "../../../app.js";
 import { getFirestore } from "firebase-admin/firestore";
-import { HTTPResponses, PackDataSchema, PackMetaData } from "data-types";
+import { HTTPResponses, PackData, PackDataSchema, PackMetaData } from "data-types";
 import { getPackDoc, getUIDFromToken } from "database";
 import {FastifyRequest, FastifyReply} from 'fastify'
+import { coerce, valid } from "semver";
 
 
 
@@ -52,7 +53,9 @@ API_APP.route({
 const setPack = async (response: any, reply: any) => {
     const { id: packId } = response.params;
     const { token } = response.query
-    const { data: packData } = response.body;
+    const { data } = response.body;
+
+    const packData = data as PackData
 
     const userId = await getUIDFromToken(token)
     if(userId === undefined)
@@ -66,6 +69,11 @@ const setPack = async (response: any, reply: any) => {
     if(!(await doc.get('contributors')).includes(userId))
         return sendError(reply, HTTPResponses.FORBIDDEN, `You are not a contributor for ${packId}`)
 
+    for(let v of packData.versions) {
+        if(coerce(v.name) == null)
+            return sendError(reply, HTTPResponses.BAD_REQUEST, `Version ${v} is not valid semver`)
+    }
+    
     
     const requestIdentifier = 'GET-PACK::' + packId
     await set(requestIdentifier, undefined, 1)        

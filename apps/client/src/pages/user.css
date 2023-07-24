@@ -1,22 +1,28 @@
-.statName {
-    background-color: var(--background);
-    padding: 16px;
+
+.statDisplay {
+    display: flex;
+    flex-direction: row;
+    background-color: var(--bold);
+    padding: 0.5rem 1rem;
+    gap: 1rem;
     border-radius: var(--defaultBorderRadius);
-    text-align: center;
-    font-size: 1.125rem;
-    color: var(--subText);
+    align-items: center;
 }
 
-.statValue {
-    color: var(--text);
-    font-size: 1.5rem;
+.profileControlContainer {
+    flex-direction: row;
+    gap: 0.5rem;
 }
 
-@media screen and (max-width: 868px) {
+.bundleControls {
+    flex-direction: row; 
+    grid-area: options; 
+    gap: 1rem; 
+}
+
+@media screen and (max-width: 43rem) {
     .statBoxes {
-        flex-flow: wrap;
-        justify-content: center;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
     }
 
@@ -28,8 +34,59 @@
         align-items: center;
         flex-direction: column;
     }
-    .userContentRoot {
-        width: 100%;
+
+    .bundleControls {
+        gap: 0.25rem;
+    }
+
+    .bundleControlButton:not(:only-child) {
+        border-radius: 0 !important;
+    }
+
+    .bundleControlButton>label, .bundleControlButton>div {
+        display: none;
+    }
+
+    .bundleControlButton:first-child:not(:only-child) {
+        border-radius: var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius) !important;
+    }
+    .bundleControlButton:last-child:not(:only-child) {
+        border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0 !important;
+    }
+}
+
+@media screen and (max-width: 36rem) {
+    
+    .profileControlContainer {
+        gap: 0.25rem;
+        flex-direction: column;
+    }
+
+    .profileControl {
+        padding: 16px 8px !important;
+        border: 2px solid transparent;
+    }
+    .profileControl.first {
+        border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0px 0px !important;
+    }
+    .profileControl.last {
+        border-radius: 0px 0px var(--defaultBorderRadius) var(--defaultBorderRadius) !important;
+    }
+
+    .profileControl>div, .profileControl>label {
+        display: none;
+    }
+
+    .bundleControls {
+        gap: 0.25rem;
+        flex-direction: column;
+    }
+
+    .bundleControlButton:first-child:not(:only-child) {
+        border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0 !important;
+    }
+    .bundleControlButton:last-child:not(:only-child) {
+        border-radius: 0 0 var(--defaultBorderRadius) var(--defaultBorderRadius) !important;
     }
 }
 @media screen and (min-width: 868px) {
@@ -40,21 +97,6 @@
         width: 100%;
         justify-content: space-between;
     }
-
-    .flexDirection {
-        flex-direction: row;
-    }
-    .statContainer {
-        flex-direction: column;
-    }
-    .userContentRoot {
-        width: 66%;
-    }
-}
-
-.flexDirection, .statContainer {
-    display: flex;
-    
 }
 
 .statBoxes {
@@ -62,4 +104,40 @@
     width: 100%;
     gap: 16px;
     height: min-content;
+}
+
+.userIconAndName {
+    display: grid;
+    grid-template-areas: 
+        "image username"
+        "image join";
+    column-gap: 16px;
+}
+
+.userName, .userJoinTime {
+    height: 100%;
+    display: flex;
+}
+
+.userName {
+    align-items: end;
+    grid-area: "username";
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.userJoinTime {
+    grid-area: "join";
+}
+
+.userFallbackPFP {
+    width: 64px;
+    height: 64px;
+    font-size: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--section);
+    border-radius: var(--defaultBorderRadius);
+    grid-area: image;
 }

@@ -6,6 +6,10 @@ export default defineConfig({
   plugins: [svgr(), react()],
   resolve: {
     alias: {
-    }
+    },
+  },
+  build: {
+    ssrEmitAssets: true,
+    ssrManifest: true
   }
 })

@@ -5,17 +5,17 @@
     min-width: 100%;
     background: var(--background);
 
-    --bold: #080809;
+    --bold: #000000;
     --background: #121213;
     --section: #1D1F21;
     --highlight: #2E2E31;
-    --border: #2E2E31;
+    --border: #4B4B4B;
     --foreground: #FFF8F0;
     --accent: #1b48c4;
     --accent2: #23A3FF;
     
     --warning: #E8AA03;
-    --distrubing: #C41B48;
+    --disturbing: #C41B48;
     --success: #1BC443;
     --secondary: #C41B9C;
 
@@ -29,7 +29,10 @@
     --subText: #aaa;
     --smallScreenSize: 640px;
 
-    --defaultBorderRadius: 16px;
+    --defaultBorderRadius: 1rem;
+
+    --mobileCutoff: 43rem;
+
     overflow: hidden;
 }
 
@@ -58,16 +61,19 @@ div {
 }
 
 h1 {
-    font-size: clamp(calc(3rem * var(--headerModifier)), calc(4rem * var(--headerModifier)), calc(4rem * var(--headerModifier)));
-    font-family: DoppioOne;
-    letter-spacing: 2px;
+    font-size: 1.5rem;
+    font-weight: 700;
 }
 
 h2 {
-    font-size: clamp(calc(2.5rem * var(--headerModifier)), calc(3.5rem * var(--headerModifier)), calc(3.5rem * var(--headerModifier)));
-    font-family: DoppioOne;
-    font-weight: normal;
+    font-size: 1.25rem;
+    font-weight: 700;
 }
+h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
 
 code {
     color: var(--codeText);
@@ -123,24 +129,29 @@ summary:active {
 }
 
 
-input,
-select {
+.input, select {
     border: none;
     border-radius: var(--defaultBorderRadius);
-    padding: 8px;
     font-family: Lexend;
     font-size: 1rem;
     border: 2px solid transparent;
     box-sizing: border-box;
 }
 
+select {
+    padding: 0px 8px;
+}
 
-input:focus, select:focus {
+.input {
+    padding: 8px 16px;
+}
+
+.input:focus, select:focus {
     outline: none;
     border: 2px solid var(--accent);
 }
 
-input:hover, select:hover {
+.input:hover {
     border: 2px solid var(--border);
 }
 
@@ -148,27 +159,61 @@ select select {
     background-color: red;
 }
 
-input:disabled {
+.input:disabled {
     color: var(--subText) !important;
     font-style: italic;
 }
 
-input[type="email"],
-input[type="password"],
-input[type="text"],
-textarea,
-select {
-    background-color: var(--section);
-
+.input, select {
+    background-color: var(--bold);
+    border: 2px solid var(--border);
     color: var(--foreground);
-    width: 256px;
+    width: 19.25rem;
+    height: 2.25rem;
+}
+.input>svg>path {
+    fill: var(--border)
+}
+
+.input:focus, select:focus {
+    border: 2px solid var(--foreground);
+}
+
+.input:focus>svg>path {
+    fill: var(--foreground);
 }
 
 input::placeholder {
-    color: var(--foreground);
-    opacity: 0.5;
+    color: var(--border);
+    font-weight: 500;
 }
 
+.invalidInput {
+    border: 2px solid var(--disturbing) !important;
+    color: var(--disturbing) !important;
+    animation: invalidShake 0.33s ease-in-out;
+}
+
+
+.invalidInput>svg>path {
+    fill: var(--disturbing);
+}
+
+
+@keyframes invalidShake {
+    25% {
+        transform: translateX(0.25rem);
+    }
+    50% {
+        transform: translateX(0rem);
+    }
+    75% {
+        transform: translateX(-0.25rem);
+    }
+    100% {
+        transform: translateX(0rem);
+    }
+}
 
 input[type="button"] {
     background-color: var(--accent);
@@ -192,13 +237,13 @@ input[type="button"]:active {
 
 
 select {
-    background-image: url(./assets/green_down-arrow.png);
-    background-blend-mode: overlay;
-    background-position: right;
-    background-repeat: no-repeat;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    cursor: pointer;
+    background-image: url(./assets/green_down-arrow.png) !important;
+    background-position: 95% !important;
+    background-repeat: no-repeat !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    cursor: pointer !important;
+    overflow: visible;
 }
 
 button, .buttonLike {
@@ -229,8 +274,14 @@ button, .buttonLike {
 
     transition: background-color, border 0.1s;
     cursor: pointer;
+
+    width: min-content;
 }
-button:hover, .buttonLike:hover {
+.buttonLike>label {
+    cursor: pointer;
+}
+
+button:hover, .buttonLike:hover:not(.disabled) {
     /* Highlight */
 
     background: var(--section);
@@ -239,14 +290,33 @@ button:hover, .buttonLike:hover {
     border: 2px solid var(--border);
 }
 
-button:focus, .buttonLike:focus {
+.invalidButtonLike:hover {
+    border-color: var(--disturbing) !important;
+    background: color-mix(
+        in srgb,
+        var(--disturbing) 25%,
+        transparent
+    ) !important;
+}
+
+.highlightButtonLike:hover {
+    background-color: var(--highlight) !important;
+}
+
+
+button:focus, .buttonLike:focus:not(.disabled) {
     outline: none;
     border: 2px solid var(--foreground);
 }
 
 
-button:active, .buttonLike:active {
+button:active, .buttonLike:active:not(.disabled) {
     filter: brightness(90%);
+}
+
+button:disabled, .buttonLike.disabled {
+    opacity: 0.5 !important;
+    cursor: default;
 }
 
 .accentedButtonLike {
@@ -254,7 +324,19 @@ button:active, .buttonLike:active {
 }
 
 .disturbingButtonLike {
-    background-color: var(--distrubing);
+    background-color: var(--disturbing);
+}
+
+.invalidButtonLike {
+    background: color-mix(
+        in srgb,
+        var(--disturbing) 25%,
+        transparent
+    )
+}
+
+.highlightButtonLike {
+    background-color: var(--highlight);
 }
 
 .successButtonLike {
@@ -293,6 +375,9 @@ button:active, .buttonLike:active {
     .main {
         padding: 0px 16px !important;
     }   
+}
+
+@media screen and (max-width: 50rem) {
     .footerContainer {
         padding: 64px 16px !important;
         grid-template: auto auto auto / auto;
@@ -313,11 +398,13 @@ button:active, .buttonLike:active {
     text-decoration: none;
 }
 
-.compactButton:hover[href] {
+.compactButton:hover[href],
+.compactButton:hover[onClick] {
     text-decoration: underline;
 }
 
-.compactButton:active[href] {
+.compactButton:active[href],
+.compactButton:active[onClick] {
     opacity: 0.9;
 }
 

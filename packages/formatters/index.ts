@@ -5,6 +5,30 @@ export function formatDownloads(downloads: number) {
     if (downloads < 1e7) return (downloads / 1e5).toFixed(1) + 'm'
 }
 
+export function prettyTimeDifference(start: number) {
+    const diff = Math.floor((Date.now() - start) / 1000);
+
+    const hours = diff / 60 / 60;
+    const days = hours / 24;
+    const weeks = days / 7
+    const months = days / 30
+    const years = days / 365
+
+    const returnFormat = (time: number, suffix: string) => `${Math.floor(time)} ${suffix}${Math.floor(time) !== 1 ? 's' : ''}`
+
+    if (years >= 1) {
+        return returnFormat(years, 'year')
+    } else if (months >= 1) {
+        return returnFormat(months, 'month')
+    } else if (weeks >= 1) {
+        return returnFormat(weeks, 'week')
+    } else if (days >= 1) {
+        return returnFormat(days, 'day')
+    } else {
+        return returnFormat(hours, 'hour')
+    }
+}
+
 
 function fixBlob(matches: RegExpExecArray, user: string, repo: string) {
     const path = matches.shift()

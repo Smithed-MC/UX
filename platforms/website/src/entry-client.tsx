@@ -1,11 +1,17 @@
-import Client from 'client'
-import React from 'react'
+import { routes } from 'client'
 import ReactDOM from 'react-dom/client'
-import ReactDOMServer from 'react-dom/server'
-import App from './App'
 import './index.css'
-import Main from './main'
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <Main/>
-)
+let router = createBrowserRouter(routes);
+
+const app = document.getElementById("app")
+if(app != null) {
+  ReactDOM.hydrateRoot(
+    app,
+    <RouterProvider router={router} />
+  );
+}

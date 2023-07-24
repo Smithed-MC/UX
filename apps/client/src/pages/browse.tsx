@@ -1,23 +1,39 @@
-import { NavBar, NavButton, PackCard, FilterButton } from "components";
+import { NavBar, NavButton, PackCard, FilterButton, IconInput, ChooseBox } from "components";
 import React, { useEffect, useRef, useState } from "react";
-import { PackBundle, PackEntry, PackVersion, SortOptions, packCategories } from "data-types"
-import PackInfo from "../widget/packInfo.js";
-import { useNavigate } from "react-router-dom";
-require('./browse.css')
-import { useFirebaseUser, useQueryParams } from "hooks";
-import { Left } from "components/svg.js";
+import { PackBundle, PackData, PackEntry, PackVersion, SortOptions, packCategories, supportedMinecraftVersions } from "data-types"
+import PackInfo, { AddToBundleModal } from "../widget/packInfo.js";
+import { useLoaderData, useNavigate } from "react-router-dom";
+import './browse.css'
+import { useAppDispatch, useAppSelector, useFirebaseUser, useQueryParams } from "hooks";
+import { Left, Browse as BrowseSvg, Plus } from "components/svg.js";
 import { coerce, compare } from "semver";
 import { getAuth } from "firebase/auth";
+import { BundlePageData } from "../loaders.js";
+import { useSelector } from "react-redux";
+import { selectSelectedBundle, selectUsersBundles, setSelectedBundle } from "store";
+import { Helmet } from "react-helmet";
+
 
 export default function Browse(props: any) {
 
-    const { search, category, bundleId, sort } = useQueryParams()
+    const { search, category, sort, version } = useQueryParams()
+
+    const selectedBundle = useAppSelector(selectSelectedBundle)
+    const bundles = useAppSelector(selectUsersBundles)
+    console.log(bundles)
+
+    const dispatch = useAppDispatch()
 
     const [categories, setCategories] = useState(new Set(category != null ? typeof category === 'string' ? [category] : category : []))
-    const [packs, setPacks] = useState<{ id: string, displayName: string }[]>([])
+    const [versions, setVersions] = useState(new Set(version != null ? typeof version === 'string' ? [version] : version : []))
+
+    const [packs, setPacks] = useState<{id: string, pack: PackData}[]>([])
     const [showWidget, setShowWidget] = useState<string | undefined>(undefined)
-    const [bundleData, setBundleData] = useState<PackBundle>()
     const [packSort, setPackSort] = useState(sort)
+
+    const [addPack, setAddPack] = useState<string|undefined>(undefined)
+
+
     const navigate = useNavigate()
     const user = useFirebaseUser()
     const rootDiv = useRef<HTMLDivElement>(null)
@@ -32,28 +48,36 @@ export default function Browse(props: any) {
         if (search != null && search !== '')
             queries.push('search=' + search)
 
-        if (bundleId != null)
-            queries.push('bundleId=' + bundleId)
-
         if (packSort != null)
             queries.push('sort=' + packSort)
 
         for (let c of categories.values())
             queries.push('category=' + c)
 
+        for (let v of versions.values())
+            queries.push('version=' + v)
+
         url += queries.join('&')
         navigate(url)
     }
 
+    const getPackData = async (id:string) => {
+        const resp = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
+        return {id, pack: await resp.json()}
+    }
+
+
     async function getPacksFromAPI() {
         const url = createUrlFromVariables();
         const response = await fetch(url)
-        const data = await response.json()
+        const data: { id: string, displayName: string }[] = await response.json()
         // const elements = document.getElementsByTagName("browsePackCard")
         // for(let e of elements) {
         //     e.remove()
         // }
-        setPacks(data)
+
+
+        setPacks(await Promise.all(data.map(d => getPackData(d.id))))
     }
 
     function createUrlFromVariables() {
@@ -68,6 +92,9 @@ export default function Browse(props: any) {
         for (let c of categories.values())
             query.push('category=' + encodeURIComponent(c as string));
 
+        for (let v of versions.values())
+            query.push('version=' + encodeURIComponent(v as string));
+
         if (packSort != null && packSort !== '')
             query.push('sort=' + packSort)
 
@@ -75,15 +102,14 @@ export default function Browse(props: any) {
         return url;
     }
 
-    async function getBundleData() {
-        const resp = await fetch(`https://api.smithed.dev/v2/bundles/${bundleId}`)
-        setBundleData(await resp.json())
-    }
+    // async function getBundleData() {
+    //     const resp = await fetch(`https://api.smithed.dev/v2/bundles/${bundleId}`)
+    //     setBundleData(await resp.json())
+    // }
 
     async function fetchData() {
         await Promise.all([
-            getPacksFromAPI(),
-            bundleId != null ? getBundleData() : undefined
+            getPacksFromAPI()
         ])
     }
 
@@ -107,7 +133,7 @@ export default function Browse(props: any) {
 
         if (data.filter(d => packs.find(p => p.id === d.id) === undefined).length === data.length) {
             updatingPacks = false;
-            setPacks(packs.concat(data))
+            setPacks(packs.concat(await Promise.all(data.map(d => getPackData(d.id)))))
         }
     }
 
@@ -116,7 +142,7 @@ export default function Browse(props: any) {
         setShowWidget(showWidget === p ? undefined : p)
     }
 
-    useEffect(() => { fetchData(); updateUrl(search) }, [search, categories.size, packSort])
+    useEffect(() => { fetchData(); updateUrl(search) }, [search, categories.size, packSort, versions.size])
 
     // return <div className="container" style={{ 
     //     height: '100%', width: '100%', 
@@ -136,73 +162,55 @@ export default function Browse(props: any) {
     // </div>
 
 
-    return <div className="container" style={{ width: '100%', boxSizing: 'border-box', height: '100%', overflow: 'hidden', justifyContent: 'safe start', gap: 32 }}>
-        <div className="container" style={{
-            position: 'absolute',
-            boxSizing: 'border-box', minHeight: 48,
-            height: 'max(3vw, 3vh)', width: '100%', flexDirection: 'row', gap: 8, justifyContent: 'left',
-            paddingLeft: 8,
-            display: bundleId != null ? 'flex' : 'none'
-        }}>
-            <a href="/account" className="button container" style={{ minHeight: 32, height: 'max(2vw, 2vh)', minWidth: 32, width: 'max(2vw, 2vh)', boxSizing: 'border-box' }}>
-                <Left style={{ fill: 'var(--text)', height: '100%', width: '100%', position: 'absolute', marginRight: 4 }} />
-            </a>
-            <h3>Back to Account</h3>
-        </div>
-        <div className={showWidget ? 'browserRootWidget' : 'browserRoot'} ref={rootDiv} style={{
-            paddingBottom: bundleId != null ? 'max(3vw, 3vh)' : ''
-        }}>
-            {!showWidget && <div className="container" style={{ width: '100%' }}>
-
-            </div>}
-            <div className="container packCardContainer" style={{ padding: 16, gap: 16, overflow: 'hidden', justifyContent: 'safe start', alignItems: 'safe center', height: '100%' }}>
-                <div className="container" style={{ width: '100%', maxWidth: 640, boxSizing: "border-box", gap: 16 }}>
-                    <div className="container" style={{flexDirection: 'row', width: '100%', gap: 16}}>
-                        <input placeholder="Search..." type="text" style={{ width: '100%' }} defaultValue={search != null ? search as string : undefined} onChange={(e) => {
-
-                            updateUrl(e.target.value.replaceAll(' ', '+'));
-
+    return <div className="container" style={{ width: '100%', boxSizing: 'border-box', height: '100%', justifyContent: 'safe start', gap: 32 }}>
+        <Helmet>
+            <title>Browse</title>
+            <meta name="description" content="Search for datapacks"/>
+        </Helmet>
+        <div className="container" style={{ gap: '1rem', width: '100%', maxWidth: '46.25rem' }}>
+            <div className="container" style={{ width: '100%', boxSizing: "border-box", gap: 16 }}>
+                <div className="container" style={{ flexDirection: 'row', width: '100%', gap: 16 }}>
+                    <IconInput icon={BrowseSvg} placeholder="Search..." type="text" style={{ width: '100%', flexGrow: 1 }} defaultValue={search != null ? search as string : undefined}
+                        onChange={(e) => {
+                            updateUrl(e.currentTarget.value.replaceAll(' ', '+'));
                         }} />
-                        Sort: <select defaultValue={(packSort as string) ?? 'downloads'} style={{ width: 'max-content', paddingRight: 24 }} onChange={(v) => {
-                            setPackSort(v.target.value)
-                        }}>
-                            {Object.keys(SortOptions).map(v => <option value={v.toLowerCase()}>{v}</option>)}
-                        </select>
-                    </div>
-                    <div className="container" style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' }}>
-                        {packCategories.map((cat) => <FilterButton onClick={() => {
-                            console.log(categories);
-                            const val = categories.has(cat)
-                            console.log(val)
-                            if (!val)
-                                categories.add(cat)
-                            else
-                                categories.delete(cat);
-                            updateUrl(search)
-                        }} >{cat}</FilterButton>)}
-                    </div>
+                    <ChooseBox placeholder="Sort" className="success" style={{ maxWidth: '13rem' }} defaultValue={(sort == null ? 'downloads' : sort) as string} choices={Object.keys(SortOptions).map(opt => ({ value: opt.toLowerCase(), content: opt }))} onChange={v => {
+                        if (typeof v === 'string')
+                            setPackSort(v)
+                    }} />
                 </div>
-                <div className="container" id="packCardContainer" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }} onScroll={(e) => onScroll(e)}>
-                    {
-                        packs.map(p => <PackCard tag="browsePackCard"
-                            key={p.id} id={p.id} state={bundleId != null ? 'add' : undefined}
-                            onClick={() => onClick(p.id)}
-                            style={{ border: p.id === showWidget ? '2px solid var(--accent)' : '' }}
-                            bundleData={bundleData}
-                            user={user}
-                        />)
-                    }
+                <div className="container" style={{ flexDirection: 'row', justifyContent: 'space-evenly', width: '100%', gap: '1rem' }}>
+                    <ChooseBox placeholder="Category" style={{ flexGrow: 1, zIndex: 2 }} defaultValue={Array.from(categories.values()).filter(c => c != null).map(c => c as string)} choices={packCategories.map(cat => { return { value: cat, content: cat } })} multiselect onChange={(v) => {
+                        setCategories(new Set(typeof v === 'string' ? [v] : v))
+                    }} />
+                    <ChooseBox placeholder="Version" style={{ flexGrow: 1, zIndex: 2 }} defaultValue={Array.from(versions.values()).filter(c => c != null).map(c => c as string)} choices={supportedMinecraftVersions.map(v => { return { value: v, content: v } })} multiselect onChange={(v) => {
+                        setVersions(new Set(typeof v === 'string' ? [v] : v))
+                    }} />
                 </div>
             </div>
-            {showWidget &&
-                <div className="container packCardContainer" style={{ padding: 16, gap: 16, overflow: 'hidden', justifyContent: 'safe start', alignItems: 'safe center', height: '100%' }}>
-                    <div className="container" style={{ gap: 16, overflowY: 'auto', overflowX: 'hidden', height: '100%', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }}>
-                        <PackInfo yOffset={window.scrollY} id={showWidget} onClose={() => setShowWidget(undefined)} fixed={true} />
-                    </div>
-                </div>}
-            {!showWidget && <div className="container" style={{ width: '100%' }}>
-
-            </div>}
+            <div className="container cardContainer" id="packCardContainer" style={{ gap: 16, boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center', flexDirection: 'column', position: 'relative' }} onScroll={(e) => onScroll(e)}>
+                {
+                    packs.map(p => <PackCard tag="browsePackCard"
+                        key={p.id} id={p.id} state={selectedBundle !== '' ? 'add' : undefined}
+                        onClick={() => onClick(p.id)}
+                        parentStyle={{zIndex: addPack === p.id ? 1 : 0}}
+                        style={{  border: p.id === showWidget ? '2px solid var(--accent)' : '' }}
+                        bundleData={bundles.find(b => b.uid === selectedBundle)}
+                        user={user}
+                        addWidget={<AddToBundleModal
+                            trigger={
+                                <div className="buttonLike" style={{ display: 'flex', backgroundColor: 'var(--highlight)' }} onClick={() => setAddPack(addPack !== p.id ? p.id : '')}>
+                                    <Plus />
+                                </div>
+                            }
+                            packData={p.pack}
+                            isOpen={addPack === p.id}
+                            close={() => setAddPack(undefined)}
+                            id={p.id}
+                        />}
+                    />)
+                }
+            </div>
         </div>
     </div>
 
