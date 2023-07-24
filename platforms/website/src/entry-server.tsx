@@ -5,6 +5,7 @@ import { StaticRouterProvider, createStaticHandler, createStaticRouter } from 'r
 import { Request as ExpressRequest } from 'express'
 import {Headers, Request} from 'node-fetch'
 import { Helmet } from 'react-helmet'
+import React from 'react'
 
 function createFetchRequest(req: ExpressRequest) {
     let origin = `${req.protocol}://${req.get("host")}`;

@@ -174,7 +174,7 @@ export default function Browse(props: any) {
                         onChange={(e) => {
                             updateUrl(e.currentTarget.value.replaceAll(' ', '+'));
                         }} />
-                    <ChooseBox placeholder="Sort" className="success" style={{ maxWidth: '13rem' }} defaultValue={(sort == null ? 'downloads' : sort) as string} choices={Object.keys(SortOptions).map(opt => ({ value: opt.toLowerCase(), content: opt }))} onChange={v => {
+                    <ChooseBox placeholder="Sort" className="success" style={{ maxWidth: '13rem', zIndex: 3 }} defaultValue={(sort == null ? 'downloads' : sort) as string} choices={Object.keys(SortOptions).map(opt => ({ value: opt.toLowerCase(), content: opt }))} onChange={v => {
                         if (typeof v === 'string')
                             setPackSort(v)
                     }} />

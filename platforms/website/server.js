@@ -124,9 +124,9 @@ async function createServer() {
 
                 const files = fs.readdirSync(distFolder + '/assets')
 
-                const links = files.filter(f => f.endsWith('.css')).map(f => `<link rel="stylesheet" href="${distFolder}/assets/${f}"/>`)
+                // const links = files.filter(f => f.endsWith('.css')).map(f => `<link rel="stylesheet" href="${distFolder}/assets/${f}"/>`)
 
-                template = template.replace('<!--link-css-->', links.join('\n'))
+                // template = template.replace('<!--link-css-->', links.join('\n'))
 
                 render = (await import('./dist/server/entry-server.js')).default
             }

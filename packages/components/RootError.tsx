@@ -5,7 +5,7 @@ export function RootError() {
     const navigate = useNavigate()
 
     console.error(error)
-    console.log(Object.keys(error))
+    // console.log(Object.keys(error))
     return <div className="container" style={{gap: 32, padding: 32, height: '100vh', justifyContent: 'start'}}>
         <h1 style={{color: 'var(--badAccent)', marginBottom: -32}}>Error</h1>
         <p style={{fontSize: '1.125rem', marginBottom: -16}}>
@@ -17,7 +17,7 @@ export function RootError() {
         <details style={{width: '100%', boxSizing: "border-box", justifySelf: 'end'}}>
             <summary>Trace</summary>
             <br/>
-            {error.stack.split('\n').map((l: string) => <label style={{paddingLeft: l.match(/(\s)+at/g) ? 32 : 0}}>{l}<br/></label>)}
+            {error.stack?.split('\n').map((l: string) => <label style={{paddingLeft: l.match(/(\s)+at/g) ? 32 : 0}}>{l}<br/></label>)}
         </details>
     </div>
 }
