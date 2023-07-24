@@ -11,6 +11,7 @@ import wiki_books from '../assets/wiki_books.png'
 import './home.css'
 
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 function SectionContainer({ children, style, className }: { children?: any, style?: React.CSSProperties, className?: string }) {
     return <div className={"container " + className} style={{ padding: 16, ...style }}>
@@ -71,7 +72,9 @@ const Divider = () => <div style={{ width: '100%', padding: '32px 0px' }}>
 
 export default function Home(props: any) {
     return <div className="container" style={{ width: '100%', boxSizing: 'border-box', justifyContent: 'safe start', gap: 32, paddingBottom: 80 }}>
-
+        <Helmet>
+            <meta name="description" content="Datapacks: the community, the tooling; all bundled into the perfect package"/>
+        </Helmet>
         <div className="cardCarousel">
             <CategoryHeader icon={Download} text={"Top downloads"} color="success" />
             <PackCard id="tcc" style={{border: '2px solid var(--border)'}}/>
