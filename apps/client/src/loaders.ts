@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs } from "react-router-dom"
 import * as querystring from 'query-string'
 import { getAuth } from "firebase/auth"
-import { PackBundle } from "data-types"
+import { PackBundle, PackData, SortOptions } from "data-types"
 
 async function getUserData(id: string) {
     const userDataResponse = await fetch(`https://api.smithed.dev/v2/users/${id}`)
@@ -22,9 +22,14 @@ async function getBundles(id: string) {
     return bundleIds
 }
 
-async function getBundleData(id: string): Promise<PackBundle|undefined> {
+async function getBundleData(id: string): Promise<PackBundle | undefined> {
     const bundleDataResponse = await fetch(`https://api.smithed.dev/v2/bundles/${id}`)
     return bundleDataResponse.ok ? await bundleDataResponse.json() : undefined
+}
+
+async function getPackData(id: string): Promise<{ id: string, pack: PackData }> {
+    const packDataResponse = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
+    return { id: id, pack: await packDataResponse.json() }
 }
 
 async function getDownloads(id: string, packs: string[]) {
@@ -47,7 +52,7 @@ async function getDownloads(id: string, packs: string[]) {
     return [total, daily]
 }
 
-export async function loadUserPageData({params}: any) {
+export async function loadUserPageData({ params }: any) {
     const id: string = params.owner
 
 
@@ -62,10 +67,41 @@ export async function loadUserPageData({params}: any) {
         dailyDownloads: dailyDownloads
     }
 
-    return {user, userStats}
+    return { user, userStats }
 }
 
 
-export interface BundlePageData {
-    bundles: PackBundle[]
+export interface HomePageData {
+    trendingPacks: { id: string, pack: PackData }[],
+    downloadedPacks: { id: string, pack: PackData }[],
+    newestPacks: { id: string, pack: PackData }[]
+}
+
+async function getTopPacksBySort(sort: SortOptions): Promise<{ id: string; displayName: string }[]> {
+    const resp = await fetch(`https://api.smithed.dev/v2/packs?sort=${sort.toLowerCase()}`)
+    return await resp.json()
+}
+
+export async function loadHomePageData(): Promise<HomePageData> {
+    let downloadedPackIds = await getTopPacksBySort(SortOptions.Downloads)
+    let newestPackIds = await getTopPacksBySort(SortOptions.Newest)
+    let trendingPackIds = await getTopPacksBySort(SortOptions.Trending)
+
+    newestPackIds = newestPackIds
+        .filter(np =>
+            !downloadedPackIds.find(dp => dp.id === np.id) &&
+            !trendingPackIds.find(dp => dp.id === np.id))
+        .slice(0, 5)
+    trendingPackIds = trendingPackIds
+        .filter(np =>
+            !downloadedPackIds.find(dp => dp.id === np.id) &&
+            !newestPackIds.find(dp => dp.id === np.id))
+        .slice(0, 5)
+    downloadedPackIds = downloadedPackIds.slice(0, 5)
+
+    return {
+        newestPacks: await Promise.all(newestPackIds.map(p => getPackData(p.id))),
+        downloadedPacks: await Promise.all(downloadedPackIds.map(p => getPackData(p.id))),
+        trendingPacks: await Promise.all(trendingPackIds.map(p => getPackData(p.id)))
+    }
 }

@@ -29,7 +29,7 @@ interface PackCardProps {
 }
 
 export default function PackCard({ id, packData, onClick, state, style, parentStyle, bundleData, user, addWidget, ...props }: PackCardProps) {
-    const [data, setData] = useState<PackData>()
+    const [data, setData] = useState<PackData|undefined>(packData)
     const [metaData, setMetaData] = useState<PackMetaData>()
     const [fallback, setFallback] = useState(false)
     const [author, setAuthor] = useState('')
@@ -112,10 +112,10 @@ export default function PackCard({ id, packData, onClick, state, style, parentSt
 
     useEffect(() => { onLoad(); }, [id])
 
-    if (data === undefined || (data.display.hidden && match))
+    if (data === undefined )
         return <div style={{ ...style }} />
 
-    if (!loaded) return <div className="packCard" style={{ ...style }} {...props}>
+    if (!data || (data.display.hidden && match)) return <div className="packCard" style={{ ...style }} {...props}>
         <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%' }}>
             <div style={{ display: 'block', width: 32, height: 32, backgroundColor: 'var(--section)', borderRadius: 'var(--defaultBorderRadius)', overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
                 <div className='packCardImage' />
@@ -134,7 +134,7 @@ export default function PackCard({ id, packData, onClick, state, style, parentSt
         }} style={{ ...style }} {...props}>
             <div className='container packCardDetails'>
                 {!fallback && <img className="packCardImage" src={data.display.icon} onError={() => setFallback(true)} />}
-                {fallback && <div className='container packCardImage' style={{ fontSize: '4rem' }}>?</div>}
+                {fallback && <div className='container packCardImage'><QuestionMark/></div>}
                 <label className='packCardName' style={{ fontWeight: 700 }}>{data.display.name}</label>
                 <p className='packCardDescription'>{data.display.description}</p>
             </div>

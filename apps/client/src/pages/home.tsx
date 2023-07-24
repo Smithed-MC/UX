@@ -10,8 +10,9 @@ import wiki_books from '../assets/wiki_books.png'
 
 import './home.css'
 
-import { useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { HomePageData } from "../loaders";
 
 function SectionContainer({ children, style, className }: { children?: any, style?: React.CSSProperties, className?: string }) {
     return <div className={"container " + className} style={{ padding: 16, ...style }}>
@@ -70,18 +71,40 @@ const Divider = () => <div style={{ width: '100%', padding: '32px 0px' }}>
     <div style={{ width: '100%', height: 4, backgroundColor: 'var(--border)' }} />
 </div>
 
+const SLIDE_TIME = 3000
+const TRANSITION_INTERVAL = 12 * 1000
+
 export default function Home(props: any) {
+    const {newestPacks, trendingPacks, downloadedPacks} = useLoaderData() as HomePageData
+    const [currentPack, setCurrentPack] = useState(0)
+    const [inAnimation, setInAnimation] = useState(true)
+
+    useEffect(() => {
+        const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+        const interval = setInterval(async () => {
+            setInAnimation(false)
+            await sleep(SLIDE_TIME - 50)
+            setInAnimation(true)
+            setCurrentPack(value => (value + 1) % 5)
+            console.log(currentPack)
+        }, TRANSITION_INTERVAL)
+        return () => clearInterval(interval)
+    }, [])
+
+    const packCard = (pack: {id: string, pack: PackData}) => <PackCard id={pack.id} packData={pack.pack} style={{
+        border: '2px solid var(--border)', animation: `packShowcaseSlide${inAnimation ? 'In' : 'Out'} ${SLIDE_TIME/1000}s cubic-bezier(0.65, 0, 0.35, 1)`}}/>
+
     return <div className="container" style={{ width: '100%', boxSizing: 'border-box', justifyContent: 'safe start', gap: 32, paddingBottom: 80 }}>
         <Helmet>
             <meta name="description" content="Datapacks: the community, the tooling; all bundled into the perfect package"/>
         </Helmet>
         <div className="cardCarousel">
             <CategoryHeader icon={Download} text={"Top downloads"} color="success" />
-            <PackCard id="tcc" style={{border: '2px solid var(--border)'}}/>
+            {packCard(downloadedPacks[currentPack])}
             <CategoryHeader icon={Globe} text={"Trending today"} color="warning" />
-            <PackCard id="tcc" style={{border: '2px solid var(--border)'}}/>
+            {packCard(trendingPacks[currentPack])}
             <CategoryHeader icon={Clock} text={"Recently added"} color="secondary" />
-            <PackCard id="tcc" style={{border: '2px solid var(--border)'}}/>
+            {packCard(newestPacks[currentPack])}
         </div>
 
         <div className="container homeSectionContainer">

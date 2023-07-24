@@ -370,11 +370,21 @@ button:disabled, .buttonLike.disabled {
     align-items: start;
 }
 
+a {
+    color: var(--accent2)
+}
+
+a:hover[href] {
+    opacity: 0.85;
+}
 
 @media screen and (max-width: 70rem) { 
     .main {
         padding: 0px 16px !important;
     }   
+    .outlet {
+        padding: 0px 16px !important;
+    }
 }
 
 @media screen and (max-width: 50rem) {

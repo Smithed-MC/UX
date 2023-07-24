@@ -53,3 +53,24 @@
         align-items: center;
     }
 }
+
+@keyframes packShowcaseSlideIn {
+    0% {
+        margin-left: -80vw;
+        opacity: 0;
+    }
+    100% {
+        margin-left: 0;
+        opacity: 1;
+    }
+}
+
+@keyframes packShowcaseSlideOut {
+    0% {
+        margin-left: 0;
+    }
+    100% {
+        margin-left: 80vw;
+        opacity: 0;
+    }
+}

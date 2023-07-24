@@ -31,6 +31,7 @@
 .packCardDescription {
     line-height: 20px;
     -webkit-line-clamp: 2;
+    height: 40px;
     margin: 0;
     max-height: 40;
     text-overflow: ellipsis;
