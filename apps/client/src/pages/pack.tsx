@@ -30,9 +30,13 @@ async function getOwner(id: string) {
 
 async function getFullview(packData?: PackData) {
     if (packData !== undefined && packData.display.webPage !== undefined) {
-        const response = await fetch(packData.display.webPage)
-        if (response.ok) {
-            return await response.text()
+        try {
+            const response = await fetch(packData.display.webPage)
+            if (response.ok) {
+                return await response.text()
+            }
+        } catch {
+            return ''
         }
     } 
     return ''
