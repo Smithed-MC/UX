@@ -95,7 +95,9 @@ API_APP.route({
 
         const requestIdentifier = 'GET-USER-PFP::' + id
         const tryCachedResult = await get(requestIdentifier)
+        
         if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
+            reply.header('Content-Type', 'image/png')
             console.log('served cached /users/', id)
             return tryCachedResult.item
         }
@@ -113,7 +115,6 @@ API_APP.route({
         const data = Buffer.from(pfp.split(',')[1], 'base64')
 
         await set(requestIdentifier, data, 60 * 60 * 1000)
-
         reply.header('Content-Type', 'image/png')
         return data
     }
