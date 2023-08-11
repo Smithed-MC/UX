@@ -5,7 +5,7 @@ import express from 'express'
 import { createServer as createViteServer } from 'vite'
 import fetch from 'node-fetch'
 import dotenv from 'dotenv'
-
+import {generateSitemap} from './generate-sitemap.js'
 dotenv.config()
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -83,6 +83,8 @@ const isProd = process.env.NODE_ENV === 'production'
 globalThis.fetch = fetch
 
 async function createServer() {
+    await generateSitemap(distFolder)
+
     const app = express()
 
     let vite
@@ -102,6 +104,7 @@ async function createServer() {
         app.use(express.static(distFolder))
     }
     
+
     app.use('*', async (req, res, next) => {
         const url = req.originalUrl
         try {
