@@ -101,8 +101,8 @@ async function createServer() {
         // express router (express.Router()), you should use router.use
         app.use(vite.middlewares)
     } else {
-        app.get('/sitemap.xml', (req, res) => {
-            res.setHeader("Content-Type", "text/xml")
+        app.get('/sitemap.xml', (req, res, next) => {
+            res.setHeader("Content-Type", "application/xml")
             res.send(fs.readFileSync(path.resolve(distFolder, "sitemap.xml")))
         })
         app.use(express.static(distFolder))
@@ -111,6 +111,11 @@ async function createServer() {
 
     app.use('*', async (req, res, next) => {
         const url = req.originalUrl
+
+        if(url === '/favicon.ico')
+            return
+
+
         try {
             let template, render
 
