@@ -101,6 +101,10 @@ async function createServer() {
         // express router (express.Router()), you should use router.use
         app.use(vite.middlewares)
     } else {
+        app.get('/sitemap.xml', (req, res) => {
+            res.setHeader("Content-Type", "text/xml")
+            res.send(fs.readFileSync(path.resolve(distFolder, "sitemap.xml")))
+        })
         app.use(express.static(distFolder))
     }
     
