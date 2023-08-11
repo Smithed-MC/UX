@@ -73,6 +73,7 @@ export default function Packs() {
             <title>{packData.display.name}</title>
             <meta name="description" content={packData.display.description}/>
             <meta name="og:image" content={packData.display.icon}/>
+            <meta name="og:site_name" content="Smithed" />
         </Helmet>
         <div className="container" style={{ gap: 16, height: '100%', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }}>
                 <PackInfo yOffset={/*window.scrollY*/0} id={id ?? ''} fixed={false} onClose={() => {}}/>

@@ -89,7 +89,7 @@ export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onC
         </div>
         <div className={`chooseBoxOptionsWrapper ${open ? 'open' : ''}`}>
             <div className={`chooseBoxOptions ${open ? 'open' : ''}`}>
-                {choices.map(c => <div onMouseDown={(e) => clickOption(e, c.value)} className="chooseBoxOption">
+                {choices.map(c => <div key={c.value} onMouseDown={(e) => clickOption(e, c.value)} className="chooseBoxOption">
                     {c.content}
                     {(multiselect ? value.includes(c.value) : value === c.value) && (multiselect ?<Check/> : <svg xmlns="http://www.w3.org/2000/svg" width="9" height="8" viewBox="0 0 9 8" fill="none">
                         <circle cx="4.5" cy="4" r="4" fill="#FFF8F0" />

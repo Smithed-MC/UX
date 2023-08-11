@@ -19,7 +19,7 @@ import { setSelectedBundle } from 'store'
 interface UserStats {
     totalDownloads: number,
     dailyDownloads: number
-    packs: string[],
+    packs: { id: string, pack: PackData }[],
     bundles: string[],
     id: string,
 }
@@ -152,11 +152,11 @@ function CreateBundleModal({ user, showModal, addPack }: { user: FirebaseUser | 
     const close = () => {
         showModal(false)
     }
-    
+
 
     return <div className="container" style={{ position: 'fixed', width: '100%', height: '100%', top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 50%)', animation: 'fadeInBackground 0.5s' }}>
         <div className='container' style={{ backgroundColor: 'var(--background)', border: '2px solid var(--border)', boxSizing: 'border-box', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 0.5s ease-in-out' }}>
-            <CreateBundle close={close} finish={close} showCloseButton showEditButton/>
+            <CreateBundle close={close} finish={close} showCloseButton showEditButton />
         </div>
     </div>
 }
@@ -189,11 +189,21 @@ export default function User() {
         </div>
     }
 
+    let pageDescription = `Check out ${user?.displayName}'s page!`
+    if (userStats.packs.length >= 1)
+        pageDescription +=
+            ` They've published ${userStats.packs.length} pack`
+            + (userStats.packs.length != 1 ? 's' : '')
+            + '!'
+
+
     if (userStats === undefined) return <div></div>
     return <div className='container' style={{ width: '100%', boxSizing: 'border-box', height: '100%', overflowY: 'auto', overflowX: 'hidden', justifyContent: 'safe start' }}>
         <Helmet>
+            <meta name="og:site_name" content="Smithed" />
             <title>{user?.displayName}</title>
-            <meta name="description" content="User page" />
+            <meta name="description" content={pageDescription} />
+            {user.pfp && <meta name="og:image" content={`https://api.smithed.dev/v2/users/${user.uid}/pfp`}/>}
         </Helmet>
         <div className='container userContentRoot' style={{ gap: '4rem', boxSizing: 'border-box', maxWidth: '46.25rem' }}>
             <div className='flexDirection' style={{ width: '100%', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', gap: 16, boxSizing: 'border-box' }}>
@@ -287,7 +297,7 @@ export default function User() {
                     <div style={{ flexGrow: 1 }} />
                     {editable && <a className='compactButton' href="/edit?new=true">+ New</a>}
                 </div>
-                {userStats?.packs.map(p => <PackCard state={editable ? 'editable' : undefined} id={p} onClick={() => { navigate(`../packs/${p}`) }} />)}
+                {userStats?.packs.map(p => <PackCard state={editable ? 'editable' : undefined} id={p.id} packData={p.pack} onClick={() => { navigate(`../packs/${p}`) }} />)}
             </div>}
             {userStats.bundles.length > 0 && <div className='container' style={{ width: '100%', gap: '1rem' }}>
                 <div className='container' style={{ flexDirection: 'row', justifyContent: 'start', gap: '0.5rem', width: '100%' }}>

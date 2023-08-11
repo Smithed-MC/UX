@@ -172,6 +172,7 @@ function Selection({ values, onChange, defaultValue }: { values: string[], onCha
 
     const updateIndex = (index: number) => {
         setIndex(index)
+
         if (onChange) onChange(index)
     }
 
@@ -189,7 +190,7 @@ function Selection({ values, onChange, defaultValue }: { values: string[], onCha
         <button className='buttonLike' onClick={cycleLeft} disabled={values.length <= 1}>
             <Right style={{ transform: 'scale(-100%, -100%)' }} />
         </button>
-        <ChooseBox style={{ flexGrow: 1 , zIndex: 10}} defaultValue={index.toString()} choices={values.map((v, i) => ({value: i.toString(), content: v}))} onChange={(e) => { updateIndex(Number.parseInt(e as string)) }}/>
+        <ChooseBox style={{ flexGrow: 1, zIndex: 10 }} defaultValue={index.toString()} choices={values.map((v, i) => ({ value: i.toString(), content: v }))} onChange={(e) => { updateIndex(Number.parseInt(e as string)) }} />
         <button className='buttonLike' onClick={cycleRight} disabled={values.length <= 1}>
             <Right />
         </button>
@@ -309,12 +310,12 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
 
             const metaData = await (await fetch(`https://api.smithed.dev/v2/packs/${d.id}/meta`)).json()
 
-            elements.push(<div className='container' style={{ flexDirection: 'row', width: '100%', gap: '0.5rem'}}>
+            elements.push(<div className='container' style={{ flexDirection: 'row', width: '100%', gap: '0.5rem' }}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
                     <circle cx="2" cy="2" r="2" fill="var(--foreground)" />
                 </svg>
                 <label key={"id" + d.id + d.version}>{metaData.rawId} v{d.version}</label>
-                <div style={{flexGrow: 1}}/>
+                <div style={{ flexGrow: 1 }} />
                 <button key={"btn" + d.id + d.version} className='buttonLike invalidButtonLike' onClick={() => {
                     dependencies.splice(i, 1)
                     onRemoveDependency()
@@ -421,7 +422,7 @@ function SavingModal({ state, changeState }: { state: SavingState, changeState: 
                 <Spinner />
             </div>}
             {state.mode === 'saved' && <div>
-                <label style={{ margin: 0, fontSize: '2rem', color: 'var(--goodAccent)' }}>Pack saved!</label>
+                <label style={{ margin: 0, fontSize: '2rem', color: 'var(--success)' }}>Pack saved!</label>
             </div>}
             {state.mode === 'error' && <div className='container' style={{ alignItems: 'center', height: '100%' }}>
                 <h3 style={{ margin: 0, width: '100%', textAlign: 'center' }}>An error occured</h3>
@@ -505,100 +506,103 @@ export default function Edit() {
     </div>
 
     const updateVersions = () => { setVersions(Object.create(packData.versions)) }
-    return <div className="container" style={{ width: '100%', height: '100%', flexDirection: 'row', alignItems: 'start', justifyContent: 'center', boxSizing: 'border-box' }}>
-        <div className='editorContainer'>
-            <div className='container' style={{ width: '100%', gap: '2.5rem', alignItems: 'start' }}>
-                <h1 style={{ fontSize: '2rem', marginBottom: '-1rem' }}>Basic information</h1>
-                <StringInput reference={packData} attr={'id'} disabled={!isNew} svg={Star}
-                    description='Unique ID that others can reference your pack by' />
-                <StringInput reference={packData.display} attr={'name'} svg={Jigsaw}
-                    description='Name of the pack' />
-                <StringInput reference={packData.display} attr={'description'} svg={TextSvg}
-                    description='Short description of the pack' />
-                <ImageURLInput description='URL to the icon of the pack' reference={packData.display} attr={'icon'} width={64} height={64} placeholder='icon_url' svg={At} />
-                <MarkdownURLInput description='URL to the ReadME of the pack' reference={packData.display} attr={'webPage'} placeholder='web_page' />
-                <DropdownSelectionInput description='Choose categories that fit your pack' reference={packData} attr={'categories'} placeholder={'Categories'} options={packCategories} onChange={() => { setCategories(Object.create(packData.categories)) }} />
-            </div>
-            <div style={{ height: '0.25rem', background: 'var(--highlight)', width: '100%' }} />
-            <div className='container' style={{ width: '100%', gap: '1.5rem' }}>
-                <div className='container' style={{ flexDirection: 'row', marginBottom: '-1rem', justifyContent: 'space-between', width: '100%' }}>
-                    <h1 style={{ fontSize: '2rem' }}>Versions</h1>
-                    <NewVersion data={packData.versions} onAddVersion={() => {
-                        setVersions(Object.create(packData.versions));
-                        setSelectedVersion(packData.versions.length - 1)
-                    }} />
-                </div>
-                {versions.length != 0 && <EditorDiv style={{ flexDirection: 'row' }}>
-                    <Selection values={versions.map(v => v.name)} onChange={setSelectedVersion} defaultValue={selectedVersion} />
-                </EditorDiv>}
-                <EditorDiv style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-                    {/* {versions.length > 1 && <button className='buttonLike invalidButtonLike' onClick={() => {
-                        if (deleteButtonRef.current == null) return
+    const savePack = async () => {
+        console.log(packData)
 
-                        if (deleteConfirmation === 0) {
-                            deleteConfirmation = 1;
-                            deleteButtonRef.current.hidden = false
-                        } else {
-                            packData.versions.splice(selectedVersion, 1)
-                            if (selectedVersion >= packData.versions.length)
-                                setSelectedVersion(packData.versions.length - 1)
-                            updateVersions()
-                            deleteConfirmation = 0;
-                            deleteButtonRef.current.hidden = true
-                        }
-                    }} onMouseLeave={() => {
-                        deleteConfirmation = 0;
-                        if (deleteButtonRef.current != null) {
-                            deleteButtonRef.current.hidden = true
-                        }
-                    }}>
-                        <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                            <Trash fill="var(--disturbing)" />
-                            <label ref={deleteButtonRef} style={{ position: 'absolute', marginTop: -84, zIndex: 10, background: 'color-mix(in srgb, var(--disturbing) 20%, var(--section))', border: '2px solid var(--disturbing)', padding: 8, borderRadius: 'var(--defaultBorderRadius)', animation: 'fadeIn 0.25s ease-in-out', width: 'max-content', fontSize: '1rem' }} hidden>{'Press again to confirm'}</label>
-                        </div>
-                    </button>} */}
-                    {versions.length > 0 && <div className='container' style={{ width: '100%', gap: '1.5rem' }}>
-                        <DownloadURLInput reference={packData.versions[selectedVersion]?.downloads} attr='datapack' placeholder='datapack_url' description='Raw URL to the download for the datapack' />
-                        <DownloadURLInput reference={packData.versions[selectedVersion]?.downloads} attr='resourcepack' placeholder='resourcepack_url' description='Raw URL to the download for the resourcepack' />
-                        <DropdownSelectionInput reference={packData.versions[selectedVersion]} attr='supports' placeholder='Supports' description='Supported Minecraft Versions' options={mcVersions} onChange={() => {
-                            const s = packData.versions[selectedVersion].supports
-                            s.sort((a, b) => compare(coerce(a) ?? '', coerce(b) ?? ''))
-                            setSupportedVersions(Object.create(s))
-                        }} />
-                        <NewDependency dependencies={versions[selectedVersion].dependencies} onAddDependency={updateVersions} />
-                        <RenderDependencies dependencies={versions[selectedVersion].dependencies} onRemoveDependency={updateVersions} />
-                    </div>}
-                </EditorDiv>
+        setSavingState({ mode: 'saving' })
+
+
+        if (!isNew) {
+            var resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}?token=${await user.getIdToken()}`, { method: 'PATCH', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
+        } else {
+            var resp = await fetch(`https://api.smithed.dev/v2/packs?token=${await user.getIdToken()}&id=${packData.id}`, {
+                method: 'POST', body: JSON.stringify({ data: packData }), headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+        }
+
+        if (resp.status !== HTTPResponses.OK && resp.status !== HTTPResponses.CREATED) {
+            const error = await resp.json()
+
+            setSavingState({ mode: 'error', error: error })
+        } else {
+            setSavingState({ mode: 'saved' })
+        }
+    }
+    const Divider = () => <div style={{ height: '0.25rem', background: 'var(--highlight)', width: '100%' }} />
+
+
+    const NavigatorColumn = () => <div className='container' style={{ width: '100%', alignItems: 'end', justifyContent: 'start' }}>
+        {/* <div className='container' style={{position: 'fixed', alignItems: 'start', paddingRight: '4rem'}}>
+            <a>Basic Information</a>
+            <a>Versions</a>
+            <a>Pack Controls</a>
+        </div> */}
+    </div>
+
+    const CenterColumn = () => <div className='editorContainer'>
+        <div className='container' style={{ width: '100%', gap: '2.5rem', alignItems: 'start' }}>
+            <h1 style={{ fontSize: '2rem', marginBottom: '-1rem' }}>Basic information</h1>
+            <StringInput reference={packData} attr={'id'} disabled={!isNew} svg={Star}
+                description='Unique ID that others can reference your pack by' />
+            <div className='container' style={{ width: '100%', flexDirection: 'column', gap: 8, alignItems: 'start' }}>
+
+                <ChooseBox placeholder='Visibility' choices={[
+                    { content: 'Public', value: 'false' },
+                    { content: 'Unlisted', value: 'true' }]
+                } onChange={(v) => packData.display.hidden = v === 'true' ? true : false} defaultValue={packData.display.hidden ? 'true' : 'false'} />
+                <span style={{ color: 'var(--border)' }}>How should the pack appear in browse</span>
             </div>
-        </div >
-        <div className='container' style={{ flexDirection: 'row', position: 'fixed', bottom: 16, right: 16, justifySelf: 'center', backgroundColor: 'var(--section)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, gap: 16, border: '2px solid var(--border)', boxSizing: 'border-box' }}>
+            <StringInput reference={packData.display} attr={'name'} svg={Jigsaw}
+                description='Name of the pack' />
+            <StringInput reference={packData.display} attr={'description'} svg={TextSvg}
+                description='Short description of the pack' />
+            <ImageURLInput description='URL to the icon of the pack' reference={packData.display} attr={'icon'} width={64} height={64} placeholder='icon_url' svg={At} />
+            <MarkdownURLInput description='URL to the ReadME of the pack' reference={packData.display} attr={'webPage'} placeholder='web_page' />
+            <DropdownSelectionInput description='Choose categories that fit your pack' reference={packData} attr={'categories'} placeholder={'Categories'} options={packCategories} onChange={() => { setCategories(Object.create(packData.categories)) }} />
+        </div>
+        <Divider />
+        <div className='container' style={{ width: '100%', gap: '1.5rem' }}>
+            <div className='container' style={{ flexDirection: 'row', marginBottom: '-1rem', justifyContent: 'space-between', width: '100%' }}>
+                <h1 style={{ fontSize: '2rem' }}>Versions</h1>
+                <NewVersion data={packData.versions} onAddVersion={() => {
+                    setVersions(Object.create(packData.versions));
+                    setSelectedVersion(packData.versions.length - 1)
+                }} />
+            </div>
+            {versions.length != 0 && <EditorDiv style={{ flexDirection: 'row' }}>
+                <Selection values={versions.map(v => v.name)} onChange={setSelectedVersion} defaultValue={selectedVersion} />
+            </EditorDiv>}
+            <EditorDiv style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+                {versions.length > 0 && <div className='container' style={{ width: '100%', gap: '1.5rem' }}>
+                    <DownloadURLInput reference={packData.versions[selectedVersion]?.downloads} attr='datapack' placeholder='datapack_url' description='Raw URL to the download for the datapack' />
+                    <DownloadURLInput reference={packData.versions[selectedVersion]?.downloads} attr='resourcepack' placeholder='resourcepack_url' description='Raw URL to the download for the resourcepack' />
+                    <DropdownSelectionInput reference={packData.versions[selectedVersion]} attr='supports' placeholder='Supports' description='Supported Minecraft Versions' options={mcVersions} onChange={() => {
+                        const s = packData.versions[selectedVersion].supports
+                        s.sort((a, b) => compare(coerce(a) ?? '', coerce(b) ?? ''))
+                        setSupportedVersions(Object.create(s))
+                    }} />
+                    <NewDependency dependencies={versions[selectedVersion].dependencies} onAddDependency={updateVersions} />
+                    <RenderDependencies dependencies={versions[selectedVersion].dependencies} onRemoveDependency={updateVersions} />
+                </div>}
+            </EditorDiv>
+        </div>
+        <Divider />
+        <div className='container' style={{ flexDirection: 'row', width: '100%', gap: '1rem' }}>
             <IconTextButton className='buttonLike invalidButtonLike' text='Cancel' icon={Cross} onClick={() => {
                 navigate(-1)
-            }}/>
-            <IconTextButton className='buttonLike successButtonLike' text='Save' icon={Check} onClick={async () => {
-                console.log(packData)
+            }} />
+            <IconTextButton className='buttonLike successButtonLike' text='Save' icon={Check} onClick={savePack} />
+        </div>
+    </div >
 
-                setSavingState({ mode: 'saving' })
 
 
-                if (!isNew) {
-                    var resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}?token=${await user.getIdToken()}`, { method: 'PATCH', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
-                } else {
-                    var resp = await fetch(`https://api.smithed.dev/v2/packs?token=${await user.getIdToken()}&id=${packData.id}`, {
-                        method: 'POST', body: JSON.stringify({ data: packData }), headers: {
-                            "Content-Type": "application/json"
-                        }
-                    })
-                }
-
-                if (resp.status !== HTTPResponses.OK && resp.status !== HTTPResponses.CREATED) {
-                    const error = await resp.json()
-
-                    setSavingState({ mode: 'error', error: error })
-                } else {
-                    setSavingState({ mode: 'saved' })
-                }
-            }}/>
+    return <div className="container" style={{ width: '100%', height: '100%', flexDirection: 'row', alignItems: 'start', justifyContent: 'center', boxSizing: 'border-box' }}>
+        <div className='editorOrganizer'>
+            <NavigatorColumn />
+            <CenterColumn />
         </div>
         <SavingModal state={savingState} changeState={setSavingState} />
     </div >
