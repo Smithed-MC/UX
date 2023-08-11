@@ -8,7 +8,7 @@ interface IconTextButtonProps {
 }
 
 export function IconTextButton({text, icon: IconSvg, iconElement, reverse, href, style, ...props}: IconTextButtonProps & any ) {
-    return <a className={`buttonLike${props.disabled ? ' disabled' : ''} ` + props.className} style={{flexDirection: reverse ? 'row-reverse' : 'row', ...style}} href={href} onClick={props.onClick}>
+    return <a className={`buttonLike${props.disabled ? ' disabled' : ''} ` + props.className} style={{flexDirection: reverse ? 'row-reverse' : 'row', ...style}} href={href} onClick={props.onClick} rel={props.rel}>
         {IconSvg !== undefined && typeof(IconSvg) === 'string' && IconSvg}
         {IconSvg !== undefined && typeof(IconSvg) !== 'string' && <IconSvg/>}
         {iconElement !== undefined && iconElement}

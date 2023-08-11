@@ -15,7 +15,7 @@ export default function Download({style, packData, id, ...props}: DownloadProps)
     console.log(versions)
     return <div className="downloadRoot" {...props} style={{animation: 'pullIn 1s', gap: 16, width: '100%', boxSizing: 'border-box', maxWidth: 320, ...style}}>
         <label style={{fontSize: '2rem', textDecoration: 'underline'}}>Downloads</label>
-        <a className="button downloadButton" style={{fontSize: '1rem', maxWidth: 196, width: '100%'}} href={`https://api.smithed.dev/v2/download?pack=${id}`}>Download Latest</a>
+        <a className="button downloadButton" style={{fontSize: '1rem', maxWidth: 196, width: '100%'}} rel="nofollow" href={`https://api.smithed.dev/v2/download?pack=${id}`}>Download Latest</a>
         <div className="container" style={{width: '100%', gap: 16, flexDirection: 'column-reverse'}}>
             {versions.map(v => <PackVersionDownload key={v.name} version={v} packId={id}/>)}
         </div>

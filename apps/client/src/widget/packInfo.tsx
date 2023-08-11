@@ -297,7 +297,7 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
                     id={id}
                 />
                 <div className="container" style={{ gap: '0.5rem' }}>
-                    <IconTextButton className="accentedButtonLike" iconElement={<Download fill="var(--foreground)" />} text={"Download"} reverse href={`https://api.smithed.dev/v2/download?pack=${id}`} />
+                    <IconTextButton className="accentedButtonLike" iconElement={<Download fill="var(--foreground)" />} text={"Download"} reverse href={`https://api.smithed.dev/v2/download?pack=${id}`} rel="nofollow"/>
                     <label style={{ color: 'var(--border)' }}>{(() => {
                         const version = packData?.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? '')).at(-1)
 
@@ -312,7 +312,7 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
                 {packData?.display.urls?.discord && <IconTextButton className={"packInfoMediaButton"} icon={Discord} text={"Join discord"} href={packData?.display.urls?.discord} />}
                 {packData?.display.urls?.source && <IconTextButton className={"packInfoMediaButton"} iconElement={<Globe fill="var(--foreground)" />} text={"Official website"} href={packData?.display.urls?.homepage} />}
                 {packData?.display.urls?.source && <IconTextButton className={"packInfoMediaButton"} icon={Github} text={"Source code"} href={packData?.display.urls?.source} />}
-                <IconTextButton className="accentedButtonLike packInfoSmallDownload packInfoMediaButton" iconElement={<Download fill="var(--foreground)" />} text={"Download"} href={`https://api.smithed.dev/v2/download?pack=${id}`} />
+                <IconTextButton className="accentedButtonLike packInfoSmallDownload packInfoMediaButton" iconElement={<Download fill="var(--foreground)" />} text={"Download"} href={`https://api.smithed.dev/v2/download?pack=${id}`} rel="nofollow"/>
 
             </div>
         </div>
