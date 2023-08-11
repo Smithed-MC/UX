@@ -115,6 +115,7 @@ async function createServer() {
         if(url === '/favicon.ico')
             return
 
+        console.log(url)
 
         try {
             let template, render
