@@ -1,4 +1,4 @@
-import { Type } from "@sinclair/typebox";
+import { Static, Type } from "@sinclair/typebox";
 import { API_APP, get, sendError, set } from "../../../app.js";
 import { getFirestore } from "firebase-admin/firestore";
 import { HTTPResponses, PackDataSchema, PackMetaData } from "data-types";
@@ -49,10 +49,17 @@ API_APP.route({
     }
 })
 
+const PartialPackDataSchema = Type.Partial(Type.Object({
+    ...PackDataSchema.properties,
+    display: Type.Partial(PackDataSchema.properties.display)
+}))
+type PartialPackData = Static<typeof PartialPackDataSchema>
+
 const setPack = async (response: any, reply: any) => {
     const { id: packId } = response.params;
     const { token } = response.query
-    const { data: packData } = response.body;
+
+    const { data: packData }: { data: PartialPackData } = response.body;
 
     const userId = await getUIDFromToken(token)
     if(userId === undefined)
@@ -66,7 +73,15 @@ const setPack = async (response: any, reply: any) => {
     if(!(await doc.get('contributors')).includes(userId))
         return sendError(reply, HTTPResponses.FORBIDDEN, `You are not a contributor for ${packId}`)
 
-    
+    if(packData.versions && packData.versions.length > (await doc.get('data.versions')).length) {
+        await doc.ref.set({
+            stats: {
+                updated: Date.now()
+            }
+        }, {merge: true})
+    }
+        
+
     const requestIdentifier = 'GET-PACK::' + packId
     await set(requestIdentifier, undefined, 1)        
     
@@ -191,6 +206,40 @@ API_APP.route({
     }
 })
 
+/*
+ * @route GET /packs/:id/contributors
+ * Get a list of contributors to a pack
+ * 
+ * @param id
+ * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
+ * 
+ * @return OK: string
+ * @return NOT_FOUND: ApiError
+ *  
+ * @example Set a packs's data
+ * fetch('https://api.smithed.dev/v2/packs/coc/contributors')
+ */
+API_APP.route({
+    method: 'GET',
+    url: '/packs/:id/contributors',
+    schema: {
+        params: Type.Object({
+            id: Type.String()
+        })
+    },
+    handler: async (response, reply) => {
+        const { id: packId } = response.params;
+    
+
+        const doc = await getPackDoc(packId)
+        if (doc === undefined)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
+
+        const existingContributors: string[] = await doc.get('contributors')
+
+        return reply.status(HTTPResponses.OK).send(existingContributors)
+    }
+})
 
 /*
  * @route POST /packs/:id/contributors
