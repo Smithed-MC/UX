@@ -127,14 +127,14 @@ export function EditBundle({ close }: EditBundleProps) {
             <span style={{ fontWeight: 700, fontSize: '1.25rem' }}>{curBundle.name}</span>
             {packs.length > 0 && <div className='container' style={{ alignItems: 'start', gap: '0.5rem', width: '100%' }}>
                 <span style={{ fontWeight: 700 }}>Packs:</span>
-                {packs.map(p => <div className='container' style={{ flexDirection: 'row', gap: '0.5rem', width: '100%', justifyContent: 'start' }}>
+                {packs.map(p => <div className='container' key={p.id} style={{ flexDirection: 'row', gap: '0.5rem', width: '100%', justifyContent: 'start' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
                         <circle cx="2" cy="2" r="2" fill="var(--foreground)" />
                     </svg>
                     {p.pack.display.name} <span style={{ color: 'var(--border)' }}>{!p.version.startsWith("v") && "v"}{p.version}</span>
                     <div style={{ flexGrow: 1 }} />
                     <button className='invalidButtonLike' style={{ padding: '0.5rem', aspectRatio: '1/1' }} onClick={() => {
-                        setPacks(packs.filter(pack => pack.id === p.id))
+                        setPacks(packs.filter(pack => pack.id !== p.id))
                     }}>
                         <Trash style={{ fill: 'var(--disturbing)' }} />
                     </button>

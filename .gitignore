@@ -14,3 +14,4 @@ temp/
 **/tests/results.txt
 
 sitemap.xml
+vite.config.ts.*

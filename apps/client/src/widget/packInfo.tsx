@@ -37,12 +37,12 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
     const user = useFirebaseUser()
 
     const [page, setPage] = useState<'mcVersion' | 'packVersion' | 'bundle' | 'createBundle'>(selectedBundle === '' ? "mcVersion" : 'packVersion')
-    const [direction, setDirection] = useState<'left'|'right'>('right')
+    const [direction, setDirection] = useState<'left' | 'right'>('right')
 
     const [minecraftVersion, setMinecraftVersion] = useState<MinecraftVersion | undefined>(selectedBundle !== '' ? bundles.find(b => b.uid === selectedBundle)?.version : undefined)
     const [bundle, setBundle] = useState<PackBundle | undefined>(selectedBundle !== '' ? bundles.find(b => b.uid === selectedBundle) : undefined)
 
-    const changePage = (direction: 'left'|'right') => {
+    const changePage = (direction: 'left' | 'right') => {
         const pages = [
             'mcVersion',
             'bundle',
@@ -52,9 +52,9 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
 
         const directionNumber = direction === 'left' ? -1 : 1
 
-        if(idx + directionNumber < 0)
+        if (idx + directionNumber < 0)
             return
-        if(idx + directionNumber >= pages.length)
+        if (idx + directionNumber >= pages.length)
             return
 
         setPage(pages[idx + directionNumber] as 'mcVersion' | 'packVersion' | 'bundle' | 'createBundle')
@@ -74,32 +74,33 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
     }
 
     const SelectMinecraftVersionPage = () => <div className="container addToBundlePage">
-        <div className="container" style={{animationName: 'slideIn' + direction}}>
+        <div className="container" style={{ animationName: 'slideIn' + direction, gap: '1.5rem' }}>
 
-            <label style={{ fontWeight: 700 }}>Choose Minecraft version</label>
+            <div className="container" style={{ gap: '1rem', width: '100%' }}>
+                <label style={{ fontWeight: 700 }}>Choose Minecraft version</label>
+                {supportedMinecraftVersions
+                    .filter((mcVersion) =>
+                        packData?.versions.find(v =>
+                            v.supports.includes(mcVersion)
+                        ) !== undefined
+                    ).reverse().map(v => {
+                        const sortedVersions = packData?.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? '')).reverse()
+                        const attachedVersion = sortedVersions?.find(ver => ver.supports.includes(v))
+                        const latestVersion = sortedVersions?.at(0)
 
-            {supportedMinecraftVersions
-                .filter((mcVersion) =>
-                    packData?.versions.find(v =>
-                        v.supports.includes(mcVersion)
-                    ) !== undefined
-                ).reverse().map(v => {
-                    const sortedVersions = packData?.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? '')).reverse()
-                    const attachedVersion = sortedVersions?.find(ver => ver.supports.includes(v))
-                    const latestVersion = sortedVersions?.at(0)
+                        const isOutdated = latestVersion !== attachedVersion
 
-                    const isOutdated = latestVersion !== attachedVersion
-
-                    return <WidgetOption isOutdated={isOutdated} onClick={() => {
-                        setMinecraftVersion(v)
-                        changePage('right')
-                    }}>
-                        <label style={{ color: isOutdated ? 'var(--disturbing)' : '', fontWeight: 700 }}>{v}</label>
-                        <label style={{ opacity: 0.25 }}>
-                            {!attachedVersion?.name.startsWith("v") && "v"}{attachedVersion?.name}
-                        </label>
-                    </WidgetOption>
-                })}
+                        return <WidgetOption isOutdated={isOutdated} onClick={() => {
+                            setMinecraftVersion(v)
+                            changePage('right')
+                        }}>
+                            <label style={{ color: isOutdated ? 'var(--disturbing)' : '', fontWeight: 700 }}>{v}</label>
+                            <label style={{ opacity: 0.25 }}>
+                                {!attachedVersion?.name.startsWith("v") && "v"}{attachedVersion?.name}
+                            </label>
+                        </WidgetOption>
+                    })}
+            </div>
             <div className="container compactButton" style={{ flexDirection: 'row', gap: '0.5rem', fontWeight: '700' }} onClick={() => {
                 close()
             }}>
@@ -118,65 +119,67 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
             .sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
             .reverse()
         return <div className="container addToBundlePage">
-            <div className="container" style={{animationName: 'slideIn' + direction}}>
-                <label style={{ fontWeight: 700, textAlign: 'center' }}>Choose Datapack version for "{bundle?.name}"</label>
+            <div className="container" style={{ animationName: 'slideIn' + direction, gap: '1.5rem' }}>
+                <div className="container" style={{ gap: '1rem', width: '100%' }}>
 
-                {versions?.map((v, idx) => {
-                    const isOutdated = idx !== 0
+                    <label style={{ fontWeight: 700, textAlign: 'center' }}>Choose Datapack version for "{bundle?.name}"</label>
+                    {versions?.map((v, idx) => {
+                        const isOutdated = idx !== 0
 
-                    return <WidgetOption isOutdated={isOutdated} onClick={async () => {
-                        if (bundle === undefined)
-                            return
+                        return <WidgetOption isOutdated={isOutdated} onClick={async () => {
+                            if (bundle === undefined)
+                                return
 
-                        const packs = [...bundle.packs]
-                        const containedPack = packs.findIndex(p => p.id === id)
-                        if (containedPack != -1) {
-                            packs.splice(containedPack, 1)
-                        }
-                        packs.push({
-                            id: id,
-                            version: v.name
-                        })
-
-
-                        const newData = {
-                            ...bundle,
-                            packs: packs
-                        }
-                        console.log(newData)
-
-                        const resp = await fetch(`https://api.smithed.dev/v2/bundles/${bundle.uid}?token=${await user?.getIdToken()}`, {
-                            method: 'PUT',
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                data: newData
+                            const packs = [...bundle.packs]
+                            const containedPack = packs.findIndex(p => p.id === id)
+                            if (containedPack != -1) {
+                                packs.splice(containedPack, 1)
+                            }
+                            packs.push({
+                                id: id,
+                                version: v.name
                             })
-                        })
 
-                        if (!resp.ok)
-                            alert(await resp.text())
 
-                        setPage('mcVersion')
-                        setDirection('right')
+                            const newData = {
+                                ...bundle,
+                                packs: packs
+                            }
+                            console.log(newData)
 
-                        const newBundles = [...bundles]
-                        newBundles.splice(newBundles.findIndex(b => b.uid === bundle.uid), 1)
-                        newBundles.push(newData)
+                            const resp = await fetch(`https://api.smithed.dev/v2/bundles/${bundle.uid}?token=${await user?.getIdToken()}`, {
+                                method: 'PUT',
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({
+                                    data: newData
+                                })
+                            })
 
-                        dispatch(setUsersBundles(newBundles))
-                        dispatch(setSelectedBundle(bundle.uid))
-                        close()
-                    }}>
-                        <label style={{ color: isOutdated ? 'var(--disturbing)' : 'var(--foreground)' }}>{v.name}</label>
-                        <label style={{ opacity: 0.25 }}>
-                        </label>
-                    </WidgetOption>
-                })}
+                            if (!resp.ok)
+                                alert(await resp.text())
+
+                            setPage('mcVersion')
+                            setDirection('right')
+
+                            const newBundles = [...bundles]
+                            newBundles.splice(newBundles.findIndex(b => b.uid === bundle.uid), 1)
+                            newBundles.push(newData)
+
+                            dispatch(setUsersBundles(newBundles))
+                            dispatch(setSelectedBundle(bundle.uid))
+                            close()
+                        }}>
+                            <label style={{ color: isOutdated ? 'var(--disturbing)' : 'var(--foreground)' }}>{v.name}</label>
+                            <label style={{ opacity: 0.25 }}>
+                            </label>
+                        </WidgetOption>
+                    })}
+                </div>
                 {versions?.length === 0 && <span style={{ color: 'var(--disturbing)' }}>Pack has no versions for {minecraftVersion}</span>}
                 <div className="container compactButton" style={{ flexDirection: 'row', gap: '0.5rem', fontWeight: '700' }} onClick={() => {
-                    if(versions?.length === 0) {
+                    if (versions?.length === 0) {
                         setPage('mcVersion')
                         setDirection('left')
                     } else {
@@ -196,27 +199,29 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
     const SelectBundlePage = () => {
 
         return <div className="container addToBundlePage">
-            <div className="container" style={{animationName: 'slideIn' + direction}}> 
+            <div className="container" style={{ animationName: 'slideIn' + direction, gap: '1.5rem' }}>
 
-                <label style={{ fontWeight: 700 }}>Choose Bundle for {minecraftVersion}</label>
+                <div className="container" style={{ gap: '1rem', width: '100%' }}>
+                    <label style={{ fontWeight: 700 }}>Choose Bundle for {minecraftVersion}</label>
 
-                {bundles
-                    .filter((b) => b.version === minecraftVersion)
-                    .map((b) => {
-                        return <WidgetOption isOutdated={false} onClick={() => {
-                            setBundle(b)
-                            changePage('right')
-                        }}>
-                            {b.name}
-                        </WidgetOption>
-                    })}
+                    {bundles
+                        .filter((b) => b.version === minecraftVersion)
+                        .map((b) => {
+                            return <WidgetOption isOutdated={false} onClick={() => {
+                                setBundle(b)
+                                changePage('right')
+                            }}>
+                                {b.name}
+                            </WidgetOption>
+                        })}
 
-                <IconTextButton icon={Plus} text={"New"} onClick={() => setPage('createBundle')} />
-                <div className="container compactButton" style={{ flexDirection: 'row', gap: '0.5rem', fontWeight: '700' }} onClick={() => {
-                    changePage('left')
-                }}>
-                    <Right style={{ transform: 'rotate(180deg)' }} />
-                    Back
+                    <IconTextButton icon={Plus} text={"New"} onClick={() => setPage('createBundle')} />
+                    <div className="container compactButton" style={{ flexDirection: 'row', gap: '0.5rem', fontWeight: '700' }} onClick={() => {
+                        changePage('left')
+                    }}>
+                        <Right style={{ transform: 'rotate(180deg)' }} />
+                        Back
+                    </div>
                 </div>
             </div>
         </div>
@@ -297,7 +302,7 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
                     id={id}
                 />
                 <div className="container" style={{ gap: '0.5rem' }}>
-                    <IconTextButton className="accentedButtonLike" iconElement={<Download fill="var(--foreground)" />} text={"Download"} reverse href={`https://api.smithed.dev/v2/download?pack=${id}`} rel="nofollow"/>
+                    <IconTextButton className="accentedButtonLike" iconElement={<Download fill="var(--foreground)" />} text={"Download"} reverse href={`https://api.smithed.dev/v2/download?pack=${id}`} rel="nofollow" />
                     <label style={{ color: 'var(--border)' }}>{(() => {
                         const version = packData?.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? '')).at(-1)
 
@@ -312,7 +317,7 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
                 {packData?.display.urls?.discord && <IconTextButton className={"packInfoMediaButton"} icon={Discord} text={"Join discord"} href={packData?.display.urls?.discord} />}
                 {packData?.display.urls?.source && <IconTextButton className={"packInfoMediaButton"} iconElement={<Globe fill="var(--foreground)" />} text={"Official website"} href={packData?.display.urls?.homepage} />}
                 {packData?.display.urls?.source && <IconTextButton className={"packInfoMediaButton"} icon={Github} text={"Source code"} href={packData?.display.urls?.source} />}
-                <IconTextButton className="accentedButtonLike packInfoSmallDownload packInfoMediaButton" iconElement={<Download fill="var(--foreground)" />} text={"Download"} href={`https://api.smithed.dev/v2/download?pack=${id}`} rel="nofollow"/>
+                <IconTextButton className="accentedButtonLike packInfoSmallDownload packInfoMediaButton" iconElement={<Download fill="var(--foreground)" />} text={"Download"} href={`https://api.smithed.dev/v2/download?pack=${id}`} rel="nofollow" />
 
             </div>
         </div>

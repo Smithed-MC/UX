@@ -120,11 +120,11 @@ export function Bundle({ id, editable, showOwner }: { id: string, editable: bool
             </div>
         </div>
         {showConfirmation && <div className='container' style={{ position: 'fixed', zIndex: 100, backgroundColor: 'rgba(0,0,0,0.5)', width: '100%', height: '100%', top: 0, left: 0, justifyContent: 'center', animation: 'fadeInBackground 1s' }}>
-            <div className='container' style={{ backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, animation: 'slideInContent 0.5s ease-in-out', border: '4px solid var(--background)', gap: 16 }}>
+            <div className='container' style={{ backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, animation: 'slideInContent 0.5s ease-in-out', border: '2px solid var(--border)', gap: 16 }}>
                 <h3 style={{ margin: 4 }}>Are you sure you want to remove "{rawBundleData.name}"?</h3>
                 <div className='container' style={{ flexDirection: 'row', gap: 16 }}>
-                    <button className='button' onClick={() => setShowConfirmation(false)}>Cancel</button>
-                    <button className='button' onClick={async () => {
+                    <IconTextButton className="accentedButtonLike" text={"Cancel"} icon={Cross} onClick={() => setShowConfirmation(false)}/>
+                    <IconTextButton className="invalidButtonLike" text={"Confirm"} icon={Check} onClick={async () => {
                         if (firebaseUser == null)
                             return setShowConfirmation(false)
                         const resp = await fetch(`https://api.smithed.dev/v2/bundles/${rawBundleData.uid}?token=${await firebaseUser.getIdToken()}`, { method: 'DELETE' })
@@ -134,7 +134,7 @@ export function Bundle({ id, editable, showOwner }: { id: string, editable: bool
                             parentElement.current?.style.setProperty('display', 'none');
                         }
                         setShowConfirmation(false)
-                    }} style={{ backgroundColor: 'var(--badAccent)' }}>Confirm</button>
+                    }}/>
                 </div>
             </div>
         </div>}
