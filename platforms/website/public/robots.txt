@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://beta.smithed.dev/sitemap.xml

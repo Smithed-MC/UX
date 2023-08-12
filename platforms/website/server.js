@@ -112,10 +112,12 @@ async function createServer() {
     app.use('*', async (req, res, next) => {
         const url = req.originalUrl
 
-        if(url === '/favicon.ico')
-            return
-
         console.log(url)
+        const lastElement = url.split('/').at(-1)
+        
+        if(lastElement.substring(0, lastElement.indexOf('?')).includes('.'))
+            return next()
+
 
         try {
             let template, render
