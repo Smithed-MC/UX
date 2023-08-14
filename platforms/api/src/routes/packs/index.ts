@@ -186,7 +186,7 @@ async function queryPacks(search: string | undefined, includeHidden: boolean | u
     if (search !== undefined && search !== '')
         packs = packs.filter(p => p.docData._indices?.includes(search));
     if (!includeHidden)
-        packs = packs.filter(p => !p.docData.display.hidden);
+        packs = packs.filter(p => !p.docData.data.display.hidden);
 
     packs = packs.sort((a, b) => {
         return getSortValue(sort, a, b);
