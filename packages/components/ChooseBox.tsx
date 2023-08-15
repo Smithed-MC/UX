@@ -43,13 +43,13 @@ export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onC
         e.stopPropagation()
 
         if (multiselect && value instanceof Array) {
-            if (value.includes(newValue)) {
+            if (value.includes(newValue) && value.indexOf(newValue) != -1) {
                 value.splice(value.indexOf(newValue), 1)
             } else {
                 value.push(newValue)
             }
             if (onChange) onChange(value)
-            setValue(Object.create(value))
+            setValue([...value])
         } else if (value !== newValue) {
             if (onChange) onChange(newValue)
             setValue(newValue)
