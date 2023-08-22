@@ -217,7 +217,7 @@ export function NavBar() {
             <IconTextButton className="navBarOption middle" text='Browse' href="/browse" icon={BrowseSvg} />
             <IconTextButton className="navBarOption middle" text='Discord' href="https://smithed.dev/discord" icon={DiscordSvg} />
             <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'row', gap: '2rem', justifyContent: 'end', overflow: 'hidden' }}>
-                {selectedBundle !== '' &&
+                {selectedBundle !== '' && !import.meta.env.SSR &&
                     <IconTextButton style={{ flexGrow: 1, overflow: 'hidden' }} className="navBarOption middle navBarBundle"
                         text={<div style={{ display: 'flex', flexShrink: 1, flexDirection: 'row', color: 'var(--warning)', gap: '0.25rem' }}>
                             <span style={{ WebkitLineClamp: 1, margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', width: 'calc(100%)', whiteSpace: 'nowrap' }}>{curBundle?.name}</span>

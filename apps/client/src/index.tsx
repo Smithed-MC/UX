@@ -20,7 +20,7 @@ import { Provider } from 'react-redux'
 import logo_small from './assets/logo_small.png'
 import { loadHomePageData, loadUserPageData } from './loaders.js'
 import User from './pages/user.js'
-import { selectUsersBundles, setUsersBundles, store } from 'store'
+import { selectSelectedBundle, selectUsersBundles, setSelectedBundle, setUsersBundles, store } from 'store'
 import { useAppDispatch, useAppSelector } from 'hooks'
 import { PackBundle } from 'data-types'
 import { Helmet } from 'react-helmet'
@@ -44,16 +44,26 @@ initializeApp({
 
 export function ClientApplet() {
     const dispatch = useAppDispatch()
+    const selectedBundle = useAppSelector(selectSelectedBundle)
+
+    function resetBundleData() {
+        dispatch(setUsersBundles([]))
+        dispatch(setSelectedBundle(''))
+    }
 
     async function loadBundles(user: FirebaseUser | null) {
-        if (user == null)
-            return dispatch(setUsersBundles([]))
+        if (user == null) {
+            return resetBundleData()
+        }
 
         const resp = await fetch(`https://api.smithed.dev/v2/users/${user.uid}/bundles`)
         if (!resp.ok)
-            return dispatch(setUsersBundles([]))
+            return resetBundleData()
 
         const bundleIds: string[] = await resp.json()
+
+        if(bundleIds.find(b => b === selectedBundle) === undefined)
+            dispatch(setSelectedBundle(''))
 
         const getData = async (id: string) => {
             const resp = await fetch(`https://api.smithed.dev/v2/bundles/${id}`)

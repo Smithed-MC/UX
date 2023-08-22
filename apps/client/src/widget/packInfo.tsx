@@ -145,7 +145,7 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
                                 ...bundle,
                                 packs: packs
                             }
-                            console.log(newData)
+                            // console.log(newData)
 
                             const resp = await fetch(`https://api.smithed.dev/v2/bundles/${bundle.uid}?token=${await user?.getIdToken()}`, {
                                 method: 'PUT',
@@ -229,7 +229,7 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
 
     const CreateBundlePage = () => <div className="container addToBundlePage">
         <CreateBundle minecraftVersion={minecraftVersion} showCloseButton close={() => setPage('bundle')} finish={(bundle) => {
-            console.log(bundle)
+            // console.log(bundle)
             setBundle(bundle)
             setPage('packVersion')
             setDirection('right')

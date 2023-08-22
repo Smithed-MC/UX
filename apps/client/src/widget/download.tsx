@@ -12,7 +12,7 @@ interface DownloadProps {
 
 export default function Download({style, packData, id, ...props}: DownloadProps) {
     const versions = packData.versions.sort((a,b) => semver.compare(semver.coerce(a.name) ?? '', semver.coerce(b.name) ?? ''))
-    console.log(versions)
+    // console.log(versions)
     return <div className="downloadRoot" {...props} style={{animation: 'pullIn 1s', gap: 16, width: '100%', boxSizing: 'border-box', maxWidth: 320, ...style}}>
         <label style={{fontSize: '2rem', textDecoration: 'underline'}}>Downloads</label>
         <a className="button downloadButton" style={{fontSize: '1rem', maxWidth: 196, width: '100%'}} rel="nofollow" href={`https://api.smithed.dev/v2/download?pack=${id}`}>Download Latest</a>

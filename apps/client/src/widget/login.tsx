@@ -11,14 +11,14 @@ export default function Login({clickSignUp}: {clickSignUp: () => void}) {
     const [passwordError, setPasswordError] = useState('')
     const [password, setPassword] = useState('')
 
-    console.log(getAuth().currentUser)
+    // console.log(getAuth().currentUser)
     const login = async () => {
         if(email === '' || password === '') return;
         try {
             const cred = await signInWithEmailAndPassword(getAuth(), email, password)
         } catch (e: any) {
             const error = e as FirebaseError
-            console.log(error.code)
+            // console.log(error.code)
 
             switch(error.code) {
                 case 'auth/invalid-email': {

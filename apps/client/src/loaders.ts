@@ -45,7 +45,7 @@ async function getDownloads(id: string, packs: string[]) {
             total += packEntry.stats.downloads.total
             daily += packEntry.stats.downloads.today ?? 0
         } catch {
-            console.log(`Pack ${pack}`)
+            // console.log(`Pack ${pack}`)
         }
 
     }

@@ -5,7 +5,7 @@ import { formatDownloads } from 'formatters'
 import './user.css'
 import { IconInput, IconTextButton, PackCard, Spinner, SvgButton } from 'components'
 import { useAppDispatch, useFirebaseUser, useQueryParams } from 'hooks'
-import { Account, BackArrow, Check, Clock, Cross, Download, Edit, Folder, Jigsaw, Line, List, NewFolder, SignOut, Trash, Upload } from 'components/svg'
+import { Account, BackArrow, Check, Clock, Cross, Discord, Download, Edit, Folder, Home, Jigsaw, Line, List, NewFolder, Plus, SignOut, Trash, Upload } from 'components/svg'
 import EditButton from 'components/EditButton'
 import { Helmet } from 'react-helmet'
 import { getAuth } from 'firebase/auth'
@@ -166,12 +166,12 @@ export default function User() {
     const { owner: userId } = useParams()
     const firebaseUser = useFirebaseUser()
     const navigate = useNavigate()
-    const { user, userStats }: { user: UserData, userStats: UserStats } = useLoaderData() as any
+    const { user, userStats }: { user: UserData|undefined, userStats: UserStats } = useLoaderData() as any
 
     const [editable, setEditable] = useState<boolean>(false)
     const [editingUserData, setEditingUserData] = useState(false)
 
-    const [pfp, setPFP] = useState(user.pfp)
+    const [pfp, setPFP] = useState(user?.pfp)
     const [showBundleCreationModal, setShowBundleCreationModal] = useState(false)
     const [showFallbackPFP, setShowFallbackPFP] = useState(false)
 
@@ -180,6 +180,16 @@ export default function User() {
     useEffect(() => {
         setEditable(userId === firebaseUser?.uid)
     }, [firebaseUser])
+
+    if (user === undefined) {
+        return <div className='container' style={{height: '100%'}}>
+            <h1>Looks like this page or user doesn't exist!</h1>
+            <div className="container" style={{flexDirection: 'row', gap: '1rem'}}>
+                <IconTextButton icon={Home} text={"Take me home"} className="accentedButtonLike" href="/"/>
+                <IconTextButton icon={Discord} text={"Report a problem"} href="https://smithed.dev/discord"/>
+            </div>
+        </div>
+    }
 
     function Stat({ name, value, icon }: { name: string, value: number | string | undefined, icon: any }) {
         return <div className='statDisplay'>
@@ -203,7 +213,7 @@ export default function User() {
             <meta name="og:site_name" content="Smithed" />
             <title>{user?.displayName}</title>
             <meta name="description" content={pageDescription} />
-            {user.pfp && <meta name="og:image" content={`https://api.smithed.dev/v2/users/${user.uid}/pfp`}/>}
+            {user?.pfp && <meta name="og:image" content={`https://api.smithed.dev/v2/users/${user.uid}/pfp`}/>}
         </Helmet>
         <div className='container userContentRoot' style={{ gap: '4rem', boxSizing: 'border-box', maxWidth: '46.25rem' }}>
             <div className='flexDirection' style={{ width: '100%', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', gap: 16, boxSizing: 'border-box' }}>
@@ -221,7 +231,7 @@ export default function User() {
                                     <input ref={pfpUploadRef} type="file" accept='image/png, image/jpeg' style={{ display: 'none' }} onChange={async (e) => {
                                         const file = e.currentTarget.files?.item(0)
 
-                                        console.log(file);
+                                        // console.log(file);
                                         if (file === undefined || file == null)
                                             return
 
@@ -236,7 +246,7 @@ export default function User() {
                                             }
                                         })
 
-                                        console.log(result)
+                                        // console.log(result)
                                         setPFP(result)
                                         setShowFallbackPFP(false)
                                     }} />
@@ -271,12 +281,13 @@ export default function User() {
                                 if (!resp.ok)
                                     alert(await resp.text())
 
-                                user.pfp = pfp
+                                if (user !== undefined)
+                                    user.pfp = pfp
                                 setEditingUserData(false)
                             }}
                             />}
                             {editingUserData && <button className='buttonLike invalidButtonLike' onClick={() => {
-                                setPFP(user.pfp)
+                                setPFP(user?.pfp)
                                 setShowFallbackPFP(false)
                                 setEditingUserData(false)
                             }}><Cross /></button>}
@@ -290,21 +301,25 @@ export default function User() {
                     </div>
                 </div>
             </div>
-            {userStats.packs.length > 0 && <div className='container' style={{ width: '100%', gap: '1rem' }}>
+            {(userStats.packs.length > 0 || editable) && <div className='container' style={{ width: '100%', gap: '1rem' }}>
                 <div className='container' style={{ flexDirection: 'row', justifyContent: 'start', gap: '0.5rem', width: '100%' }}>
                     <List />
                     <label>Packs:</label>
                     <div style={{ flexGrow: 1 }} />
-                    {editable && <a className='compactButton' href="/edit?new=true">+ New</a>}
+                    {userStats.packs.length >= 1 && editable && <a className='compactButton' href="/edit?new=true">+ New</a>}
                 </div>
                 {userStats?.packs.map(p => <PackCard state={editable ? 'editable' : undefined} id={p.id} packData={p.pack} onClick={() => { navigate(`../packs/${p}`) }} />)}
+                {editable && userStats.packs.length == 0 && <div className="container" style={{gap: '1rem'}}>
+                    Looks like you don't have any packs!
+                    <IconTextButton icon={Plus} text={"Make one here"} className="accentedButtonLike" href="/edit?new=true"/>
+                </div>}
             </div>}
-            {userStats.bundles.length > 0 && <div className='container' style={{ width: '100%', gap: '1rem' }}>
+            {(userStats.bundles.length > 0 || editable) && <div className='container' style={{ width: '100%', gap: '1rem' }}>
                 <div className='container' style={{ flexDirection: 'row', justifyContent: 'start', gap: '0.5rem', width: '100%' }}>
                     <Folder />
                     <label>Bundles:</label>
                     <div style={{ flexGrow: 1 }} />
-                    {editable && <a className='compactButton' href="" onClick={(e) => {
+                    {editable && userStats.bundles.length >= 1 && <a className='compactButton' href="" onClick={(e) => {
                         e.preventDefault()
                         setShowBundleCreationModal(true)
                     }}>+ New</a>}
@@ -315,6 +330,12 @@ export default function User() {
                     }} user={firebaseUser} />}
                 </div>}
                 {userStats.bundles?.map(b => <Bundle key={b} id={b} editable={editable} />)}
+                {editable && userStats.bundles.length == 0 && <div className="container" style={{gap: '1rem'}}>
+                    Need to group some packs together?
+                    <IconTextButton icon={Plus} text={"Click here"} className="accentedButtonLike" onClick={() => {
+                        setShowBundleCreationModal(true)
+                    }}/>
+                </div>}
             </div>}
         </div>
     </div>

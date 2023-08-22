@@ -16,7 +16,7 @@ export default function SignUp({clickLogin}: {clickLogin: ()=>void}) {
 
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
-    console.log(getAuth().currentUser)
+    // console.log(getAuth().currentUser)
 
 
 
@@ -48,7 +48,7 @@ export default function SignUp({clickLogin}: {clickLogin: ()=>void}) {
 
         } catch (e: any) {
             const error = e as FirebaseError
-            console.log(error.code)
+            // console.log(error.code)
 
             switch (error.code) {
                 case 'auth/invalid-email': {

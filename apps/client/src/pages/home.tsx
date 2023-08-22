@@ -86,7 +86,7 @@ export default function Home(props: any) {
             await sleep(SLIDE_TIME - 50)
             setInAnimation(true)
             setCurrentPack(value => (value + 1) % 5)
-            console.log(currentPack)
+            // console.log(currentPack)
         }, TRANSITION_INTERVAL)
         return () => clearInterval(interval)
     }, [])
@@ -133,7 +133,7 @@ export default function Home(props: any) {
                     Tired of having to manually update your datapacks? Merging all the ones you want to play? What about filtering through tons of incompatible content?
                     <br />
                     <br />
-                    The Smithed launcher allows you to play datapacks just like you would mods! By using the launcher, conflicts between datapacks are automatically resolved, resourcepacks are automatically applied and everything is kept separate from your base game. No more cluttered resourcepack folders.
+                    The Smithed launcher allows you to play datapacks just like you would mods! By using the launcher, conflicts between datapacks are automatically resolved, resourcepacks are automatically applied, and everything is kept separate from your base game. No more cluttered resourcepack folders.
                 </div>
                 <div className="homeImageContainer">
                     <img src={launcher_graphic} />

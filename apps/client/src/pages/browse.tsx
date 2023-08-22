@@ -20,7 +20,7 @@ export default function Browse(props: any) {
 
     const selectedBundle = useAppSelector(selectSelectedBundle)
     const bundles = useAppSelector(selectUsersBundles)
-    console.log(bundles)
+    // console.log(bundles)
 
     const dispatch = useAppDispatch()
 
@@ -118,7 +118,7 @@ export default function Browse(props: any) {
             return
         const scrollPosition = e.currentTarget.scrollTop
         const scrollHeight = e.currentTarget.scrollHeight
-        console.log(e.currentTarget.offsetHeight, scrollHeight, scrollPosition)
+        // console.log(e.currentTarget.offsetHeight, scrollHeight, scrollPosition)
 
         if (scrollPosition / scrollHeight < 0.60)
             return

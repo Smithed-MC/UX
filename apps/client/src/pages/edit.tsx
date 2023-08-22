@@ -1,7 +1,7 @@
 import { e } from '@tauri-apps/api/event-2a9960e7'
 import { ChooseBox, ErrorPage, IconInput, IconTextButton, MarkdownRenderer, Spinner } from 'components'
-import { Back, Cross, Info, Left, Right, Trash, Edit as EditSvg, Globe, Browse, Plus, Picture, Download, Check, Folder, Jigsaw, Line, Star, Text as TextSvg, At, Refresh, File } from 'components/svg'
-import { HTTPResponses, MinecraftVersion, PackData, PackDependency, PackVersion, packCategories } from 'data-types'
+import { Back, Cross, Info, Left, Right, Trash, Edit as EditSvg, Globe, Browse, Plus, Picture, Download, Check, Folder, Jigsaw, Line, Star, Text as TextSvg, At, Refresh, File, Account, Home } from 'components/svg'
+import { HTTPResponses, MinecraftVersion, PackData, PackDependency, PackMetaData, PackVersion, UserData, packCategories } from 'data-types'
 import { formatDownloadURL } from 'formatters'
 import { useFirebaseUser, useQueryParams } from 'hooks'
 import React, { CSSProperties, useEffect, useRef, useState } from 'react'
@@ -58,7 +58,7 @@ function Tooltip({ description, style, offset }: { description: string, offset?:
 function StringInput({ reference, attr, description, header, disabled, svg, placeholder }: EditorInputProps) {
     return <EditorDiv>
         <div className='container' style={{ width: '100%', flexDirection: 'column', alignItems: 'start', gap: '0.5rem' }}>
-            <IconInput icon={svg ?? EditSvg} style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={(e) => reference[attr] = e.currentTarget.value} defaultValue={reference !== undefined ? reference[attr] : ''} disabled={disabled} />
+            <IconInput icon={svg ?? EditSvg} style={{ width: '100%', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={(e) => reference[attr] = e.currentTarget.value} defaultValue={reference !== undefined ? reference[attr] : ''} disabled={disabled} />
             <span style={{ color: 'var(--border)' }}>{description}</span>
         </div>
     </EditorDiv>
@@ -74,7 +74,7 @@ function ImageURLInput({ reference, attr, width, height, description, header, pl
 
     return <EditorDiv>
         <div className='container' style={{ width: '100%', flexDirection: 'column', alignItems: 'start', gap: '0.5rem' }}>
-            <IconInput icon={svg ?? Picture} style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={async (e) => { reference[attr] = await formatDownloadURL(e.currentTarget.value); setSrc(reference[attr]) }} defaultValue={reference !== undefined ? reference[attr] : ''} />
+            <IconInput icon={svg ?? Picture} style={{ width: '100%', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={async (e) => { reference[attr] = await formatDownloadURL(e.currentTarget.value); setSrc(reference[attr]) }} defaultValue={reference !== undefined ? reference[attr] : ''} />
             <span style={{ color: 'var(--border)' }}>{description}</span>
         </div>
         {/* <img style={{ width: width, height: height, padding: 4, backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)' }} src={src} /> */}
@@ -110,7 +110,7 @@ function MarkdownURLInput({ reference, attr, description, placeholder, svg }: Ed
     return <EditorDiv>
         <div className='container' style={{ width: '100%', flexDirection: 'column', alignItems: 'start', gap: '0.5rem' }}>
             <div className='container' style={{ width: '100%', flexDirection: 'row', gap: '1rem' }}>
-                <IconInput icon={svg ?? Globe} style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={(e) => { reference[attr] = e.currentTarget.value; }} defaultValue={reference !== undefined ? reference[attr] : ''} />
+                <IconInput icon={svg ?? Globe} style={{ width: '100%', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={(e) => { reference[attr] = e.currentTarget.value; }} defaultValue={reference !== undefined ? reference[attr] : ''} />
                 <button className='buttonLike accentedButtonLike' onClick={onClickPreviewButton} title="Preview">
                     <Picture />
                 </button>
@@ -142,7 +142,7 @@ function DownloadURLInput({ reference, attr, description, header }: EditorInputP
     return <EditorDiv>
         <div className='container' style={{ width: '100%', flexDirection: 'column', alignItems: 'start', gap: '0.5rem' }}>
             <div className='container' style={{ flexDirection: 'row', width: '100%' }}>
-                <IconInput icon={Globe} style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={(e) => { reference[attr] = e.currentTarget.value; setValue(reference[attr]); setValid(false) }} value={value} />
+                <IconInput icon={Globe} style={{ width: '100%', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={(e) => { reference[attr] = e.currentTarget.value; setValue(reference[attr]); setValid(false) }} value={value} />
                 <button className='accentedButtonLike' style={{ marginLeft: 8 }} onClick={async () => {
                     setError('')
                     setValid(false)
@@ -223,6 +223,7 @@ function DropdownSelectionInput({ reference, attr, description, placeholder, opt
     return <EditorDiv>
         <div className='container' style={{ width: '100%', flexDirection: 'column', gap: 8, alignItems: 'start' }}>
             <ChooseBox placeholder={placeholder} onChange={(value) => {
+                // console.log(value)
                 reference[attr] = typeof value === 'string' ? [value] : value
             }} choices={options.map(o => ({ value: o, content: o }))} multiselect defaultValue={reference[attr]} />
             <span style={{ color: 'var(--border)' }}>{description}</span>
@@ -236,11 +237,11 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
     const versionName = useRef<HTMLInputElement>(null);
 
     const addVersion = () => {
-        console.log(versionName)
+        // console.log(versionName)
         if (versionName.current == null)
             return
         const name = versionName.current.value
-        console.log(name)
+        // console.log(name)
         setError('')
 
         if (name === undefined || name === '') {
@@ -265,7 +266,7 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
             dependencies: []
         })
 
-        console.log(data)
+        // console.log(data)
         setAddNewVersion(false)
         onAddVersion()
     }
@@ -276,7 +277,7 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
     }
 
     if (addNewVersion) {
-        return <div style={{ position: 'fixed', top: 0, left: 0, display: 'flex', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', background: 'rgba(0,0,0,0.5' }}>
+        return <div style={{ position: 'fixed', top: 0, left: 0, display: 'flex', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', background: 'rgba(0,0,0,0.5', zIndex: 100 }}>
             <div className="container" style={{ alignItems: 'center', padding: '1rem', backgroundColor: 'var(--background)', border: '2px solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', gap: '0.5rem' }}>
                 <IconInput icon={EditSvg} placeholder='Version Number...' inputRef={versionName} onMouseEnter={() => versionName.current?.select()} onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -302,7 +303,7 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
     const [elements, setElements] = useState<JSX.Element[]>([]);
 
     const getDeps = async () => {
-        console.log(dependencies)
+        // console.log(dependencies)
         dependencies.sort((a, b) => a.id.localeCompare(b.id))
         let elements: JSX.Element[] = []
         for (let i = 0; i < dependencies.length; i++) {
@@ -335,13 +336,48 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
     </div>
 }
 
+function RenderContributors({ contributors, owner, onRemoveContributor }: { contributors: string[], owner: string, onRemoveContributor: () => void }) {
+    const [elements, setElements] = useState<JSX.Element[]>([]);
+
+    const getDeps = async () => {
+        let elements: JSX.Element[] = []
+
+        for (let i = 0; i < contributors.length; i++) {
+            const contributor = contributors[i]
+            const userData: UserData = await (await fetch(`https://api.smithed.dev/v2/users/${contributor}`)).json()
+
+            elements.push(<div className='container' style={{ flexDirection: 'row', width: '100%', gap: '0.5rem' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
+                    <circle cx="2" cy="2" r="2" fill="var(--foreground)" />
+                </svg>
+                <label key={"name" + contributor}>{userData.displayName}</label>
+                <div style={{ flexGrow: 1 }} />
+                {contributor !== owner && <button key={"btn" + contributor} className='buttonLike invalidButtonLike' onClick={() => {
+                    contributors.splice(i, 1)
+                    onRemoveContributor()
+                }}>
+                    <Trash fill="var(--disturbing)" />
+                </button>}
+            </div>)
+        }
+
+        setElements(elements)
+    }
+
+    useEffect(() => { getDeps() }, [...contributors])
+
+    return <div className="container" style={{ alignItems: 'start', width: '100%', gap: '1rem' }}>
+        {elements}
+    </div>
+}
+
 function NewDependency({ dependencies, onAddDependency }: { dependencies: PackDependency[], onAddDependency: () => void }) {
     const idRef = useRef<HTMLInputElement>(null)
     const versionRef = useRef<HTMLInputElement>(null)
 
     return <EditorDiv style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <IconInput icon={Folder} ref={idRef} style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white' }} placeholder='dependency' />
-        <IconInput ref={versionRef} style={{ width: 'fit-content', backgroundColor: 'var(--background)', color: 'white' }} placeholder='version' />
+        <IconInput icon={Folder} ref={idRef} style={{ width: '100%', color: 'white' }} placeholder='dependency' />
+        <IconInput ref={versionRef} style={{ width: 'fit-content', color: 'white' }} placeholder='version' />
         <button className='buttonLike accentedButtonLike' onClick={async () => {
             if (idRef.current == null || versionRef.current == null)
                 return
@@ -414,7 +450,7 @@ function SavingModal({ state, changeState }: { state: SavingState, changeState: 
 
 
 
-    return <div style={{ display: 'flex', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', fontSize: '1.125rem', justifyContent: 'center', alignItems: 'center', color: 'var(--goodAccent)', backgroundColor: 'rgba(0,0,0,0.5)', animation: 'fadeInBackground 1s ease-in-out', zIndex: 100 }} ref={modalContainer}>
+    return <div style={{ display: 'flex', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', fontSize: '1.125rem', justifyContent: 'center', alignItems: 'center', color: 'var(--goodAccent)', backgroundColor: 'rgba(0,0,0,0.5)', animation: 'fadeInBackground 1s ease-in-out', zIndex: 10 }} ref={modalContainer}>
         <div className='container' style={{ backgroundColor: 'var(--section)', border: '2px solid var(--border)', width: '100%', maxWidth: 384, aspectRatio: '2 / 1', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 1s', transition: 'transform 0.6s cubic-bezier(0.87, 0, 0.13, 1)' }} ref={modalBody}>
 
             {state.mode === 'saving' && <div>
@@ -448,6 +484,11 @@ export default function Edit() {
     const [packData, setPackData] = useState<PackData>()
     const [versions, setVersions] = useState<PackVersion[]>([])
     const [categories, setCategories] = useState<string[]>([])
+
+    const [metaData, setMetaData] = useState<PackMetaData>()
+    const [contributors, setContributors] = useState<string[]>([])
+
+
     const [selectedVersion, setSelectedVersion] = useState(0)
     const [mcVersions, setMCVersions] = useState<string[]>([])
     const [supportedVersions, setSupportedVersions] = useState<MinecraftVersion[] | undefined>([])
@@ -491,15 +532,23 @@ export default function Edit() {
             v.dependencies ??= []
         })
 
+        const metaData: PackMetaData = await (await fetch(`https://api.smithed.dev/v2/packs/${pack}/meta`, { cache: 'no-cache' })).json()
+
         setPackData(data)
+        setMetaData(metaData)
+        setContributors([...metaData.contributors])
         setVersions(data.versions)
         setCategories(data.categories)
 
     }
     useEffect(() => { onLoad() }, [pack, user])
 
-    if (user == null) return <div style={{ animation: 'fadeIn 1s' }}>
-        <ErrorPage title="Error 401" description='Not signed in!' returnLink='/' returnMessage='Back to Home' />
+    if (user == null) return <div className='container' style={{height: '100%'}}>
+        <h1>You must be signed in to create/edit a pack</h1>
+        <div className='container' style={{gap: '1rem', flexDirection: 'row'}}>
+            <IconTextButton icon={Account} text={"Login"} href="/account" className="accentedButtonLike"/>
+            <IconTextButton icon={Home} text={"Go Home"} href="/"/>
+        </div>
     </div>
     if (packData === undefined) return <div className="container" style={{ width: '100%', height: '100vh', boxSizing: 'border-box' }}>
         <Spinner />
@@ -507,7 +556,7 @@ export default function Edit() {
 
     const updateVersions = () => { setVersions(Object.create(packData.versions)) }
     const savePack = async () => {
-        console.log(packData)
+        // console.log(packData)
 
         setSavingState({ mode: 'saving' })
 
@@ -579,9 +628,10 @@ export default function Edit() {
                     <DownloadURLInput reference={packData.versions[selectedVersion]?.downloads} attr='datapack' placeholder='datapack_url' description='Raw URL to the download for the datapack' />
                     <DownloadURLInput reference={packData.versions[selectedVersion]?.downloads} attr='resourcepack' placeholder='resourcepack_url' description='Raw URL to the download for the resourcepack' />
                     <DropdownSelectionInput reference={packData.versions[selectedVersion]} attr='supports' placeholder='Supports' description='Supported Minecraft Versions' options={mcVersions} onChange={() => {
+
                         const s = packData.versions[selectedVersion].supports
                         s.sort((a, b) => compare(coerce(a) ?? '', coerce(b) ?? ''))
-                        setSupportedVersions(Object.create(s))
+                        setSupportedVersions([...s])
                     }} />
                     <NewDependency dependencies={versions[selectedVersion].dependencies} onAddDependency={updateVersions} />
                     <RenderDependencies dependencies={versions[selectedVersion].dependencies} onRemoveDependency={updateVersions} />
@@ -589,6 +639,17 @@ export default function Edit() {
             </EditorDiv>
         </div>
         <Divider />
+        {user.uid === metaData?.owner && <div className='container' style={{ width: '100%', gap: '1.5rem' }}>
+            <div className='container' style={{ flexDirection: 'row', marginBottom: '-1rem', justifyContent: 'space-between', width: '100%' }}>
+                <h1 style={{ fontSize: '2rem' }}>Contributors</h1>
+            </div>
+            <div className='container' style={{width: '100%', flexDirection: 'row', gap: '0.5rem'}}>
+                <IconInput icon={Account} placeholder='Username/UID' style={{width: '100%'}} />
+                <button className='buttonLike accentedButtonLike'><Plus/></button>
+            </div>
+            <RenderContributors contributors={contributors} owner={metaData.owner} onRemoveContributor={() => setContributors([...contributors])} />
+        </div>}
+        {user.uid === metaData?.owner && <Divider />}
         <div className='container' style={{ flexDirection: 'row', width: '100%', gap: '1rem' }}>
             <IconTextButton className='buttonLike invalidButtonLike' text='Cancel' icon={Cross} onClick={() => {
                 navigate(-1)
