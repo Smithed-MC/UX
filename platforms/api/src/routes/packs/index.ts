@@ -20,6 +20,16 @@ const getSortValue = (sort: SortOptions, a: ReceivedPackResult, b: ReceivedPackR
     }
 }
 
+const getPackSchema = Type.Object({
+    search: Type.Optional(Type.String()),
+    sort: SortSchema,
+    limit: Type.Integer({maximum: 100, minimum: 1, default: 20}),
+    start: Type.Integer({minimum: 0, default: 0}),
+    category: Type.Array(Type.String(), {default: []}),
+    hidden: Type.Optional(Type.Boolean({default: false})),
+    version: Type.Array(MinecraftVersionSchema, {default: []})
+})
+
 /*
  * @route GET /packs
  * Get a list of packs which meet the specified criteria
@@ -54,34 +64,52 @@ API_APP.route({
     method: "GET",
     url: '/packs',
     schema: {
-        querystring: Type.Object({
-            search: Type.Optional(Type.String()),
-            sort: SortSchema,
-            limit: Type.Integer({maximum: 100, minimum: 1, default: 20}),
-            start: Type.Integer({minimum: 0, default: 0}),
-            category: Type.Array(Type.String(), {default: []}),
-            hidden: Type.Optional(Type.Boolean({default: false})),
-            version: Type.Array(MinecraftVersionSchema, {default: []})
-        })
+        querystring: getPackSchema
     }, 
     handler: async (request, reply) => {
         const {search, sort, limit, start, category, hidden: includeHidden, version} = request.query;
 
-        const requestIdentifier = 'GET-PACKS::' + Object.values(request.query)
-        const tryCachedResult = await get(requestIdentifier)
-
-        let packs: {id: string, displayName: string}[] = []
-        if(tryCachedResult) {
-            packs = tryCachedResult.item
-        } else {
-            packs = await queryPacks(search, includeHidden, sort, category, version);
-            await set(requestIdentifier, packs, 5 * 60 * 1000)
-        }
+        let packs: { id: string; displayName: string; }[] = await getPacks(request, search, includeHidden, sort, category, version);
         
         return packs.slice(start, start + limit)
     } 
 })
 
+/*
+ * @route GET /packs/count
+ * Similar to /packs, this route returns the number of packs which match the criteria
+ * 
+ * @query search: string
+ * A search query against the name or id of the pack
+ * 
+ * @query category: PackCategory[]?
+ * Which categories should the pack be a part of
+ * 
+ * @query version: MinecraftVersion[]?
+ * Which versions should the pack support
+ * 
+ * @query hidden: boolean = false
+ * Should unlisted packs be returned. 
+ * 
+ * @return OK: number
+ *  
+ * @example Number of packs which contain `the`
+ * fetch('https://api.smithed.dev/v2/packs/count?search=the')
+ */
+API_APP.route({
+    method: 'GET',
+    url: '/packs/count',
+    schema: {
+        querystring: Type.Omit(getPackSchema, ['limit', 'start', 'sort'])
+    },
+    handler: async (request, reply) => {
+        const {search, category, hidden: includeHidden, version} = request.query;
+
+        let packs: { id: string; displayName: string; }[] = await getPacks(request, search, includeHidden, SortOptions.Newest, category, version);
+        
+        return packs.length
+    }
+})
 
 /*
  * @route POST /packs
@@ -160,6 +188,20 @@ API_APP.route({
     }
 })
 
+async function getPacks(request, search: string | undefined, includeHidden: boolean | undefined, sort: SortOptions, category: string[], version: string[]) {
+    const requestIdentifier = 'GET-PACKS::' + Object.values(request.query);
+    const tryCachedResult = await get(requestIdentifier);
+
+    let packs: { id: string; displayName: string; }[] = [];
+    if (tryCachedResult) {
+        packs = tryCachedResult.item;
+    } else {
+        packs = await queryPacks(search, includeHidden, sort, category, version);
+        await set(requestIdentifier, packs, 5 * 60 * 1000);
+    }
+    return packs;
+}
+
 async function queryPacks(search: string | undefined, includeHidden: boolean | undefined, sort: SortOptions, category: string[], version: MinecraftVersion[]) {
     const requestIdentifier = 'STORED-PACKS';
     const tryCachedResult = await get(requestIdentifier);
@@ -184,7 +226,7 @@ async function queryPacks(search: string | undefined, includeHidden: boolean | u
 
 
     if (search !== undefined && search !== '')
-        packs = packs.filter(p => p.docData._indices?.includes(search));
+        packs = packs.filter(p => p.docData._indices?.includes(search.toLowerCase()));
     if (!includeHidden)
         packs = packs.filter(p => !p.docData.data.display.hidden);
 
