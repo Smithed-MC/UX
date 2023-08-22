@@ -188,7 +188,7 @@ API_APP.route({
     }
 })
 
-async function getPacks(request, search: string | undefined, includeHidden: boolean | undefined, sort: SortOptions, category: string[], version: string[]) {
+async function getPacks(request: any, search: string | undefined, includeHidden: boolean | undefined, sort: SortOptions, category: string[], version: string[]) {
     const requestIdentifier = 'GET-PACKS::' + Object.values(request.query);
     const tryCachedResult = await get(requestIdentifier);
 
@@ -196,13 +196,13 @@ async function getPacks(request, search: string | undefined, includeHidden: bool
     if (tryCachedResult) {
         packs = tryCachedResult.item;
     } else {
-        packs = await queryPacks(search, includeHidden, sort, category, version);
+        packs = await filterPacksByQuery(search, includeHidden, sort, category, version);
         await set(requestIdentifier, packs, 5 * 60 * 1000);
     }
     return packs;
 }
 
-async function queryPacks(search: string | undefined, includeHidden: boolean | undefined, sort: SortOptions, category: string[], version: MinecraftVersion[]) {
+async function filterPacksByQuery(search: string | undefined, includeHidden: boolean | undefined, sort: SortOptions, category: string[], version: MinecraftVersion[]) {
     const requestIdentifier = 'STORED-PACKS';
     const tryCachedResult = await get(requestIdentifier);
     let packs: ReceivedPackResult[];
