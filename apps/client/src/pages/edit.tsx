@@ -311,7 +311,7 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
 
             const metaData = await (await fetch(`https://api.smithed.dev/v2/packs/${d.id}/meta`)).json()
 
-            elements.push(<div className='container' style={{ flexDirection: 'row', width: '100%', gap: '0.5rem' }}>
+            elements.push(<div className='container' key={d.id} style={{ flexDirection: 'row', width: '100%', gap: '0.5rem' }}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
                     <circle cx="2" cy="2" r="2" fill="var(--foreground)" />
                 </svg>
@@ -346,7 +346,7 @@ function RenderContributors({ contributors, owner, onRemoveContributor }: { cont
             const contributor = contributors[i]
             const userData: UserData = await (await fetch(`https://api.smithed.dev/v2/users/${contributor}`)).json()
 
-            elements.push(<div className='container' style={{ flexDirection: 'row', width: '100%', gap: '0.5rem' }}>
+            elements.push(<div className='container' key={contributor} style={{ flexDirection: 'row', width: '100%', gap: '0.5rem' }}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
                     <circle cx="2" cy="2" r="2" fill="var(--foreground)" />
                 </svg>
@@ -376,8 +376,8 @@ function NewDependency({ dependencies, onAddDependency }: { dependencies: PackDe
     const versionRef = useRef<HTMLInputElement>(null)
 
     return <EditorDiv style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <IconInput icon={Folder} ref={idRef} style={{ width: '100%', color: 'white' }} placeholder='dependency' />
-        <IconInput ref={versionRef} style={{ width: 'fit-content', color: 'white' }} placeholder='version' />
+        <IconInput icon={Folder} inputRef={idRef} style={{ width: '100%', color: 'white' }} placeholder='dependency' />
+        <IconInput inputRef={versionRef} style={{ width: 'fit-content', color: 'white' }} placeholder='version' />
         <button className='buttonLike accentedButtonLike' onClick={async () => {
             if (idRef.current == null || versionRef.current == null)
                 return
@@ -476,6 +476,29 @@ function SavingModal({ state, changeState }: { state: SavingState, changeState: 
         </div>
     </div>
 }
+function AddContributor({ contributors, setContributors, owner }: { contributors: string[], setContributors: (c: string[]) => void, owner: string }) {
+    const [contributorToAdd, setContributorToAdd] = useState<string>('')
+    return <div className='container' style={{ width: '100%', gap: '1.5rem' }}>
+        <div className='container' style={{ flexDirection: 'row', marginBottom: '-1rem', justifyContent: 'space-between', width: '100%' }}>
+            <h1 style={{ fontSize: '2rem' }}>Contributors</h1>
+        </div>
+        <div className='container' style={{ width: '100%', flexDirection: 'row', gap: '0.5rem' }}>
+            <IconInput icon={Account} placeholder='Username/UID' style={{ width: '100%' }} onChange={(e) => setContributorToAdd(e.currentTarget.value)} />
+            <button className='buttonLike accentedButtonLike' onClick={async () => {
+                const response = await fetch(`https://api.smithed.dev/v2/users/${contributorToAdd}`)
+                if (!response.ok)
+                    return alert('Could not find user ' + contributorToAdd)
+
+                const { uid } = await response.json()
+
+                setContributors([...contributors, uid])
+
+            }} disabled={contributorToAdd === ''}><Plus /></button>
+        </div>
+        <RenderContributors contributors={contributors} owner={owner} onRemoveContributor={() => setContributors([...contributors])} />
+    </div>
+}
+
 
 export default function Edit() {
     const user = useFirebaseUser()
@@ -487,13 +510,12 @@ export default function Edit() {
 
     const [metaData, setMetaData] = useState<PackMetaData>()
     const [contributors, setContributors] = useState<string[]>([])
-
+    const [contributorToAdd, setContributorToAdd] = useState<string>('')
 
     const [selectedVersion, setSelectedVersion] = useState(0)
     const [mcVersions, setMCVersions] = useState<string[]>([])
     const [supportedVersions, setSupportedVersions] = useState<MinecraftVersion[] | undefined>([])
     const [savingState, setSavingState] = useState<SavingState>({ mode: 'off' })
-    const deleteButtonRef = useRef<HTMLLabelElement>(null)
     const saveTextRef = useRef<HTMLDivElement>(null)
     let deleteConfirmation = 0;
 
@@ -543,11 +565,11 @@ export default function Edit() {
     }
     useEffect(() => { onLoad() }, [pack, user])
 
-    if (user == null) return <div className='container' style={{height: '100%'}}>
+    if (user == null) return <div className='container' style={{ height: '100%' }}>
         <h1>You must be signed in to create/edit a pack</h1>
-        <div className='container' style={{gap: '1rem', flexDirection: 'row'}}>
-            <IconTextButton icon={Account} text={"Login"} href="/account" className="accentedButtonLike"/>
-            <IconTextButton icon={Home} text={"Go Home"} href="/"/>
+        <div className='container' style={{ gap: '1rem', flexDirection: 'row' }}>
+            <IconTextButton icon={Account} text={"Login"} href="/account" className="accentedButtonLike" />
+            <IconTextButton icon={Home} text={"Go Home"} href="/" />
         </div>
     </div>
     if (packData === undefined) return <div className="container" style={{ width: '100%', height: '100vh', boxSizing: 'border-box' }}>
@@ -570,6 +592,25 @@ export default function Edit() {
                 }
             })
         }
+
+        if (metaData && contributors !== metaData.contributors) {
+
+            if (!contributors.includes(metaData.owner))
+                contributors.push(metaData.owner)
+
+            const newContributors = contributors.filter(c => !metaData.contributors.includes(c))
+            const delContributors = metaData.contributors.filter(c => !contributors.includes(c))
+
+
+            const uid = !isNew ? pack : packData.id
+
+            if (newContributors.length > 0)
+                await fetch(`https://api.smithed.dev/v2/packs/${uid}/contributors?token=${await user.getIdToken()}&` + newContributors.map(c => "contributors=" + c).join('&'), { method: 'POST' })
+            if (delContributors.length > 0)
+                await fetch(`https://api.smithed.dev/v2/packs/${uid}/contributors?token=${await user.getIdToken()}&` + delContributors.map(c => "contributors=" + c).join('&'), { method: 'DELETE' })
+
+        }
+
 
         if (resp.status !== HTTPResponses.OK && resp.status !== HTTPResponses.CREATED) {
             const error = await resp.json()
@@ -639,16 +680,7 @@ export default function Edit() {
             </EditorDiv>
         </div>
         <Divider />
-        {user.uid === metaData?.owner && <div className='container' style={{ width: '100%', gap: '1.5rem' }}>
-            <div className='container' style={{ flexDirection: 'row', marginBottom: '-1rem', justifyContent: 'space-between', width: '100%' }}>
-                <h1 style={{ fontSize: '2rem' }}>Contributors</h1>
-            </div>
-            <div className='container' style={{width: '100%', flexDirection: 'row', gap: '0.5rem'}}>
-                <IconInput icon={Account} placeholder='Username/UID' style={{width: '100%'}} />
-                <button className='buttonLike accentedButtonLike'><Plus/></button>
-            </div>
-            <RenderContributors contributors={contributors} owner={metaData.owner} onRemoveContributor={() => setContributors([...contributors])} />
-        </div>}
+        {user.uid === metaData?.owner && <AddContributor contributors={contributors} setContributors={setContributors} owner={metaData.owner} />}
         {user.uid === metaData?.owner && <Divider />}
         <div className='container' style={{ flexDirection: 'row', width: '100%', gap: '1rem' }}>
             <IconTextButton className='buttonLike invalidButtonLike' text='Cancel' icon={Cross} onClick={() => {
