@@ -48,38 +48,11 @@ async function getMetadata(url = '') {
 
 }
 
-const handleMetadata = async (req, res) => {
-    const url = req.originalUrl
-    try {
-        // 1. Read index.html
-        let template = fs.readFileSync(
-            path.resolve(__dirname, 'index.html'),
-            'utf-8',
-        )
-
-        const metaData = await getMetadata(url)
-        console.log(metaData)
-
-        let index = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), { encoding: 'utf-8' })
-
-        index = index
-            .replace('__OGSITENAME__', metaData?.siteName ?? '')
-            .replace('__DESCRIPTION__', metaData?.description ?? '')
-            .replace('__TITLE__', metaData?.title ?? '')
-            .replace('__IMAGE__', metaData?.image ?? '')
-        // 6. Send the rendered HTML back.
-        res.status(200).set({ 'Content-Type': 'text/html' }).end(index)
-    } catch (e) {
-        console.error(e)
-        res.status(500).end(JSON.stringify(e))
-    }
-}
-
 const distFolder = "dist/client"
+const isProd = process.env.NODE_ENV === 'production' || process.env.SERVER_ENV === 'production'
 
-const isProd = process.env.NODE_ENV === 'production'
-
-
+console.log('Is server production?', isProd)
+console.log('Running on port:', process.env.PORT)
 globalThis.fetch = fetch
 
 async function createServer() {
@@ -105,16 +78,16 @@ async function createServer() {
             res.setHeader("Content-Type", "application/xml")
             res.send(fs.readFileSync(path.resolve(distFolder, "sitemap.xml")))
         })
-        app.use(express.static(distFolder))
+        app.use(express.static(distFolder, {index: false}))
     }
     
 
     app.use('*', async (req, res, next) => {
         const url = req.originalUrl
 
-        console.log(url)
+        // console.log('URL is', url)
         const lastElement = url.split('/').at(-1)
-        
+        // console.log('Last Element is', lastElement)
         if(lastElement.substring(0, lastElement.indexOf('?')).includes('.'))
             return next()
 
@@ -139,29 +112,9 @@ async function createServer() {
 
                 const files = fs.readdirSync(distFolder + '/assets')
 
-                // const links = files.filter(f => f.endsWith('.css')).map(f => `<link rel="stylesheet" href="${distFolder}/assets/${f}"/>`)
-
-                // template = template.replace('<!--link-css-->', links.join('\n'))
-
                 render = (await import('./dist/server/entry-server.js')).default
             }
-            // console.log(template)
-            const parts = template.split('<!--ssr-outlet-->');
 
-            // 3. Load the server entry. ssrLoadModule automatically transforms
-            //    ESM source code to be usable in Node.js! There is no bundling
-            //    required, and provides efficient invalidation similar to HMR.
-
-            // const stream = await render(req, {
-            //     onShellReady() {
-            //         res.write(parts[0]);
-            //         stream.pipe(res);
-            //     },
-            //     onAllReady() {
-            //         res.write(parts[1])
-            //         res.end();
-            //     },
-            // });
 
             // // 4. render the app HTML. This assumes entry-server.js's exported
             // //     `render` function calls appropriate framework SSR APIs,
