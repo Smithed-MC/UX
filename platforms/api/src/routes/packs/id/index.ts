@@ -287,7 +287,7 @@ API_APP.route({
         if (doc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
 
-        if((await doc.get('data.owner')) !== userId)
+        if((await doc.get('owner')) !== userId)
             return sendError(reply, HTTPResponses.FORBIDDEN, `You are not the owner of ${packId}`)
 
         const existingContributors: string[] = await doc.get('contributors')
@@ -348,7 +348,7 @@ API_APP.route({
         if (doc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
 
-        if((await doc.get('data.owner')) !== userId)
+        if((await doc.get('owner')) !== userId)
             return sendError(reply, HTTPResponses.FORBIDDEN, `You are not the owner of ${packId}`)
 
         const existingContributors: string[] = await doc.get('contributors')
