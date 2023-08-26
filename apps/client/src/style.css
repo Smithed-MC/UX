@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend&display=swap');
+
 :root {
     font-family: Lexend;
     position: absolute;
@@ -56,7 +58,6 @@
         url('./fonts/Lexend-VariableFont_wght.ttf') format('truetype variations');
 } */
 
-@import url('https://fonts.googleapis.com/css2?family=Lexend&display=swap');
 
 div {
     font-family: Lexend;
