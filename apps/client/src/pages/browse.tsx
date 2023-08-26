@@ -1,22 +1,36 @@
-import { NavBar, NavButton, PackCard, FilterButton, IconInput, ChooseBox } from "components";
+import { PackCard, IconInput, ChooseBox } from "components";
 import React, { useEffect, useRef, useState } from "react";
-import { PackBundle, PackData, PackEntry, PackVersion, SortOptions, packCategories, supportedMinecraftVersions } from "data-types"
-import PackInfo, { AddToBundleModal } from "../widget/packInfo.js";
+import { PackData, SortOptions, packCategories, supportedMinecraftVersions } from "data-types"
+import { AddToBundleModal } from "../widget/packInfo.js";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import './browse.css'
 import { useAppDispatch, useAppSelector, useFirebaseUser, useQueryParams } from "hooks";
-import { Left, Browse as BrowseSvg, Plus } from "components/svg.js";
-import { coerce, compare } from "semver";
-import { getAuth } from "firebase/auth";
-import { BundlePageData } from "../loaders.js";
-import { useSelector } from "react-redux";
-import { selectSelectedBundle, selectUsersBundles, setSelectedBundle } from "store";
+import { Browse as BrowseSvg, Plus } from "components/svg.js";
+import { selectSelectedBundle, selectUsersBundles } from "store";
 import { Helmet } from "react-helmet";
+import { BrowsePageData, createBrowseSearchParams } from "../loaders.js";
 
+
+
+function RenderPages({totalPacks, currentPage, params}: {totalPacks: number, currentPage: number, params: URLSearchParams}) {
+    const numberOfPages = Math.ceil(totalPacks/20)
+
+    const formatSelected = (page: number) => `[${page + 1}]` 
+
+    let pageLinks = []
+    for(let p = 0; p < numberOfPages; p++) {
+        pageLinks.push(<a className={`browsePageButton ${currentPage === p ? 'selected' : ''}`} href={`/browse?page=${p}&` + params}>{p + 1}</a>)
+    }
+
+    return <div className="container" style={{flexDirection: 'row', gap: '0.25rem', width: '100%', justifyContent: 'center'}}>
+        {pageLinks}
+    </div>
+}
 
 export default function Browse(props: any) {
 
-    const { search, category, sort, version } = useQueryParams()
+    const params = useQueryParams()
+    const { search, category, sort, version, page } = params
 
     const selectedBundle = useAppSelector(selectSelectedBundle)
     const bundles = useAppSelector(selectUsersBundles)
@@ -24,117 +38,32 @@ export default function Browse(props: any) {
 
     const dispatch = useAppDispatch()
 
+    const { count: totalPacks, packs } = useLoaderData() as BrowsePageData 
+
     const [categories, setCategories] = useState(new Set(category != null ? typeof category === 'string' ? [category] : category : []))
     const [versions, setVersions] = useState(new Set(version != null ? typeof version === 'string' ? [version] : version : []))
 
-    const [packs, setPacks] = useState<{id: string, pack: PackData}[]>([])
     const [showWidget, setShowWidget] = useState<string | undefined>(undefined)
     const [packSort, setPackSort] = useState(sort)
 
-    const [addPack, setAddPack] = useState<string|undefined>(undefined)
+    const [addPack, setAddPack] = useState<string | undefined>(undefined)
 
 
     const navigate = useNavigate()
     const user = useFirebaseUser()
     const rootDiv = useRef<HTMLDivElement>(null)
 
-    let currentLoaded = 0;
-    let updatingPacks = false;
-
 
     async function updateUrl(search: string | null | (string | null)[]) {
-        let url = '?'
-        let queries = []
-        if (search != null && search !== '')
-            queries.push('search=' + search)
-
-        if (packSort != null)
-            queries.push('sort=' + packSort)
-
-        for (let c of categories.values())
-            queries.push('category=' + c)
-
-        for (let v of versions.values())
-            queries.push('version=' + v)
-
-        url += queries.join('&')
-        navigate(url)
-    }
-
-    const getPackData = async (id:string) => {
-        const resp = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
-        return {id, pack: await resp.json()}
-    }
-
-
-    async function getPacksFromAPI() {
-        const url = createUrlFromVariables();
-        const response = await fetch(url)
-        const data: { id: string, displayName: string }[] = await response.json()
-        // const elements = document.getElementsByTagName("browsePackCard")
-        // for(let e of elements) {
-        //     e.remove()
-        // }
-
-
-        setPacks(await Promise.all(data.map(d => getPackData(d.id))))
-    }
-
-    function createUrlFromVariables() {
-        const query: string[] = [
-            'limit=20',
-            'start=' + currentLoaded
-        ];
-
-        if (search != null && search !== '')
-            query.push('search=' + search as string);
-
-        for (let c of categories.values())
-            query.push('category=' + encodeURIComponent(c as string));
-
-        for (let v of versions.values())
-            query.push('version=' + encodeURIComponent(v as string));
-
-        if (packSort != null && packSort !== '')
-            query.push('sort=' + packSort)
-
-        const url = 'https://api.smithed.dev/v2/packs?' + query.join('&');
-        return url;
-    }
-
-    // async function getBundleData() {
-    //     const resp = await fetch(`https://api.smithed.dev/v2/bundles/${bundleId}`)
-    //     setBundleData(await resp.json())
-    // }
-
-    async function fetchData() {
-        await Promise.all([
-            getPacksFromAPI()
-        ])
-    }
-
-    async function onScroll(e: React.UIEvent<HTMLDivElement, UIEvent>) {
-        if (updatingPacks)
-            return
-        const scrollPosition = e.currentTarget.scrollTop
-        const scrollHeight = e.currentTarget.scrollHeight
-        // console.log(e.currentTarget.offsetHeight, scrollHeight, scrollPosition)
-
-        if (scrollPosition / scrollHeight < 0.60)
-            return
-
-        updatingPacks = true;
-
-        currentLoaded += 20
-        const url = createUrlFromVariables()
-
-        const response = await fetch(url)
-        const data: { id: string, displayName: string }[] = (await response.json())
-
-        if (data.filter(d => packs.find(p => p.id === d.id) === undefined).length === data.length) {
-            updatingPacks = false;
-            setPacks(packs.concat(await Promise.all(data.map(d => getPackData(d.id)))))
-        }
+        const params = createBrowseSearchParams({
+            search,
+            category: categories,
+            version: versions,
+            sort: packSort,
+        })
+        if(page)
+            params.set('page', page as string)
+        navigate('/browse?' + params)
     }
 
     function onClick(p: string) {
@@ -142,30 +71,12 @@ export default function Browse(props: any) {
         setShowWidget(showWidget === p ? undefined : p)
     }
 
-    useEffect(() => { fetchData(); updateUrl(search) }, [search, categories.size, packSort, versions.size])
-
-    // return <div className="container" style={{ 
-    //     height: '100%', width: '100%', 
-    //     position: 'absolute', backgroundColor: 'red', top: 0, left: 0,
-    //     justifyContent: 'safe start',
-    //     alignItems: 'safe start'
-    // }}>
-    //     <div className="container" style={{justifyContent: 'safe start', height: '100%', overflow: 'hidden'}}>
-    //         <div>
-    //             Search stuff here
-    //         </div>
-    //         <div className="container" style={{flexGrow: 1, overflow: 'auto', justifyContent: 'safe start'}}>
-    //             Scrollable<br/>
-    //             Last Scrollable<br/>
-    //         </div>
-    //     </div>
-    // </div>
-
+    useEffect(() => { updateUrl(search) }, [search, categories.size, packSort, versions.size])
 
     return <div className="container" style={{ width: '100%', boxSizing: 'border-box', height: '100%', justifyContent: 'safe start', gap: 32 }}>
         <Helmet>
             <title>Browse</title>
-            <meta name="description" content="Search for datapacks"/>
+            <meta name="description" content="Search for datapacks" />
         </Helmet>
         <div className="container" style={{ gap: '1rem', width: '100%', maxWidth: '46.25rem' }}>
             <div className="container" style={{ width: '100%', boxSizing: "border-box", gap: 16 }}>
@@ -187,14 +98,15 @@ export default function Browse(props: any) {
                         setVersions(new Set(typeof v === 'string' ? [v] : v))
                     }} />
                 </div>
+                {packs.length > 1 && <RenderPages totalPacks={totalPacks} currentPage={page != null ? Number.parseInt(page as string) : 0} params={createBrowseSearchParams(params)}/>}
             </div>
-            <div className="container cardContainer" id="packCardContainer" style={{ gap: 16, boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center', flexDirection: 'column', position: 'relative' }} onScroll={(e) => onScroll(e)}>
+            <div className="container cardContainer" id="packCardContainer" style={{ gap: 16, boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center', flexDirection: 'column', position: 'relative' }}>
                 {
                     packs.map(p => <PackCard tag="browsePackCard"
                         key={p.id} id={p.id} state={selectedBundle !== '' ? 'add' : undefined}
                         onClick={() => onClick(p.id)}
-                        parentStyle={{zIndex: addPack === p.id ? 1 : 0}}
-                        style={{  border: p.id === showWidget ? '2px solid var(--accent)' : '' }}
+                        parentStyle={{ zIndex: addPack === p.id ? 1 : 0 }}
+                        style={{ border: p.id === showWidget ? '2px solid var(--accent)' : '' }}
                         bundleData={bundles.find(b => b.uid === selectedBundle)}
                         user={user}
                         addWidget={<AddToBundleModal
@@ -210,7 +122,10 @@ export default function Browse(props: any) {
                         />}
                     />)
                 }
+
+                {packs.length === 0 && <h1>Looks like there's nothing matching these criteria</h1>}
             </div>
+            {packs.length >= 3 && <RenderPages totalPacks={totalPacks} currentPage={page != null ? Number.parseInt(page as string) : 0} params={createBrowseSearchParams(params)}/>}
         </div>
     </div>
 

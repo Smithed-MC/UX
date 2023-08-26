@@ -62,7 +62,7 @@ function PackPreview({ type }: { type: 'trending' | 'downloads' | 'newest' }) {
 
 
 function CategoryHeader({ icon: Icon, text, color }: { icon: any, text: string, color: string }) {
-    return <div style={{ fontWeight: 700, fontSize: '1rem', display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center', color: `var(--${color})` }}>
+    return <div style={{ fontWeight: 600, fontSize: '1rem', display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center', color: `var(--${color})` }}>
         <Icon style={{ width: '1rem' }} fill={`var(--${color})`} /> {text}
     </div>
 }

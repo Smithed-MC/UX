@@ -124,9 +124,9 @@ export function EditBundle({ close }: EditBundleProps) {
 
     return <div className="container" style={{ position: 'fixed', width: '100%', height: '100%', top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 50%)', animation: 'fadeInBackground 0.5s' }}>
         <div className='container' style={{ backgroundColor: 'var(--background)', border: '2px solid var(--border)', boxSizing: 'border-box', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 0.5s ease-in-out', alignItems: 'start' }}>
-            <span style={{ fontWeight: 700, fontSize: '1.25rem' }}>{curBundle.name}</span>
+            <span style={{ fontWeight: 600, fontSize: '1.25rem' }}>{curBundle.name}</span>
             {packs.length > 0 && <div className='container' style={{ alignItems: 'start', gap: '0.5rem', width: '100%' }}>
-                <span style={{ fontWeight: 700 }}>Packs:</span>
+                <span style={{ fontWeight: 600 }}>Packs:</span>
                 {packs.map(p => <div className='container' key={p.id} style={{ flexDirection: 'row', gap: '0.5rem', width: '100%', justifyContent: 'start' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
                         <circle cx="2" cy="2" r="2" fill="var(--foreground)" />

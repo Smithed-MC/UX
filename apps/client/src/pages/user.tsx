@@ -87,7 +87,7 @@ export function Bundle({ id, editable, showOwner }: { id: string, editable: bool
         <div className='container' style={{ alignItems: 'start', gap: '1rem', flexGrow: 1, justifyContent: 'start', height: '100%' }}>
             <div className='container' style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
                 <div>
-                    <label style={{ fontSize: '1.5rem', fontWeight: 700 }}>{rawBundleData.name}</label>
+                    <label style={{ fontSize: '1.5rem', fontWeight: 600 }}>{rawBundleData.name}</label>
                     {showOwner === true && <div style={{ display: 'flex', fontSize: '1.125rem', alignItems: 'center', gap: 8 }}>
                         Created By
                         <label style={{ backgroundColor: 'var(--background)', padding: 8, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)' }}>

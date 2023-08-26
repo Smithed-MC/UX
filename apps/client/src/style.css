@@ -1,6 +1,7 @@
 :root {
-    font-family: 'Lexend';
+    font-family: Lexend;
     position: absolute;
+    font-weight: 300;
     min-height: 100%;
     min-width: 100%;
     background: var(--background);
@@ -49,11 +50,13 @@
         url('./fonts/DoppioOne-Regular.ttf') format('truetype')
 }
 
-@font-face {
+/* @font-face {
     font-family: 'Lexend';
     src: local('Lexend'),
-        url('./fonts/Lexend-VariableFont_wght.ttf') format('truetype')
-}
+        url('./fonts/Lexend-VariableFont_wght.ttf') format('truetype variations');
+} */
+
+@import url('https://fonts.googleapis.com/css2?family=Lexend&display=swap');
 
 div {
     font-family: Lexend;
@@ -62,34 +65,41 @@ div {
 
 h1 {
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 h2 {
     font-size: 1.25rem;
-    font-weight: 700;
+    font-weight: 600;
 }
 h3 {
     font-size: 1.125rem;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 
 code {
-    color: var(--codeText);
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 8px;
+    background-color: var(--highlight);
+    font-family: Inconsolata;
+    color:rgba(255, 255, 255, 0.7);
+    padding: 0.125rem;
     box-sizing: border-box;
-    line-height: 36px;
-    border-radius: var(--defaultBorderRadius);
+    line-height: 1.5rem;
+    border-radius: 0.125rem;
 }
 
 
 pre {
     color: var(--codeText);
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--highlight);
     padding: 16px;
     border-radius: var(--defaultBorderRadius);
+}
+
+pre>code {
+    background-color: transparent !important;
+    white-space: break-spaces;
+    line-height: normal;
 }
 
 details {
@@ -253,6 +263,8 @@ button, .buttonLike {
     align-items: center;
     padding: 8px 16px;
     gap: 16px;
+
+    font-weight: 400;
     
     height: 36px;
     
@@ -281,7 +293,7 @@ button, .buttonLike {
     cursor: pointer;
 }
 
-button:hover, .buttonLike:hover:not(.disabled) {
+button:hover:not(:disabled), .buttonLike:hover:not(:disabled) {
     /* Highlight */
 
     background: var(--section);
@@ -304,17 +316,17 @@ button:hover, .buttonLike:hover:not(.disabled) {
 }
 
 
-button:focus, .buttonLike:focus:not(.disabled) {
+button:focus:not(:disabled), .buttonLike:focus:not(:disabled) {
     outline: none;
     border: 2px solid var(--foreground);
 }
 
 
-button:active, .buttonLike:active:not(.disabled) {
+button:active:not(:disabled), .buttonLike:active:not(:disabled) {
     filter: brightness(90%);
 }
 
-button:disabled, .buttonLike.disabled {
+button:disabled, .buttonLike:disabled {
     opacity: 0.5 !important;
     cursor: default;
 }

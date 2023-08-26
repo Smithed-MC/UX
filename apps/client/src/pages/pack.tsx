@@ -6,6 +6,7 @@ import Download from "../widget/download"
 import { Spinner } from "components"
 import './pack.css'
 import { Helmet } from "react-helmet"
+import { correctGithubLinks } from "formatters"
 
 async function getPack(id: string) {
     const response = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
@@ -31,7 +32,8 @@ async function getOwner(id: string) {
 async function getFullview(packData?: PackData) {
     if (packData !== undefined && packData.display.webPage !== undefined) {
         try {
-            const response = await fetch(packData.display.webPage)
+            
+            const response = await fetch(correctGithubLinks(packData.display.webPage))
             if (response.ok) {
                 return await response.text()
             }

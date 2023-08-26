@@ -70,7 +70,7 @@ export function CreateBundle({ close, minecraftVersion, showCloseButton, showEdi
 
     if(user == null) {
         return <div className="container" style={{gap: '1rem'}}>
-            <label style={{fontWeight: 700}}>You must login to create a bundle</label>
+            <label style={{fontWeight: 600}}>You must login to create a bundle</label>
             <div className="container" style={{flexDirection: 'row', gap: '1rem'}}>
                 <IconTextButton className="invalidButtonLike" icon={Cross} text={"Cancel"} onClick={close}/>
                 <IconTextButton icon={Account} text={"Login"} href="/account"/>
@@ -79,7 +79,7 @@ export function CreateBundle({ close, minecraftVersion, showCloseButton, showEdi
     }
 
     return <div className="container" style={{ gap: '1rem', width: '100%' }}>
-        <label style={{ fontWeight: 700 }}>Create a bundle</label>
+        <label style={{ fontWeight: 600 }}>Create a bundle</label>
         <IconInput style={{ width: '100%', zIndex: 1 }} type="text" icon={Edit} placeholder='Name...' onChange={(e) => setName(e.currentTarget?.value)} />
         {!minecraftVersion && <ChooseBox style={{ zIndex: 100 }} onChange={(v) => setVersion(v as string)} placeholder="Version" choices={supportedMinecraftVersions.map(v => ({ value: v, content: v }))} />}
         <div className='container' style={{ flexDirection: 'row', width: '100%', gap: 16 }}>

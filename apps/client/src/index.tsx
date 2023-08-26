@@ -18,7 +18,7 @@ import Settings from './pages/settings.js'
 import { Provider } from 'react-redux'
 
 import logo_small from './assets/logo_small.png'
-import { loadHomePageData, loadUserPageData } from './loaders.js'
+import { loadBrowseData, loadHomePageData, loadUserPageData } from './loaders.js'
 import User from './pages/user.js'
 import { selectSelectedBundle, selectUsersBundles, setSelectedBundle, setUsersBundles, store } from 'store'
 import { useAppDispatch, useAppSelector } from 'hooks'
@@ -104,7 +104,7 @@ export function ClientApplet() {
         <div className='container' style={{ width: '100%', backgroundColor: 'var(--bold)', borderTop: '2px solid var(--border)' }}>
             <div className="footerContainer" style={{ width: 'min(70rem, 100vw)', paddingLeft: 16 }}>
                 <div className='container footerLargeGroup'>
-                    <div className="container" style={{ flexDirection: 'row', fontWeight: 700, fontSize: '3rem', justifyContent: 'center', gap: 16 }}>
+                    <div className="container" style={{ flexDirection: 'row', fontWeight: 600, fontSize: '3rem', justifyContent: 'center', gap: 16 }}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
                             <path d="M18.85 10.3625C14.8125 12.4 11.475 14.1 11.4375 14.15C11.3375 14.25 35.7625 26.5 36.05 26.5C36.3375 26.5 50.9875 18.95 50.9625 18.8125C50.9375 18.65 26.65 6.625 26.3875 6.6375C26.275 6.65 22.8875 8.325 18.85 10.3625Z" fill="#FFF8F0" stroke="#121213" strokeWidth="2" />
                             <path d="M10.875 20.175V25.6125L23.4625 31.8625C30.375 35.3125 36.1125 38.125 36.1875 38.125C36.275 38.125 39.7625 36.3875 43.95 34.2625L51.5625 30.3875L51.6 24.875C51.6125 21.8375 51.5875 19.375 51.525 19.4C51.1375 19.5625 36.5375 27.0625 36.45 27.1375C36.375 27.2 36.25 27.25 36.1625 27.25C36.075 27.25 30.375 24.4375 23.5 21C16.625 17.5625 10.975 14.75 10.9375 14.75C10.9 14.75 10.875 17.2 10.875 20.175Z" fill="#FFF8F0" stroke="#121213" strokeWidth="2" />
@@ -149,7 +149,8 @@ export const subRoutes = [
     },
     {
         path: "browse",
-        element: <Browse />
+        element: <Browse />,
+        loader: loadBrowseData
     },
     {
         path: "account",

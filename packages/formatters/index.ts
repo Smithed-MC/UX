@@ -69,3 +69,21 @@ export async function formatDownloadURL(url: string) {
         return await fixRelease(matches, user??'', repo??'') ?? url
     return url
 }
+
+export function correctGithubLinks(url: string) {
+    const matches = /(https:\/\/)?(www\.)?github\.com\/(\S[^\/]+)\/(\S[^\/]+)\/(\S[^\/]+)\/(\S[^?\s]+)/g.exec(url)
+    console.log(matches)
+    if (matches == null || matches.length === 0)
+        return url
+
+    matches.splice(0, 3)
+    const user = matches.shift()
+    const repo = matches.shift()
+    const method = matches.shift()
+    if (method !== 'blob')
+        return url
+    const path = matches.shift()
+
+    return `https://raw.githubusercontent.com/${user}/${repo}/${path}`
+
+}

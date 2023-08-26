@@ -135,7 +135,7 @@ export default function PackCard({ id, packData, onClick, state, style, parentSt
             <div className='container packCardDetails'>
                 {!fallback && <img className="packCardImage" src={data.display.icon} onError={() => setFallback(true)} />}
                 {fallback && <div className='container packCardImage'><QuestionMark/></div>}
-                <label className='packCardName' style={{ fontWeight: 700 }}>{data.display.name}</label>
+                <label className='packCardName' style={{ fontWeight: 600 }}>{data.display.name}</label>
                 <p className='packCardDescription'>{data.display.description}</p>
             </div>
             <div className='container' style={{ width: '100%', flexBasis: 'fit-content', flexShrink: 0, gap: '1rem', flexDirection: 'row', position: 'relative' }}>

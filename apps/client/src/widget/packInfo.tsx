@@ -77,7 +77,7 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
         <div className="container" style={{ animationName: 'slideIn' + direction, gap: '1.5rem' }}>
 
             <div className="container" style={{ gap: '1rem', width: '100%' }}>
-                <label style={{ fontWeight: 700 }}>Choose Minecraft version</label>
+                <label style={{ fontWeight: 600 }}>Choose Minecraft version</label>
                 {supportedMinecraftVersions
                     .filter((mcVersion) =>
                         packData?.versions.find(v =>
@@ -94,7 +94,7 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
                             setMinecraftVersion(v)
                             changePage('right')
                         }}>
-                            <label style={{ color: isOutdated ? 'var(--disturbing)' : '', fontWeight: 700 }}>{v}</label>
+                            <label style={{ color: isOutdated ? 'var(--disturbing)' : '', fontWeight: 600 }}>{v}</label>
                             <label style={{ opacity: 0.25 }}>
                                 {!attachedVersion?.name.startsWith("v") && "v"}{attachedVersion?.name}
                             </label>
@@ -107,7 +107,7 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
                 <Right style={{ transform: 'rotate(180deg)' }} />
                 Close
             </div>
-            <span className="container" style={{ flexDirection: 'row', gap: '0.5rem', color: 'var(--border)', fontSize: '0.75rem', fontWeight: 700 }}>
+            <span className="container" style={{ flexDirection: 'row', gap: '0.5rem', color: 'var(--border)', fontSize: '0.75rem', fontWeight: 600 }}>
                 <Warning style={{ fill: 'var(--border)', width: '0.75rem', height: '0.75rem' }} />
                 Symbol means that the version is outdated
             </span>
@@ -122,7 +122,7 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
             <div className="container" style={{ animationName: 'slideIn' + direction, gap: '1.5rem' }}>
                 <div className="container" style={{ gap: '1rem', width: '100%' }}>
 
-                    <label style={{ fontWeight: 700, textAlign: 'center' }}>Choose Datapack version for "{bundle?.name}"</label>
+                    <label style={{ fontWeight: 600, textAlign: 'center' }}>Choose Datapack version for "{bundle?.name}"</label>
                     {versions?.map((v, idx) => {
                         const isOutdated = idx !== 0
 
@@ -189,7 +189,7 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
                     <Right style={{ transform: 'rotate(180deg)' }} />
                     Back
                 </div>
-                <span className="container" style={{ flexDirection: 'row', gap: '0.5rem', color: 'var(--border)', fontSize: '0.75rem', fontWeight: 700 }}>
+                <span className="container" style={{ flexDirection: 'row', gap: '0.5rem', color: 'var(--border)', fontSize: '0.75rem', fontWeight: 600 }}>
                     <Warning style={{ fill: 'var(--border)', width: '0.75rem', height: '0.75rem' }} />
                     Symbol means that the version is outdated
                 </span>
@@ -202,7 +202,7 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
             <div className="container" style={{ animationName: 'slideIn' + direction, gap: '1.5rem' }}>
 
                 <div className="container" style={{ gap: '1rem', width: '100%' }}>
-                    <label style={{ fontWeight: 700 }}>Choose Bundle for {minecraftVersion}</label>
+                    <label style={{ fontWeight: 600 }}>Choose Bundle for {minecraftVersion}</label>
 
                     {bundles
                         .filter((b) => b.version === minecraftVersion)
@@ -281,7 +281,7 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
         <div className="packPageHeader" style={{}}>
             <div className="packDetailsContainer">
                 <img src={packData?.display.icon} style={{ gridArea: 'icon', borderRadius: 'var(--defaultBorderRadius)' }}></img>
-                <label style={{ gridArea: 'name', fontSize: '1.5rem', fontWeight: 700 }}>{packData?.display.name}</label>
+                <label style={{ gridArea: 'name', fontSize: '1.5rem', fontWeight: 600 }}>{packData?.display.name}</label>
                 <label style={{ gridArea: 'byLine' }}>by {owner?.displayName}
                     <label className="packDetailsUpdateInfo">
                         {` ∙ ${metaData?.stats.updated ? 'Updated' : 'Uploaded'} ${prettyTimeDifference(metaData?.stats.updated ?? metaData?.stats.added ?? 0)} ago`}

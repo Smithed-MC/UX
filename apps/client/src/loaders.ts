@@ -9,7 +9,7 @@ async function getUserData(id: string) {
     return await userDataResponse.json()
 }
 
-async function getPacks(id: string) {
+async function getUserPacks(id: string) {
     const userPacksResponse = await fetch(`https://api.smithed.dev/v2/users/${id}/packs`)
     const packIds: string[] = userPacksResponse.ok ? (await userPacksResponse.json()) : []
 
@@ -56,10 +56,10 @@ export async function loadUserPageData({ params }: any) {
     const id: string = params.owner
 
 
-    const [user, packIds, bundles] = await Promise.all([getUserData(id), getPacks(id), getBundles(id)])
+    const [user, packIds, bundles] = await Promise.all([getUserData(id), getUserPacks(id), getBundles(id)])
 
     const packs = await Promise.all(packIds.map(p => getPackData(p)))
-    
+
     const [totalDownloads, dailyDownloads] = await getDownloads(id ?? '', packIds)
 
     const userStats = {
@@ -108,3 +108,57 @@ export async function loadHomePageData(): Promise<HomePageData> {
         trendingPacks: await Promise.all(trendingPackIds.map(p => getPackData(p.id)))
     }
 }
+
+function setMultiple(params: URLSearchParams, key: string, value: string | (string | null)[]) {
+
+    if (typeof value === 'string')
+        params.append(key, value)
+    else
+        value.forEach(v => params.append(key, v as string))
+}
+
+async function getTotalCount(params: URLSearchParams): Promise<number> {
+    const response = await fetch('https://api.smithed.dev/v2/packs/count?' + params.toString())
+    return response.ok ? await response.json() : 0
+}
+
+const PACKS_PER_PAGE = 20
+
+async function getPackEntriesForBrowse(params: URLSearchParams, page: number): Promise<{id: string, displayName: string}[]> {
+    params.set('start', (page * PACKS_PER_PAGE).toString())
+    params.set('limit', PACKS_PER_PAGE.toString())
+    const response = await fetch('https://api.smithed.dev/v2/packs?' + params.toString())
+    return response.ok ? await response.json() : []
+}
+
+export interface BrowsePageData {
+    count: number,
+    packs: {id: string, pack: PackData}[]
+}
+
+export function createBrowseSearchParams(parsedParams: any) {
+    const { search, category, sort, version } = parsedParams
+
+    const params = new URLSearchParams()
+
+    if (search)
+        params.set('search', search as string)
+    if (category)
+        setMultiple(params, 'category', category)
+    if (sort)
+        params.set('sort', sort as string)
+    if (version)
+        setMultiple(params, 'version', version)
+    return params
+} 
+
+export async function loadBrowseData({ request }: { request: Request }) {
+    const {page, ...parsedParams} = querystring.parse(request.url.split('?')[1])
+    const params = createBrowseSearchParams(parsedParams)
+
+    const [count, packEntries] = await Promise.all([getTotalCount(params), getPackEntriesForBrowse(params, page ? Number.parseInt(page as string) : 0)])
+
+    const packs = await Promise.all(packEntries.map(p => getPackData(p.id)))
+
+    return {count, packs: packs}
+} 
