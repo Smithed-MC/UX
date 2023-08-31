@@ -56,7 +56,6 @@ console.log('Running on port:', process.env.PORT)
 globalThis.fetch = fetch
 
 async function createServer() {
-    await generateSitemap(distFolder)
 
     const app = express()
 
@@ -74,6 +73,8 @@ async function createServer() {
         // express router (express.Router()), you should use router.use
         app.use(vite.middlewares)
     } else {
+        await generateSitemap(distFolder)
+
         app.get('/sitemap.xml', (req, res, next) => {
             res.setHeader("Content-Type", "application/xml")
             res.send(fs.readFileSync(path.resolve(distFolder, "sitemap.xml")))

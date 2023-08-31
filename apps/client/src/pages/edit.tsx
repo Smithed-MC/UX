@@ -118,9 +118,10 @@ function MarkdownURLInput({ reference, attr, description, placeholder, svg }: Ed
             <span style={{ color: 'var(--border)' }}>
                 {description}
             </span>
-            {showPreview && <div className='container' style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', justifyContent: 'start', padding: 16, zIndex: 100, boxSizing: 'border-box' }}>
-                <div className='container' style={{ backgroundColor: 'var(--section)', width: '100%', height: '100%', padding: 16, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)', border: '2px solid var(--border)' }}>
-                    <MarkdownRenderer style={{ flexGrow: 1, width: '100%', height: '100%' }}>{showPreview}
+            {showPreview && <div className='container' style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', justifyContent: 'start', padding: 16, zIndex: 100, boxSizing: 'border-box' }}>
+                <div className='container' style={{ backgroundColor: 'var(--section)', width: '100%', height: 'calc(100%)', padding: 16, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)', border: '2px solid var(--border)', overflow: 'hidden', overflowY: 'auto' }}>
+                    <MarkdownRenderer style={{ flexGrow: 1, width: '100%', height: '100%'}}>
+                        {showPreview}
                     </MarkdownRenderer>
                     <div style={{ flexGrow: 1 }} />
                     <button className='buttonLike invalidButtonLike' style={{ width: 128, fontSize: '1.125rem', backgroundColor: 'var(--disturbing)', justifySelf: 'flex-end' }} onClick={() => { setShowPreview(undefined) }}>Close</button>
