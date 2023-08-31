@@ -8,21 +8,23 @@ import { useAppDispatch, useAppSelector, useFirebaseUser, useQueryParams } from 
 import { Browse as BrowseSvg, Plus } from "components/svg.js";
 import { selectSelectedBundle, selectUsersBundles } from "store";
 import { Helmet } from "react-helmet";
-import { BrowsePageData, createBrowseSearchParams } from "../loaders.js";
+import { BrowsePageData, PACKS_PER_PAGE, createBrowseSearchParams } from "../loaders.js";
 
 
 
 function RenderPages({totalPacks, currentPage, params}: {totalPacks: number, currentPage: number, params: URLSearchParams}) {
-    const numberOfPages = Math.ceil(totalPacks/20)
+    const numberOfPages = Math.ceil(totalPacks/PACKS_PER_PAGE)
 
     const formatSelected = (page: number) => `[${page + 1}]` 
+
+    currentPage = Math.min(currentPage, numberOfPages)
 
     let pageLinks = []
     for(let p = 0; p < numberOfPages; p++) {
         pageLinks.push(<a className={`browsePageButton ${currentPage === p ? 'selected' : ''}`} href={`/browse?page=${p}&` + params}>{p + 1}</a>)
     }
 
-    return <div className="container" style={{flexDirection: 'row', gap: '0.25rem', width: '100%', justifyContent: 'center'}}>
+    return <div className="container" key="pages" style={{flexDirection: 'row', gap: '0.25rem', width: '100%', justifyContent: 'center'}}>
         {pageLinks}
     </div>
 }
@@ -85,7 +87,7 @@ export default function Browse(props: any) {
                         onChange={(e) => {
                             updateUrl(e.currentTarget.value.replaceAll(' ', '+'));
                         }} />
-                    <ChooseBox placeholder="Sort" className="success" style={{ maxWidth: '13rem', zIndex: 3 }} defaultValue={(sort == null ? 'downloads' : sort) as string} choices={Object.keys(SortOptions).map(opt => ({ value: opt.toLowerCase(), content: opt }))} onChange={v => {
+                    <ChooseBox placeholder="Sort" style={{ maxWidth: '13rem', zIndex: 3 }} defaultValue={(sort == null ? 'downloads' : sort) as string} choices={Object.keys(SortOptions).map(opt => ({ value: opt.toLowerCase(), content: opt }))} onChange={v => {
                         if (typeof v === 'string')
                             setPackSort(v)
                     }} />

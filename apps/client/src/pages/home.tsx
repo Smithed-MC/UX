@@ -61,9 +61,9 @@ function PackPreview({ type }: { type: 'trending' | 'downloads' | 'newest' }) {
 }
 
 
-function CategoryHeader({ icon: Icon, text, color }: { icon: any, text: string, color: string }) {
-    return <div style={{ fontWeight: 600, fontSize: '1rem', display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center', color: `var(--${color})` }}>
-        <Icon style={{ width: '1rem' }} fill={`var(--${color})`} /> {text}
+function CategoryHeader({ icon: Icon, text, color, sort }: { icon: any, text: string, color: string, sort: string }) {
+    return <div style={{ fontWeight: 600, fontSize: '1rem', display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center' }}>
+        <Icon style={{ width: '1rem', color: `var(--${color})` }} fill={`var(--${color})`} /><a href={`/browse?sort=${sort}`} style={{color: `var(--${color})`}}>{text}</a>
     </div>
 }
 
@@ -99,11 +99,11 @@ export default function Home(props: any) {
             <meta name="description" content="Datapacks: the community, the tooling; all bundled into the perfect package"/>
         </Helmet>
         <div className="cardCarousel">
-            <CategoryHeader icon={Download} text={"Top downloads"} color="success" />
+            <CategoryHeader icon={Download} text={"Top downloads"} color="success" sort="downloads"/>
             {packCard(downloadedPacks[currentPack])}
-            <CategoryHeader icon={Globe} text={"Trending today"} color="warning" />
+            <CategoryHeader icon={Globe} text={"Trending today"} color="warning" sort="trending"/>
             {packCard(trendingPacks[currentPack])}
-            <CategoryHeader icon={Clock} text={"Recently added"} color="secondary" />
+            <CategoryHeader icon={Clock} text={"Recently added"} color="secondary" sort="newest"/>
             {packCard(newestPacks[currentPack])}
         </div>
 

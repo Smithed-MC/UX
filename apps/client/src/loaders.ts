@@ -122,7 +122,7 @@ async function getTotalCount(params: URLSearchParams): Promise<number> {
     return response.ok ? await response.json() : 0
 }
 
-const PACKS_PER_PAGE = 20
+export const PACKS_PER_PAGE = 20
 
 async function getPackEntriesForBrowse(params: URLSearchParams, page: number): Promise<{id: string, displayName: string}[]> {
     params.set('start', (page * PACKS_PER_PAGE).toString())
@@ -153,10 +153,13 @@ export function createBrowseSearchParams(parsedParams: any) {
 } 
 
 export async function loadBrowseData({ request }: { request: Request }) {
-    const {page, ...parsedParams} = querystring.parse(request.url.split('?')[1])
+    const {page: pageParam, ...parsedParams} = querystring.parse(request.url.split('?')[1])
     const params = createBrowseSearchParams(parsedParams)
 
-    const [count, packEntries] = await Promise.all([getTotalCount(params), getPackEntriesForBrowse(params, page ? Number.parseInt(page as string) : 0)])
+    const page = pageParam ? Number.parseInt(pageParam as string) : 0
+
+    const count = await getTotalCount(params)
+    const packEntries = await getPackEntriesForBrowse(params, Math.min(page, Math.ceil(count / PACKS_PER_PAGE)))
 
     const packs = await Promise.all(packEntries.map(p => getPackData(p.id)))
 
