@@ -7,7 +7,9 @@ use serde_json::{json, Value};
 
 use simple_error::bail;
 
-use crate::{mcvm::{MinecraftProfile, add_user}};
+use crate::mcvm::{add_user, MinecraftProfile};
+
+pub const CLIENT_ID: &str = "0cee860d-3586-4214-8dc4-ab45b3ec0a54";
 
 pub async fn get_device_code() -> Result<String, Box<dyn Error>> {
     let client = reqwest::Client::new();
@@ -103,7 +105,7 @@ pub async fn get_xbl_token(msa_token: MSAToken) -> Result<String, Box<dyn Error>
 #[derive(Serialize, Deserialize)]
 pub struct XSTSToken {
     token: String,
-    user_hash: String
+    user_hash: String,
 }
 
 fn value_to_str(value: &Value) -> String {
@@ -127,17 +129,18 @@ pub async fn get_xsts_token(xbl_token: String) -> Result<XSTSToken, Box<dyn Erro
         "https://xsts.auth.xboxlive.com/xsts/authorize".to_owned(),
         body.to_string(),
     )
-    .await.expect("An error occured while posting");
+    .await
+    .expect("An error occured while posting");
 
     // eprintln!("Received response, status {}", resp.status());
     let text = resp.text().await?;
     // eprint!("XSTS JSON Response: {}", text);
     let token_response: Value = serde_json::from_str(&text)?;
 
-    Ok(XSTSToken { 
+    Ok(XSTSToken {
         token: value_to_str(&token_response["Token"]),
-        user_hash: value_to_str(&token_response["DisplayClaims"]["xui"][0]["uhs"])
-     })
+        user_hash: value_to_str(&token_response["DisplayClaims"]["xui"][0]["uhs"]),
+    })
 }
 
 pub async fn get_minecraft_token(xsts_token: XSTSToken) -> Result<String, Box<dyn Error>> {
@@ -146,7 +149,11 @@ pub async fn get_minecraft_token(xsts_token: XSTSToken) -> Result<String, Box<dy
         "platform": "PC_LAUNCHER"
     });
     // eprintln!("{}", body.to_string());
-    let resp = post_json("https://api.minecraftservices.com/launcher/login".to_owned(), body.to_string()).await?;
+    let resp = post_json(
+        "https://api.minecraftservices.com/launcher/login".to_owned(),
+        body.to_string(),
+    )
+    .await?;
 
     let text = resp.text().await?;
     // eprintln!("Minecraft Response: {text}");
@@ -155,16 +162,19 @@ pub async fn get_minecraft_token(xsts_token: XSTSToken) -> Result<String, Box<dy
     Ok(value_to_str(&token_response["access_token"]))
 }
 
-pub async fn get_minecraft_profile(minecraft_token: String) -> Result<MinecraftProfile, Box<dyn Error>>{
+pub async fn get_minecraft_profile(
+    minecraft_token: String,
+) -> Result<MinecraftProfile, Box<dyn Error>> {
     let client = Client::new();
     let resp = client
         .get("https://api.minecraftservices.com/minecraft/profile")
         .header("Authorization", format!("Bearer {}", minecraft_token))
-        .send().await?;
+        .send()
+        .await?;
 
     eprintln!("Status {}", resp.status());
     let text = resp.text().await?;
-    eprintln!("{}",text);
+    eprintln!("{}", text);
     let profile: MinecraftProfile = serde_json::from_str(&text).unwrap();
 
     Ok(profile)
@@ -177,7 +187,9 @@ pub async fn complete_auth(device_code: String) -> Result<String, Box<dyn Error>
     // eprintln!("XBL: {}", xbl_token);
     let xsts_token: XSTSToken = get_xsts_token(xbl_token).await.expect("Failed to get XSTS");
     // eprintln!("XSTS: {}", xsts_token.token);
-    let minecraft_token = get_minecraft_token(xsts_token).await.expect("Error while getting minecraft token");
+    let minecraft_token = get_minecraft_token(xsts_token)
+        .await
+        .expect("Error while getting minecraft token");
     let profile = get_minecraft_profile(minecraft_token.clone()).await?;
 
     add_user(&profile, minecraft_token.clone()).await?;

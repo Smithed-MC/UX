@@ -3,16 +3,13 @@
     windows_subsystem = "windows"
 )]
 
+pub mod mcvm;
 pub mod minecraft;
 pub mod tauri_utils;
-pub mod mcvm;
 
 use crate::tauri_utils::commands;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-
-
-
 
 fn main() {
     // let result = testGetAuth();
