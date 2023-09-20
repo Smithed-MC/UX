@@ -23,7 +23,6 @@ pub async fn launch_instance(
     let mut lock = Lockfile::open(&paths)?;
     let mut config = Config::load(&paths.project.config_dir().join("mcvm.json"), true, output)?;
 
-    // switch_user(&mut config, String::from("CarbonSmasher")).await?;
     let user = "carbon".to_string();
     config.users.users.insert(
         user.clone(),

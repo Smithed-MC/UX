@@ -3,8 +3,9 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { Event, listen } from "@tauri-apps/api/event";
 import { clipboard } from "@tauri-apps/api";
 import { WebviewWindow } from "@tauri-apps/api/window";
+import { IconTextButton, svg } from "components";
 
-function MCVMRuntime() {
+function LaunchPage() {
 	const [authDisplay, setAuthDisplay] = useState<AuthDisplayEvent | undefined>(
 		undefined
 	);
@@ -31,7 +32,13 @@ function MCVMRuntime() {
 
 	return (
 		<div className="container">
-			<button onClick={launchGame}>Launch</button>
+			<IconTextButton
+				className="accentedButtonLike"
+				text={"Launch"}
+				icon={svg.Play}
+				style={{ width: "fit-content" }}
+				onClick={launchGame}
+			/>
 			<br />
 			{authDisplay && <AuthDisplay {...authDisplay} />}
 		</div>
@@ -46,33 +53,32 @@ interface AuthDisplayEvent {
 function AuthDisplay({ url, device_code }: AuthDisplayEvent) {
 	return (
 		<div className="container">
-			Open this link:
-			<a
+			Copy this code:
+			<br />
+			<br />
+			<IconTextButton
+				className="buttonLike"
+				text={"Copy code"}
+				icon={svg.Copy}
+				style={{ width: "fit-content" }}
+				onClick={async () => {
+					await clipboard.writeText(device_code);
+				}}
+			/>
+			<br />
+			Then open the login page:
+			<br />
+			<br />
+			<IconTextButton
+				className="buttonLike"
+				text={"Open Login Page"}
+				icon={svg.Right}
+				style={{ width: "fit-content" }}
 				onClick={() => {
 					openMicrosoftLogin(url);
 				}}
-			>
-				{url}
-			</a>
-			<br />
-			And put in the code:
-			<div id="device-code">
-				{device_code}
-				<div
-					id="device-code-copy"
-					onClick={async () => {
-						await clipboard.writeText(device_code);
-					}}
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						height="1em"
-						viewBox="0 0 448 512"
-					>
-						<path d="M384 336H192c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16l140.1 0L400 115.9V320c0 8.8-7.2 16-16 16zM192 384H384c35.3 0 64-28.7 64-64V115.9c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1H192c-35.3 0-64 28.7-64 64V320c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H256c35.3 0 64-28.7 64-64V416H272v32c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V192c0-8.8 7.2-16 16-16H96V128H64z" />
-					</svg>
-				</div>
-			</div>
+				reverse={true}
+			/>
 		</div>
 	);
 }
@@ -83,4 +89,4 @@ function openMicrosoftLogin(url: string) {
 	});
 }
 
-export default MCVMRuntime;
+export default LaunchPage;

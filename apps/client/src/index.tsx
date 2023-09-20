@@ -24,9 +24,13 @@ import { selectSelectedBundle, selectUsersBundles, setSelectedBundle, setUsersBu
 import { useAppDispatch, useAppSelector } from 'hooks'
 import { PackBundle } from 'data-types'
 import { Helmet } from 'react-helmet'
+import { ClientInject, getDefaultInject } from './inject.js'
+
+export type { ClientInject } from './inject.js'
 
 interface ClientProps {
-    platform: 'desktop' | 'website'
+    platform: 'desktop' | 'website',
+    inject: ClientInject,
 }
 
 initializeApp({
@@ -42,7 +46,7 @@ initializeApp({
 
 
 
-export function ClientApplet() {
+export function ClientApplet(props: ClientProps) {
     const dispatch = useAppDispatch()
     const selectedBundle = useAppSelector(selectSelectedBundle)
 
@@ -98,7 +102,7 @@ export function ClientApplet() {
             <meta name="og:image" content="/icon.png" />
         </Helmet>
         <div className='container outlet' style={{ width: 'min(70rem, 100%)', gap: 32, boxSizing: 'border-box', flexGrow: 1, justifyContent: 'start' }}>
-            <NavBar />
+            <NavBar getTabs={props.inject.getNavbarTabs} />
             <Outlet />
         </div>
         <div className='container' style={{ width: '100%', backgroundColor: 'var(--bold)', borderTop: '2px solid var(--border)' }}>
@@ -181,14 +185,21 @@ export const routes = [
         path: '/',
         children: subRoutes,
         element: <Provider store={store}>
-            <ClientApplet />
+            <ClientApplet platform='website' inject={getDefaultInject()}/>
         </Provider>,
         errorElement: <RootError />
     }
 ]
 
+// Set the default client applet to one with different props
+export function populateDefaultRouteProps(props: ClientProps) {
+    console.log("Populate");
+    routes[0].element = <Provider store={store}>
+        <ClientApplet {...props}/>
+    </Provider>;
+}
+
 export default function Client({ platform }: ClientProps) {
     const router = createBrowserRouter(routes)
     return <RouterProvider router={router} />
 }
-
