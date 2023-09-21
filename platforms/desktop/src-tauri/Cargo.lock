@@ -3,23 +3,6 @@
 version = 3
 
 [[package]]
-name = "Smithed"
-version = "0.3.0"
-dependencies = [
- "anyhow",
- "chrono",
- "directories",
- "mcvm",
- "oauth2",
- "reqwest",
- "serde",
- "serde_json",
- "simple-error",
- "tauri",
- "tauri-build",
-]
-
-[[package]]
 name = "adler"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3571,6 +3554,23 @@ name = "smallvec"
 version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a507befe795404456341dfab10cef66ead4c041f62b8b11bbb92bffe5d0953e0"
+
+[[package]]
+name = "smithed"
+version = "0.3.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "directories",
+ "mcvm",
+ "oauth2",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "simple-error",
+ "tauri",
+ "tauri-build",
+]
 
 [[package]]
 name = "socket2"

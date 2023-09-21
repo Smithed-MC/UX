@@ -3,6 +3,7 @@ import { svg } from "components";
 
 export interface ClientInject {
 	getNavbarTabs: () => JSX.Element[];
+	enableFooter: boolean;
 }
 
 export function getDefaultInject(): ClientInject {
@@ -35,5 +36,6 @@ export function getDefaultInject(): ClientInject {
 				/>
 			</>,
 		],
+		enableFooter: true,
 	};
 }

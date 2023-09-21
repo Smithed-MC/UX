@@ -20,24 +20,26 @@ let inject: ClientInject = {
 		return [
 			<IconTextButton
 				className="navBarOption start"
-				text="Browse"
-				href="/browse"
-				icon={svg.Browse}
-			/>,
-			<IconTextButton
-				className="navBarOption middle"
 				text="Launch"
 				href="/launch"
 				icon={svg.Play}
 			/>,
 			<IconTextButton
 				className="navBarOption middle"
+				text="Browse"
+				href="/browse"
+				icon={svg.Browse}
+			/>,
+			<IconTextButton
+				className="navBarOption middle"
 				text="Discord"
 				href="https://smithed.dev/discord"
+				target="_blank"
 				icon={svg.Discord}
 			/>,
 		];
 	},
+	enableFooter: false,
 };
 
 populateDefaultRouteProps({ platform: "desktop", inject: inject });

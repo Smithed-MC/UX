@@ -2,17 +2,17 @@ use mcvm::shared::output::{MCVMOutput, MessageLevel};
 use serde::Serialize;
 use tauri::{AppHandle, Manager};
 
-pub struct SmithedMCVMOutput<'app> {
-    app: &'app mut AppHandle,
+pub struct SmithedMCVMOutput {
+    app: AppHandle,
 }
 
-impl<'a> SmithedMCVMOutput<'a> {
-    pub fn new(app: &'a mut AppHandle) -> SmithedMCVMOutput<'a> {
+impl SmithedMCVMOutput {
+    pub fn new(app: AppHandle) -> Self {
         Self { app }
     }
 }
 
-impl<'app> MCVMOutput for SmithedMCVMOutput<'app> {
+impl MCVMOutput for SmithedMCVMOutput {
     fn display_text(&mut self, text: String, _level: MessageLevel) {
         println!("{text}");
         let _ = self.app.emit_all("mcvm_output_message", MessageEvent(text));
@@ -28,17 +28,6 @@ impl<'app> MCVMOutput for SmithedMCVMOutput<'app> {
             },
         );
     }
-
-    // fn prompt_yes_no(&mut self, default: bool, message: MessageContents) -> anyhow::Result<bool> {
-    //     let message = message.default_format();
-    //     self.app.emit_all(
-    //         "mcvm_prompt_yes_no_request",
-    //         YesNoPromptEvent { default, message },
-    //     )?;
-    //     self.app.listen_global("mcvm_prompt_yes_no_response", || {
-
-    //     });
-    // }
 }
 
 /// Event for a message

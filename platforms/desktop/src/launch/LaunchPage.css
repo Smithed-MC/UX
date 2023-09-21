@@ -1,0 +1,50 @@
+.bundleSelector {
+	display: flex;
+	width: 100%;
+}
+
+.launchButton {
+	scale: 130%;
+	display: flex;
+}
+
+.launchFooter {
+	background-color: var(--section);
+	width: min(100vw);
+	padding: 1.5rem;
+	border-top: 2px solid var(--border);
+	position: absolute;
+	bottom: 0px;
+	flex-direction: row;
+	gap: 2rem;
+	justify-content: space-evenly;
+}
+
+.launchFooterLeft {
+	justify-content: flex-start;
+	flex-grow: 1;
+
+	padding-left: 1rem;
+}
+
+.launchFooterCenter {
+	justify-content: center;
+	flex-grow: 1;
+}
+
+.launchFooterRight {
+	justify-content: flex-end;
+	flex-grow: 1;
+	padding-right: 1rem;
+}
+
+.launchPopup {
+	background-color: var(--section);
+	padding: 2rem;
+	position: absolute;
+	left: 50vw;
+	top: 40vh;
+	transform: translate(-50%, -50%);
+	-webkit-transform: translate(-50%, -50%);
+	border-radius: 16px;
+}

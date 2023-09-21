@@ -26,9 +26,14 @@
     box-sizing: border-box;
 }
 
-.chooseBoxTrigger.open {
+.chooseBoxTrigger.open.noflip {
     border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0;
     border-bottom: 2px solid var(--border);
+}
+
+.chooseBoxTrigger.open.flip {
+    border-radius: 0 0 var(--defaultBorderRadius) var(--defaultBorderRadius);
+    border-top: 2px solid var(--border);
 }
 
 .chooseBoxOptionsWrapper {
@@ -37,12 +42,20 @@
 
     position: absolute;
     width: 100%;
-    top: 100%;
 
     z-index: 5;
     box-sizing: border-box;
     overflow: hidden;
 }
+
+.chooseBoxOptionsWrapper.noflip {
+    top: 100%;
+}
+
+.chooseBoxOptionsWrapper.flip {
+    bottom: 100%;
+}
+
 .chooseBoxOptionsWrapper.open {
     visibility: visible;
 }
@@ -55,6 +68,11 @@
     border: 2px solid var(--background);
     border-top: none;
     overflow: hidden;
+}
+
+.chooseBoxOptions.flip {
+    border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0;
+
 }
 
 .chooseBoxOptions.open {

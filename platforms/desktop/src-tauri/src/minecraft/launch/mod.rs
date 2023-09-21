@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::error::Error;
 
 use mcvm::data::config::instance::{read_instance_config, InstanceConfig};
 use mcvm::data::config::profile::ProfileConfig;
@@ -15,8 +14,8 @@ use crate::mcvm::output::SmithedMCVMOutput;
 
 pub async fn launch_instance(
     instance: &str,
-    output: &mut SmithedMCVMOutput<'_>,
-) -> Result<(), Box<dyn Error>> {
+    output: &mut SmithedMCVMOutput,
+) -> anyhow::Result<()> {
     let instance = InstanceID::from(instance);
     let paths: Paths = Paths::new().await?;
 
