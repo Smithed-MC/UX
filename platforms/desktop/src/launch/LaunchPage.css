@@ -1,10 +1,32 @@
+.smithedLogoContainer {
+	position: fixed;
+	left: 50vw;
+	top: 32vh;
+	transform: translate(-48%, -50%);
+	-webkit-transform: translate(-48%, -50%);
+}
+
+.bigSmithedLogo {
+	scale: 105%;
+}
+
+.bigSmithedText {
+	scale: 240%;
+	margin-top: 7%;
+}
+
+.smithedVersion {
+	scale: 100%;
+	margin-top: 10%;
+}
+
 .bundleSelector {
 	display: flex;
 	width: 100%;
 }
 
 .launchButton {
-	scale: 130%;
+	scale: 135%;
 	display: flex;
 }
 
@@ -41,7 +63,7 @@
 .launchPopup {
 	background-color: var(--section);
 	padding: 2rem;
-	position: absolute;
+	position: fixed;
 	left: 50vw;
 	top: 40vh;
 	transform: translate(-50%, -50%);

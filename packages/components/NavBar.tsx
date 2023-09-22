@@ -211,7 +211,7 @@ export function NavBar(props: NavBarProps) {
 
     return (
         <div className="container navBarContainer" style={{ flexDirection: 'row', width: '100%', boxSizing: 'border-box', zIndex: 100 }}>
-            <a className='navBarHide' style={{ fontSize: '24px', lineHeight: '30px', fontWeight: '700', fontFamily: 'Lexend', color: 'var(--foreground)', textDecoration: 'none' }} href="/">Smithed</a>
+            <a className='navBarHide' style={{ fontSize: '24px', lineHeight: '30px', fontWeight: '700', fontFamily: 'Lexend', color: 'var(--foreground)', textDecoration: 'none' }} href={props.logoUrl}>Smithed</a>
             <div className='navBarHide' style={{ width: 1, height: 36, background: 'var(--foreground)' }} />
             
             {props.getTabs && props.getTabs()}
@@ -232,4 +232,5 @@ export function NavBar(props: NavBarProps) {
 
 export interface NavBarProps {
     getTabs: (() => JSX.Element[]) | undefined;
+    logoUrl: string;
 }

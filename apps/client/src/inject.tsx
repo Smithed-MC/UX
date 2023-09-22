@@ -1,10 +1,19 @@
 import { IconTextButton } from "components";
 import { svg } from "components";
+import { Download } from "components/svg";
 
 export interface ClientInject {
 	getNavbarTabs: () => JSX.Element[];
 	enableFooter: boolean;
+	logoUrl: string;
+	packDownloadButton: PackDownloadButtonFn;
 }
+
+export type PackDownloadButtonFn = (
+	id: string,
+	openPopup: (element: JSX.Element) => void,
+	closePopup: () => void
+) => JSX.Element;
 
 export function getDefaultInject(): ClientInject {
 	return {
@@ -37,5 +46,16 @@ export function getDefaultInject(): ClientInject {
 			</>,
 		],
 		enableFooter: true,
+		logoUrl: "/",
+		packDownloadButton: (id) => (
+			<IconTextButton
+				className="accentedButtonLike"
+				iconElement={<Download fill="var(--foreground)" />}
+				text={"Download"}
+				reverse
+				href={`https://api.smithed.dev/v2/download?pack=${id}`}
+				rel="nofollow"
+			/>
+		),
 	};
 }

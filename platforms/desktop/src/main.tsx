@@ -3,14 +3,17 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./style.css";
 import LaunchPage from "./launch/LaunchPage";
-import { ClientInject, populateDefaultRouteProps, subRoutes } from "client";
+import { ClientInject, populateRouteProps, subRoutes } from "client";
 import { IconTextButton, svg } from "components";
+import AddToBundle from "./components/AddToBundle";
+import { invoke } from "@tauri-apps/api";
 
 // Injection code to modify the client so it works with the launcher
 const launchRoute = {
 	path: "launch",
 	element: <LaunchPage />,
 };
+
 if (!subRoutes.includes(launchRoute)) {
 	subRoutes.push(launchRoute);
 }
@@ -40,9 +43,34 @@ let inject: ClientInject = {
 		];
 	},
 	enableFooter: false,
+	logoUrl: "/launch",
+	packDownloadButton: (id, openPopup, closePopup) => (
+		<IconTextButton
+			className="accentedButtonLike"
+			iconElement={<svg.Plus fill="var(--foreground)" />}
+			text={"Add to local bundle"}
+			onClick={() => {
+				const element = (
+					<AddToBundle
+						onFinish={async (bundleId) => {
+							if (bundleId !== undefined) {
+								try {
+								} catch (e) {
+									console.error("Failed to add pack to bundle: " + e);
+								}
+							}
+							closePopup();
+						}}
+					/>
+				);
+				openPopup(element);
+			}}
+			reverse
+		/>
+	),
 };
 
-populateDefaultRouteProps({ platform: "desktop", inject: inject });
+populateRouteProps({ platform: "desktop", inject: inject });
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 	<React.StrictMode>

@@ -21,7 +21,7 @@ reqwest = { version = "0.11.15", features = ["rustls-tls"] }
 chrono = "0.4.24"
 simple-error = "0.3.0"
 directories = "5.0"
-mcvm = "0.12.4"
+mcvm = { version = "0.13.0", features = ["arc"] }
 oauth2 = "4.4.2"
 anyhow = "1.0.75"
 

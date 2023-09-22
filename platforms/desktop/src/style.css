@@ -22,3 +22,14 @@
 .titlebar-button:hover {
     background: #5bbec3;
 }
+
+.popup {
+	background-color: var(--section);
+	padding: 2rem;
+	position: fixed;
+	left: 50vw;
+	top: 40vh;
+	transform: translate(-50%, -50%);
+	-webkit-transform: translate(-50%, -50%);
+	border-radius: 16px;
+}

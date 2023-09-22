@@ -122,6 +122,7 @@ export type PackDependency = Static<typeof PackReferenceSchema>
 export type PackVersion = Static<typeof PackVersionSchema>
 export type PackData = Static<typeof PackDataSchema>
 export type PackBundle = Static<typeof BundleSchema>
+export type PackReference = Static<typeof PackReferenceSchema>
 
 export type UserData = Static<typeof UserDataSchema>
 

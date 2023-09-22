@@ -5,31 +5,30 @@ use mcvm::data::config::profile::ProfileConfig;
 use mcvm::data::user::{AuthState, User, UserKind};
 use mcvm::data::{config::Config, id::InstanceID};
 use mcvm::io::{files::paths::Paths, lock::Lockfile};
+use mcvm::shared::modifications::ClientType;
 use mcvm::shared::Side;
-use mcvm::util::versions::{MinecraftLatestVersion, MinecraftVersionDeser};
+use mcvm::util::versions::MinecraftVersionDeser;
 use oauth2::ClientId;
 use simple_error::bail;
 
+use crate::config::LocalBundleConfig;
 use crate::mcvm::output::SmithedMCVMOutput;
 
-pub async fn launch_instance(
-    instance: &str,
+pub async fn launch_bundle(
+    bundle_id: String,
+    bundle: LocalBundleConfig,
     output: &mut SmithedMCVMOutput,
 ) -> anyhow::Result<()> {
-    let instance = InstanceID::from(instance);
+    let instance = InstanceID::from(format!("smithed-bundle-{bundle_id}"));
     let paths: Paths = Paths::new().await?;
 
     let mut lock = Lockfile::open(&paths)?;
     let mut config = Config::load(&paths.project.config_dir().join("mcvm.json"), true, output)?;
 
-    let user = "carbon".to_string();
+    let user = "smithed-user".to_string();
     config.users.users.insert(
         user.clone(),
-        User::new(
-            UserKind::Microsoft { xbox_uid: None },
-            &user,
-            "CarbonSmasher",
-        ),
+        User::new(UserKind::Microsoft { xbox_uid: None }, &user, "SmithedUser"),
     );
     config.users.state = AuthState::UserChosen(user.clone());
 
@@ -38,9 +37,9 @@ pub async fn launch_instance(
         let mut instances = HashMap::new();
         instances.insert(instance.clone(), instance_config.clone());
         let profile_config = ProfileConfig {
-            version: MinecraftVersionDeser::Latest(MinecraftLatestVersion::Release),
+            version: MinecraftVersionDeser::Version(bundle.version),
             modloader: Default::default(),
-            client_type: Default::default(),
+            client_type: ClientType::None,
             server_type: Default::default(),
             instances,
             packages: Default::default(),

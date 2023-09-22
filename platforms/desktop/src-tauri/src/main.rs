@@ -22,7 +22,9 @@ fn main() -> anyhow::Result<()> {
             commands::stop_game,
             commands::add_bundle,
             commands::list_bundles,
+            commands::bundle_exists,
             commands::remove_bundle,
+            commands::add_pack_to_bundle,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

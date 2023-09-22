@@ -102,7 +102,7 @@ export function ClientApplet(props: ClientProps) {
             <meta name="og:image" content="/icon.png" />
         </Helmet>
         <div className='container outlet' style={{ width: 'min(70rem, 100%)', gap: 32, boxSizing: 'border-box', flexGrow: 1, justifyContent: 'start' }}>
-            <NavBar getTabs={props.inject.getNavbarTabs} />
+            <NavBar getTabs={props.inject.getNavbarTabs} logoUrl={props.inject.logoUrl} />
             <Outlet />
         </div>
         {props.inject.enableFooter ? <Footer /> : <br />}
@@ -145,6 +145,7 @@ function Footer() {
     </div>;
 }
 
+// Don't reorder these please
 export const subRoutes = [
     {
         path: "",
@@ -175,7 +176,7 @@ export const subRoutes = [
     },
     {
         path: "packs/:id",
-        element: <Packs />,
+        element: <Packs packDownloadButton={getDefaultInject().packDownloadButton} />,
         loader: loadPackData
     },
     {
@@ -196,11 +197,12 @@ export const routes = [
 ]
 
 // Set the default client applet to one with different props
-export function populateDefaultRouteProps(props: ClientProps) {
+export function populateRouteProps(props: ClientProps) {
     console.log("Populate");
     routes[0].element = <Provider store={store}>
         <ClientApplet {...props}/>
     </Provider>;
+    subRoutes[6].element = <Packs packDownloadButton={props.inject.packDownloadButton} />;
 }
 
 export default function Client({ platform }: ClientProps) {

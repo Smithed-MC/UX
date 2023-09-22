@@ -13,7 +13,7 @@ pub struct SmithedConfig {
 }
 
 /// Config for a  local launchable bundle
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct LocalBundleConfig {
     pub version: String,
     pub packs: Vec<PackReference>,

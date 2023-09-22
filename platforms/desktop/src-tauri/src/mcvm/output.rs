@@ -10,6 +10,10 @@ impl SmithedMCVMOutput {
     pub fn new(app: AppHandle) -> Self {
         Self { app }
     }
+
+    pub fn get_app_handle(self) -> AppHandle {
+        self.app
+    }
 }
 
 impl MCVMOutput for SmithedMCVMOutput {
