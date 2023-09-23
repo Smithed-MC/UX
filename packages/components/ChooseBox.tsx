@@ -54,6 +54,7 @@ export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onC
             if (onChange) onChange(value)
             setValue([...value])
         } else if (value !== newValue) {
+            setOpen(false)
             if (onChange) onChange(newValue)
             setValue(newValue)
         }

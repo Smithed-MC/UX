@@ -1,23 +1,36 @@
+.launchContentContainer {
+	padding-bottom: 8%;
+}
+
 .smithedLogoContainer {
-	position: fixed;
-	left: 50vw;
-	top: 32vh;
-	transform: translate(-48%, -50%);
-	-webkit-transform: translate(-48%, -50%);
+	margin-top: -4%;
+	margin-bottom: 2%;
 }
 
 .bigSmithedLogo {
-	scale: 105%;
+	scale: 55%;
 }
 
 .bigSmithedText {
-	scale: 240%;
-	margin-top: 7%;
+	scale: 170%;
+	margin-top: -21%;
+	color: var(--foreground);
 }
 
 .smithedVersion {
-	scale: 100%;
-	margin-top: 10%;
+	scale: 90%;
+	margin-top: 3%;
+	color: var(--border);
+}
+
+.launchSectionHeader {
+	font-size: 30px;
+}
+
+.showSelectedBundle {
+	display: inline;
+	width: 100%;
+	font-size: 18px;
 }
 
 .bundleSelector {
@@ -32,11 +45,13 @@
 
 .launchFooter {
 	background-color: var(--section);
-	width: min(100vw);
+	width: min(100%);
 	padding: 1.5rem;
 	border-top: 2px solid var(--border);
-	position: absolute;
+	position: fixed;
 	bottom: 0px;
+	left: 0px;
+	box-sizing: border-box;
 	flex-direction: row;
 	gap: 2rem;
 	justify-content: space-evenly;
@@ -44,7 +59,7 @@
 
 .launchFooterLeft {
 	justify-content: flex-start;
-	flex-grow: 1;
+	flex: 1 1;
 
 	padding-left: 1rem;
 }
@@ -56,7 +71,7 @@
 
 .launchFooterRight {
 	justify-content: flex-end;
-	flex-grow: 1;
+	flex: 1;
 	padding-right: 1rem;
 }
 

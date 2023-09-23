@@ -32,4 +32,12 @@
 	transform: translate(-50%, -50%);
 	-webkit-transform: translate(-50%, -50%);
 	border-radius: 16px;
+    border: 2px solid var(--border);
+}
+
+.bigText {
+	font-size: 24px;
+	line-height: 30px;
+	font-weight: 700;
+	font-family: Lexend;
 }

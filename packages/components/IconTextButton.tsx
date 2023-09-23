@@ -32,20 +32,23 @@ export function IconTextButton({
 			target={target}
 			onClick={props.onClick}
 			rel={props.rel}
-            onMouseOver={props.onMouseOver}
-            onMouseLeave={props.onMouseLeave}
+			onMouseEnter={props.onMouseEnter}
+			onMouseLeave={props.onMouseLeave}
 		>
 			{IconSvg !== undefined && typeof IconSvg === "string" && IconSvg}
 			{IconSvg !== undefined && typeof IconSvg !== "string" && <IconSvg />}
 			{iconElement !== undefined && iconElement}
-			<div
-				style={{
-					width: 2,
-					height: 20,
-					opacity: 0.15,
-					backgroundColor: "white",
-				}}
-			/>
+			{IconSvg === undefined ||
+				(iconElement === undefined && (
+					<div
+						style={{
+							width: 2,
+							height: 20,
+							opacity: 0.15,
+							backgroundColor: "white",
+						}}
+					/>
+				))}
 			<label>{text}</label>
 		</a>
 	);

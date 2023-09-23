@@ -3,6 +3,7 @@
     windows_subsystem = "windows"
 )]
 
+pub mod api;
 pub mod api_types;
 pub mod config;
 pub mod mcvm;
@@ -21,10 +22,12 @@ fn main() -> anyhow::Result<()> {
             commands::launch_game,
             commands::stop_game,
             commands::add_bundle,
+            commands::get_bundle,
             commands::list_bundles,
             commands::bundle_exists,
             commands::remove_bundle,
             commands::add_pack_to_bundle,
+            commands::get_pack_version_for_bundle,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

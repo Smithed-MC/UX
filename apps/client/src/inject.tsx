@@ -7,6 +7,7 @@ export interface ClientInject {
 	enableFooter: boolean;
 	logoUrl: string;
 	packDownloadButton: PackDownloadButtonFn;
+	showBackButton: boolean;
 }
 
 export type PackDownloadButtonFn = (
@@ -57,5 +58,6 @@ export function getDefaultInject(): ClientInject {
 				rel="nofollow"
 			/>
 		),
+		showBackButton: false,
 	};
 }

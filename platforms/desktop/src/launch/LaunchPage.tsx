@@ -4,22 +4,13 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { Event, listen } from "@tauri-apps/api/event";
 import { app, clipboard } from "@tauri-apps/api";
 import { WebviewWindow } from "@tauri-apps/api/window";
-import {
-	ChooseBox,
-	IconInput,
-	IconTextButton,
-	SvgButton,
-	svg,
-} from "components";
-import {
-	ChooseBoxChoice,
-	ConfiguredLocalBundles,
-	LocalBundleConfig,
-	availableMinecraftVersionsChooseBox,
-} from "../types";
+import { ChooseBox, IconInput, IconTextButton, svg } from "components";
+import { ChooseBoxChoice, LocalBundleConfig } from "../types";
 import { MinecraftVersion } from "data-types";
 import { Smithed } from "components/svg";
 import { getChooseBoxBundles } from "../util";
+import BundleList from "./BundleList";
+import CreateBundle from "../components/CreateBundle";
 
 function LaunchPage() {
 	const [authDisplay, setAuthDisplay] = useState<AuthDisplayEvent | undefined>(
@@ -42,7 +33,10 @@ function LaunchPage() {
 	async function launchGame() {
 		console.log("3 2 1 blastoff!");
 		try {
-			let launch_promise = invoke("launch_game", { bundleId: bundle });
+			let launch_promise = invoke("launch_game", {
+				bundleId: bundle,
+				offline: !online,
+			});
 			let auth_listener_promise = listen(
 				"mcvm_display_auth_info",
 				(event: Event<AuthDisplayEvent>) => {
@@ -76,41 +70,22 @@ function LaunchPage() {
 	}
 
 	return (
-		<div className="container">
-			<div className="container smithedLogoContainer">
-				<Smithed className="bigSmithedLogo" />
-				<div
-					className="bigSmithedText"
-					style={{
-						fontSize: "24px",
-						lineHeight: "30px",
-						fontWeight: "700",
-						fontFamily: "Lexend",
-						color: "var(--foreground)",
-						textDecoration: "none",
-					}}
-				>
-					Smithed
+		<div className="container launchContainer">
+			<div className="container launchContentContainer">
+				<div className="container smithedLogoContainer">
+					<Smithed className="bigSmithedLogo" />
+					<div className="bigText bigSmithedText">Smithed</div>
+					<div className="bigText smithedVersion">{appVersion}</div>
 				</div>
-				<div
-					className="smithedVersion"
-					style={{
-						fontSize: "24px",
-						lineHeight: "30px",
-						fontWeight: "700",
-						fontFamily: "Lexend",
-						color: "var(--highlight)",
-						textDecoration: "none",
-					}}
-				>
-					{appVersion}
-				</div>
+				<br />
+				<BundleList onSelect={setBundle} />
+				{authDisplay && <AuthPopup {...authDisplay} />}
 			</div>
-			{authDisplay && <AuthPopup {...authDisplay} />}
+
 			<LaunchFooter
 				onLaunch={launchGame}
 				onCancel={stopGame}
-				onSelectBundle={setBundle}
+				selectedBundle={bundle}
 				onSetOnline={setOnline}
 			/>
 		</div>
@@ -120,15 +95,13 @@ function LaunchPage() {
 function LaunchFooter({
 	onLaunch,
 	onCancel,
-	onSelectBundle,
 	onSetOnline,
+	selectedBundle,
 }: LaunchFooterProps) {
-	const [bundleSelected, setBundleSelected] = useState(false);
-	const [isOnline, setIsOnline] = useState(true);
 	const [error, setError] = useState<undefined | "no_bundle">(undefined);
 
 	async function tryLaunch() {
-		if (!bundleSelected) {
+		if (selectedBundle === undefined) {
 			setError("no_bundle");
 			return;
 		}
@@ -138,18 +111,28 @@ function LaunchFooter({
 	return (
 		<div className="launchFooter container">
 			<div className="launchFooterLeft container">
-				<BundleSelector
-					onSetBundle={(id) => {
-						onSelectBundle(id);
-						setBundleSelected(true);
-					}}
-				/>
+				<div className="editBundleContainer">
+					<IconTextButton
+						className={
+							selectedBundle ? "secondaryButtonLike" : "highlightButtonLike"
+						}
+						text={selectedBundle ? "Edit bundle" : "Select bundle"}
+						icon={svg.Edit}
+						style={{ width: "fit-content" }}
+						href={
+							selectedBundle !== undefined
+								? `/editLocalBundle/${selectedBundle}`
+								: ""
+						}
+					/>
+					{/* <b>Selected bundle:</b> {selectedBundle} */}
+				</div>
 			</div>
 			<div className="launchFooterCenter container">
 				<LaunchButton
 					onLaunch={tryLaunch}
 					onCancel={onCancel}
-					bundleSelected={bundleSelected}
+					selectedBundle={selectedBundle}
 					error={error == "no_bundle" ? "No bundle selected" : ""}
 				/>
 			</div>
@@ -170,11 +153,12 @@ function LaunchFooter({
 					flip={true}
 					onChange={(value) => {
 						if (value == "online") {
-							setIsOnline(true);
+							onSetOnline(true);
 						} else if (value == "offline") {
-							setIsOnline(false);
+							onSetOnline(false);
 						}
 					}}
+					style={{ width: "75%" }}
 				/>
 			</div>
 		</div>
@@ -184,25 +168,28 @@ function LaunchFooter({
 interface LaunchFooterProps {
 	onLaunch: () => void;
 	onCancel: () => void;
-	onSelectBundle: (id: string) => void;
 	onSetOnline: (online: boolean) => void;
+	selectedBundle: string | undefined;
 }
 
 function LaunchButton({
-	bundleSelected,
+	selectedBundle,
 	onLaunch,
 	onCancel,
 	error,
 }: LaunchButtonProps) {
 	let [state, setState] = useState(LaunchButtonState.SelectBundle);
 
-	if (state == LaunchButtonState.SelectBundle && bundleSelected) {
+	if (state == LaunchButtonState.SelectBundle && selectedBundle !== undefined) {
 		setState(LaunchButtonState.ClickToLaunch);
 	}
 
-	useEffect(() => {
-		listen;
-	});
+	if (
+		state == LaunchButtonState.ClickToLaunch &&
+		selectedBundle === undefined
+	) {
+		setState(LaunchButtonState.SelectBundle);
+	}
 
 	async function onClick() {
 		if (state == LaunchButtonState.ClickToLaunch) {
@@ -230,7 +217,7 @@ function LaunchButton({
 					state == LaunchButtonState.SelectBundle
 						? "Select bundle"
 						: state == LaunchButtonState.ClickToLaunch
-						? "Launch"
+						? `Launch bundle '${selectedBundle}'`
 						: state == LaunchButtonState.Running
 						? "Running"
 						: state == LaunchButtonState.ClickToCancel
@@ -255,7 +242,7 @@ function LaunchButton({
 				}
 				style={{ width: "fit-content" }}
 				onClick={onClick}
-				onMouseOver={() => {
+				onMouseEnter={() => {
 					if (state == LaunchButtonState.Running) {
 						setState(LaunchButtonState.ClickToCancel);
 					}
@@ -272,7 +259,7 @@ function LaunchButton({
 }
 
 interface LaunchButtonProps {
-	bundleSelected: boolean;
+	selectedBundle: string | undefined;
 	onLaunch: () => void;
 	onCancel: () => void;
 	error?: string;
@@ -303,12 +290,17 @@ function BundleSelector({ onSetBundle }: BundleSelectorProps) {
 		setShowCreate(true);
 	}
 
-	async function addBundle(name: string, version: MinecraftVersion) {
-		try {
-			let bundle: LocalBundleConfig = { version: version, packs: [] };
-			await invoke("add_bundle", { bundleId: name, bundle: bundle });
-		} catch (e) {
-			console.error("Failed to add bundle: " + e);
+	async function addBundle(
+		name: string | undefined,
+		version: MinecraftVersion | undefined
+	) {
+		if (name !== undefined && version !== undefined) {
+			try {
+				let bundle: LocalBundleConfig = { version: version, packs: [] };
+				await invoke("add_bundle", { bundleId: name, bundle: bundle });
+			} catch (e) {
+				console.error("Failed to add bundle: " + e);
+			}
 		}
 
 		setShowCreate(false);
@@ -316,7 +308,7 @@ function BundleSelector({ onSetBundle }: BundleSelectorProps) {
 
 	return (
 		<>
-			{showCreate && <CreateBundlePopup onFinish={addBundle} />}
+			{showCreate && <CreateBundle onFinish={addBundle} />}
 			<div className="bundleSelector">
 				<ChooseBox
 					choices={available}
@@ -349,7 +341,7 @@ interface AuthDisplayEvent {
 
 function AuthPopup({ url, device_code }: AuthDisplayEvent) {
 	return (
-		<div className="container launchPopup authPopup">
+		<div className="container popup authPopup">
 			Copy this code:
 			<br />
 			<br />
@@ -411,83 +403,6 @@ function LoginWindowButton({ url }: LoginWindowButtonProps) {
 
 interface LoginWindowButtonProps {
 	url: string;
-}
-
-function CreateBundlePopup({ onFinish }: CreateBundlePopupProps) {
-	let [name, setName] = useState("");
-	let [version, setVersion] = useState<MinecraftVersion>("1.20.1");
-	let [error, setError] = useState<undefined | "bundle_exists" | "empty_name">(
-		undefined
-	);
-
-	async function checkIfExists() {
-		try {
-			let exists: boolean = await invoke("bundle_exists", { bundleId: name });
-			return exists;
-		} catch (e) {
-			console.error("Failed to check if bundle exists: " + e);
-			return true;
-		}
-	}
-
-	return (
-		<div className="container launchPopup createBundlePopup">
-			<h2>Create new bundle</h2>
-			<IconInput
-				type="text"
-				className={
-					error == "bundle_exists" || error == "empty_name"
-						? "invalidInput"
-						: ""
-				}
-				title={
-					error == "bundle_exists"
-						? "Bundle with this name already exists"
-						: error == "empty_name"
-						? "Name cannot be empty"
-						: ""
-				}
-				placeholder="Bundle name"
-				icon={svg.Edit}
-				onChange={(e) => {
-					setName(e.currentTarget.value);
-				}}
-				value={name}
-			/>
-			<br />
-			<ChooseBox
-				choices={availableMinecraftVersionsChooseBox}
-				placeholder="Select Minecraft version"
-				defaultValue={"1.20.1"}
-				onChange={(value) => {
-					if (!Array.isArray(value)) {
-						setVersion(value);
-					}
-				}}
-			/>
-			<br />
-			<br />
-			<IconTextButton
-				className="accentedButtonLike"
-				text="Save bundle"
-				icon={svg.Save}
-				style={{ width: "fit-content" }}
-				onClick={async () => {
-					if (name === "") {
-						setError("empty_name");
-					} else if (await checkIfExists()) {
-						setError("bundle_exists");
-					} else {
-						onFinish(name, version);
-					}
-				}}
-			/>
-		</div>
-	);
-}
-
-interface CreateBundlePopupProps {
-	onFinish: (name: string, version: MinecraftVersion) => void;
 }
 
 export default LaunchPage;

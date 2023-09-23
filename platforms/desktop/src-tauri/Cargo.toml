@@ -14,16 +14,17 @@ rust-version = "1.57"
 tauri-build = {version = "1.2", features = [] }
 
 [dependencies]
+anyhow = "1.0.75"
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.2", features = ["api-all"] }
-reqwest = { version = "0.11.15", features = ["rustls-tls"] }
+reqwest = { version = "0.11.15", features = ["rustls-tls", "json"] }
 chrono = "0.4.24"
 simple-error = "0.3.0"
 directories = "5.0"
-mcvm = { version = "0.13.0", features = ["arc"] }
+mcvm = { version = "0.13.0", path="/home/pango/code/mcvm-new", features = ["arc", "disable_profile_update_packages"] }
 oauth2 = "4.4.2"
-anyhow = "1.0.75"
+zip = "0.6.4"
 
 [features]
 # by default Tauri runs in production mode

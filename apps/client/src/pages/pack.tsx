@@ -54,7 +54,7 @@ export async function loadPackData({params}: any) {
     return {packData, metaData, fullview, owner}
 }
 
-export default function Packs({packDownloadButton}: PacksProps) {
+export default function Packs({packDownloadButton, showBackButton}: PacksProps) {
     const { id: id } = useParams()
     const data = useLoaderData() as any
 
@@ -79,11 +79,12 @@ export default function Packs({packDownloadButton}: PacksProps) {
             <meta name="og:site_name" content="Smithed" />
         </Helmet>
         <div className="container" style={{ gap: 16, height: '100%', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }}>
-                <PackInfo yOffset={/*window.scrollY*/0} id={id ?? ''} fixed={false} onClose={() => {}} downloadButton={packDownloadButton}/>
+            <PackInfo yOffset={/*window.scrollY*/0} id={id ?? ''} fixed={false} onClose={() => {}} downloadButton={packDownloadButton} showBackButton={showBackButton} />
         </div>
     </div>
 }
 
 export interface PacksProps {
     packDownloadButton: PackDownloadButtonFn,
+    showBackButton: boolean,
 }

@@ -7,6 +7,8 @@ import { ClientInject, populateRouteProps, subRoutes } from "client";
 import { IconTextButton, svg } from "components";
 import AddToBundle from "./components/AddToBundle";
 import { invoke } from "@tauri-apps/api";
+import { PackReference } from "data-types";
+import EditLocalBundle, { loadEditBundleData } from "./EditLocalBundle";
 
 // Injection code to modify the client so it works with the launcher
 const launchRoute = {
@@ -16,6 +18,16 @@ const launchRoute = {
 
 if (!subRoutes.includes(launchRoute)) {
 	subRoutes.push(launchRoute);
+}
+
+const editLocalBundleRoute = {
+	path: "editLocalBundle/:id",
+	element: <EditLocalBundle />,
+	loader: loadEditBundleData,
+};
+
+if (!subRoutes.includes(editLocalBundleRoute)) {
+	subRoutes.push(editLocalBundleRoute);
 }
 
 let inject: ClientInject = {
@@ -52,9 +64,18 @@ let inject: ClientInject = {
 			onClick={() => {
 				const element = (
 					<AddToBundle
-						onFinish={async (bundleId) => {
-							if (bundleId !== undefined) {
+						packId={id}
+						onFinish={async (bundleId, packVersion) => {
+							if (bundleId !== undefined && packVersion !== undefined) {
+								const ref: PackReference = {
+									id: id,
+									version: packVersion,
+								};
 								try {
+									await invoke("add_pack_to_bundle", {
+										bundleId: bundleId,
+										pack: ref,
+									});
 								} catch (e) {
 									console.error("Failed to add pack to bundle: " + e);
 								}
@@ -68,6 +89,7 @@ let inject: ClientInject = {
 			reverse
 		/>
 	),
+	showBackButton: true,
 };
 
 populateRouteProps({ platform: "desktop", inject: inject });

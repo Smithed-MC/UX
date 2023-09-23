@@ -1,6 +1,6 @@
 import { tauri } from "@tauri-apps/api";
 import { open } from '@tauri-apps/api/shell'
-import { IconTextButton, markdownOptions, MarkdownRenderer, Spinner } from "components";
+import { BackButton, IconTextButton, markdownOptions, MarkdownRenderer, Spinner } from "components";
 import { Cross, Discord, Download, Github, Globe, Plus, Right, Warning } from "components/svg";
 import { MinecraftVersion, MinecraftVersionSchema, PackBundle, PackData, PackEntry, PackMetaData, supportedMinecraftVersions, UserData } from "data-types";
 import Markdown, { MarkdownToJSX } from "markdown-to-jsx";
@@ -24,6 +24,7 @@ interface PackInfoProps {
     onClose: () => void
     style?: React.CSSProperties
     downloadButton: PackDownloadButtonFn
+    showBackButton: boolean
 }
 
 if (!import.meta.env.SSR && window.__TAURI_IPC__ !== undefined && markdownOptions !== undefined) {
@@ -265,7 +266,7 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
 }
 
 
-export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style, downloadButton }: PackInfoProps) {
+export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style, downloadButton, showBackButton }: PackInfoProps) {
     const loaderData = useLoaderData() as any
     // console.log(loaderData)
 
@@ -318,6 +319,7 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
                 </div>
             </div>
             <div className="userButtonsContainer">
+                {showBackButton && <BackButton />}
                 {packData?.display.urls?.discord && <IconTextButton className={"packInfoMediaButton"} icon={Discord} text={"Join Discord"} href={packData?.display.urls?.discord} />}
                 {packData?.display.urls?.source && <IconTextButton className={"packInfoMediaButton"} iconElement={<Globe fill="var(--foreground)" />} text={"Official website"} href={packData?.display.urls?.homepage} />}
                 {packData?.display.urls?.source && <IconTextButton className={"packInfoMediaButton"} icon={Github} text={"Source code"} href={packData?.display.urls?.source} />}

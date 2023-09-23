@@ -1862,8 +1862,6 @@ checksum = "a3e378b66a060d48947b590737b30a1be76706c8dd7b8ba0f2fe3989c68a853f"
 [[package]]
 name = "mcvm"
 version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db0b1670c07faa31065699c98d6bb420b084efe151b0a4d0105474556f2a0c1e"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1896,8 +1894,6 @@ dependencies = [
 [[package]]
 name = "mcvm_parse"
 version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4679648f5ffbe974bec7752574797c28f8bbcec8390c5c9c2ec0ded43b72277e"
 dependencies = [
  "anyhow",
  "mcvm_shared",
@@ -1908,8 +1904,6 @@ dependencies = [
 [[package]]
 name = "mcvm_pkg"
 version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9caf1275000431e7bf954c025e2cbf69cb331cf93e63429aa7dbb84d9f944b44"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1924,8 +1918,6 @@ dependencies = [
 [[package]]
 name = "mcvm_shared"
 version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "19d84aacac0ed017298681b8561cd04917e045981f1ce4ae8b88ac5f885afa4c"
 dependencies = [
  "anyhow",
  "current_locale",
@@ -3322,6 +3314,7 @@ dependencies = [
  "simple-error",
  "tauri",
  "tauri-build",
+ "zip",
 ]
 
 [[package]]

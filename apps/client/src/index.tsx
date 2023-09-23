@@ -146,7 +146,7 @@ function Footer() {
 }
 
 // Don't reorder these please
-export const subRoutes = [
+export const subRoutes: any[] = [
     {
         path: "",
         element: <Home />,
@@ -176,7 +176,7 @@ export const subRoutes = [
     },
     {
         path: "packs/:id",
-        element: <Packs packDownloadButton={getDefaultInject().packDownloadButton} />,
+        element: <Packs packDownloadButton={getDefaultInject().packDownloadButton} showBackButton={getDefaultInject().showBackButton} />,
         loader: loadPackData
     },
     {
@@ -202,7 +202,7 @@ export function populateRouteProps(props: ClientProps) {
     routes[0].element = <Provider store={store}>
         <ClientApplet {...props}/>
     </Provider>;
-    subRoutes[6].element = <Packs packDownloadButton={props.inject.packDownloadButton} />;
+    subRoutes[6].element = <Packs packDownloadButton={props.inject.packDownloadButton} showBackButton={props.inject.showBackButton} />;
 }
 
 export default function Client({ platform }: ClientProps) {
