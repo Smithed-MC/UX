@@ -38,17 +38,16 @@ export function IconTextButton({
 			{IconSvg !== undefined && typeof IconSvg === "string" && IconSvg}
 			{IconSvg !== undefined && typeof IconSvg !== "string" && <IconSvg />}
 			{iconElement !== undefined && iconElement}
-			{IconSvg === undefined ||
-				(iconElement === undefined && (
-					<div
-						style={{
-							width: 2,
-							height: 20,
-							opacity: 0.15,
-							backgroundColor: "white",
-						}}
-					/>
-				))}
+			{!(IconSvg === undefined && iconElement === undefined) && (
+				<div
+					style={{
+						width: 2,
+						height: 20,
+						opacity: 0.15,
+						backgroundColor: "white",
+					}}
+				/>
+			)}
 			<label>{text}</label>
 		</a>
 	);

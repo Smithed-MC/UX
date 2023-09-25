@@ -2,13 +2,14 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./style.css";
-import LaunchPage from "./launch/LaunchPage";
+import LaunchPage from "./pages/launch/LaunchPage";
 import { ClientInject, populateRouteProps, subRoutes } from "client";
 import { IconTextButton, svg } from "components";
 import AddToBundle from "./components/AddToBundle";
 import { invoke } from "@tauri-apps/api";
 import { PackReference } from "data-types";
-import EditLocalBundle, { loadEditBundleData } from "./EditLocalBundle";
+import EditLocalBundle from "./pages/EditLocalBundle";
+import ImportBundle from "./components/ImportBundle";
 
 // Injection code to modify the client so it works with the launcher
 const launchRoute = {
@@ -22,8 +23,7 @@ if (!subRoutes.includes(launchRoute)) {
 
 const editLocalBundleRoute = {
 	path: "editLocalBundle/:id",
-	element: <EditLocalBundle />,
-	loader: loadEditBundleData,
+	element: <EditLocalBundle />
 };
 
 if (!subRoutes.includes(editLocalBundleRoute)) {
@@ -78,6 +78,36 @@ let inject: ClientInject = {
 									});
 								} catch (e) {
 									console.error("Failed to add pack to bundle: " + e);
+								}
+							}
+							closePopup();
+						}}
+					/>
+				);
+				openPopup(element);
+			}}
+			reverse
+		/>
+	),
+	bundleDownloadButton: (id, openPopup, closePopup) => (
+		<IconTextButton
+			className="accentedButtonLike"
+			iconElement={<svg.Download fill="var(--foreground)" />}
+			text={"Import"}
+			onClick={() => {
+				console.log("clic");
+				const element = (
+					<ImportBundle
+						bundleId={id}
+						onFinish={async (bundleId, bundle) => {
+							if (bundleId !== undefined && bundle !== undefined) {
+								try {
+									await invoke("add_bundle", {
+										bundleId: bundleId,
+										bundle: bundle,
+									});
+								} catch (e) {
+									console.error("Failed to add imported bundle: " + e);
 								}
 							}
 							closePopup();

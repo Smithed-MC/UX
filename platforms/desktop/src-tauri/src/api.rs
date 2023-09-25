@@ -8,11 +8,21 @@ use mcvm::net::download;
 use reqwest::Client;
 use zip::ZipArchive;
 
-use crate::api_types::{PackData, PackReference};
+use crate::api_types::{PackData, PackReference, PackBundle};
 
 /// Get a pack from the API
 pub async fn get_pack(client: &Client, id: &str) -> anyhow::Result<PackData> {
     let url = format!("{API_URL}/packs/{id}");
+    // let text = download::text(url.clone(), client).await?;
+    // println!("Pack response: {text}");
+    download::json(url, client).await
+}
+
+/// Get a bundle from the API
+pub async fn get_bundle(client: &Client, id: &str) -> anyhow::Result<PackBundle> {
+    let url = format!("{API_URL}/bundles/{id}");
+    // let text = download::text(url.clone(), client).await?;
+    // println!("Pack response: {text}");
     download::json(url, client).await
 }
 

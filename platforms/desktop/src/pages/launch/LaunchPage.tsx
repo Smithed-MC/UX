@@ -5,12 +5,12 @@ import { Event, listen } from "@tauri-apps/api/event";
 import { app, clipboard } from "@tauri-apps/api";
 import { WebviewWindow } from "@tauri-apps/api/window";
 import { ChooseBox, IconInput, IconTextButton, svg } from "components";
-import { ChooseBoxChoice, LocalBundleConfig } from "../types";
+import { ChooseBoxChoice, LocalBundleConfig } from "../../types";
 import { MinecraftVersion } from "data-types";
 import { Smithed } from "components/svg";
-import { getChooseBoxBundles } from "../util";
+import { getChooseBoxBundles } from "../../util";
 import BundleList from "./BundleList";
-import CreateBundle from "../components/CreateBundle";
+import CreateBundle from "../../components/CreateBundle";
 
 function LaunchPage() {
 	const [authDisplay, setAuthDisplay] = useState<AuthDisplayEvent | undefined>(

@@ -13,7 +13,7 @@ import { useAppDispatch, useAppSelector, useFirebaseUser } from "hooks";
 import { selectSelectedBundle, selectUsersBundles, setSelectedBundle, setUsersBundles } from "store";
 import { CreateBundle } from "./bundle";
 import { Bundle } from "../pages/user";
-import { PackDownloadButtonFn } from "../inject";
+import { DownloadButtonFn } from "../inject";
 
 interface PackInfoProps {
     yOffset: number
@@ -23,7 +23,7 @@ interface PackInfoProps {
     fixed: boolean
     onClose: () => void
     style?: React.CSSProperties
-    downloadButton: PackDownloadButtonFn
+    downloadButton: DownloadButtonFn
     showBackButton: boolean
 }
 
@@ -287,7 +287,7 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
             <div className="packDetailsContainer">
                 <img src={packData?.display.icon} style={{ gridArea: 'icon', borderRadius: 'var(--defaultBorderRadius)' }}></img>
                 <label style={{ gridArea: 'name', fontSize: '1.5rem', fontWeight: 600 }}>{packData?.display.name}</label>
-                <label style={{ gridArea: 'byLine' }}>by {owner?.displayName}
+                <label style={{ gridArea: 'byLine' }}>by <a href={`/${owner?.uid}`}>{owner?.displayName}</a>
                     <label className="packDetailsUpdateInfo">
                         {` ∙ ${metaData?.stats.updated ? 'Updated' : 'Uploaded'} ${prettyTimeDifference(metaData?.stats.updated ?? metaData?.stats.added ?? 0)} ago`}
                     </label>
@@ -324,7 +324,6 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
                 {packData?.display.urls?.source && <IconTextButton className={"packInfoMediaButton"} iconElement={<Globe fill="var(--foreground)" />} text={"Official website"} href={packData?.display.urls?.homepage} />}
                 {packData?.display.urls?.source && <IconTextButton className={"packInfoMediaButton"} icon={Github} text={"Source code"} href={packData?.display.urls?.source} />}
                 <IconTextButton className="accentedButtonLike packInfoSmallDownload packInfoMediaButton" iconElement={<Download fill="var(--foreground)" />} text={"Download"} href={`https://api.smithed.dev/v2/download?pack=${id}`} rel="nofollow" />
-
             </div>
         </div>
         <div style={{ maxWidth: '53rem' }}>

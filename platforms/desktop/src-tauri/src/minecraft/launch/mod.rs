@@ -1,3 +1,6 @@
+mod mods;
+
+use anyhow::Context;
 use mcvm::data::config::instance::{read_instance_config, InstanceConfig};
 use mcvm::data::config::profile::ProfileConfig;
 use mcvm::data::id::ProfileID;
@@ -18,6 +21,7 @@ use std::collections::HashMap;
 use crate::api;
 use crate::config::LocalBundleConfig;
 use crate::mcvm::output::SmithedMCVMOutput;
+use crate::minecraft::launch::mods::install_mods;
 
 pub async fn launch_bundle(
     bundle_id: String,
@@ -67,9 +71,7 @@ pub async fn launch_bundle(
             &HashMap::new(),
         )?;
         config.instances.insert(instance.clone(), instance_val);
-        config
-            .profiles
-            .insert(profile_id.clone(), Box::new(profile));
+        config.profiles.insert(profile_id.clone(), profile);
     }
 
     println!("Updating bundle mcvm profile");
@@ -78,6 +80,12 @@ pub async fn launch_bundle(
 
     if let Some(instance) = config.instances.get_mut(&instance) {
         install_bundle_packs(&bundle, instance, &paths, client).await?;
+        instance.ensure_dirs(&paths)?;
+        let mods_dir = &instance.dirs.get().game_dir.join("mods");
+        files::create_dir(&mods_dir)?;
+        install_mods(client, &mods_dir, &bundle.version)
+            .await
+            .context("Failed to install mods")?;
 
         let (.., profile) = config
             .profiles
@@ -108,14 +116,17 @@ async fn install_bundle_packs(
     paths: &Paths,
     client: &Client,
 ) -> anyhow::Result<()> {
-    instance.ensure_dirs(&paths)?;
+    instance
+        .ensure_dirs(&paths)
+        .context("Failed to create instance dirs")?;
     let game_dir = &instance.dirs.get().game_dir;
     let paxi_dir = game_dir.join("config/paxi");
-    files::create_dir(&paxi_dir)?;
+    files::create_leading_dirs(&paxi_dir).context("Failed to create leading dirs for Paxi dir")?;
+    files::create_dir(&paxi_dir).context("Failed to create Paxi dir")?;
     let datapacks_dir = paxi_dir.join("datapacks");
-    files::create_dir(&datapacks_dir)?;
+    files::create_dir(&datapacks_dir).context("Failed to create Paxi datapacks dir")?;
     let resource_packs_dir = paxi_dir.join("resourcepacks");
-    files::create_dir(&resource_packs_dir)?;
+    files::create_dir(&resource_packs_dir).context("Failed to create Paxi resource packs dir")?;
 
     dbg!(&paxi_dir, &datapacks_dir, &resource_packs_dir);
 

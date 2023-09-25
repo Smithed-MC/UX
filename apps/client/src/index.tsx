@@ -171,7 +171,7 @@ export const subRoutes: any[] = [
     },
     {
         path: ":owner",
-        element: <User />,
+        element: <User showBackButton={getDefaultInject().showBackButton} bundleDownloadButton={getDefaultInject().bundleDownloadButton} />,
         loader: loadUserPageData
     },
     {
@@ -202,6 +202,7 @@ export function populateRouteProps(props: ClientProps) {
     routes[0].element = <Provider store={store}>
         <ClientApplet {...props}/>
     </Provider>;
+    subRoutes[5].element = <User showBackButton={props.inject.showBackButton} bundleDownloadButton={props.inject.bundleDownloadButton} />;
     subRoutes[6].element = <Packs packDownloadButton={props.inject.packDownloadButton} showBackButton={props.inject.showBackButton} />;
 }
 

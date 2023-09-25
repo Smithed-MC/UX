@@ -1,15 +1,30 @@
 import { ChooseBox, IconInput, IconTextButton, svg } from "components";
-import { MinecraftVersion } from "data-types";
-import { availableMinecraftVersionsChooseBox } from "../types";
+import { useEffect, useState } from "react";
+import { ChooseBoxChoice, LocalBundleConfig } from "../types";
+import { getChooseBoxBundles } from "../util";
 import { invoke } from "@tauri-apps/api";
-import { useState } from "react";
+import { PackBundle } from "data-types";
 
-function CreateBundle({ onFinish }: CreateBundleProps) {
+function ImportBundle({ bundleId, onFinish }: ImportBundleProps) {
+	const [bundle, setBundle] = useState<PackBundle | undefined>(undefined);
 	const [name, setName] = useState("");
-	const [version, setVersion] = useState<MinecraftVersion>("1.20.1");
-	const [error, setError] = useState<undefined | "bundle_exists" | "empty_name">(
+
+	let [error, setError] = useState<undefined | "bundle_exists" | "empty_name">(
 		undefined
 	);
+
+	useEffect(() => {
+		async function get() {
+			const remoteBundle: PackBundle = await invoke("get_remote_bundle", {
+				bundleId: bundleId,
+			});
+			setBundle(remoteBundle);
+			setName(remoteBundle.name);
+		}
+		if (bundle === undefined) {
+			get();
+		}
+	});
 
 	async function checkIfExists() {
 		try {
@@ -22,8 +37,8 @@ function CreateBundle({ onFinish }: CreateBundleProps) {
 	}
 
 	return (
-		<div className="container popup createBundlePopup">
-			<h2>Create new bundle</h2>
+		<div className="container popup">
+			<h2>Import bundle</h2>
 			<IconInput
 				type="text"
 				className={
@@ -46,19 +61,6 @@ function CreateBundle({ onFinish }: CreateBundleProps) {
 				value={name}
 			/>
 			<br />
-			<ChooseBox
-				choices={availableMinecraftVersionsChooseBox}
-				placeholder="Select version"
-				defaultValue={"1.20.1"}
-				onChange={(value) => {
-					if (!Array.isArray(value)) {
-						setVersion(value);
-					}
-				}}
-				style={{width: "100%"}}
-			/>
-			<br />
-			<br />
 			<div className="container" style={{ flexFlow: "row", gap: "1rem" }}>
 				<IconTextButton
 					className="highlightButtonLike"
@@ -70,17 +72,28 @@ function CreateBundle({ onFinish }: CreateBundleProps) {
 					}}
 				/>
 				<IconTextButton
-					className="accentedButtonLike"
-					text="Save bundle"
+					className={"accentedButtonLike"}
+					text="Import"
+					icon={svg.Download}
+					reverse={true}
 					style={{ width: "fit-content" }}
 					onClick={async () => {
 						if (name === "") {
 							setError("empty_name");
-						} else if (await checkIfExists()) {
-							setError("bundle_exists");
-						} else {
-							onFinish(name, version);
+							return;
 						}
+						if (await checkIfExists()) {
+							setError("bundle_exists");
+							return;
+						}
+						if (bundle === undefined) {
+							return;
+						}
+						const bundleConfig: LocalBundleConfig = {
+							version: bundle.version,
+							packs: bundle.packs,
+						};
+						onFinish(name, bundleConfig);
 					}}
 				/>
 			</div>
@@ -88,11 +101,12 @@ function CreateBundle({ onFinish }: CreateBundleProps) {
 	);
 }
 
-interface CreateBundleProps {
+export interface ImportBundleProps {
+	bundleId: string;
 	onFinish: (
-		name: string | undefined,
-		version: MinecraftVersion | undefined
-	) => void;
+		id: string | undefined,
+		bundle: LocalBundleConfig | undefined
+	) => {};
 }
 
-export default CreateBundle;
+export default ImportBundle;

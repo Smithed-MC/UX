@@ -6,11 +6,12 @@ export interface ClientInject {
 	getNavbarTabs: () => JSX.Element[];
 	enableFooter: boolean;
 	logoUrl: string;
-	packDownloadButton: PackDownloadButtonFn;
+	packDownloadButton: DownloadButtonFn;
+	bundleDownloadButton: DownloadButtonFn;
 	showBackButton: boolean;
 }
 
-export type PackDownloadButtonFn = (
+export type DownloadButtonFn = (
 	id: string,
 	openPopup: (element: JSX.Element) => void,
 	closePopup: () => void
@@ -59,5 +60,14 @@ export function getDefaultInject(): ClientInject {
 			/>
 		),
 		showBackButton: false,
+		bundleDownloadButton: (id) => (
+			<IconTextButton
+				text={"Download"}
+				iconElement={<Download fill="var(--foreground)" />}
+				className="accentedButtonLike bundleControlButton"
+				reverse={true}
+				href={`https://api.smithed.dev/v2/bundles/${id}/download`}
+			/>
+		),
 	};
 }

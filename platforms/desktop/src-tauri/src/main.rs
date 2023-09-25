@@ -27,7 +27,11 @@ fn main() -> anyhow::Result<()> {
             commands::bundle_exists,
             commands::remove_bundle,
             commands::add_pack_to_bundle,
+            commands::remove_pack_from_bundle,
             commands::get_pack_version_for_bundle,
+            commands::get_bundle_packs,
+            commands::get_remote_bundle,
+            commands::import_bundle,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

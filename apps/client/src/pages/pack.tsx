@@ -7,7 +7,7 @@ import { Spinner } from "components"
 import './pack.css'
 import { Helmet } from "react-helmet"
 import { correctGithubLinks } from "formatters"
-import { PackDownloadButtonFn } from "../inject"
+import { DownloadButtonFn } from "../inject"
 
 async function getPack(id: string) {
     const response = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
@@ -85,6 +85,6 @@ export default function Packs({packDownloadButton, showBackButton}: PacksProps) 
 }
 
 export interface PacksProps {
-    packDownloadButton: PackDownloadButtonFn,
+    packDownloadButton: DownloadButtonFn,
     showBackButton: boolean,
 }

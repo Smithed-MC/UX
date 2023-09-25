@@ -22,7 +22,7 @@ reqwest = { version = "0.11.15", features = ["rustls-tls", "json"] }
 chrono = "0.4.24"
 simple-error = "0.3.0"
 directories = "5.0"
-mcvm = { version = "0.13.0", path="/home/pango/code/mcvm-new", features = ["arc", "disable_profile_update_packages"] }
+mcvm = { version = "0.14.0", path="/home/pango/code/mcvm-new", features = ["arc", "disable_profile_update_packages"] }
 oauth2 = "4.4.2"
 zip = "0.6.4"
 

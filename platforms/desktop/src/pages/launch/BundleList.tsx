@@ -1,11 +1,11 @@
 import { FunctionComponent, SVGProps, useEffect, useState } from "react";
-import { ConfiguredLocalBundles, LocalBundleConfig } from "../types";
+import { ConfiguredLocalBundles, LocalBundleConfig } from "../../types";
 import "./BundleList.css";
 import { invoke } from "@tauri-apps/api";
 import libraries_box from "client/src/assets/libraries_box.png";
 import { IconTextButton, svg } from "components";
 import { MinecraftVersion } from "data-types";
-import CreateBundle from "../components/CreateBundle";
+import CreateBundle from "../../components/CreateBundle";
 
 function BundleList({ onSelect }: BundleListProps) {
 	const [list, setList] = useState<ConfiguredLocalBundles | undefined>(

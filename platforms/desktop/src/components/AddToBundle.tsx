@@ -1,6 +1,6 @@
 import { ChooseBox, IconTextButton, svg } from "components";
 import { useEffect, useState } from "react";
-import { ChooseBoxChoice } from "../types";
+import { ChooseBoxChoice, LocalBundleConfig } from "../types";
 import { getChooseBoxBundles } from "../util";
 import { invoke } from "@tauri-apps/api";
 import { PackReference } from "data-types";
@@ -10,7 +10,7 @@ function AddToBundle({ onFinish, packId }: AddToBundleProps) {
 	const [available, setAvailable] = useState<ChooseBoxChoice[]>([]);
 
 	let [error, setError] = useState<
-		undefined | "none_selected" | "unsupported_pack"
+		undefined | "none_selected" | "unsupported_pack" | "already_in_bundle"
 	>(undefined);
 
 	useEffect(() => {
@@ -31,6 +31,18 @@ function AddToBundle({ onFinish, packId }: AddToBundleProps) {
 		} catch (e) {
 			console.error("Failed to check for pack support: " + e);
 			return undefined;
+		}
+	}
+
+	async function isInBundle(bundleId: string) {
+		try {
+			let bundle: LocalBundleConfig = await invoke("get_bundle", {
+				bundleId: bundleId,
+			});
+			return bundle.packs.find((pack) => pack.id == packId) !== undefined;
+		} catch (e) {
+			console.error("Failed to check if bundle exists: " + e);
+			return true;
 		}
 	}
 
@@ -73,14 +85,18 @@ function AddToBundle({ onFinish, packId }: AddToBundleProps) {
 					onClick={async () => {
 						if (selected === undefined) {
 							setError("none_selected");
-						} else {
-							const packVersion = await getPackVersion();
-							if (packVersion === undefined) {
-								setError("unsupported_pack");
-							} else {
-								onFinish(selected, packVersion);
-							}
+							return;
 						}
+						const packVersion = await getPackVersion();
+						if (packVersion === undefined) {
+							setError("unsupported_pack");
+							return;
+						}
+						if (await isInBundle(selected)) {
+							setError("already_in_bundle");
+							return;
+						}
+						onFinish(selected, packVersion);
 					}}
 				/>
 			</div>
