@@ -13,16 +13,12 @@ use crate::api_types::{PackBundle, PackData, PackReference};
 /// Get a pack from the API
 pub async fn get_pack(client: &Client, id: &str) -> anyhow::Result<PackData> {
     let url = format!("{API_URL}/packs/{id}");
-    // let text = download::text(url.clone(), client).await?;
-    // println!("Pack response: {text}");
     download::json(url, client).await
 }
 
 /// Get a bundle from the API
 pub async fn get_bundle(client: &Client, id: &str) -> anyhow::Result<PackBundle> {
     let url = format!("{API_URL}/bundles/{id}");
-    // let text = download::text(url.clone(), client).await?;
-    // println!("Pack response: {text}");
     download::json(url, client).await
 }
 
@@ -37,17 +33,13 @@ pub async fn download_packs(
         return Ok(());
     }
 
-    println!("DOWNLOADING");
     let url = format_download_packs_url(packs);
 
     let bytes = download::bytes(url, client).await?;
-    println!("DONE DOWNLOADING");
     let mut cursor = Cursor::new(bytes);
     let mut zip = ZipArchive::new(&mut cursor)?;
-    println!("ZIP OPENED WITH SIZE {}", zip.len());
     for i in 0..zip.len() {
         let mut file = zip.by_index(i)?;
-        println!("OPENED ZIP FILE");
         let path = if file.name().contains("resource") {
             Some(resource_packs_dir)
         } else if file.name().contains("datapack") {
@@ -57,14 +49,10 @@ pub async fn download_packs(
         };
         if let Some(path) = path {
             let out_file = File::create(path.join(WELDED_PACK_FILENAME))?;
-            println!("OPENED OUT FILE");
             let mut out_file = BufWriter::new(out_file);
-            println!("COPYING FILE");
             std::io::copy(&mut file, &mut out_file)?;
-            println!("DONE COPYING FILE");
         }
     }
-    println!("EXTRACTED");
 
     Ok(())
 }

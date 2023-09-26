@@ -128,8 +128,6 @@ async fn install_bundle_packs(
     let resource_packs_dir = paxi_dir.join("resourcepacks");
     files::create_dir(&resource_packs_dir).context("Failed to create Paxi resource packs dir")?;
 
-    dbg!(&paxi_dir, &datapacks_dir, &resource_packs_dir);
-
     api::download_packs(
         client,
         bundle.packs.clone(),

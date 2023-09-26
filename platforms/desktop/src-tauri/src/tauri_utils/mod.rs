@@ -33,12 +33,5 @@ pub struct LaunchedGame {
     pub task_handle: LaunchHandle,
 }
 
-impl LaunchedGame {
-    /// Utility method to get the task handle since we cant do an if let on the launched game (which is in a mutex)
-    pub fn get_task_hand(&mut self) -> &mut LaunchHandle {
-        &mut self.task_handle
-    }
-}
-
 /// Type for the task handle of the launch process
 type LaunchHandle = async_runtime::JoinHandle<anyhow::Result<()>>;

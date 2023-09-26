@@ -30,13 +30,19 @@ pub async fn install_mods(
 		_ => bail!("Unsupported Minecraft version"),
 	};
 
-	let paxi_path = mods_dir.join("Smithed_mod_Paxi.jar");
-	let yungs_path = mods_dir.join("Smithed_mod_YUNGS_API.jar");
-	let fabric_api_path = mods_dir.join("Smithed_mod_Fabric_API.jar");
+    let paxi_path = mods_dir.join("Smithed_mod_Paxi.jar");
+    let yungs_path = mods_dir.join("Smithed_mod_YUNGS_API.jar");
+    let fabric_api_path = mods_dir.join("Smithed_mod_Fabric_API.jar");
 
-	download::file(paxi, &paxi_path, client).await.context("Failed to download Paxi")?;
-	download::file(yungs, &yungs_path, client).await.context("Failed to download YUNG's API")?;
-	download::file(fabric_api, &fabric_api_path, client).await.context("Failed to download Fabric API")?;
+    download::file(paxi, &paxi_path, client)
+        .await
+        .context("Failed to download Paxi")?;
+    download::file(yungs, &yungs_path, client)
+        .await
+        .context("Failed to download YUNG's API")?;
+    download::file(fabric_api, &fabric_api_path, client)
+        .await
+        .context("Failed to download Fabric API")?;
 
     Ok(())
 }

@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use tauri::{async_runtime, Manager};
 
 use crate::api;
-use crate::api_types::{PackData, PackReference, PackBundle};
+use crate::api_types::{PackBundle, PackData, PackReference};
 use crate::config::{LocalBundleConfig, SmithedConfig};
 use crate::mcvm::output::SmithedMCVMOutput;
 use crate::minecraft::launch::launch_bundle;
@@ -18,12 +18,15 @@ use super::{LaunchedGame, SmithedState};
 #[tauri::command]
 pub async fn launch_game(
     app_handle: tauri::AppHandle,
-    state: tauri::State<'_, SmithedState>,
+    mut state: tauri::State<'_, SmithedState>,
     bundle_id: String,
     offline: bool,
 ) -> Result<(), String> {
     let output = SmithedMCVMOutput::new(app_handle);
     let bundle = get_bundle_impl(&bundle_id, &state.project_dirs).await?;
+
+    // Make sure the game is stopped first
+    stop_game_impl(&mut state)?;
 
     let lock = state.launched_game.lock();
     let mut lock = fmt_err(lock)?;
@@ -66,8 +69,14 @@ fn get_launched_game(
 }
 
 #[tauri::command]
-pub async fn stop_game(state: tauri::State<'_, SmithedState>) -> Result<(), String> {
+pub async fn stop_game(mut state: tauri::State<'_, SmithedState>) -> Result<(), String> {
     println!("Stopping game...");
+    stop_game_impl(&mut state)?;
+
+    Ok(())
+}
+
+fn stop_game_impl(state: &mut tauri::State<'_, SmithedState>) -> Result<(), String> {
     let lock = state.launched_game.lock();
     let mut lock = fmt_err(lock)?;
     lock.as_mut().map(|game| game.task_handle.abort());
@@ -175,7 +184,6 @@ pub async fn remove_pack_from_bundle(
 ) -> Result<(), String> {
     let mut config = fmt_err(SmithedConfig::open(&state.project_dirs))?;
     if let Some(bundle) = config.local_bundles.get_mut(&bundle_id) {
-        dbg!(&bundle.packs, &pack_id);
         let index = bundle.packs.iter().position(|x| x.id == pack_id.as_str());
         if let Some(index) = index {
             bundle.packs.remove(index);
