@@ -12,5 +12,6 @@ import SvgButton from './SvgButton'
 import { IconTextButton } from './IconTextButton'
 import IconInput from './IconInput'
 import { ChooseBox } from './ChooseBox'
+import GalleryPackCard from './GalleryPackCard'
 
-export { NavButton, NavBar, PackCard, Spinner, PackVersionDownload, svg, ErrorPage, MarkdownRenderer, markdownComponents as markdownOptions, RootError, FilterButton, SvgButton, IconTextButton, IconInput, ChooseBox }
+export { NavButton, NavBar, PackCard, Spinner, PackVersionDownload, svg, ErrorPage, MarkdownRenderer, markdownComponents as markdownOptions, RootError, FilterButton, SvgButton, IconTextButton, IconInput, ChooseBox, GalleryPackCard }

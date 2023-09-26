@@ -9,7 +9,15 @@
 
 .packCardContainer {
     box-sizing: border-box;
-    width: 100%;
+    width: 100% !important;
+    display: grid;
+    grid-template-columns: auto auto;
+    /* grid-template-rows: aut; */
+    position: relative;
+
+    transition: all 0.5s;
+
+    gap: 2rem;
 }
 
 .browsePageButton {
@@ -46,5 +54,11 @@
 @media screen and (min-width: 1024px) {
     .packCardContainer {
         width: 100%;
+    }
+}
+
+@media screen and (max-width: 48rem) {
+    .packCardContainer {
+        grid-template-columns: auto;
     }
 }

@@ -45,7 +45,7 @@ async function getDownloads(id: string, packs: string[]) {
             total += packEntry.stats.downloads.total
             daily += packEntry.stats.downloads.today ?? 0
         } catch {
-            // console.log(`Pack ${pack}`)
+            console.log(`Pack ${pack}`)
         }
 
     }
@@ -57,7 +57,7 @@ export async function loadUserPageData({ params }: any) {
 
 
     const [user, packIds, bundles] = await Promise.all([getUserData(id), getUserPacks(id), getBundles(id)])
-
+    console.log(packIds)
     const packs = await Promise.all(packIds.map(p => getPackData(p)))
 
     const [totalDownloads, dailyDownloads] = await getDownloads(id ?? '', packIds)
