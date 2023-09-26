@@ -70,7 +70,8 @@ export const PackDataSchema = Type.Object({
             discord: Type.Optional(Type.String()),
             source: Type.Optional(Type.String()),
             homepage: Type.Optional(Type.String())
-        }))
+        })),
+        gallery: Type.Optional(Type.Array(Type.String()))
     }),
     versions: Type.Array(PackVersionSchema, {minItems: 1}),
     categories: Type.Array(PackCategorySchema)

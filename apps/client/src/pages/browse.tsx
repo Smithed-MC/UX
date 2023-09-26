@@ -1,4 +1,4 @@
-import { PackCard, IconInput, ChooseBox } from "components";
+import { PackCard, IconInput, ChooseBox, GalleryPackCard } from "components";
 import React, { useEffect, useRef, useState } from "react";
 import { PackData, SortOptions, packCategories, supportedMinecraftVersions } from "data-types"
 import { AddToBundleModal } from "../widget/packInfo.js";
@@ -80,7 +80,7 @@ export default function Browse(props: any) {
             <title>Browse</title>
             <meta name="description" content="Search for datapacks" />
         </Helmet>
-        <div className="container" style={{ gap: '1rem', width: '100%', maxWidth: '46.25rem' }}>
+        <div className="container" style={{ gap: '1rem', width: '100%', maxWidth: '61.875rem' }}>
             <div className="container" style={{ width: '100%', boxSizing: "border-box", gap: 16 }}>
                 <div className="container" style={{ flexDirection: 'row', width: '100%', gap: 16 }}>
                     <IconInput icon={BrowseSvg} placeholder="Search..." type="text" style={{ width: '100%', flexGrow: 1 }} defaultValue={search != null ? search as string : undefined}
@@ -102,12 +102,12 @@ export default function Browse(props: any) {
                 </div>
                 {packs.length > 1 && <RenderPages totalPacks={totalPacks} currentPage={page != null ? Number.parseInt(page as string) : 0} params={createBrowseSearchParams(params)}/>}
             </div>
-            <div className="container cardContainer" id="packCardContainer" style={{ gap: 16, boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center', flexDirection: 'column', position: 'relative' }}>
+            <div className="packCardContainer" id="packCardContainer">
                 {
-                    packs.map(p => <PackCard tag="browsePackCard"
+                    packs.map(p => <GalleryPackCard tag="browsePackCard"
                         key={p.id} id={p.id} state={selectedBundle !== '' ? 'add' : undefined}
                         onClick={() => onClick(p.id)}
-                        parentStyle={{ zIndex: addPack === p.id ? 1 : 0 }}
+                        parentStyle={{ zIndex: addPack === p.id ? 1 : undefined }}
                         style={{ border: p.id === showWidget ? '2px solid var(--accent)' : '' }}
                         bundleData={bundles.find(b => b.uid === selectedBundle)}
                         user={user}

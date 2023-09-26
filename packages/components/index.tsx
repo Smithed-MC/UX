@@ -13,6 +13,7 @@ import { IconTextButton } from "./IconTextButton";
 import IconInput from "./IconInput";
 import { ChooseBox } from "./ChooseBox";
 import BackButton from "./BackButton";
+import GalleryPackCard from './GalleryPackCard'
 
 export {
 	NavButton,
@@ -31,4 +32,5 @@ export {
 	IconInput,
 	ChooseBox,
 	BackButton,
+  GalleryPackCard
 };

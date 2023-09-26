@@ -1,0 +1,196 @@
+.packCard {
+    flex-direction: column;
+}
+
+.downloadBox {
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.galleryPackCard {
+    display: flex;
+    align-items: flex-start;
+    justify-content: left;
+    flex-direction: column;
+
+    max-width: 100%;
+    width: 100%;
+    flex-shrink: 1;
+    box-sizing: border-box;
+    background-color: var(--section);
+    border-radius: var(--defaultBorderRadius);
+
+    transition: all 0.2s;
+    /* overflow: hidden; */
+
+    min-height: 16rem;
+    max-height: 16rem;
+    position: absolute;
+    bottom: 0;
+}
+
+.galleryPackCard>.packInfo {
+    display: grid;
+    padding: 0.5rem 1rem 1rem 1rem;
+
+    width: 100%;
+    box-sizing: border-box;
+
+    align-items: center;
+    column-gap: 1rem;
+
+    grid-template-areas:
+        "name name name"
+        "description description description"
+        "author author open";
+
+    grid-template-columns: 1fr auto auto;
+
+    background-color: var(--section);
+    border-radius: 0 0 var(--defaultBorderRadius) var(--defaultBorderRadius);
+}
+
+.galleryPackCardContainer.displayGallery {
+    z-index: 10;
+    overflow: visible;
+}
+
+.galleryPackCard.displayGallery {
+    height: unset;
+    max-height: 24rem;
+    position: absolute;
+    bottom: 0;
+}
+
+.galleryPackCard.displayGallery>.packInfo {
+    padding: 1rem;
+    grid-template-areas:
+        "name open";
+        /* "author author open"; */
+
+    gap: 0;
+}
+
+.galleryPackCard.displayGallery>.galleryImage {
+    border-radius: var(--defaultBorderRadius);
+}
+
+.galleryPackCard.displayGallery>.galleryImage::after {
+    /* background: url(<path-to-image>), lightgray 50% / contain no-repeat; */
+    box-shadow: inset 0px 0px 32px 0px rgba(0, 0, 0, 0.5);
+    content: "";
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    border-radius: var(--defaultBorderRadius);
+    pointer-events: none;
+}
+
+.galleryPackCard>*>.carousel {
+    position: absolute; 
+    bottom: 0; 
+    width: 100%; 
+    background: rgba(0,0,0,0.1); 
+    backdrop-filter: blur(8px); 
+    padding: 0.5rem 0rem;
+
+    display: flex;
+    justify-content: center;
+
+    gap: 1rem;
+
+    border-radius: var(--defaultBorderRadius);
+    z-index: 1;
+}
+
+
+.galleryPackCard>.galleryImage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    overflow: hidden;
+    width: 100%;
+    flex-direction: column;
+    border-radius:  var(--defaultBorderRadius) var(--defaultBorderRadius)  0 0;
+}
+
+.galleryPackCard>.galleryImage>img {
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.galleryPackCard>.galleryImage>.thumbnail:hover {
+    opacity: 0.8;
+}
+.galleryPackCard>.galleryImage>.thumbnail:active {
+    opacity: 0.6;
+}
+
+.galleryPackCard>.packInfo>.author,
+.galleryPackCard>.packInfo>.description {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 20px;
+    width: 100%;
+}
+
+.galleryPackCard>.packInfo>.description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+
+    -webkit-line-clamp: 3;
+    height: 60px;
+    max-height: 60px;
+
+    margin: 0.5rem 0 1rem 0;
+
+    grid-area: description;
+    box-sizing: border-box;
+}
+
+.galleryPackCard>.packInfo>.author {
+    height: 20px;
+    max-height: 20px;
+
+    gap: .375rem;
+    justify-content: start;
+    font-weight: 300;
+    opacity: 0.5;
+    grid-area: author;
+
+    white-space: nowrap;
+    word-wrap: break-word;
+}
+
+/* @container galleryPackCardContainer (max-width: 20rem) {
+    .galleryPackCard>.packInfo {
+        grid-template-areas:
+            "name name"
+            "description description"
+            "author author"
+            "open open";
+    }
+} */
+
+.galleryPackCardContainer {
+    container: galleryPackCardContainer;
+    container-type: inline-size;
+    width: 100%;
+    height: 16rem;
+    position: relative;
+}
+
+@keyframes galleryPackCardShake {
+    33% {
+        margin-left: -1rem;
+    }
+    66% {
+        margin-left: 1rem;
+    }
+    100% {
+        margin-left: 0rem;
+    }
+}
