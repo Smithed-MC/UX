@@ -91,8 +91,8 @@ export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onC
         </div>
     </div>;
 
-    return <div className={"chooseBoxWrapper " + className} style={{...style}}>
-        {flip && options}
+    return <div className={"chooseBoxWrapper " + className} style={{flexDirection: flip ? "column-reverse" : "column", ...style}}>
+        {options}
         <div className={`chooseBoxTrigger ${open ? 'open' : ''} ${flip ? 'flip' : 'noflip'}`} onMouseDown={clickTrigger} ref={triggerRef}>
             <label style={{lineHeight: '20px', WebkitLineClamp: 1, margin: 0, textOverflow: 'ellipsis', display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden', flexGrow: 1, width: '100%', wordBreak: 'break-all'}}>
                 <span style={{ opacity: 0.5 }} className="chooseBoxPlaceholder">
@@ -103,6 +103,5 @@ export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onC
             <div style={{ height: '1rem', width: 2, opacity: 0.2, flexShrink: 0, backgroundColor: 'white' }} />
             <Right style={{ transform: `rotate(${open ? (flip ? '-90' : '90') : (flip ? '90' : '-90')}deg)`, transition: 'all 0.25s ease-in-out', flexShrink: 0 }} />
         </div>
-        {!flip && options}
     </div>
 }

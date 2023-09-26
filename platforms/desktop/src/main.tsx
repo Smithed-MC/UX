@@ -37,7 +37,7 @@ let inject: ClientInject = {
 				className="navBarOption start"
 				text="Launch"
 				href="/launch"
-				icon={svg.Play}
+				iconElement={<svg.Play fill="white" />}
 			/>,
 			<IconTextButton
 				className="navBarOption middle"

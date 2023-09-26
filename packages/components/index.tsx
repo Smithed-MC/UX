@@ -12,7 +12,6 @@ import SvgButton from "./SvgButton";
 import { IconTextButton } from "./IconTextButton";
 import IconInput from "./IconInput";
 import { ChooseBox } from "./ChooseBox";
-import BackButton from "./BackButton";
 import GalleryPackCard from './GalleryPackCard'
 
 export {
@@ -31,6 +30,5 @@ export {
 	IconTextButton,
 	IconInput,
 	ChooseBox,
-	BackButton,
   GalleryPackCard
 };

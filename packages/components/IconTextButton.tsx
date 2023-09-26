@@ -20,20 +20,25 @@ export function IconTextButton({
 	href,
 	style,
 	target,
-	...props
+	className,
+	onClick,
+	onMouseEnter,
+	onMouseLeave,
+	rel,
+	disabled
 }: IconTextButtonProps & any) {
 	return (
 		<a
 			className={
-				`buttonLike${props.disabled ? " disabled" : ""} ` + props.className
+				`buttonLike${disabled ? " disabled" : ""} ` + className
 			}
 			style={{ flexDirection: reverse ? "row-reverse" : "row", ...style }}
 			href={href}
 			target={target}
-			onClick={props.onClick}
-			rel={props.rel}
-			onMouseEnter={props.onMouseEnter}
-			onMouseLeave={props.onMouseLeave}
+			onClick={onClick}
+			rel={rel}
+			onMouseEnter={onMouseEnter}
+			onMouseLeave={onMouseLeave}
 		>
 			{IconSvg !== undefined && typeof IconSvg === "string" && IconSvg}
 			{IconSvg !== undefined && typeof IconSvg !== "string" && <IconSvg />}

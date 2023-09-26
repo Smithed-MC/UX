@@ -1,5 +1,5 @@
 .launchContentContainer {
-	padding-bottom: 8%;
+	padding-bottom: 5rem;
 }
 
 .smithedLogoContainer {
@@ -12,13 +12,13 @@
 }
 
 .bigSmithedText {
-	scale: 170%;
+	font-size: 41px;
 	margin-top: -21%;
 	color: var(--foreground);
 }
 
 .smithedVersion {
-	scale: 90%;
+	font-size: 22px;
 	margin-top: 3%;
 	color: var(--border);
 }

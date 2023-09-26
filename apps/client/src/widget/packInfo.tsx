@@ -1,6 +1,6 @@
 import { tauri } from "@tauri-apps/api";
 import { open } from '@tauri-apps/api/shell'
-import { BackButton, IconTextButton, markdownOptions, MarkdownRenderer, Spinner } from "components";
+import { IconTextButton, markdownOptions, MarkdownRenderer, Spinner } from "components";
 import { Cross, Discord, Download, Github, Globe, Plus, Right, Warning } from "components/svg";
 import { MinecraftVersion, MinecraftVersionSchema, PackBundle, PackData, PackEntry, PackMetaData, supportedMinecraftVersions, UserData } from "data-types";
 import Markdown, { MarkdownToJSX } from "markdown-to-jsx";
@@ -14,6 +14,7 @@ import { selectSelectedBundle, selectUsersBundles, setSelectedBundle, setUsersBu
 import { CreateBundle } from "./bundle";
 import { Bundle } from "../pages/user";
 import { DownloadButtonFn } from "../inject";
+import BackButton from "./BackButton";
 
 interface PackInfoProps {
     yOffset: number

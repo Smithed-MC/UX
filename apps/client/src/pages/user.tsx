@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useLoaderData, useNavigate, useParams } from 'react-router-dom'
 import { formatDownloads } from 'formatters'
 import './user.css'
-import { BackButton, IconInput, IconTextButton, PackCard, Spinner, SvgButton } from 'components'
+import { IconInput, IconTextButton, PackCard, Spinner, SvgButton } from 'components'
 import { useAppDispatch, useFirebaseUser, useQueryParams } from 'hooks'
 import { Account, BackArrow, Check, Clock, Cross, Discord, Download, Edit, Folder, Home, Jigsaw, Line, List, NewFolder, Plus, SignOut, Trash, Upload } from 'components/svg'
 import EditButton from 'components/EditButton'
@@ -16,6 +16,7 @@ import { prettyTimeDifference } from 'formatters'
 import { CreateBundle } from '../widget/bundle'
 import { setSelectedBundle } from 'store'
 import { DownloadButtonFn } from '../inject'
+import BackButton from '../widget/BackButton'
 
 interface UserStats {
     totalDownloads: number,

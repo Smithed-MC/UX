@@ -279,16 +279,18 @@ function LaunchButton({
 						? "May cause data loss!"
 						: error
 				}
-				icon={
-					state == LaunchButtonState.SelectBundle
-						? svg.Play
-						: state == LaunchButtonState.ClickToLaunch
-						? svg.Play
-						: state == LaunchButtonState.Running
-						? "..."
-						: state == LaunchButtonState.ClickToCancel
-						? svg.Cross
-						: "Invalid state"
+				iconElement={
+					state == LaunchButtonState.SelectBundle ? (
+						<svg.Play fill="white" />
+					) : state == LaunchButtonState.ClickToLaunch ? (
+						<svg.Play fill="white" />
+					) : state == LaunchButtonState.Running ? (
+						"..."
+					) : state == LaunchButtonState.ClickToCancel ? (
+						<svg.Cross />
+					) : (
+						""
+					)
 				}
 				style={{ width: "fit-content" }}
 				onClick={onClick}
@@ -412,7 +414,7 @@ function CopyCodeButton({ code }: CopyCodeButtonProps) {
 		<IconTextButton
 			className={clicked ? "successButtonLike" : "accentedButtonLike"}
 			text={clicked ? "Copied!" : "Click to copy"}
-			icon={clicked ? svg.Check : svg.Copy}
+			iconElement={clicked ? <svg.Check /> : <svg.Copy fill="white" />}
 			style={{ width: "fit-content" }}
 			onClick={async () => {
 				setClicked(true);
