@@ -23,7 +23,7 @@ if (!subRoutes.includes(launchRoute)) {
 
 const editLocalBundleRoute = {
 	path: "editLocalBundle/:id",
-	element: <EditLocalBundle />
+	element: <EditLocalBundle />,
 };
 
 if (!subRoutes.includes(editLocalBundleRoute)) {
@@ -95,7 +95,6 @@ let inject: ClientInject = {
 			iconElement={<svg.Download fill="var(--foreground)" />}
 			text={"Import"}
 			onClick={() => {
-				console.log("clic");
 				const element = (
 					<ImportBundle
 						bundleId={id}
