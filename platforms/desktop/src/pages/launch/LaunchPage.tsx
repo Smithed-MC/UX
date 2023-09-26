@@ -1,23 +1,31 @@
 import "./LaunchPage.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
-import { Event, listen } from "@tauri-apps/api/event";
+import { Event, UnlistenFn, listen } from "@tauri-apps/api/event";
 import { app, clipboard } from "@tauri-apps/api";
 import { WebviewWindow } from "@tauri-apps/api/window";
-import { ChooseBox, IconInput, IconTextButton, svg } from "components";
-import { ChooseBoxChoice, LocalBundleConfig } from "../../types";
+import { ChooseBox, IconTextButton, svg } from "components";
+import {
+	AssociatedProgressEvent,
+	ChooseBoxChoice,
+	LocalBundleConfig,
+	OutputMessageEvent,
+} from "../../types";
 import { MinecraftVersion } from "data-types";
 import { Smithed } from "components/svg";
 import { getChooseBoxBundles } from "../../util";
 import BundleList from "./BundleList";
 import CreateBundle from "../../components/CreateBundle";
+import LaunchConsole, {
+	LaunchConsoleProps,
+	createProgressBar,
+} from "./LaunchConsole";
 
 function LaunchPage() {
 	const [authDisplay, setAuthDisplay] = useState<AuthDisplayEvent | undefined>(
 		undefined
 	);
 	const [bundle, setBundle] = useState<string | undefined>(undefined);
-	const [online, setOnline] = useState(true);
 	const [appVersion, setAppVersion] = useState<undefined | string>(undefined);
 
 	useEffect(() => {
@@ -29,45 +37,6 @@ function LaunchPage() {
 			getVersion();
 		}
 	});
-
-	async function launchGame() {
-		console.log("3 2 1 blastoff!");
-		try {
-			let launch_promise = invoke("launch_game", {
-				bundleId: bundle,
-				offline: !online,
-			});
-			let auth_listener_promise = listen(
-				"mcvm_display_auth_info",
-				(event: Event<AuthDisplayEvent>) => {
-					let url = event.payload.url;
-					let device_code = event.payload.device_code;
-					setAuthDisplay({ url, device_code });
-				}
-			);
-			let close_listener_promise = listen("game_finished", () => {
-				setAuthDisplay(undefined);
-			});
-
-			await Promise.all([
-				launch_promise,
-				auth_listener_promise,
-				close_listener_promise,
-			]);
-		} catch (e) {
-			console.error("Failed to launch game: " + e);
-		}
-	}
-
-	async function stopGame() {
-		console.log("Stopping game...");
-		setAuthDisplay(undefined);
-		try {
-			await invoke("stop_game");
-		} catch (e) {
-			console.error("Failed to stop game: " + e);
-		}
-	}
 
 	return (
 		<div className="container launchContainer">
@@ -82,35 +51,119 @@ function LaunchPage() {
 				{authDisplay && <AuthPopup {...authDisplay} />}
 			</div>
 
-			<LaunchFooter
-				onLaunch={launchGame}
-				onCancel={stopGame}
-				selectedBundle={bundle}
-				onSetOnline={setOnline}
-			/>
+			<LaunchFooter onSetAuthDisplay={setAuthDisplay} selectedBundle={bundle} />
 		</div>
 	);
 }
 
-function LaunchFooter({
-	onLaunch,
-	onCancel,
-	onSetOnline,
-	selectedBundle,
-}: LaunchFooterProps) {
+function LaunchFooter({ selectedBundle, onSetAuthDisplay }: LaunchFooterProps) {
+	const [online, setOnline] = useState(true);
+	const [consoleProps, setConsoleProps] = useState<LaunchConsoleProps>({
+		messages: [],
+	});
+	const [showConsole, setShowConsole] = useState(false);
+
 	const [error, setError] = useState<undefined | "no_bundle">(undefined);
+	const [unlistens, setUnlistens] = useState<UnlistenFn[]>([]);
+
+	function updateConsole(msg: string) {
+		setConsoleProps((current) => {
+			return {
+				messages: current.messages.concat(msg),
+			};
+		});
+	}
+
+	function clearConsole() {
+		let console: LaunchConsoleProps = { messages: [] };
+		setConsoleProps(console);
+	}
+
+	async function launchGame() {
+		console.log("3 2 1 blastoff!");
+		try {
+			for (let unlisten of unlistens) {
+				unlisten();
+			}
+			setShowConsole(true);
+			clearConsole();
+			let launchPromise = invoke("launch_game", {
+				bundleId: selectedBundle,
+				offline: !online,
+			});
+
+			let closeListenerPromise = listen("game_finished", () => {
+				onSetAuthDisplay(undefined);
+				setShowConsole(false);
+			});
+
+			let auth = listen(
+				"mcvm_display_auth_info",
+				(event: Event<AuthDisplayEvent>) => {
+					let url = event.payload.url;
+					let device_code = event.payload.device_code;
+					onSetAuthDisplay({ url, device_code });
+				}
+			);
+
+			let message = listen(
+				"mcvm_output_message",
+				(event: Event<OutputMessageEvent>) => {
+					updateConsole(event.payload);
+				}
+			);
+
+			let header = listen(
+				"mcvm_output_header",
+				(event: Event<OutputMessageEvent>) => {
+					updateConsole(event.payload);
+				}
+			);
+
+			let progress = listen(
+				"mcvm_output_progress",
+				(event: Event<AssociatedProgressEvent>) => {
+					updateConsole(createProgressBar(event.payload));
+				}
+			);
+
+			let [_, ...eventUnlistens] = await Promise.all([
+				launchPromise,
+				closeListenerPromise,
+				auth,
+				message,
+				header,
+				progress,
+			]);
+			setUnlistens(eventUnlistens);
+		} catch (e) {
+			console.error("Failed to launch game: " + e);
+		}
+	}
 
 	async function tryLaunch() {
 		if (selectedBundle === undefined) {
 			setError("no_bundle");
 			return;
 		}
-		onLaunch();
+		await launchGame();
+	}
+
+	async function stopGame() {
+		console.log("Stopping game...");
+		onSetAuthDisplay(undefined);
+		setShowConsole(false);
+		try {
+			await invoke("stop_game");
+		} catch (e) {
+			console.error("Failed to stop game: " + e);
+		}
 	}
 
 	return (
 		<div className="launchFooter container">
 			<div className="launchFooterLeft container">
+				{showConsole && <LaunchConsole {...consoleProps} />}
 				<div className="editBundleContainer">
 					<IconTextButton
 						className={
@@ -125,13 +178,12 @@ function LaunchFooter({
 								: ""
 						}
 					/>
-					{/* <b>Selected bundle:</b> {selectedBundle} */}
 				</div>
 			</div>
 			<div className="launchFooterCenter container">
 				<LaunchButton
 					onLaunch={tryLaunch}
-					onCancel={onCancel}
+					onCancel={stopGame}
 					selectedBundle={selectedBundle}
 					error={error == "no_bundle" ? "No bundle selected" : ""}
 				/>
@@ -153,9 +205,9 @@ function LaunchFooter({
 					flip={true}
 					onChange={(value) => {
 						if (value == "online") {
-							onSetOnline(true);
+							setOnline(true);
 						} else if (value == "offline") {
-							onSetOnline(false);
+							setOnline(false);
 						}
 					}}
 					style={{ width: "75%" }}
@@ -166,9 +218,7 @@ function LaunchFooter({
 }
 
 interface LaunchFooterProps {
-	onLaunch: () => void;
-	onCancel: () => void;
-	onSetOnline: (online: boolean) => void;
+	onSetAuthDisplay: (value: AuthDisplayEvent | undefined) => void;
 	selectedBundle: string | undefined;
 }
 
@@ -178,7 +228,7 @@ function LaunchButton({
 	onCancel,
 	error,
 }: LaunchButtonProps) {
-	let [state, setState] = useState(LaunchButtonState.SelectBundle);
+	const [state, setState] = useState(LaunchButtonState.SelectBundle);
 
 	if (state == LaunchButtonState.SelectBundle && selectedBundle !== undefined) {
 		setState(LaunchButtonState.ClickToLaunch);

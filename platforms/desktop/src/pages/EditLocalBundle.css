@@ -9,7 +9,7 @@
 }
 
 .editLocalPackContainer {
-	width: 70%;
+	width: 50%;
 }
 
 .editLocalPackTitleContainer {
@@ -21,6 +21,7 @@
 	justify-content: left;
 
 	width: 100%;
+	box-sizing: border-box;
 
 	flex-direction: row;
 	gap: 1rem;

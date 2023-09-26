@@ -7,9 +7,9 @@ import { useState } from "react";
 function CreateBundle({ onFinish }: CreateBundleProps) {
 	const [name, setName] = useState("");
 	const [version, setVersion] = useState<MinecraftVersion>("1.20.1");
-	const [error, setError] = useState<undefined | "bundle_exists" | "empty_name">(
-		undefined
-	);
+	const [error, setError] = useState<
+		undefined | "bundle_exists" | "empty_name" | "name_too_long"
+	>(undefined);
 
 	async function checkIfExists() {
 		try {
@@ -27,7 +27,9 @@ function CreateBundle({ onFinish }: CreateBundleProps) {
 			<IconInput
 				type="text"
 				className={
-					error == "bundle_exists" || error == "empty_name"
+					error == "bundle_exists" ||
+					error == "empty_name" ||
+					error == "name_too_long"
 						? "invalidInput"
 						: ""
 				}
@@ -36,6 +38,8 @@ function CreateBundle({ onFinish }: CreateBundleProps) {
 						? "Bundle with this name already exists"
 						: error == "empty_name"
 						? "Name cannot be empty"
+						: error == "name_too_long"
+						? "Name must be less than 17 characters"
 						: ""
 				}
 				placeholder="Bundle name"
@@ -55,7 +59,7 @@ function CreateBundle({ onFinish }: CreateBundleProps) {
 						setVersion(value);
 					}
 				}}
-				style={{width: "100%"}}
+				style={{ width: "100%" }}
 			/>
 			<br />
 			<br />
@@ -78,6 +82,8 @@ function CreateBundle({ onFinish }: CreateBundleProps) {
 							setError("empty_name");
 						} else if (await checkIfExists()) {
 							setError("bundle_exists");
+						} else if (name.length > 16) {
+							setError("name_too_long");
 						} else {
 							onFinish(name, version);
 						}

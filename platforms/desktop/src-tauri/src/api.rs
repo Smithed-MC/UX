@@ -8,7 +8,7 @@ use mcvm::net::download;
 use reqwest::Client;
 use zip::ZipArchive;
 
-use crate::api_types::{PackData, PackReference, PackBundle};
+use crate::api_types::{PackBundle, PackData, PackReference};
 
 /// Get a pack from the API
 pub async fn get_pack(client: &Client, id: &str) -> anyhow::Result<PackData> {
@@ -33,6 +33,10 @@ pub async fn download_packs(
     datapacks_dir: &Path,
     resource_packs_dir: &Path,
 ) -> anyhow::Result<()> {
+    if packs.is_empty() {
+        return Ok(());
+    }
+
     println!("DOWNLOADING");
     let url = format_download_packs_url(packs);
 

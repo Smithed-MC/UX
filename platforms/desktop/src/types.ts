@@ -24,3 +24,11 @@ export const availableMinecraftVersionsChooseBox: ChooseBoxChoice[] = [
 ];
 
 export type ChooseBoxChoice = { value: string; content: string };
+
+export interface AssociatedProgressEvent {
+	current: number;
+	total: number;
+	message: string;
+}
+
+export type OutputMessageEvent = string;

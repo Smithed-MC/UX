@@ -1,7 +1,7 @@
 import "./EditLocalBundle.css";
 
 import { invoke } from "@tauri-apps/api";
-import { useLoaderData, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { LocalBundleConfig } from "../types";
 import { BackButton, IconTextButton, PackCard, svg } from "components";
 import { PackData, PackReference } from "data-types";
@@ -150,6 +150,7 @@ function EditLocalPack({ data, reference, onRemove }: EditLocalPackProps) {
 						flexGrow: "1",
 						gap: "1rem",
 						flexDirection: "row",
+						boxSizing: "border-box"
 					}}
 				>
 					<img className="editLocalPackIcon" src={data.display.icon} />

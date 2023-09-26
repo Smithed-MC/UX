@@ -16,7 +16,7 @@
 }
 
 .bundleCard.selected {
-	background-color: var(--highlight);
+	background-color: var(--section);
 	border-color: var(--accent);
 }
 
@@ -29,8 +29,14 @@
 	font-size: 140%;
 }
 
+.bundleCardName {
+	font-weight: 700;
+	text-overflow: ellipsis;
+}
+
 .bundleCardVersion {
 	color: var(--border);
+	font-weight: 400;
 }
 
 .bundleThumbnailContainer {

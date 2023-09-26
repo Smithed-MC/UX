@@ -92,7 +92,7 @@ function BundleCard({ id, config, selectedId, onSelect }: BundleCardProps) {
 			</div>
 			<br />
 			<IconTextButton
-				className={isSelected ? "accentedButtonLike" : "highlightButtonLike"}
+				className={isSelected ? "highlightButtonLike" : "highlightButtonLike"}
 				text={isSelected ? "Selected" : "Select"}
 				style={{ width: "fit-content" }}
 				onClick={() => {
