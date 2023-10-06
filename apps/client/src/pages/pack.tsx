@@ -7,6 +7,7 @@ import { Spinner } from "components"
 import './pack.css'
 import { Helmet } from "react-helmet"
 import { correctGithubLinks } from "formatters"
+import { DownloadButtonFn } from "../inject"
 
 async function getPack(id: string) {
     const response = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
@@ -53,7 +54,7 @@ export async function loadPackData({params}: any) {
     return {packData, metaData, fullview, owner}
 }
 
-export default function Packs() {
+export default function Packs({packDownloadButton, showBackButton}: PacksProps) {
     const { id: id } = useParams()
     const data = useLoaderData() as any
 
@@ -78,7 +79,12 @@ export default function Packs() {
             <meta name="og:site_name" content="Smithed" />
         </Helmet>
         <div className="container" style={{ gap: 16, height: '100%', boxSizing: 'border-box', width: '100%', justifyContent: 'safe start', alignItems: 'safe center' }}>
-                <PackInfo yOffset={/*window.scrollY*/0} id={id ?? ''} fixed={false} onClose={() => {}}/>
+            <PackInfo yOffset={/*window.scrollY*/0} id={id ?? ''} fixed={false} onClose={() => {}} downloadButton={packDownloadButton} showBackButton={showBackButton} />
         </div>
     </div>
+}
+
+export interface PacksProps {
+    packDownloadButton: DownloadButtonFn,
+    showBackButton: boolean,
 }

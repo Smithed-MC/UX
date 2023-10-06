@@ -58,7 +58,8 @@
         "height": 720,
         "resizable": true,
         "title": "Smithed",
-        "width": 1280
+        "width": 1280,
+        "url": "/launch"
       }
     ]
   }

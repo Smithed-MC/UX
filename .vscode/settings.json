@@ -1,3 +1,6 @@
 {
-    "explorer.excludeGitIgnore": false
+    "explorer.excludeGitIgnore": false,
+    "rust-analyzer.linkedProjects": [
+        "platforms/desktop/src-tauri/Cargo.toml"
+    ]
 }

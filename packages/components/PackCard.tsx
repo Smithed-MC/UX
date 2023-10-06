@@ -140,7 +140,7 @@ export default function PackCard({ id, packData, onClick, state, style, parentSt
             </div>
             <div className='container' style={{ width: '100%', flexBasis: 'fit-content', flexShrink: 0, gap: '1rem', flexDirection: 'row', position: 'relative' }}>
                 <div className='packCardInfo'>
-                    by {author}<br />
+                    by <a href={`/${metaData?.owner}`}>{author}</a><br />
                     <span className="packCardInfoSeperator">
                         <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
                             <circle cx="2" cy="2" r="2" fill="#FFF8F0" />

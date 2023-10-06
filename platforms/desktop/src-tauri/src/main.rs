@@ -3,26 +3,38 @@
     windows_subsystem = "windows"
 )]
 
+pub mod api;
+pub mod api_types;
+pub mod config;
+pub mod mcvm;
 pub mod minecraft;
 pub mod tauri_utils;
-pub mod mcvm;
+
+use tauri_utils::SmithedState;
 
 use crate::tauri_utils::commands;
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-
-
-
-
-fn main() {
-    // let result = testGetAuth();
+fn main() -> anyhow::Result<()> {
     tauri::Builder::default()
+        .manage(SmithedState::new()?)
         .invoke_handler(tauri::generate_handler![
             /* REGISTER TAURI IPC COMMANDS */
-            commands::get_minecraft_token,
-            commands::get_device_code,
-            commands::launch_game
+            commands::launch_game,
+            commands::stop_game,
+            commands::add_bundle,
+            commands::get_bundle,
+            commands::list_bundles,
+            commands::bundle_exists,
+            commands::remove_bundle,
+            commands::add_pack_to_bundle,
+            commands::remove_pack_from_bundle,
+            commands::get_pack_version_for_bundle,
+            commands::get_bundle_packs,
+            commands::get_remote_bundle,
+            commands::import_bundle,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+
+    Ok(())
 }

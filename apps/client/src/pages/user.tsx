@@ -15,6 +15,8 @@ import { User as FirebaseUser } from 'firebase/auth'
 import { prettyTimeDifference } from 'formatters'
 import { CreateBundle } from '../widget/bundle'
 import { setSelectedBundle } from 'store'
+import { DownloadButtonFn } from '../inject'
+import BackButton from '../widget/BackButton'
 
 interface UserStats {
     totalDownloads: number,
@@ -33,11 +35,12 @@ function CreationButton({ text, onPress }: { text: string, onPress: () => void }
     </div>
 }
 
-export function Bundle({ id, editable, showOwner }: { id: string, editable: boolean, showOwner?: boolean }) {
+export function Bundle({ id, editable, showOwner, bundleDownloadButton }: { id: string, editable: boolean, showOwner?: boolean, bundleDownloadButton: DownloadButtonFn }) {
     const [rawBundleData, setRawBundleData] = useState<PackBundle | undefined>()
     const [containedPacks, setContainedPacks] = useState<[string, string, string][]>()
     const [ownerName, setOwnerName] = useState('')
     const [showConfirmation, setShowConfirmation] = useState<boolean>(false)
+    const [injectPopup, setInjectPopup] = useState<undefined | JSX.Element>(undefined);
     const parentElement = useRef<HTMLDivElement>(null)
     const firebaseUser = useFirebaseUser()
     const dispatch = useAppDispatch()
@@ -107,7 +110,8 @@ export function Bundle({ id, editable, showOwner }: { id: string, editable: bool
                     {editable && <a className='buttonLike highlightButtonLike bundleControlButton' href={`/browse`} onClick={(e) => {
                         dispatch(setSelectedBundle(rawBundleData.uid))
                     }}><NewFolder /></a>}
-                    <IconTextButton text={"Download"} iconElement={<Download fill="var(--foreground)" />} className="accentedButtonLike bundleControlButton" reverse={true} href={`https://api.smithed.dev/v2/bundles/${rawBundleData.uid}/download`} />
+                    {rawBundleData.uid !== undefined && bundleDownloadButton(rawBundleData.uid, (element) => {setInjectPopup(element)}, () => {setInjectPopup(undefined)})}
+                    {/* <IconTextButton text={"Download"} iconElement={<Download fill="var(--foreground)" />} className="accentedButtonLike bundleControlButton" reverse={true} href={`https://api.smithed.dev/v2/bundles/${rawBundleData.uid}/download`} /> */}
                 </div>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
@@ -138,6 +142,7 @@ export function Bundle({ id, editable, showOwner }: { id: string, editable: bool
                 </div>
             </div>
         </div>}
+        {injectPopup}
     </div>
 }
 
@@ -161,8 +166,12 @@ function CreateBundleModal({ user, showModal, addPack }: { user: FirebaseUser | 
     </div>
 }
 
+export interface UserProps {
+    showBackButton?: boolean;
+    bundleDownloadButton: DownloadButtonFn,
+}
 
-export default function User() {
+export default function User({showBackButton, bundleDownloadButton}: UserProps) {
     const { owner: userId } = useParams()
     const firebaseUser = useFirebaseUser()
     const navigate = useNavigate()
@@ -295,6 +304,7 @@ export default function User() {
 
                     </div>
                     <div className='statBoxes container '>
+                        {showBackButton && <><BackButton /></>}
                         <Stat icon={<Jigsaw fill={'var(--foreground)'} />} name='Total Pack' value={userStats?.packs?.length ?? 0} />
                         <Stat icon={<Download fill={'var(--foreground)'} />} name='Total Download' value={formatDownloads(userStats?.totalDownloads ?? 0)} />
                         <Stat icon={<Clock fill={'var(--foreground)'} />} name='Daily Download' value={formatDownloads(userStats?.dailyDownloads ?? 0)} />
@@ -329,7 +339,7 @@ export default function User() {
                         navigate('')
                     }} user={firebaseUser} />}
                 </div>}
-                {userStats.bundles?.map(b => <Bundle key={b} id={b} editable={editable} />)}
+                {userStats.bundles?.map(b => <Bundle key={b} id={b} editable={editable} bundleDownloadButton={bundleDownloadButton} />)}
                 {editable && userStats.bundles.length == 0 && <div className="container" style={{gap: '1rem'}}>
                     Need to group some packs together?
                     <IconTextButton icon={Plus} text={"Click here"} className="accentedButtonLike" onClick={() => {

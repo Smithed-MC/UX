@@ -9,10 +9,12 @@ interface ChooseBoxProps {
     choices: ({ value: string, content: string })[],
     onChange?: (value: string | string[]) => void
     style?: CSSProperties,
-    className?: string
+    className?: string,
+    flip?: boolean,
+    beforeOpen?: () => void,
 }
 
-export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onChange, style, className}: ChooseBoxProps) {
+export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onChange, style, className, flip, beforeOpen }: ChooseBoxProps) {
     const [value, setValue] = useState<string | string[]>(defaultValue ?? (multiselect ? [] : ''))
     const [open, setOpen] = useState(false)
 
@@ -35,7 +37,8 @@ export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onC
     }, [defaultValue])
 
     const clickTrigger: React.MouseEventHandler<HTMLDivElement> = (e) => {
-        e.stopPropagation()
+        e.stopPropagation();
+        beforeOpen && beforeOpen();
         setOpen(!open)
     }
 
@@ -51,6 +54,7 @@ export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onC
             if (onChange) onChange(value)
             setValue([...value])
         } else if (value !== newValue) {
+            setOpen(false)
             if (onChange) onChange(newValue)
             setValue(newValue)
         }
@@ -76,8 +80,20 @@ export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onC
         }
     }
 
-    return <div className={"chooseBoxWrapper " + className} style={{...style}}>
-        <div className={`chooseBoxTrigger ${open ? 'open' : ''}`} onMouseDown={clickTrigger} ref={triggerRef}>
+    let options = <div className={`chooseBoxOptionsWrapper ${open ? 'open' : ''} ${flip ? 'flip' : 'noflip'}`}>
+        <div className={`chooseBoxOptions ${open ? 'open' : ''} ${flip ? 'flip' : 'noflip'}`}>
+            {choices.map(c => <div key={c.value} onMouseDown={(e) => clickOption(e, c.value)} className="chooseBoxOption">
+                {c.content}
+                {(multiselect ? value.includes(c.value) : value === c.value) && (multiselect ?<Check/> : <svg xmlns="http://www.w3.org/2000/svg" width="9" height="8" viewBox="0 0 9 8" fill="none">
+                    <circle cx="4.5" cy="4" r="4" fill="#FFF8F0" />
+                </svg>)}
+            </div>)}
+        </div>
+    </div>;
+
+    return <div className={"chooseBoxWrapper " + className} style={{flexDirection: flip ? "column-reverse" : "column", ...style}}>
+        {options}
+        <div className={`chooseBoxTrigger ${open ? 'open' : ''} ${flip ? 'flip' : 'noflip'}`} onMouseDown={clickTrigger} ref={triggerRef}>
             <label style={{lineHeight: '20px', WebkitLineClamp: 1, margin: 0, textOverflow: 'ellipsis', display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden', flexGrow: 1, width: '100%', wordBreak: 'break-all'}}>
                 <span style={{ opacity: 0.5 }} className="chooseBoxPlaceholder">
                     {`${placeholder ?? 'Choice'}: `}
@@ -85,17 +101,7 @@ export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onC
                 {value.length !== 0 ? getContent() : <span><label className="chooseBoxPlaceholder">None Selected</label><label className="chooseBoxSecondaryPlaceHolder">{placeholder}</label></span>}
             </label>
             <div style={{ height: '1rem', width: 2, opacity: 0.2, flexShrink: 0, backgroundColor: 'white' }} />
-            <Right style={{ transform: `rotate(${open ? '90' : '-90'}deg)`, transition: 'all 0.25s ease-in-out', flexShrink: 0 }} />
-        </div>
-        <div className={`chooseBoxOptionsWrapper ${open ? 'open' : ''}`}>
-            <div className={`chooseBoxOptions ${open ? 'open' : ''}`}>
-                {choices.map(c => <div key={c.value} onMouseDown={(e) => clickOption(e, c.value)} className="chooseBoxOption">
-                    {c.content}
-                    {(multiselect ? value.includes(c.value) : value === c.value) && (multiselect ?<Check/> : <svg xmlns="http://www.w3.org/2000/svg" width="9" height="8" viewBox="0 0 9 8" fill="none">
-                        <circle cx="4.5" cy="4" r="4" fill="#FFF8F0" />
-                    </svg>)}
-                </div>)}
-            </div>
+            <Right style={{ transform: `rotate(${open ? (flip ? '-90' : '90') : (flip ? '90' : '-90')}deg)`, transition: 'all 0.25s ease-in-out', flexShrink: 0 }} />
         </div>
     </div>
 }

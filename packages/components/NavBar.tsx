@@ -177,7 +177,7 @@ export function EditBundle({ close }: EditBundleProps) {
     </div>
 }
 
-export function NavBar() {
+export function NavBar(props: NavBarProps) {
     const [open, setOpen] = useState(previousState)
 
     const [editBundleOpen, setEditBundleOpen] = useState(false)
@@ -211,11 +211,10 @@ export function NavBar() {
 
     return (
         <div className="container navBarContainer" style={{ flexDirection: 'row', width: '100%', boxSizing: 'border-box', zIndex: 100 }}>
-            <a className='navBarHide' style={{ fontSize: '24px', lineHeight: '30px', fontWeight: '700', fontFamily: 'Lexend', color: 'var(--foreground)', textDecoration: 'none' }} href="/">Smithed</a>
+            <a className='navBarHide' style={{ fontSize: '24px', lineHeight: '30px', fontWeight: '700', fontFamily: 'Lexend', color: 'var(--foreground)', textDecoration: 'none' }} href={props.logoUrl}>Smithed</a>
             <div className='navBarHide' style={{ width: 1, height: 36, background: 'var(--foreground)' }} />
-            <IconTextButton className="navBarOption start" text='Home' href="/" icon={HomeSvg} />
-            <IconTextButton className="navBarOption middle" text='Browse' href="/browse" icon={BrowseSvg} />
-            <IconTextButton className="navBarOption middle" text='Discord' href="https://smithed.dev/discord" icon={DiscordSvg} />
+            
+            {props.getTabs && props.getTabs()}
             <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'row', gap: '2rem', justifyContent: 'end', overflow: 'hidden' }}>
                 {selectedBundle !== '' && !import.meta.env.SSR &&
                     <IconTextButton style={{ flexGrow: 1, overflow: 'hidden', maxWidth: 'min-content' }} className="navBarOption middle navBarBundle"
@@ -229,4 +228,9 @@ export function NavBar() {
             {editBundleOpen && <EditBundle close={() => setEditBundleOpen(false)} />}
         </div>
     )
+}
+
+export interface NavBarProps {
+    getTabs: (() => JSX.Element[]) | undefined;
+    logoUrl: string;
 }

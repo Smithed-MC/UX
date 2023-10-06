@@ -39,6 +39,8 @@ import { ReactComponent as Star } from './assets/star.svg'
 import { ReactComponent as Text } from './assets/text.svg'
 import { ReactComponent as Refresh } from './assets/refresh.svg'
 import { ReactComponent as Smithed } from './assets/smithed.svg'
+import { ReactComponent as Play } from './assets/play.svg'
+import { ReactComponent as Copy } from './assets/copy.svg'
 
 export {
     Account,
@@ -81,5 +83,7 @@ export {
     Star,
     Text,
     Refresh,
-    Smithed
+    Smithed,
+    Play,
+    Copy
 }

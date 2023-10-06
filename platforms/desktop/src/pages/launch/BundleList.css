@@ -1,0 +1,47 @@
+.bundleListContainer {
+	flex-direction: row;
+	flex-wrap: wrap;
+	/* justify-content: space-around; */
+	gap: 2rem;
+}
+
+.bundleCard {
+	background-color: var(--section);
+	padding: 1.2rem;
+	padding-top: 0rem;
+	border-radius: 16px;
+	border: 2px solid var(--border);
+	height: 16rem;
+	width: 12rem;
+}
+
+.bundleCard.selected {
+	background-color: var(--section);
+	border-color: var(--accent);
+}
+
+.bundleCardInfoContainer {
+	flex-direction: row;
+	gap: 0.5rem;
+	margin-top: -12%;
+	margin-bottom: 0%;
+	font-weight: 500;
+	font-size: 140%;
+}
+
+.bundleCardName {
+	font-weight: 700;
+	text-overflow: ellipsis;
+}
+
+.bundleCardVersion {
+	color: var(--border);
+	font-weight: 400;
+}
+
+.bundleThumbnailContainer {
+	/* border-bottom: 2px solid var(--border); */
+	margin: -10%;
+	margin-left: 0px;
+	margin-right: 0px;
+}
