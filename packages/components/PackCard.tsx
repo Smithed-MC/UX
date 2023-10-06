@@ -135,12 +135,12 @@ export default function PackCard({ id, packData, onClick, state, style, parentSt
             <div className='container packCardDetails'>
                 {!fallback && <img className="packCardImage" src={data.display.icon} onError={() => setFallback(true)} />}
                 {fallback && <div className='container packCardImage'><QuestionMark/></div>}
-                <label className='packCardName' style={{ fontWeight: 600 }}>{data.display.name}</label>
+                <a className='compactButton packCardName' style={{ fontWeight: 600 }} href={`/packs/${id}`}>{data.display.name}</a>
                 <p className='packCardDescription'>{data.display.description}</p>
             </div>
             <div className='container' style={{ width: '100%', flexBasis: 'fit-content', flexShrink: 0, gap: '1rem', flexDirection: 'row', position: 'relative' }}>
                 <div className='packCardInfo'>
-                    by <a href={`/${metaData?.owner}`}>{author}</a><br />
+                    <span>by <a className="compactButton" href={`/${metaData?.owner}`}>{author}</a></span>
                     <span className="packCardInfoSeperator">
                         <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
                             <circle cx="2" cy="2" r="2" fill="#FFF8F0" />
