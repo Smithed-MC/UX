@@ -171,7 +171,10 @@ export default function GalleryPackCard({ id, packData, onClick, state, style, p
             <div className={`galleryPackCard${displayGallery ? ' displayGallery' : ''}`} key={id} ref={card} onClick={(e) => {
                 if (!(e.target instanceof HTMLDivElement || e.target instanceof HTMLLabelElement)) return
                 // if (onClick) onClick()
-            }} style={{ ...style }} {...props} onMouseLeave={() => setDisplayGallery(false)}>
+            }} style={{ ...style }} {...props} onMouseLeave={() => {
+                setDisplayGallery(false)
+                setCurrentImage(0)
+            }}>
                 <div className='galleryImage' style={{ position: 'relative' }}>
                     {fallback && <div style={{ backgroundColor: 'var(--accent)', width: '100%', height: '100%', flexGrow: 1 }} />}
                     {!data?.display.gallery && !fallback

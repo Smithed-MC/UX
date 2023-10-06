@@ -15,3 +15,5 @@ temp/
 
 sitemap.xml
 vite.config.ts.*
+
+.DS_Store/

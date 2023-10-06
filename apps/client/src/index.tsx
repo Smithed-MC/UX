@@ -101,7 +101,7 @@ export function ClientApplet(props: ClientProps) {
             <meta name="description" content="Datapacks: the community, the tooling; all bundled into the perfect package." />
             <meta name="og:image" content="/icon.png" />
         </Helmet>
-        <div className='container outlet' style={{ width: 'min(70rem, 100%)', gap: 32, boxSizing: 'border-box', flexGrow: 1, justifyContent: 'start' }}>
+        <div className='container outlet' style={{ width: 'min(70rem, 100%)', gap: '4rem', boxSizing: 'border-box', flexGrow: 1, justifyContent: 'start' }}>
             <NavBar getTabs={props.inject.getNavbarTabs} logoUrl={props.inject.logoUrl} />
             <Outlet />
         </div>
