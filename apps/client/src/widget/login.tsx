@@ -5,7 +5,7 @@ import { FirebaseError } from "firebase/app";
 import { IconInput, IconTextButton } from "components";
 import { Right, Key, At } from "components/svg";
 
-export default function Login({clickSignUp}: {clickSignUp: () => void}) {
+export default function Login({clickSignUp, clickHelp}: {clickSignUp: () => void, clickHelp: () => void}) {
     const [email, setEmail] = useState('')
     const [emailError, setEmailError] = useState('')
     const [passwordError, setPasswordError] = useState('')
@@ -48,8 +48,8 @@ export default function Login({clickSignUp}: {clickSignUp: () => void}) {
             setPasswordError('')
         }} value={password} onKeyDown={(e) => {if(e.key === 'Enter') login()}} title={passwordError}/>
         <div className="container" style={{flexDirection: 'row', gap: '1.25rem'}}>
-            <a className="compactButton" style={{color: 'var(--border)'}} href="https://smithed.dev/discord">
-                Need help
+            <a className="compactButton" style={{color: 'var(--border)'}} onClick={clickHelp}>
+                Need help?
             </a>
             <div style={{width: '0.25rem', height: '0.25rem', backgroundColor: 'var(--border)', borderRadius: '50%', margin: '0rem -0.75rem'}}/>
             <a className="compactButton" style={{color: 'var(--border)'}} onClick={clickSignUp}>

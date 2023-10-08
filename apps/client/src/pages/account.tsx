@@ -6,11 +6,12 @@ import { useFirebaseUser } from "hooks";
 import SignUp from "../widget/signup";
 
 import logo from '../assets/logo.png'
+import ResetPassword from "../widget/resetPassword";
 
 export default function Account() {
     const user = useFirebaseUser()
     const navigate = useNavigate()
-    const [tab, setTab] = useState<'login'|'signup'>('login')
+    const [tab, setTab] = useState<'login'|'signup'|'reset'>('login')
 
     
 
@@ -26,8 +27,9 @@ export default function Account() {
             <div className='container' style={{backgroundColor: 'var(--backgroundAccent)', padding: 12, borderRadius: 'var(--defaultBorderRadius)', gap: 32, justifyContent: 'start'}}>
                 <img src={logo}/>
                 <div className="container" style={{justifyContent: 'center', height: '100%'}}>
-                    {tab === 'login' && <Login clickSignUp={() => setTab('signup')} />}
+                    {tab === 'login' && <Login clickSignUp={() => setTab('signup')} clickHelp={() => setTab('reset')}/>}
                     {tab === 'signup' && <SignUp clickLogin={() => setTab('login')} />}
+                    {tab === 'reset' && <ResetPassword clickBack={() => setTab('login')}/>}
                 </div>
             </div>
         </div>
