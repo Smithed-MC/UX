@@ -9,5 +9,35 @@ If you are looking for the Docker configuration that runs the backend, go [here]
 The latest stable version of the launcher can be downloaded from the [website](https://smithed.dev/)
 
 ## Building
-You will need Node.js 18+ and the Turbo CLI. To build the launcher, you also need to install Rust and the Tauri CLI.
+### Prerequisites
+- [Node.js - v18+](https://nodejs.org/en)
+- [Rust / Tauri](https://tauri.app/v1/guides/getting-started/prerequisites) (Only required for building the launcher)
 
+### Setting up the monorepo
+1. Clone the repo
+```sh
+git clone https://github.com/Smithed-MC/UX
+```
+2. Go into the directory and install dependencies
+```sh
+cd ./UX
+npm i
+```
+### Developing the website
+```
+npm run web:dev
+```
+This will open a local development server with live reload.
+
+### Developing the API
+In order to test, you'll need to create your own [firebase database and secret](https://firebase.google.com/docs/admin/setup). 
+Afterwards, navigate to UX/platforms/api and create a `.env` file and put your secret into a `secret.json` file
+Inside the `.env` file:
+```
+CERT=./secret.json
+PORT=8000
+```
+Then from the root `UX` folder, you should be able to start the API like so
+```
+npm run api:dev
+```
