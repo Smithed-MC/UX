@@ -12,9 +12,10 @@ interface ChooseBoxProps {
     className?: string,
     flip?: boolean,
     beforeOpen?: () => void,
+    title?: string
 }
 
-export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onChange, style, className, flip, beforeOpen }: ChooseBoxProps) {
+export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onChange, style, className, flip, beforeOpen, title }: ChooseBoxProps) {
     const [value, setValue] = useState<string | string[]>(defaultValue ?? (multiselect ? [] : ''))
     const [open, setOpen] = useState(false)
 
@@ -91,7 +92,7 @@ export function ChooseBox({ placeholder, defaultValue, multiselect, choices, onC
         </div>
     </div>;
 
-    return <div className={"chooseBoxWrapper " + className} style={{flexDirection: flip ? "column-reverse" : "column", ...style}}>
+    return <div className={"chooseBoxWrapper " + className} style={{flexDirection: flip ? "column-reverse" : "column", ...style}} title={title}>
         {options}
         <div className={`chooseBoxTrigger ${open ? 'open' : ''} ${flip ? 'flip' : 'noflip'}`} onMouseDown={clickTrigger} ref={triggerRef}>
             <label style={{lineHeight: '20px', WebkitLineClamp: 1, margin: 0, textOverflow: 'ellipsis', display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden', flexGrow: 1, width: '100%', wordBreak: 'break-all'}}>

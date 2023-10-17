@@ -1,4 +1,4 @@
-import { IconTextButton, NavBar, NavButton, PackCard } from "components";
+import { GalleryPackCard, IconTextButton, NavBar, NavButton, PackCard } from "components";
 import React, { useEffect, useRef, useState } from "react";
 import { PackData } from "data-types";
 import { Browse, Clock, ColoredLogo, Download, Download as DownloadIcon, Globe, Logo, Search, Smithed } from 'components/svg.js'
@@ -90,7 +90,7 @@ export default function Home(props: any) {
         return () => clearInterval(interval)
     }, [])
 
-    const packCard = (pack: {id: string, pack: PackData}) => <PackCard id={pack.id} packData={pack.pack} style={{
+    const packCard = (pack: {id: string, pack: PackData}) => <GalleryPackCard id={pack.id} packData={pack.pack} style={{
         border: '2px solid var(--border)', animation: `packShowcaseSlide${inAnimation ? 'In' : 'Out'} ${SLIDE_TIME/1000}s cubic-bezier(0.65, 0, 0.35, 1)`}}/>
 
     return <div className="container" style={{ width: '100%', boxSizing: 'border-box', justifyContent: 'safe start', gap: 32, paddingBottom: 80 }}>
@@ -98,8 +98,8 @@ export default function Home(props: any) {
             <meta name="description" content="Datapacks: the community, the tooling; all bundled into the perfect package"/>
         </Helmet>
         <div className="cardCarousel">
-            <CategoryHeader icon={Download} text={"Top downloads"} color="success" sort="downloads"/>
-            {packCard(downloadedPacks[currentPack])}
+            {/* <CategoryHeader icon={Download} text={"Top downloads"} color="success" sort="downloads"/>
+            {packCard(downloadedPacks[currentPack])} */}
             <CategoryHeader icon={Globe} text={"Trending today"} color="warning" sort="trending"/>
             {packCard(trendingPacks[currentPack])}
             <CategoryHeader icon={Clock} text={"Recently added"} color="secondary" sort="newest"/>

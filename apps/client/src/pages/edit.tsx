@@ -1,6 +1,6 @@
 import { e } from '@tauri-apps/api/event-2a9960e7'
 import { ChooseBox, ErrorPage, IconInput, IconTextButton, MarkdownRenderer, Spinner } from 'components'
-import { Back, Cross, Info, Left, Right, Trash, Edit as EditSvg, Globe, Browse, Plus, Picture, Download, Check, Folder, Jigsaw, Line, Star, Text as TextSvg, At, Refresh, File, Account, Home } from 'components/svg'
+import { Back, Cross, Info, Left, Right, Trash, Edit as EditSvg, Globe, Browse, Plus, Picture, Download, Check, Folder, Jigsaw, Line, Star, Text as TextSvg, At, Refresh, File, Account, Home, List } from 'components/svg'
 import { HTTPResponses, MinecraftVersion, PackData, PackDependency, PackMetaData, PackVersion, UserData, packCategories } from 'data-types'
 import { formatDownloadURL } from 'formatters'
 import { useFirebaseUser, useQueryParams } from 'hooks'
@@ -55,11 +55,21 @@ function Tooltip({ description, style, offset }: { description: string, offset?:
 
 }
 
-function StringInput({ reference, attr, description, header, disabled, svg, placeholder }: EditorInputProps) {
+function StringInput({ reference, attr, description, header, disabled, svg, placeholder, multiline }: EditorInputProps & { multiline?: boolean }) {
     return <EditorDiv>
         <div className='container' style={{ width: '100%', flexDirection: 'column', alignItems: 'start', gap: '0.5rem' }}>
-            <IconInput icon={svg ?? EditSvg} style={{ width: '100%', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={(e) => reference[attr] = e.currentTarget.value} defaultValue={reference !== undefined ? reference[attr] : ''} disabled={disabled} />
-            <span style={{ color: 'var(--border)' }}>{description}</span>
+            {!multiline && <IconInput icon={svg ?? EditSvg}
+                style={{ width: '100%', color: 'white', paddingRight: 32 }}
+                placeholder={placeholder ?? attr}
+                onChange={(e) => reference[attr] = e.currentTarget.value}
+                defaultValue={reference !== undefined ? reference[attr] : ''}
+                disabled={disabled}
+                title={description} />}
+            {multiline &&
+                <textarea className='input' placeholder={placeholder ?? attr}
+                    style={{ minWidth: '100%', maxWidth: '100%', minHeight: '6.75rem', textAlign: 'start' }} defaultValue={reference[attr]}></textarea>
+            }
+            {/* <span style={{ color: 'var(--border)' }}>{description}</span> */}
         </div>
     </EditorDiv>
 }
@@ -71,13 +81,19 @@ interface ImageURLInputProps extends EditorInputProps {
 
 function ImageURLInput({ reference, attr, width, height, description, header, placeholder, svg }: ImageURLInputProps) {
     const [src, setSrc] = useState(reference[attr])
+    const [fallback, setFallback] = useState(false)
 
-    return <EditorDiv>
-        <div className='container' style={{ width: '100%', flexDirection: 'column', alignItems: 'start', gap: '0.5rem' }}>
+    useEffect(() => setFallback(false), [src])
+
+    return <EditorDiv style={{ flexDirection: 'row', gap: '1rem' }}>
+        <div className='container' style={{ width: '4rem', height: '4rem', border: '2px solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--section)' }}>
+            {fallback && <span style={{ fontSize: '0.625rem' }}>PREVIEW</span>}
+            {!fallback && <img src={src} style={{ width: '100%', height: '100%' }} onError={() => setFallback(true)} />}
+        </div>
+        <div className='container' style={{ flexDirection: 'column', alignItems: 'start', gap: '0.5rem', flexGrow: 1 }}>
             <IconInput icon={svg ?? Picture} style={{ width: '100%', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={async (e) => { reference[attr] = await formatDownloadURL(e.currentTarget.value); setSrc(reference[attr]) }} defaultValue={reference !== undefined ? reference[attr] : ''} />
             <span style={{ color: 'var(--border)' }}>{description}</span>
         </div>
-        {/* <img style={{ width: width, height: height, padding: 4, backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)' }} src={src} /> */}
     </EditorDiv>
 }
 
@@ -110,17 +126,14 @@ function MarkdownURLInput({ reference, attr, description, placeholder, svg }: Ed
     return <EditorDiv>
         <div className='container' style={{ width: '100%', flexDirection: 'column', alignItems: 'start', gap: '0.5rem' }}>
             <div className='container' style={{ width: '100%', flexDirection: 'row', gap: '1rem' }}>
-                <IconInput icon={svg ?? Globe} style={{ width: '100%', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={(e) => { reference[attr] = e.currentTarget.value; }} defaultValue={reference !== undefined ? reference[attr] : ''} />
+                <IconInput icon={svg ?? Globe} style={{ width: '100%', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={(e) => { reference[attr] = e.currentTarget.value; }} defaultValue={reference !== undefined ? reference[attr] : ''} title={description} />
                 <button className='buttonLike accentedButtonLike' onClick={onClickPreviewButton} title="Preview">
                     <Picture />
                 </button>
             </div>
-            <span style={{ color: 'var(--border)' }}>
-                {description}
-            </span>
             {showPreview && <div className='container' style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', justifyContent: 'start', padding: 16, zIndex: 100, boxSizing: 'border-box' }}>
                 <div className='container' style={{ backgroundColor: 'var(--section)', width: '100%', height: 'calc(100%)', padding: 16, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)', border: '2px solid var(--border)', overflow: 'hidden', overflowY: 'auto' }}>
-                    <MarkdownRenderer style={{ flexGrow: 1, width: '100%', height: '100%'}}>
+                    <MarkdownRenderer style={{ flexGrow: 1, width: '100%', height: '100%' }}>
                         {showPreview}
                     </MarkdownRenderer>
                     <div style={{ flexGrow: 1 }} />
@@ -133,7 +146,7 @@ function MarkdownURLInput({ reference, attr, description, placeholder, svg }: Ed
     </EditorDiv>
 }
 
-function DownloadURLInput({ reference, attr, description, header }: EditorInputProps) {
+function DownloadURLInput({ reference, attr, description, placeholder }: EditorInputProps) {
     const [error, setError] = useState<string | undefined>(undefined)
     const [valid, setValid] = useState<boolean>(false)
     const [value, setValue] = useState<string>(reference[attr])
@@ -143,7 +156,7 @@ function DownloadURLInput({ reference, attr, description, header }: EditorInputP
     return <EditorDiv>
         <div className='container' style={{ width: '100%', flexDirection: 'column', alignItems: 'start', gap: '0.5rem' }}>
             <div className='container' style={{ flexDirection: 'row', width: '100%' }}>
-                <IconInput icon={Globe} style={{ width: '100%', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={(e) => { reference[attr] = e.currentTarget.value; setValue(reference[attr]); setValid(false) }} value={value} />
+                <IconInput icon={Globe} style={{ width: '100%', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={(e) => { reference[attr] = e.currentTarget.value; setValue(reference[attr]); setValid(false) }} value={value} />
                 <button className='accentedButtonLike' style={{ marginLeft: 8 }} onClick={async () => {
                     setError('')
                     setValid(false)
@@ -222,12 +235,11 @@ function DropdownSelectionInput({ reference, attr, description, placeholder, opt
     }
 
     return <EditorDiv>
-        <div className='container' style={{ width: '100%', flexDirection: 'column', gap: 8, alignItems: 'start' }}>
+        <div className='container' style={{ width: '100%', flexDirection: 'column', gap: 8, alignItems: 'start', margin: '1rem  0 1rem 0' }}>
             <ChooseBox placeholder={placeholder} onChange={(value) => {
                 // console.log(value)
                 reference[attr] = typeof value === 'string' ? [value] : value
-            }} choices={options.map(o => ({ value: o, content: o }))} multiselect defaultValue={reference[attr]} />
-            <span style={{ color: 'var(--border)' }}>{description}</span>
+            }} choices={options.map(o => ({ value: o, content: o }))} multiselect defaultValue={reference[attr]} title={description} />
         </div>
     </EditorDiv>
 }
@@ -295,7 +307,7 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
     }
 
     return <div>
-        <button className='compactButton' style={{ background: 'none', fontSize: '1.5rem' }} onClick={() => toggleDisplay()}>+ New</button>
+        <button className='compactButton' style={{ background: 'none' }} onClick={() => toggleDisplay()}>+ New</button>
     </div>
 
 }
@@ -480,8 +492,8 @@ function SavingModal({ state, changeState }: { state: SavingState, changeState: 
 function AddContributor({ contributors, setContributors, owner }: { contributors: string[], setContributors: (c: string[]) => void, owner: string }) {
     const [contributorToAdd, setContributorToAdd] = useState<string>('')
     return <div className='container' style={{ width: '100%', gap: '1.5rem' }}>
-        <div className='container' style={{ flexDirection: 'row', marginBottom: '-1rem', justifyContent: 'space-between', width: '100%' }}>
-            <h1 style={{ fontSize: '2rem' }}>Contributors</h1>
+        <div className='container' style={{ flexDirection: 'row', justifyContent: 'start', width: '100%', gap: '1rem', fontWeight: 600 }}>
+            <Account />Contributors
         </div>
         <div className='container' style={{ width: '100%', flexDirection: 'row', gap: '0.5rem' }}>
             <IconInput icon={Account} placeholder='Username/UID' style={{ width: '100%' }} onChange={(e) => setContributorToAdd(e.currentTarget.value)} />
@@ -500,6 +512,64 @@ function AddContributor({ contributors, setContributors, owner }: { contributors
     </div>
 }
 
+export function GalleryManager({ display }: { display: { gallery?: string[] } }) {
+    const [selectedImage, setSelectedImage] = useState(0)
+    const [images, setImages] = useState<string[]>([])
+
+    useEffect(() => {
+        setImages(display.gallery ?? [])
+    }, [...(display.gallery ?? [])])
+
+    const fileUploadRef = useRef<HTMLInputElement>(null);
+
+    async function OnFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.currentTarget.files?.item(0)
+
+        // console.log(file);
+        if (file === undefined || file == null)
+            return
+
+        if (file.size > 1024 * 1024)
+            return alert('Selected image exceeds 1MB')
+
+        const result = await new Promise<string>((resolve) => {
+            const fileReader = new FileReader()
+            fileReader.readAsDataURL(file);
+            fileReader.onloadend = () => {
+                resolve(fileReader.result as string)
+            }
+        })
+
+        if (display.gallery === undefined)
+            display.gallery = []
+
+        display.gallery.push(result)
+        setImages([...display.gallery])
+        setSelectedImage(display.gallery.length - 1)
+    }
+
+    return <div className='container' style={{ gap: '1rem', width: '100%' }}>
+        <input ref={fileUploadRef} type="file" accept='image/png, image/jpeg' hidden onChange={OnFileUpload} />
+        {display.gallery && display.gallery.length >= 1 && <div style={{ width: '100%', position: 'relative' }}>
+            <img style={{ width: '100%', borderRadius: 'var(--defaultBorderRadius)' }} src={images[selectedImage]} />
+            <button className='buttonLike' style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', padding: '0.5rem' }} onClick={() => {
+                display.gallery?.splice(selectedImage, 1)
+                setImages([...(display.gallery ?? [])])
+                setSelectedImage(selectedImage > 0 ? selectedImage - 1 : 0)
+            }}>
+                <Trash style={{ width: '1rem', height: '1rem', fill: 'var(--text)' }} />
+            </button>
+        </div>}
+        <div className='container' style={{ flexDirection: 'row', width: '100%', gap: '0.5rem' }}>
+            {images.map((g, idx) =>
+                <img key={`gImg${idx}`} src={g} className='galleryImageButton' onClick={() => setSelectedImage(idx)} />
+            )}
+            <span className="buttonLike" style={{ background: images.length > 0 ? 'none' : undefined, width: images.length == 0 ? '100%' : undefined }} onClick={() => {
+                fileUploadRef.current?.click()
+            }}><Plus />{images.length === 0 ? 'Upload image' : ''}</span>
+        </div>
+    </div>
+}
 
 export default function Edit() {
     const user = useFirebaseUser()
@@ -523,6 +593,8 @@ export default function Edit() {
     useEffect(() => {
         if (packData && packData.versions[selectedVersion])
             packData.versions[selectedVersion].dependencies ??= []
+        if (packData && !packData.display.urls)
+            packData.display.urls = {}
         setSupportedVersions(packData?.versions[selectedVersion]?.supports ?? [])
     }, [packData, selectedVersion])
 
@@ -633,30 +705,47 @@ export default function Edit() {
     </div>
 
     const CenterColumn = () => <div className='editorContainer'>
-        <div className='container' style={{ width: '100%', gap: '2.5rem', alignItems: 'start' }}>
-            <h1 style={{ fontSize: '2rem', marginBottom: '-1rem' }}>Basic information</h1>
+        <div className='container' style={{ width: '100%', gap: '1rem', alignItems: 'start' }}>
+            <div className="container" style={{ fontWeight: 600, flexDirection: 'row', gap: '1rem' }}>
+                <TextSvg /> Basic information
+            </div>
             <StringInput reference={packData} attr={'id'} disabled={!isNew} svg={Star}
                 description='Unique ID that others can reference your pack by' />
+            <ImageURLInput description='URL to the icon of the pack' reference={packData.display} attr={'icon'} width={64} height={64} placeholder='icon_url' svg={At} />
+            <DropdownSelectionInput
+                description='Choose categories that fit your pack'
+                reference={packData} attr={'categories'} placeholder={'Categories'}
+                options={packCategories} onChange={() => { setCategories(Object.create(packData.categories)) }} />
+            <StringInput reference={packData.display} attr={'name'} svg={Jigsaw}
+                description='Name of the pack' />
+            <MarkdownURLInput description='URL to the ReadME of the pack' reference={packData.display} attr={'webPage'} placeholder='readme_url' />
+            <StringInput reference={packData.display.urls ?? {}} attr={'discord'} placeholder='discord_url' svg={Globe} description='URL to your discord' />
+            <StringInput reference={packData.display.urls ?? {}} attr={'homepage'} placeholder='official_site_url' svg={Globe} description='URL to your official site' />
+            <StringInput reference={packData.display.urls ?? {}} attr={'source'} placeholder='source_url' svg={Globe} description='URL to your source code' />
+            <StringInput reference={packData.display} attr={'description'} svg={TextSvg}
+                description='Short description of the pack' multiline />
             <div className='container' style={{ width: '100%', flexDirection: 'column', gap: 8, alignItems: 'start' }}>
-
                 <ChooseBox placeholder='Visibility' choices={[
                     { content: 'Public', value: 'false' },
                     { content: 'Unlisted', value: 'true' }]
                 } onChange={(v) => packData.display.hidden = v === 'true' ? true : false} defaultValue={packData.display.hidden ? 'true' : 'false'} />
                 <span style={{ color: 'var(--border)' }}>How should the pack appear in browse</span>
             </div>
-            <StringInput reference={packData.display} attr={'name'} svg={Jigsaw}
-                description='Name of the pack' />
-            <StringInput reference={packData.display} attr={'description'} svg={TextSvg}
-                description='Short description of the pack' />
-            <ImageURLInput description='URL to the icon of the pack' reference={packData.display} attr={'icon'} width={64} height={64} placeholder='icon_url' svg={At} />
-            <MarkdownURLInput description='URL to the ReadME of the pack' reference={packData.display} attr={'webPage'} placeholder='web_page' />
-            <DropdownSelectionInput description='Choose categories that fit your pack' reference={packData} attr={'categories'} placeholder={'Categories'} options={packCategories} onChange={() => { setCategories(Object.create(packData.categories)) }} />
+
         </div>
         <Divider />
-        <div className='container' style={{ width: '100%', gap: '1.5rem' }}>
+        <div className='container' style={{ width: '100%', gap: '1rem', alignItems: 'start' }}>
+            <div className="container" style={{ fontWeight: 600, flexDirection: 'row', gap: '1rem' }}>
+                <Folder /> Gallery
+            </div>
+            <GalleryManager display={packData.display} />
+        </div>
+        <Divider />
+        <div className='container' style={{ width: '100%', gap: '1rem' }}>
             <div className='container' style={{ flexDirection: 'row', marginBottom: '-1rem', justifyContent: 'space-between', width: '100%' }}>
-                <h1 style={{ fontSize: '2rem' }}>Versions</h1>
+                <div className="container" style={{ fontWeight: 600, flexDirection: 'row', gap: '1rem' }}>
+                    <Folder /> Versions
+                </div>
                 <NewVersion data={packData.versions} onAddVersion={() => {
                     setVersions(Object.create(packData.versions));
                     setSelectedVersion(packData.versions.length - 1)
