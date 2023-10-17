@@ -20,6 +20,7 @@ import { ReactComponent as Discord } from './assets/discord.svg'
 import { ReactComponent as Globe } from './assets/globe.svg'
 import { ReactComponent as Clock } from './assets/clock.svg'
 import { ReactComponent as Logo } from './assets/logo.svg'
+import { ReactComponent as ColoredLogo } from './assets/colored_logo.svg'
 import { ReactComponent as Key } from './assets/key.svg'
 import { ReactComponent as At } from './assets/at.svg'
 import { ReactComponent as BackArrow } from './assets/back-arrow.svg'
@@ -67,6 +68,7 @@ export {
     Clock,
     Key,
     Logo,
+    ColoredLogo,
     BackArrow,
     Line,
     Jigsaw,

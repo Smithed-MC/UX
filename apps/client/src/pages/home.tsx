@@ -1,9 +1,8 @@
 import { IconTextButton, NavBar, NavButton, PackCard } from "components";
 import React, { useEffect, useRef, useState } from "react";
 import { PackData } from "data-types";
-import { Browse, Clock, Download, Download as DownloadIcon, Globe, Search, Smithed } from 'components/svg.js'
+import { Browse, Clock, ColoredLogo, Download, Download as DownloadIcon, Globe, Logo, Search, Smithed } from 'components/svg.js'
 
-import logo from '../assets/logo.png'
 import launcher_graphic from '../assets/launcher_graphic.png'
 import libraries_box from '../assets/libraries_box.png'
 import wiki_books from '../assets/wiki_books.png'
@@ -116,7 +115,7 @@ export default function Home(props: any) {
                     We are a set of projects with the express purpose of making datapacks more compatible, easier to manage, and fool proof to install. Smithed is not only a project but a community of passionate people.
                 </div>
                 <div className="homeImageContainer">
-                    <Smithed style={{strokeWidth: 3, stroke: 'black', width: '12rem'}}/>
+                    <ColoredLogo style={{width: '12rem', height: '12rem', color: 'var(--accent)'}}/>
                 </div>
             </div>
             <IconTextButton className="accentedButtonLike" text={"Join the community"} icon={"@"} style={{ width: 'fit-content' }} href="https://smithed.dev/discord" />
