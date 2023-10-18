@@ -308,7 +308,7 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
                     id={id}
                 />
                 <div className="container" style={{ gap: '0.5rem' }}>
-                    {downloadButton(id, (element) => {setInjectPopup(element)}, () => {setInjectPopup(undefined)})}
+                    {downloadButton(id, (element) => { setInjectPopup(element) }, () => { setInjectPopup(undefined) })}
                     <label style={{ color: 'var(--border)' }}>{(() => {
                         const version = packData?.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? '')).at(-1)
 
@@ -321,9 +321,15 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
             </div>
             <div className="userButtonsContainer">
                 {showBackButton && <BackButton />}
-                {packData?.display.urls?.discord && <IconTextButton className={"packInfoMediaButton"} icon={Discord} text={"Join Discord"} href={packData?.display.urls?.discord} />}
-                {packData?.display.urls?.source && <IconTextButton className={"packInfoMediaButton"} iconElement={<Globe fill="var(--foreground)" />} text={"Official website"} href={packData?.display.urls?.homepage} />}
-                {packData?.display.urls?.source && <IconTextButton className={"packInfoMediaButton"} icon={Github} text={"Source code"} href={packData?.display.urls?.source} />}
+                {packData?.display.urls?.discord && packData?.display.urls?.discord.length > 0 &&
+                    <IconTextButton className={"packInfoMediaButton"} icon={Discord} text={"Join Discord"} href={packData?.display.urls?.discord} />
+                }
+                {packData?.display.urls?.homepage && packData?.display.urls?.homepage.length > 0 &&
+                    <IconTextButton className={"packInfoMediaButton"} iconElement={<Globe fill="var(--foreground)" />} text={"Official website"} href={packData?.display.urls?.homepage} />
+                }
+                {packData?.display.urls?.source && packData?.display.urls?.source.length > 0 &&
+                    <IconTextButton className={"packInfoMediaButton"} icon={Github} text={"Source code"} href={packData?.display.urls?.source} />
+                }
                 <IconTextButton className="accentedButtonLike packInfoSmallDownload packInfoMediaButton" iconElement={<Download fill="var(--foreground)" />} text={"Download"} href={`https://api.smithed.dev/v2/download?pack=${id}`} rel="nofollow" />
             </div>
         </div>
