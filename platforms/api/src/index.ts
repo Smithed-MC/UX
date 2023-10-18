@@ -30,7 +30,7 @@ async function listen(port: number) {
   await setupApp()
   await API_APP.listen({ port: port, host: process.env.DOCKER ? '0.0.0.0' : '127.0.0.1' })
 
-  executeTasks()
+  executeTasks(process.env.TEST_TASKS == 'true')
   setInterval(executeTasks, 60 * 1000)
 }
 
