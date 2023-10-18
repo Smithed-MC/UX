@@ -177,7 +177,7 @@ export default function GalleryPackCard({ id, packData, onClick, state, style, p
             }}>
                 <div className='galleryImage' style={{ position: 'relative' }}>
                     {fallback && <div style={{ backgroundColor: 'var(--accent)', width: '100%', height: '100%', flexGrow: 1 }} />}
-                    {!data?.display.gallery && !fallback
+                    {(!data?.display.gallery || data?.display.gallery.length == 0) && !fallback
                         && <img style={{ width: '40rem', WebkitFilter: blur ? 'blur(0.5rem)' : '' }} src={data?.display.icon} onError={(e) => setFallback(true)}
                             onClick={() => {
                                 if (!card.current)
@@ -191,7 +191,7 @@ export default function GalleryPackCard({ id, packData, onClick, state, style, p
                                 setTimeout(() => card.current?.style.removeProperty('animation'), 0.4 * 1000)
                             }} />
                     }
-                    {data?.display.gallery &&
+                    {data?.display.gallery && data?.display.gallery.length > 0 &&
                         <img className='thumbnail' style={{ width: '100%', cursor: 'pointer' }} src={data?.display.gallery[currentImage]}
                             onClick={() => { setDisplayGallery(!displayGallery) }} />
                     }
