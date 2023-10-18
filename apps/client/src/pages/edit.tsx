@@ -86,7 +86,7 @@ function ImageURLInput({ reference, attr, width, height, description, header, pl
     useEffect(() => setFallback(false), [src])
 
     return <EditorDiv style={{ flexDirection: 'row', gap: '1rem' }}>
-        <div className='container' style={{ width: '4rem', height: '4rem', border: '2px solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--section)' }}>
+        <div className='container' style={{ width: '4rem', height: '4rem', border: '2px solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--section)', overflow: 'hidden' }}>
             {fallback && <span style={{ fontSize: '0.625rem' }}>PREVIEW</span>}
             {!fallback && <img src={src} style={{ width: '100%', height: '100%' }} onError={() => setFallback(true)} />}
         </div>
