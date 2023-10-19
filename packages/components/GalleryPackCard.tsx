@@ -76,7 +76,7 @@ export default function GalleryPackCard({ id, packData, onClick, state, style, p
         const onScreen = list[0].top < window.innerHeight + list[0].height && list[0].top + list[0].height > 0
         setBlur(onScreen);
 
-        if(displayGallery && !onScreen) {
+        if (displayGallery && !onScreen) {
             setDisplayGallery(false)
         }
     }
@@ -178,7 +178,7 @@ export default function GalleryPackCard({ id, packData, onClick, state, style, p
                 <div className='galleryImage' style={{ position: 'relative' }}>
                     {fallback && <div style={{ backgroundColor: 'var(--accent)', width: '100%', height: '100%', flexGrow: 1 }} />}
                     {(!data?.display.gallery || data?.display.gallery.length == 0) && !fallback
-                        && <img style={{ width: '40rem', WebkitFilter: blur ? 'blur(0.5rem)' : '' }} src={data?.display.icon} onError={(e) => setFallback(true)}
+                        && <img style={{ width: '100%', filter: 'blur(0.25rem)' }} src={data?.display.icon} onError={(e) => setFallback(true)}
                             onClick={() => {
                                 if (!card.current)
                                     return
