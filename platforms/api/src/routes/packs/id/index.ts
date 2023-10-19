@@ -74,10 +74,11 @@ const setPack = async (response: any, reply: any) => {
     if(!(await doc.get('contributors')).includes(userId))
         return sendError(reply, HTTPResponses.FORBIDDEN, `You are not a contributor for ${packId}`)
 
-    for(let v of packData.versions) {
-        if(coerce(v.name) == null)
-            return sendError(reply, HTTPResponses.BAD_REQUEST, `Version ${v} is not valid semver`)
-    }
+    if (packData.versions)
+        for(let v of packData.versions) {
+            if(coerce(v.name) == null)
+                return sendError(reply, HTTPResponses.BAD_REQUEST, `Version ${v} is not valid semver`)
+        }
     
     if(packData.versions && packData.versions.length > (await doc.get('data.versions')).length) {
         await doc.ref.set({
