@@ -1,7 +1,7 @@
 import { Type } from "@sinclair/typebox";
 import { API_APP, REDIS, get, sendError, set } from "../app.js";
 import { CollectedPack, DownloadRunner, collectPacks, incrementPackDownloadCount } from 'downloader'
-import { HTTPResponses, MinecraftVersionSchema, latestMinecraftVersion } from "data-types";
+import { HTTPResponses, MinecraftVersionSchema, latestMinecraftVersion } from '@smithed-mc/data-types';
 import hash from 'hash.js'
 import * as fs from 'fs'
 import fetch from "node-fetch";

@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
 import { API_APP, get, sendError, set } from "../../../app.js";
-import { HTTPResponses, MinecraftVersionSchema, PackVersion, PackVersionSchema } from "data-types";
+import { HTTPResponses, MinecraftVersionSchema, PackVersion, PackVersionSchema } from '@smithed-mc/data-types';
 import { coerce, compare } from "semver";
 import { getPackDoc, getUIDFromToken } from "database";
 

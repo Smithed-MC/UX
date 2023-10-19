@@ -3,7 +3,7 @@ import { PythonShell } from 'python-shell'
 import fetch from 'node-fetch'
 import semver from 'semver'
 
-import { MinecraftVersion, PackData, PackVersion } from 'data-types'
+import { MinecraftVersion, PackData, PackVersion } from '@smithed-mc/data-types'
 import { getFirestore } from 'firebase-admin/firestore'
 import { getPackDoc } from 'database'
 import { RUNNER } from './runner.js'

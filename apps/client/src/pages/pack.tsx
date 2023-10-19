@@ -1,6 +1,6 @@
 import { useLoaderData, useParams } from "react-router-dom"
 import React, { useEffect, useState } from "react"
-import { PackData, PackMetaData, UserData } from "data-types"
+import { PackData, PackMetaData, UserData } from '@smithed-mc/data-types'
 import PackInfo from "../widget/packInfo"
 import Download from "../widget/download"
 import { Spinner } from "components"

@@ -1,7 +1,7 @@
 import { setupApp } from "../src/app.js";
 import {test} from 'tap'
 import dotenv from 'dotenv'
-import { HTTPResponses, PackData, PackVersion } from "data-types";
+import { HTTPResponses, PackData, PackVersion } from '@smithed-mc/data-types';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import { initializeApp } from 'firebase/app'
 

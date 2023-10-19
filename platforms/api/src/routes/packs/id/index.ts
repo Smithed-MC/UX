@@ -1,7 +1,7 @@
 import { Static, Type } from "@sinclair/typebox";
 import { API_APP, get, sendError, set } from "../../../app.js";
 import { getFirestore } from "firebase-admin/firestore";
-import { HTTPResponses, PackData, PackDataSchema, PackMetaData } from "data-types";
+import { HTTPResponses, PackData, PackDataSchema, PackMetaData } from '@smithed-mc/data-types';
 import { getPackDoc, getUIDFromToken } from "database";
 import {FastifyRequest, FastifyReply} from 'fastify'
 import { coerce, valid } from "semver";

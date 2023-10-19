@@ -1,4 +1,4 @@
-import { PackVersion } from "data-types";
+import { PackVersion } from '@smithed-mc/data-types';
 import React from "react";
 import DownloadButton from "./DownloadButton";
 import semver from 'semver'

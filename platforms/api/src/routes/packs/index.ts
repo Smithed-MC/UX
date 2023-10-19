@@ -2,7 +2,7 @@ import {Type} from '@sinclair/typebox'
 import {API_APP, get, sendError, set} from "../../app.js";
 import {getFirestore} from 'firebase-admin/firestore'
 import { Queryable } from '../../index.js';
-import { HTTPResponses, MinecraftVersion, MinecraftVersionSchema, PackData, PackDataSchema, SortOptions, SortSchema } from 'data-types';
+import { HTTPResponses, MinecraftVersion, MinecraftVersionSchema, PackData, PackDataSchema, SortOptions, SortSchema } from '@smithed-mc/data-types';
 import { getUIDFromToken } from 'database';
 import { coerce } from 'semver';
 

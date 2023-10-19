@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
 import { API_APP, sendError } from "../app.js";
-import { HTTPResponses } from "data-types";
+import { HTTPResponses } from '@smithed-mc/data-types';
 
 
 /*

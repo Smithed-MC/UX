@@ -4,7 +4,7 @@ import { invoke } from "@tauri-apps/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { LocalBundleConfig } from "../types";
 import { IconTextButton, PackCard, svg } from "components";
-import { PackData, PackReference } from "data-types";
+import { PackData, PackReference } from '@smithed-mc/data-types';
 import { useEffect, useState } from "react";
 import BackButton from "client/src/widget/BackButton";
 

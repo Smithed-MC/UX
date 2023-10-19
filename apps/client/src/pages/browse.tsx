@@ -1,6 +1,6 @@
 import { PackCard, IconInput, ChooseBox, GalleryPackCard } from "components";
 import React, { useEffect, useRef, useState } from "react";
-import { PackData, SortOptions, packCategories, supportedMinecraftVersions } from "data-types"
+import { PackData, SortOptions, packCategories, supportedMinecraftVersions } from '@smithed-mc/data-types'
 import { AddToBundleModal } from "../widget/packInfo.js";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import './browse.css'

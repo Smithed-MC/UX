@@ -45,6 +45,7 @@
     "@octokit/core": "^4.2.0",
     "@reduxjs/toolkit": "^1.9.5",
     "@sinclair/typebox": "^0.25.20",
+    "@smithed-mc/data-types": "^0.1.2",
     "@vitejs/plugin-react": "^4.0.0",
     "abstract-cache": "^1.0.1",
     "abstract-cache-redis": "^2.0.0",

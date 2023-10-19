@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { BundleSchema, HTTPResponses, MetaDataSchema, MinecraftVersionSchema, PackCategorySchema, PackDataSchema, PackReferenceSchema, PackVersionSchema, SortSchema, UserDataSchema } from 'data-types'
+import { BundleSchema, HTTPResponses, MetaDataSchema, MinecraftVersionSchema, PackCategorySchema, PackDataSchema, PackReferenceSchema, PackVersionSchema, SortSchema, UserDataSchema } from '@smithed-mc/data-types'
 import { TProperties, TObject, TArray, TSchema, Kind, Modifier, TUnion, TLiteral, TLiteralValue } from '@sinclair/typebox';
 
 interface Config {

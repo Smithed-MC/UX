@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ChooseBoxChoice, LocalBundleConfig } from "../types";
 import { getChooseBoxBundles } from "../util";
 import { invoke } from "@tauri-apps/api";
-import { PackBundle } from "data-types";
+import { PackBundle } from '@smithed-mc/data-types';
 
 function ImportBundle({ bundleId, onFinish }: ImportBundleProps) {
 	const [bundle, setBundle] = useState<PackBundle | undefined>(undefined);

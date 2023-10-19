@@ -2,7 +2,7 @@ import { tauri } from "@tauri-apps/api";
 import { open } from '@tauri-apps/api/shell'
 import { IconTextButton, markdownOptions, MarkdownRenderer, Spinner } from "components";
 import { Cross, Discord, Download, Github, Globe, Plus, Right, Warning } from "components/svg";
-import { MinecraftVersion, MinecraftVersionSchema, PackBundle, PackData, PackEntry, PackMetaData, supportedMinecraftVersions, UserData } from "data-types";
+import { MinecraftVersion, MinecraftVersionSchema, PackBundle, PackData, PackEntry, PackMetaData, supportedMinecraftVersions, UserData } from '@smithed-mc/data-types';
 import Markdown, { MarkdownToJSX } from "markdown-to-jsx";
 import React, { useEffect, useRef, useState } from "react";
 import { useFormAction, useLoaderData, useNavigate } from "react-router-dom";

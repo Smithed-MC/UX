@@ -1,5 +1,5 @@
 import React, { CSSProperties, RefObject, useEffect, useRef, useState } from 'react'
-import { PackBundle, PackData, PackEntry, PackMetaData, PackVersion } from 'data-types'
+import { PackBundle, PackData, PackEntry, PackMetaData, PackVersion } from '@smithed-mc/data-types'
 import { formatDownloads, prettyTimeDifference } from 'formatters'
 import { ReactComponent as QuestionMark } from './assets/question-mark.svg'
 import { ReactComponent as Download } from './assets/download.svg'

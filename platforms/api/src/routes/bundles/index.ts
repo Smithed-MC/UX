@@ -2,7 +2,7 @@ import { Type } from '@sinclair/typebox'
 import { API_APP, sendError } from '../../app.js'
 import { getFirestore } from 'firebase-admin/firestore'
 import { sanitize } from '../sanitize.js'
-import { BundleSchema, HTTPResponses, PackBundle } from 'data-types'
+import { BundleSchema, HTTPResponses, PackBundle } from '@smithed-mc/data-types'
 import { getUIDFromToken } from 'database'
 
 export async function getBundleDoc(id: string) {

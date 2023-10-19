@@ -9,7 +9,7 @@ import { Check, Cross, Download, Jigsaw, MenuBars, Save, Trash } from './svg.js'
 import { IconTextButton } from './IconTextButton'
 import { Discord as DiscordSvg, Home as HomeSvg, Browse as BrowseSvg, Account as AccountSvg } from 'components/svg.js'
 import { selectSelectedBundle, selectUsersBundles, setUsersBundles } from 'store'
-import { PackBundle, PackData } from 'data-types'
+import { PackBundle, PackData } from '@smithed-mc/data-types'
 
 interface NavButtonProps {
     onOpen: () => void

@@ -11,7 +11,7 @@ import {
 	LocalBundleConfig,
 	OutputMessageEvent,
 } from "../../types";
-import { MinecraftVersion } from "data-types";
+import { MinecraftVersion } from '@smithed-mc/data-types';
 import { Smithed } from "components/svg";
 import { getChooseBoxBundles } from "../../util";
 import BundleList from "./BundleList";
