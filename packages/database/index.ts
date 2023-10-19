@@ -6,10 +6,11 @@ import {getFirestore} from 'firebase-admin/firestore'
 import { ServiceAccount } from 'firebase-admin/lib/app/credential';
 import * as jose from 'jose'
 
-let privateKey: jose.KeyLike
+export let privateKey: jose.KeyLike
+export let serviceAccount: any
+
 export async function initialize() {
-    const serviceAccount = typeof process.env.ADMIN_CERT === 'string' ? JSON.parse(fs.readFileSync(process.env.ADMIN_CERT, {encoding: 'utf-8'})) : process.env.ADMIN_CERT;
-    
+    serviceAccount = typeof process.env.ADMIN_CERT === 'string' ? JSON.parse(fs.readFileSync(process.env.ADMIN_CERT, {encoding: 'utf-8'})) : process.env.ADMIN_CERT;
     if(serviceAccount.private_key === undefined)
         throw new Error('Service account does not have a defined private key!')
 

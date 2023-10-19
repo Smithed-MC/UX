@@ -1,5 +1,3 @@
-
-export const RUNNER = `
 import io
 import sys
 import os
@@ -35,4 +33,3 @@ with run_weld(zips) as context:
         with ZipFile(path / 'welded-both.zip', 'w') as zip:
             zip.write(path / 'welded-dp.zip', arcname='datapacks.zip')
             zip.write(path / 'welded-rp.zip', arcname='resourcepacks.zip')
-`

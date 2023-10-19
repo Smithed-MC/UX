@@ -118,6 +118,9 @@ API_APP.route({
         await doc.ref.set({
             data: {
                 versions: versions
+            },
+            stats: {
+                updated: Date.now()
             }
         }, {merge: true})
 

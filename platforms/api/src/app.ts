@@ -39,7 +39,7 @@ export async function importRoutes(dirPath: string) {
 export let REDIS: IORedis|undefined = undefined
 
 async function registerCacheRedis() {
-    const redis = new IORedis({ host: '127.0.0.1' })
+    const redis = new IORedis({ host: process.env.DOCKER ? 'redis' : '127.0.0.1' })
     REDIS = redis
 
     const abcache = abCache({

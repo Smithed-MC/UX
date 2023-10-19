@@ -26,7 +26,6 @@ export const supportedMinecraftVersions = [
 ]
 export const latestMinecraftVersion = '1.20.2'
 
-
 export const MinecraftVersionSchema = Type.Union(supportedMinecraftVersions.map(v => Type.Literal(v)))
 
 export const packCategories = [ 
@@ -106,8 +105,8 @@ export const UserDataSchema = Type.Object({
     displayName: Type.String(),
     cleanName: Type.String(),
     creationTime: Type.Number(),
-    pfp: Type.Optional(Type.String()),
-    uid: Type.String()
+    uid: Type.String(),
+    pfp: Type.Optional(Type.String())
 })
 
 export enum SortOptions {
