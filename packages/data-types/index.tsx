@@ -13,16 +13,16 @@ Format.Set('semver', (v) => coerce(v) != null)
 console.log(Format.Has('semver'))
 
 export const supportedMinecraftVersions = [
-    '1.17',
-    '1.17.1',
-    '1.18',
-    '1.18.1',
-    '1.18.2',
-    '1.19',
-    '1.19.4',
-    '1.20',
+    '1.20.2',
     '1.20.1',
-    '1.20.2'
+    '1.20',
+    '1.19.4',
+    '1.19',
+    '1.18.2',
+    '1.18.1',
+    '1.18',
+    '1.17.1',
+    '1.17'
 ]
 export const latestMinecraftVersion = '1.20.2'
 
