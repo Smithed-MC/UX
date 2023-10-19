@@ -159,7 +159,7 @@ export async function loadBrowseData({ request }: { request: Request }) {
     const page = pageParam ? Number.parseInt(pageParam as string) : 0
 
     const count = await getTotalCount(params)
-    const packEntries = await getPackEntriesForBrowse(params, Math.min(page, Math.ceil(count / PACKS_PER_PAGE)))
+    const packEntries = await getPackEntriesForBrowse(params, Math.max(0, Math.min(page, Math.ceil(count / PACKS_PER_PAGE) - 1)))
 
     const packs = await Promise.all(packEntries.map(p => getPackData(p.id)))
 

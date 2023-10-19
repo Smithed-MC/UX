@@ -44,7 +44,8 @@
     grid-template-areas:
         "name name name"
         "description description description"
-        "author author open";
+        "author author open"
+        "downloads downloads open";
 
     grid-template-columns: 1fr auto auto;
 
@@ -130,6 +131,7 @@
 }
 
 .galleryPackCard>.packInfo>.author,
+.galleryPackCard>.packInfo>.downloads,
 .galleryPackCard>.packInfo>.description {
     text-overflow: ellipsis;
     overflow: hidden;
@@ -151,7 +153,8 @@
     box-sizing: border-box;
 }
 
-.galleryPackCard>.packInfo>.author {
+.galleryPackCard>.packInfo>.author,
+.galleryPackCard>.packInfo>.downloads {
     height: 20px;
     max-height: 20px;
 
@@ -163,6 +166,10 @@
 
     white-space: nowrap;
     word-wrap: break-word;
+}
+
+.galleryPackCard>.packInfo>.downloads {
+    grid-area: downloads;
 }
 
 /* @container galleryPackCardContainer (max-width: 20rem) {
