@@ -1,240 +1,76 @@
-header {
-    font-size: clamp(calc(3.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)));
-}
-
-.pageText {
-    font-size: calc(1.5rem * (var(--headerModifier) + .2));
-}
-
-:root {
-    --colorTransitionTime: 20s;
-}
-
-.accentText {
-
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    animation: accent var(--colorTransitionTime) infinite;
-    background-size: 100% 400%;
-    background-repeat: repeat-y;
-}
-
-.trendingContainer {
-    flex-direction: column;
-    display: inline-grid;
-    /* grid-template-rows: auto auto; */
-    /* grid-template-columns: 1fr 1fr 1fr; */
-    place-items: center;
-    place-content: center;
-    justify-content: space-evenly;
-    box-sizing: border-box;
-    width: 100%;
-    column-gap: 32px;
-    padding: 32px;
-
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-areas: 
-        'downloadsHeader trendingHeader newestHeader'
-        'downloadsPreview trendingPreview newestPreview';
-}
-
-.trendingCard {
-    width: 100%;
-    box-sizing: border-box;
-    height: 100%;
-    justify-content: start;
-}
-
-.header {
-    box-sizing: border-box;
-    font-weight: bolder;
-    font-family: DoppioOne;
-    padding: 16px;
-    border-radius: var(--defaultBorderRadius);
-    /* animation: headerIntro 2s; */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 96px;
-    overflow: visible;
-}
-
-
-
-.homePageIntroPanel,
-.homePageLauncherPanel,
-.genericPanel {
+.cardCarousel {
     display: grid;
-    grid-template-columns: 50% 50%;
-    place-items: center;
-    width: 75%;
-    column-gap: 32px;
+    width: 100%;
+    grid-template: auto auto / auto auto;
+    grid-auto-flow: column;
+    padding: 8px 0px;
+    gap: 16px 12px;
+    box-sizing: border-box;
 }
 
-.homePageIntroPanel {
-    grid-template-areas:
-        'logo header'
-        'logo content'
-        'logo footer';
-
-}
-
-.homePageLauncherPanel {
-    grid-template-areas:
-        'screenshot header'
-        'screenshot content1'
-        'screenshot footer1'
-        'screenshot subheading'
-        'screenshot content2'
-        'screenshot footer2';
+.homeSectionHeader {
+    font-size: 4rem;
+    font-weight: 600;
 }
 
 
-.logo {
-    animation: accent var(--colorTransitionTime) infinite;
+
+.homeSectionContainer {
+    align-items: start;
+    gap: 24px;
 }
 
-.imageContainer {
-    height: '100%'
+.homeTextContainer {
+    width: 50%;
+    margin: 0;
+    align-items: start;
+    gap: 16px;
 }
 
-:root {
-    --headerModifier: 1;
+.homeImageContainer {
+    flex-grow: 1;
+    width: 50%;
+    display: flex;
+    justify-content: right;
 }
 
-@media screen and (max-width: 1024px) {
-    :root {
-        --headerModifier: .6;
+@media screen and (max-width: 70rem) {
+    .cardCarousel {
+        grid-template: auto auto auto auto auto auto / auto
     }
-
-    .homePageIntroPanel,
-    .homePageLauncherPanel,
-    .genericPanel {
+    .homeImageContainer {
+        display: none !important;
+    }
+    .homeTextContainer {
         width: 100%;
-        padding: 16px;
-        box-sizing: border-box;
-        grid-template-columns: 100%;
     }
-
-    .homePageIntroPanel {
-        grid-template-areas:
-            'header'
-            'content'
-            'footer';
+    .homeSectionHeader {
+        font-size: 2.5rem;
+        width: 100%;
+        text-align: center;
     }
-
-    .homePageLauncherPanel {
-        grid-template-areas:
-            'header'
-            'content1'
-            'footer1'
-            'subheading'
-            'content2'
-            'footer2';
-    }
-
-    .imageContainer {
-        display: none;
-    }
-
-    .trendingContainer {
-        row-gap: 32px;
-        grid-template-columns: 100%;
-        grid-template-areas: 
-            'downloadsHeader' 
-            'downloadsPreview'
-            'trendingHeader' 
-            'trendingPreview' 
-            'newestHeader'
-            'newestPreview';
+    .homeSectionContainer {
+        align-items: center;
     }
 }
 
-
-@media screen and (min-width: 1024px) {
-    .trendingCard {
-        width: 33%;
-    }
-}
-
-
-@keyframes headerIntro {
+@keyframes packShowcaseSlideIn {
     0% {
-        font-size: clamp(calc(4rem * var(--headerModifier)), calc(5rem * var(--headerModifier)), calc(5rem * var(--headerModifier)));
-        opacity: 0%;
-    }
-
-    10% {
-        font-size: clamp(calc(5rem * var(--headerModifier)), calc(6rem * var(--headerModifier)), calc(6rem * var(--headerModifier)));
-    }
-
-    20% {
-        rotate: 5deg;
-    }
-
-    40% {
-        font-size: max(7vw, 7vh);
-        rotate: -5deg;
-        opacity: 100%;
-    }
-
-    60% {
-        font-size: clamp(calc(5rem * var(--headerModifier)), calc(6rem * var(--headerModifier)), calc(6rem * var(--headerModifier)));;
-        rotate: 0deg;
-    }
-
-    65% {}
-
-    100% {
-        font-size: clamp(calc(3.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)));;
-        margin-top: 0%;
-    }
-}
-
-.cursor {
-    height: 100%;
-    width: 4px;
-    border-radius: 2px;
-    animation: blinkingCursor 1s infinite;
-    background-color: var(--accent);
-    margin-left: 4px;
-    margin-right: 6px;
-}
-
-@keyframes blinkingCursor {
-    0% {
+        margin-left: -80vw;
         opacity: 0;
     }
-
-    50% {
+    100% {
+        margin-left: 0;
         opacity: 1;
     }
 }
 
-@keyframes pulse {
+@keyframes packShowcaseSlideOut {
     0% {
-        font-size: clamp(calc(4rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)));
+        margin-left: 0;
     }
-
-    33% {
-        font-size: clamp(calc(4.2rem * var(--headerModifier)), calc(4.7rem * var(--headerModifier)), calc(4.7rem * var(--headerModifier)));
-    }
-
-    66% {
-        font-size: clamp(calc(4rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)), calc(4.5rem * var(--headerModifier)));
-    }
-}
-
-@keyframes accent {
-    0% {
-        background-color: var(--accent);
-    }
-
-    50% {
-        background-color: var(--accent2);
-    }
-
     100% {
-        background-color: var(--accent);
+        margin-left: 80vw;
+        opacity: 0;
     }
 }

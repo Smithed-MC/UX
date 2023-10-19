@@ -5,11 +5,38 @@
     height: 100%;
     width: 100%;
     box-sizing: border-box;
-    padding-right: 12px;
 }
 
 .packCardContainer {
     box-sizing: border-box;
+    width: 100% !important;
+    display: grid;
+    grid-template-columns: auto auto;
+    /* grid-template-rows: aut; */
+    position: relative;
+
+    transition: all 0.5s;
+
+    gap: 2rem;
+}
+
+.browsePageButton {
+    padding: 0.5rem;
+    border-radius: var(--defaultBorderRadius);
+    color: var(--foreground);
+    text-decoration: none;
+    aspect-ratio: 1 / 1 !important;
+    width: auto;
+    height: 1.25rem;
+    text-align: center;
+    vertical-align: center;
+    opacity: 0.5;
+    transition: all 0.2s ease-in-out;
+}
+
+.browsePageButton:hover, .browsePageButton.selected {
+    background-color: var(--section);
+    opacity: 1;
 }
 
 @media screen and (max-width: 1024px) {
@@ -22,31 +49,16 @@
         place-items: safe center !important;
         align-items: safe center !important;
     }
-
-    .packCardContainer {
-        width: fit-content;
-    }
 }
 
 @media screen and (min-width: 1024px) {
-    .browserRoot, .browserRootWidget {
-        flex-direction: row !important;
-        align-items: safe start !important;
-        justify-content: safe start !important;
-    }
-    
-    .browserRoot {
-        columns: 3;
-        grid-template-columns: 20% 60% 20%;
-    }
-
-    .browserRootWidget {
-        columns: 2;
-        grid-template-columns: 40% 60%;
-    }
-
     .packCardContainer {
         width: 100%;
-        padding: 0px 16px 0px 16px;
+    }
+}
+
+@media screen and (max-width: 48rem) {
+    .packCardContainer {
+        grid-template-columns: auto;
     }
 }

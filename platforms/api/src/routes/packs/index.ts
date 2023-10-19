@@ -4,6 +4,7 @@ import {getFirestore} from 'firebase-admin/firestore'
 import { Queryable } from '../../index.js';
 import { HTTPResponses, MinecraftVersion, MinecraftVersionSchema, PackData, PackDataSchema, SortOptions, SortSchema } from 'data-types';
 import { getUIDFromToken } from 'database';
+import { coerce } from 'semver';
 
 type ReceivedPackResult = {docId: string, docData: {data: PackData, _indices: string[], hidden?: boolean, [key: string]: any}}
 
@@ -161,7 +162,11 @@ API_APP.route({
 
         if((await existingCount.get()).data().count != 0) 
             return sendError(reply, HTTPResponses.CONFLICT, `Pack with ID ${id} already exists in the database`)
-
+        
+        for(let v of data.versions) {
+            if(coerce(v.name) == null)
+                return sendError(reply, HTTPResponses.BAD_REQUEST, `Version ${v} is not valid semver`)
+        }
 
         const documentData = {
             id: id,

@@ -13,19 +13,18 @@ Format.Set('semver', (v) => coerce(v) != null)
 console.log(Format.Has('semver'))
 
 export const supportedMinecraftVersions = [
-    '1.17',
-    '1.17.1',
-    '1.18',
-    '1.18.1',
-    '1.18.2',
-    '1.19',
-    '1.19.4',
-    '1.20',
+    '1.20.2',
     '1.20.1',
-    '1.20.2'
+    '1.20',
+    '1.19.4',
+    '1.19',
+    '1.18.2',
+    '1.18.1',
+    '1.18',
+    '1.17.1',
+    '1.17'
 ]
-export const latestMinecraftVersion = '1.20.1'
-
+export const latestMinecraftVersion = '1.20.2'
 
 export const MinecraftVersionSchema = Type.Union(supportedMinecraftVersions.map(v => Type.Literal(v)))
 
@@ -66,7 +65,13 @@ export const PackDataSchema = Type.Object({
         description: Type.String({minLength: 3}),
         icon: Type.String({default: ''}),
         hidden: Type.Boolean({default: false}),
-        webPage: Type.Optional(Type.String())
+        webPage: Type.Optional(Type.String()),
+        urls: Type.Optional(Type.Object({
+            discord: Type.Optional(Type.String()),
+            source: Type.Optional(Type.String()),
+            homepage: Type.Optional(Type.String())
+        })),
+        gallery: Type.Optional(Type.Array(Type.String()))
     }),
     versions: Type.Array(PackVersionSchema, {minItems: 1}),
     categories: Type.Array(PackCategorySchema)
@@ -118,6 +123,7 @@ export type PackDependency = Static<typeof PackReferenceSchema>
 export type PackVersion = Static<typeof PackVersionSchema>
 export type PackData = Static<typeof PackDataSchema>
 export type PackBundle = Static<typeof BundleSchema>
+export type PackReference = Static<typeof PackReferenceSchema>
 
 export type UserData = Static<typeof UserDataSchema>
 

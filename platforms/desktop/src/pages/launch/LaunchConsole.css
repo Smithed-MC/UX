@@ -1,0 +1,51 @@
+.launchConsole {
+	position: absolute;
+	bottom: 5.5rem;
+	width: 25rem;
+}
+
+.launchConsoleHeader {
+	background-color: var(--highlight);
+	border-top-left-radius: 16px;
+	border-top-right-radius: 16px;
+	border: 2px solid var(--border);
+	box-sizing: border-box;
+	padding: 0.5rem;
+
+	flex-direction: row;
+	gap: 1rem;
+}
+
+.launchConsoleTitle {
+	flex-grow: 1;
+	padding-left: 1rem;
+}
+
+.launchConsoleLatest {
+	overflow: hidden;
+}
+
+.launchConsoleArrow.open {
+	transform: rotate(90deg);
+}
+
+.launchConsoleExpanded {
+	background-color: var(--section);
+	border: 2px solid var(--border);
+	border-top: 0px;
+	height: 15rem;
+	padding: 0.5rem;
+	box-sizing: border-box;
+
+	text-overflow: ellipsis;
+	overflow-y: scroll;
+}
+
+.consoleMessage {
+	font-size: 15px;
+	font-family: "Courier New", Courier, monospace;
+}
+
+.consoleMessage.last {
+	font-weight: 700;
+}

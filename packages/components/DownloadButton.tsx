@@ -10,7 +10,7 @@ interface DownloadButtonProps {
 export default function DownloadButton({ link }: DownloadButtonProps) {
     const [downloading, setDownloading] = useState(false)
     return <div style={{ width: 48, height: 48, flexShrink: 0 }}>
-        <a className="button wobbleHover container" style={{ width: 48, height: 48, borderRadius: '24px', padding: 12, boxSizing: 'border-box', overflow: 'clip', justifyContent: 'center' }} href={link} onClick={async (e) => {
+        <a className="button wobbleHover container" style={{ width: 48, height: 48, borderRadius: '24px', padding: 12, boxSizing: 'border-box', overflow: 'clip', justifyContent: 'center' }} href={link} rel="nofollow" onClick={async (e) => {
             e.preventDefault()
             
             setDownloading(true)

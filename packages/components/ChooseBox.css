@@ -1,0 +1,136 @@
+.chooseBoxWrapper {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    width: 100%;
+    box-sizing: border-box;
+    container-type: inline-size;
+    container-name: chooseBox;
+}
+
+
+.chooseBoxTrigger {
+    background-color: var(--section);
+    padding: 0.5rem 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    border-radius: var(--defaultBorderRadius);
+    cursor: pointer;
+
+    border: 2px solid var(--background);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.chooseBoxTrigger.open.noflip {
+    border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0;
+    border-bottom: 2px solid var(--border);
+}
+
+.chooseBoxTrigger.open.flip {
+    border-radius: 0 0 var(--defaultBorderRadius) var(--defaultBorderRadius);
+    border-top: 2px solid var(--border);
+}
+
+.chooseBoxOptionsWrapper {
+    display: block;
+    visibility: hidden;
+
+    position: absolute;
+    width: 100%;
+
+    z-index: 5;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.chooseBoxOptionsWrapper.noflip {
+    top: 100%;
+}
+
+.chooseBoxOptionsWrapper.flip {
+    bottom: 100%;
+}
+
+.chooseBoxOptionsWrapper.open {
+    visibility: visible;
+}
+
+.chooseBoxOptions {
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 0 0 var(--defaultBorderRadius) var(--defaultBorderRadius);
+    border: 2px solid var(--background);
+    border-top: none;
+    overflow: hidden;
+}
+
+.chooseBoxOptions.flip {
+    border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0;
+
+}
+
+.chooseBoxOptions.open {
+    animation: chooseBoxFoldout 0.3s ease-out;
+}
+
+.chooseBoxOption {
+    padding: 0.5rem 1rem;
+    background-color: var(--section);
+
+
+    cursor: pointer;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.chooseBoxWrapper.success>.chooseBoxTrigger {
+    background-color: var(--success);
+}
+.chooseBoxWrapper.success>.chooseBoxTrigger.open {
+    border-bottom: 2px solid rgba(1,1,1,0.1);
+}
+.chooseBoxWrapper.success>*>*>.chooseBoxOption {
+    background-color: var(--success);
+}
+.chooseBoxWrapper.success>*>*>.chooseBoxOption:hover {
+    background-color: color-mix(in srgb, var(--success) 70%, white);
+}
+
+
+.chooseBoxOption:hover {
+    background-color: var(--highlight);
+}
+
+.chooseBoxSecondaryPlaceHolder {
+    display: none;
+}
+
+
+@container chooseBox (max-width: 192px) {
+    .chooseBoxPlaceholder {
+        display: none;
+    }
+    .chooseBoxSecondaryPlaceHolder {
+        display: revert;
+        opacity: 0.5;
+    }
+}
+
+
+@keyframes chooseBoxFoldout {
+    0% {
+        height: 0%;
+    }
+    100% {
+        height: 100%;
+    }
+}

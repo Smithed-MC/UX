@@ -1,32 +1,36 @@
 import React, { CSSProperties, RefObject, useEffect, useRef, useState } from 'react'
-import { PackBundle, PackData, PackEntry, PackVersion } from 'data-types'
-import { formatDownloads } from 'formatters'
+import { PackBundle, PackData, PackEntry, PackMetaData, PackVersion } from 'data-types'
+import { formatDownloads, prettyTimeDifference } from 'formatters'
 import { ReactComponent as QuestionMark } from './assets/question-mark.svg'
 import { ReactComponent as Download } from './assets/download.svg'
 import { useMatch, useNavigate } from 'react-router-dom'
 import './PackCard.css'
-import DownloadButton from './DownloadButton'
-import Spinner from './Spinner'
-import EditButton from './EditButton'
-import AddRemovePackButton from './AddRemovePackButton'
+import DownloadButton from './DownloadButton.js'
+import Spinner from './Spinner.js'
+import EditButton from './EditButton.js'
+import AddRemovePackButton from './AddRemovePackButton.js'
 import { compare, coerce } from 'semver'
 import { User } from 'firebase/auth'
+import { IconTextButton } from './IconTextButton.js'
+import { Edit, Right } from './svg.js'
 
 interface PackCardProps {
     id: string,
     packEntry?: PackEntry,
     packData?: PackData,
     state?: 'editable' | 'add',
-    style?: CSSProperties
+    style?: CSSProperties,
+    parentStyle?: CSSProperties,
     bundleData?: PackBundle
     user?: User | null
     onClick?: () => void,
+    addWidget?: JSX.Element
     [key: string]: any
 }
 
-export default function PackCard({ id, packData, onClick, state, style, bundleData, user, ...props }: PackCardProps) {
-    const [data, setData] = useState<PackData>()
-    const [downloads, setDownloads] = useState<number>(0)
+export default function PackCard({ id, packData, onClick, state, style, parentStyle, bundleData, user, addWidget, ...props }: PackCardProps) {
+    const [data, setData] = useState<PackData|undefined>(packData)
+    const [metaData, setMetaData] = useState<PackMetaData>()
     const [fallback, setFallback] = useState(false)
     const [author, setAuthor] = useState('')
     const [loaded, setLoaded] = useState(false)
@@ -65,7 +69,7 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
 
         await Promise.all([getData(), getAuthor(metaData.owner)])
 
-        setDownloads(metaData.stats.downloads.total)
+        setMetaData(metaData)
 
         setLoaded(true)
         setFallback(false)
@@ -105,15 +109,16 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
             return
         setValidForBundle(bundleData !== undefined && data?.versions.findIndex(v => v.supports.includes(bundleData.version)) === -1)
     }, [bundleData, data])
+
     useEffect(() => { onLoad(); }, [id])
 
-    if (data === undefined || (data.display.hidden && match))
+    if (data === undefined )
         return <div style={{ ...style }} />
 
-    if (!loaded) return <div className="packCard" style={{ ...style }} {...props}>
+    if (!data || (data.display.hidden && match)) return <div className="packCard" style={{ ...style }} {...props}>
         <div className='container' style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%' }}>
-            <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)', overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
-                <div className='packImage' />
+            <div style={{ display: 'block', width: 32, height: 32, backgroundColor: 'var(--section)', borderRadius: 'var(--defaultBorderRadius)', overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
+                <div className='packCardImage' />
             </div>
             <div className='container fadeOut' style={{ alignItems: 'start', flexGrow: 1, gap: 8, width: '100%' }}>
                 <label className='' style={{ fontSize: '1.5rem', backgroundColor: 'var(--background)', maxWidth: 256, width: '100%', height: 24 }} />
@@ -122,44 +127,52 @@ export default function PackCard({ id, packData, onClick, state, style, bundleDa
         </div>
     </div>
 
-    return <div className='cardContainer'>
+    return <div className='cardContainer' style={{ ...parentStyle }}>
         <div className="packCard" key={id} ref={card} onClick={(e) => {
             if (!(e.target instanceof HTMLDivElement || e.target instanceof HTMLLabelElement)) return
-            if (onClick) onClick()
+            // if (onClick) onClick()
         }} style={{ ...style }} {...props}>
-            <div className='container' style={{ flexDirection: 'row', alignItems: 'safe flex-start', gap: 16, width: '100%', flexGrow: 1, overflow: 'hidden' }}>
-                <div className="packImage" style={{ display: 'block', backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)', overflow: 'hidden', flexBasis: 'max-content', flexShrink: '0' }}>
-                    {!fallback && <img src={data.display.icon} key={data.id} className="packImage fadeIn" style={{ aspectRatio: '1 / 1', imageRendering: 'pixelated' }} onError={() => setFallback(true)} />}
-                    {fallback && <QuestionMark className="packImage" style={{ fill: "var(--text)" }} />}
-                </div>
-                <div className='container fadeIn' style={{ alignItems: 'start', flexGrow: 1, gap: 8, maxWidth: '100%', fontSize: '1.125rem', overflow: 'hidden', justifyContent: 'start', boxSizing: 'border-box' }}>
-                    <label className='' style={{ fontSize: '1.5rem', color: 'var(--accent2)' }}>
-                        {data.display.name} <a className='' style={{ fontSize: '1rem', color: 'var(--subText)', cursor: 'pointer' }} href={'/' + author}>by {author}</a>
-                    </label>
-                    <div className='packDescription'>
-                        {data.display.description}
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'end', gap: 8, height: 'max-content' }}>
-                        {/* {data.categories?.map(c => <div style={{borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--accent2)', padding: 8}}>{c}</div>)} */}
-                    </div>
-                </div>
+            <div className='container packCardDetails'>
+                {!fallback && <img className="packCardImage" src={data.display.icon} onError={() => setFallback(true)} />}
+                {fallback && <div className='container packCardImage'><QuestionMark/></div>}
+                <a className='compactButton packCardName' style={{ fontWeight: 600 }} href={`/packs/${id}`}>{data.display.name}</a>
+                <p className='packCardDescription'>{data.display.description}</p>
             </div>
-            <div className='container downloadBox fadeIn' style={{ height: '100%', flexBasis: 'fit-content', flexShrink: 0, gap: 16 }}>
-                <label style={{ fontSize: '1.5rem' }}>{formatDownloads(downloads)} <label style={{ fontSize: '1rem', color: 'var(--subText)' }}>download{downloads === 1 ? '' : 's'}</label></label>
-                <div className='container' style={{ flexDirection: 'row', justifyContent: 'right', gap: 8 }}>
-                    {state !== 'add' && <DownloadButton link={`https://api.smithed.dev/v2/download?pack=${id}`} />}
-                    {showInvalidTooltip && <div style={{ position: 'fixed', animation: 'fadeIn 0.5s', marginRight: 40, backgroundColor: 'var(--accent)', padding: 8, paddingRight: 16, borderRadius: 'var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius)' }}>Pack does not support {bundleData?.version}</div>}
-                    {state === 'add' && <AddRemovePackButton add={!contained} onClick={onAddClick} disabled={validForBundle} onMouseOver={() => {
-                        if (validForBundle) setShowInvalidTooltip(true)
-                    }} onMouseOut={() => {
-                        if (validForBundle) setShowInvalidTooltip(false)
-                    }} />}
-                    {state === 'editable' && <EditButton link={`../edit?pack=${id}`} />}
+            <div className='container' style={{ width: '100%', flexBasis: 'fit-content', flexShrink: 0, gap: '1rem', flexDirection: 'row', position: 'relative' }}>
+                <div className='packCardInfo'>
+                    <span>by <a className="compactButton" href={`/${metaData?.owner}`}>{author}</a></span>
+                    <span className="packCardInfoSeperator">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
+                            <circle cx="2" cy="2" r="2" fill="#FFF8F0" />
+                        </svg>
+                    </span>
+                    {formatDownloads(metaData?.stats.downloads.total ?? 0)} Download{metaData?.stats.downloads.total === 1 ? '' : 's'}
+                    <span className="packCardInfoSeperator">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
+                            <circle cx="2" cy="2" r="2" fill="#FFF8F0" />
+                        </svg>
+                    </span>
+                    <span className='packCardUpdateInfo'>{prettyTimeDifference(metaData?.stats.updated ?? metaData?.stats.added ?? 0)} ago</span>
                 </div>
+                <div style={{ flexGrow: 1 }} />
+                {state === 'editable' && <a className='buttonLike accentedButtonLike' href={`/edit?pack=${id}`}><Edit /></a>}
+                {state === 'add' && addWidget}
+                <IconTextButton className="accentedButtonLike" text={"Open"} icon={Right} reverse={true} href={`/packs/${id}`} />
             </div>
         </div>
     </div>
 }
+
+// <div className='container' style={{ flexDirection: 'row', justifyContent: 'right', gap: 8 }}>
+//                     {state !== 'add' && <DownloadButton link={`https://api.smithed.dev/v2/download?pack=${id}`} />}
+//                     {showInvalidTooltip && <div style={{ position: 'fixed', animation: 'fadeIn 0.5s', marginRight: 40, backgroundColor: 'var(--accent)', padding: 8, paddingRight: 16, borderRadius: 'var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius)' }}>Pack does not support {bundleData?.version}</div>}
+//                     {state === 'add' && <AddRemovePackButton add={!contained} onClick={onAddClick} disabled={validForBundle} onMouseOver={() => {
+//                         if (validForBundle) setShowInvalidTooltip(true)
+//                     }} onMouseOut={() => {
+//                         if (validForBundle) setShowInvalidTooltip(false)
+//                     }} />}
+//                     {state === 'editable' && <EditButton link={`../edit?pack=${id}`} />}
+//                 </div>
 
 // 3_4_0
 // breaking

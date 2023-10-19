@@ -1,7 +1,7 @@
 import { e } from '@tauri-apps/api/event-2a9960e7'
-import { ErrorPage, MarkdownRenderer, Spinner } from 'components'
-import { Back, Cross, Info, Left, Right, Save, Trash } from 'components/svg'
-import { HTTPResponses, MinecraftVersion, PackData, PackDependency, PackVersion, packCategories } from 'data-types'
+import { ChooseBox, ErrorPage, IconInput, IconTextButton, MarkdownRenderer, Spinner } from 'components'
+import { Back, Cross, Info, Left, Right, Trash, Edit as EditSvg, Globe, Browse, Plus, Picture, Download, Check, Folder, Jigsaw, Line, Star, Text as TextSvg, At, Refresh, File, Account, Home, List } from 'components/svg'
+import { HTTPResponses, MinecraftVersion, PackData, PackDependency, PackMetaData, PackVersion, UserData, packCategories } from 'data-types'
 import { formatDownloadURL } from 'formatters'
 import { useFirebaseUser, useQueryParams } from 'hooks'
 import React, { CSSProperties, useEffect, useRef, useState } from 'react'
@@ -17,8 +17,8 @@ interface InputWithTooltipProps {
 }
 
 function Editor({ children, title, style, ...props }: any) {
-    return <div className='container' style={{ backgroundColor: 'var(--backgroundAccent)', width: '100%', maxWidth: 'calc(512px + 16px)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, boxSizing: 'border-box', ...style }}>
-        <h1>{title}</h1>
+    return <div className='container' style={{ backgroundColor: 'var(--section)', width: '100%', maxWidth: 'calc(512px + 16px)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, boxSizing: 'border-box', ...style }}>
+        <h1 style={{ fontFamily: 'Lexend' }}>{title}</h1>
         <div className='container' style={{ width: '100%', height: '100%', gap: 16, alignItems: 'start' }}>{children}</div>
     </div>
 }
@@ -36,9 +36,13 @@ function AttributeHeader({ attr }: { attr: string }) {
 interface EditorInputProps {
     reference: { [key: string]: any }
     attr: string,
+    placeholder?: string,
     description: string,
     header?: string,
-    disabled?: boolean
+    disabled?: boolean,
+    svg?: React.FunctionComponent<React.SVGProps<SVGSVGElement> & {
+        title?: string | undefined;
+    }> | string
 }
 
 
@@ -51,12 +55,21 @@ function Tooltip({ description, style, offset }: { description: string, offset?:
 
 }
 
-function StringInput({ reference, attr, description, header, disabled }: EditorInputProps) {
+function StringInput({ reference, attr, description, header, disabled, svg, placeholder, multiline }: EditorInputProps & { multiline?: boolean }) {
     return <EditorDiv>
-        {(header !== '') && <AttributeHeader attr={header ?? attr} />}
-        <div className='container' style={{ width: '100%', flexDirection: 'row' }}>
-            <input style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={(e) => reference[attr] = e.currentTarget.value} defaultValue={reference !== undefined ? reference[attr] : ''} disabled={disabled} />
-            <Tooltip description={description} />
+        <div className='container' style={{ width: '100%', flexDirection: 'column', alignItems: 'start', gap: '0.5rem' }}>
+            {!multiline && <IconInput icon={svg ?? EditSvg}
+                style={{ width: '100%', color: 'white', paddingRight: 32 }}
+                placeholder={placeholder ?? attr}
+                onChange={(e) => reference[attr] = e.currentTarget.value}
+                defaultValue={reference !== undefined ? reference[attr] : ''}
+                disabled={disabled}
+                title={description} />}
+            {multiline &&
+                <textarea className='input' placeholder={placeholder ?? attr}
+                    style={{ minWidth: '100%', maxWidth: '100%', minHeight: '6.75rem', textAlign: 'start' }} defaultValue={reference[attr]}></textarea>
+            }
+            {/* <span style={{ color: 'var(--border)' }}>{description}</span> */}
         </div>
     </EditorDiv>
 }
@@ -66,54 +79,65 @@ interface ImageURLInputProps extends EditorInputProps {
     height: number | string
 }
 
-function ImageURLInput({ reference, attr, width, height, description, header }: ImageURLInputProps) {
+function ImageURLInput({ reference, attr, width, height, description, header, placeholder, svg }: ImageURLInputProps) {
     const [src, setSrc] = useState(reference[attr])
+    const [fallback, setFallback] = useState(false)
 
-    return <EditorDiv>
-        <AttributeHeader attr={header ?? attr} />
-        <div className='container' style={{ width: '100%', flexDirection: 'row' }}>
-            <input style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={async (e) => { reference[attr] = await formatDownloadURL(e.currentTarget.value); setSrc(reference[attr]) }} defaultValue={reference !== undefined ? reference[attr] : ''} />
-            <Tooltip description={description} />
+    useEffect(() => setFallback(false), [src])
+
+    return <EditorDiv style={{ flexDirection: 'row', gap: '1rem' }}>
+        <div className='container' style={{ width: '4rem', height: '4rem', border: '2px solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--section)', overflow: 'hidden' }}>
+            {fallback && <span style={{ fontSize: '0.625rem' }}>PREVIEW</span>}
+            {!fallback && <img src={src} style={{ width: '100%', height: '100%' }} onError={() => setFallback(true)} />}
         </div>
-
-        <img style={{ width: width, height: height, padding: 4, backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)' }} src={src} />
+        <div className='container' style={{ flexDirection: 'column', alignItems: 'start', gap: '0.5rem', flexGrow: 1 }}>
+            <IconInput icon={svg ?? Picture} style={{ width: '100%', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={async (e) => { reference[attr] = await formatDownloadURL(e.currentTarget.value); setSrc(reference[attr]) }} defaultValue={reference !== undefined ? reference[attr] : ''} />
+            <span style={{ color: 'var(--border)' }}>{description}</span>
+        </div>
     </EditorDiv>
 }
 
-function MarkdownURLInput({ reference, attr, description }: EditorInputProps) {
+function MarkdownURLInput({ reference, attr, description, placeholder, svg }: EditorInputProps) {
     const [showPreview, setShowPreview] = useState<string | undefined>(undefined)
     const [error, setError] = useState<string | undefined>(undefined)
+
+    const onClickPreviewButton = async () => {
+        setError('')
+        const url = reference[attr]
+        if (url === '') return void setError('No URL is specified')
+
+
+        const resp = await fetch(await formatDownloadURL(url))
+        if (!resp.ok) {
+            switch (resp.status) {
+                case 404:
+                    setError('404: Page was not found, check your link again.')
+                    break;
+                default:
+                    setError(`Error has occured! ${resp.status}: ${resp.statusText}`)
+                    break;
+            }
+            return
+        }
+
+        setShowPreview(await resp.text())
+    }
+
     return <EditorDiv>
-        <AttributeHeader attr={attr} />
-        <div className='container' style={{ width: '100%', flexDirection: 'row' }}>
-            <input style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={(e) => { reference[attr] = e.currentTarget.value; }} defaultValue={reference !== undefined ? reference[attr] : ''} />
-            <Tooltip description={description} />
-            <button className='button' style={{ marginLeft: 8 }} onClick={async () => {
-                setError('')
-                const url = reference[attr]
-                if (url === '') return void setError('No URL is specified')
-
-
-                const resp = await fetch(await formatDownloadURL(url))
-                if (!resp.ok) {
-                    switch (resp.status) {
-                        case 404:
-                            setError('404: Page was not found, check your link again.')
-                            break;
-                        default:
-                            setError(`Error has occured! ${resp.status}: ${resp.statusText}`)
-                            break;
-                    }
-                    return
-                }
-
-                setShowPreview(await resp.text())
-            }}>Preview</button>
-            {showPreview && <div className='container' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 'calc(100vh - 32px)', justifyContent: 'start', padding: 16, zIndex: 100 }}>
-                <div className='container' style={{ backgroundColor: 'var(--backgroundAccent)', width: '100%', maxWidth: 720, padding: 16, height: '100%', borderRadius: 'var(--defaultBorderRadius)', border: '2px solid var(--accent)' }}>
-                    <MarkdownRenderer style={{ flexGrow: 1, width: '100%' }}>{showPreview}
+        <div className='container' style={{ width: '100%', flexDirection: 'column', alignItems: 'start', gap: '0.5rem' }}>
+            <div className='container' style={{ width: '100%', flexDirection: 'row', gap: '1rem' }}>
+                <IconInput icon={svg ?? Globe} style={{ width: '100%', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={(e) => { reference[attr] = e.currentTarget.value; }} defaultValue={reference !== undefined ? reference[attr] : ''} title={description} />
+                <button className='buttonLike accentedButtonLike' onClick={onClickPreviewButton} title="Preview">
+                    <Picture />
+                </button>
+            </div>
+            {showPreview && <div className='container' style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', justifyContent: 'start', padding: 16, zIndex: 100, boxSizing: 'border-box' }}>
+                <div className='container' style={{ backgroundColor: 'var(--section)', width: '100%', height: 'calc(100%)', padding: 16, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)', border: '2px solid var(--border)', overflow: 'hidden', overflowY: 'auto' }}>
+                    <MarkdownRenderer style={{ flexGrow: 1, width: '100%', height: '100%' }}>
+                        {showPreview}
                     </MarkdownRenderer>
-                    <button className='button' style={{ width: 128, fontSize: '1.125rem', backgroundColor: 'var(--badAccent)' }} onClick={() => { setShowPreview(undefined) }}>Close</button>
+                    <div style={{ flexGrow: 1 }} />
+                    <button className='buttonLike invalidButtonLike' style={{ width: 128, fontSize: '1.125rem', backgroundColor: 'var(--disturbing)', justifySelf: 'flex-end' }} onClick={() => { setShowPreview(undefined) }}>Close</button>
                 </div>
 
             </div>}
@@ -122,7 +146,7 @@ function MarkdownURLInput({ reference, attr, description }: EditorInputProps) {
     </EditorDiv>
 }
 
-function DownloadURLInput({ reference, attr, description, header }: EditorInputProps) {
+function DownloadURLInput({ reference, attr, description, placeholder }: EditorInputProps) {
     const [error, setError] = useState<string | undefined>(undefined)
     const [valid, setValid] = useState<boolean>(false)
     const [value, setValue] = useState<string>(reference[attr])
@@ -130,27 +154,30 @@ function DownloadURLInput({ reference, attr, description, header }: EditorInputP
     useEffect(() => setValue(reference[attr]), [reference, attr])
 
     return <EditorDiv>
-        <AttributeHeader attr={header ?? attr} />
-        <div className='container' style={{ width: '100%', flexDirection: 'row' }}>
-            <input style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white', paddingRight: 32 }} placeholder={prettyString(attr) + '...'} onChange={(e) => { reference[attr] = e.currentTarget.value; setValue(reference[attr]); setValid(false) }} value={value} />
-            <Tooltip description={description} />
-            <button className='button' style={{ marginLeft: 8 }} onClick={async () => {
-                setError('')
-                setValid(false)
-                const url = reference[attr]
-                if (url === '') return void setError('No URL is specified')
+        <div className='container' style={{ width: '100%', flexDirection: 'column', alignItems: 'start', gap: '0.5rem' }}>
+            <div className='container' style={{ flexDirection: 'row', width: '100%' }}>
+                <IconInput icon={Globe} style={{ width: '100%', color: 'white', paddingRight: 32 }} placeholder={placeholder ?? attr} onChange={(e) => { reference[attr] = e.currentTarget.value; setValue(reference[attr]); setValid(false) }} value={value} />
+                <button className='accentedButtonLike' style={{ marginLeft: 8 }} onClick={async () => {
+                    setError('')
+                    setValid(false)
+                    const url = reference[attr]
+                    if (url === '') return void setError('No URL is specified')
 
-                const resp = await fetch(`https://api.smithed.dev/v2/validate-download?url=${url}`)
-                const status = await resp.text()
+                    const resp = await fetch(`https://api.smithed.dev/v2/validate-download?url=${url}`)
+                    const status = await resp.json()
 
-                if (status !== 'valid') return void setError(status)
+                    if (!resp.ok) return void setError(status)
 
-                setValid(true)
+                    setValid(status.valid)
 
-            }}>Validate</button>
+                }}>
+                    <Refresh />
+                </button>
+            </div>
+            <span style={{ color: 'var(--border)' }}>{description}</span>
+            {error && <label style={{ color: 'var(--badAccent)', padding: 4 }}>{error}</label>}
+            {valid && <label style={{ color: 'var(--goodAccent)', padding: 4 }}>Download is working!</label>}
         </div>
-        {error && <label style={{ color: 'var(--badAccent)', padding: 4 }}>{error}</label>}
-        {valid && <label style={{ color: 'var(--goodAccent)', padding: 4 }}>Download is working!</label>}
     </EditorDiv>
 }
 
@@ -159,6 +186,7 @@ function Selection({ values, onChange, defaultValue }: { values: string[], onCha
 
     const updateIndex = (index: number) => {
         setIndex(index)
+
         if (onChange) onChange(index)
     }
 
@@ -173,23 +201,17 @@ function Selection({ values, onChange, defaultValue }: { values: string[], onCha
     const cycleRight = () => cycle(1)
 
     return <EditorDiv style={{ flexDirection: 'row' }}>
-        <button className='button' style={{ borderRadius: '50%', height: 32, width: 32, alignItems: 'center' }} onClick={cycleLeft} disabled={values.length <= 1}>
-            <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Left style={{ width: '24px', height: '24px', flexShrink: 0, stroke: 'var(--buttonText)' }} />
-            </div>
+        <button className='buttonLike' onClick={cycleLeft} disabled={values.length <= 1}>
+            <Right style={{ transform: 'scale(-100%, -100%)' }} />
         </button>
-        <select className='container' style={{ flexGrow: 1, maxWidth: 196, backgroundColor: 'var(--accent)', height: 32, alignItems: 'center', borderRadius: 'var(--defaultBorderRadius)', textAlignLast: 'center' }} value={index} onChange={(e) => { updateIndex(Number.parseInt(e.currentTarget.value)) }}>
-            {values.map((v, i) => <option value={i} style={{ textAlign: 'left' }}>{v}</option>)}
-        </select>
-        <button className='button' style={{ borderRadius: '50%', height: 32, width: 32, alignItems: 'center' }} onClick={cycleRight} disabled={values.length <= 1}>
-            <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Right style={{ width: '24px', height: '24px', flexShrink: 0, stroke: 'var(--buttonText)' }} />
-            </div>
+        <ChooseBox style={{ flexGrow: 1, zIndex: 10 }} defaultValue={index.toString()} choices={values.map((v, i) => ({ value: i.toString(), content: v }))} onChange={(e) => { updateIndex(Number.parseInt(e as string)) }} />
+        <button className='buttonLike' onClick={cycleRight} disabled={values.length <= 1}>
+            <Right />
         </button>
     </EditorDiv>
 }
 
-function DropdownSelectionInput({ reference, attr, description, header, options, onChange }: EditorInputProps & { options: string[], onChange: () => void }) {
+function DropdownSelectionInput({ reference, attr, description, placeholder, options, onChange }: EditorInputProps & { options: string[], onChange: () => void }) {
     const select = useRef<HTMLSelectElement>(null)
     const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined)
     const [contained, setContained] = useState<boolean>()
@@ -213,21 +235,11 @@ function DropdownSelectionInput({ reference, attr, description, header, options,
     }
 
     return <EditorDiv>
-        <AttributeHeader attr={attr} />
-        <div className='container' style={{ width: '100%', flexDirection: 'row', gap: 8 }}>
-            <select ref={select} style={{ width: '100%', backgroundColor: 'var(--background)' }} defaultValue='_placeholder' onChange={(e) => setSelectedValue(e.currentTarget.value)}>
-                {options.map(s => <option key={s}>{s}</option>)}
-                <option selected value={'_placeholder'} hidden>{description + '...'} </option>
-            </select>
-            {selectedValue !== undefined && ((
-                !contained && <button className='button' style={{ width: 32, height: 32, fontSize: '1.5rem', borderRadius: '50%', flexShrink: 0 }} onClick={addVersion}>
-                    <div className='container' style={{ width: '100%', height: '100%' }}>+</div>
-                </button>
-            ) || (
-                    <button className='button' style={{ width: 32, height: 32, fontSize: '1.5rem', borderRadius: '50%', flexShrink: 0, backgroundColor: 'var(--badAccent)' }} onClick={removeVersion}>
-                        <div className='container' style={{ width: '100%', height: '100%' }}>-</div>
-                    </button>
-                ))}
+        <div className='container' style={{ width: '100%', flexDirection: 'column', gap: 8, alignItems: 'start', margin: '1rem  0 1rem 0' }}>
+            <ChooseBox placeholder={placeholder} onChange={(value) => {
+                // console.log(value)
+                reference[attr] = typeof value === 'string' ? [value] : value
+            }} choices={options.map(o => ({ value: o, content: o }))} multiselect defaultValue={reference[attr]} title={description} />
         </div>
     </EditorDiv>
 }
@@ -238,10 +250,11 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
     const versionName = useRef<HTMLInputElement>(null);
 
     const addVersion = () => {
+        // console.log(versionName)
         if (versionName.current == null)
             return
         const name = versionName.current.value
-        console.log(name)
+        // console.log(name)
         setError('')
 
         if (name === undefined || name === '') {
@@ -266,7 +279,7 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
             dependencies: []
         })
 
-        console.log(data)
+        // console.log(data)
         setAddNewVersion(false)
         onAddVersion()
     }
@@ -277,31 +290,33 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
     }
 
     if (addNewVersion) {
-        return <EditorDiv style={{ alignItems: 'center', padding: '16px 0px', marginTop: -8, width: 'fit-content' }} onMouseLeave={() => setAddNewVersion(false)}>
-            <EditorDiv style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <input style={{ backgroundColor: 'var(--background)', color: 'var(--text)' }} placeholder='Version Number...' ref={versionName} onMouseEnter={() => versionName.current?.select()} onKeyDown={(e) => {
+        return <div style={{ position: 'fixed', top: 0, left: 0, display: 'flex', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', background: 'rgba(0,0,0,0.5', zIndex: 100 }}>
+            <div className="container" style={{ alignItems: 'center', padding: '1rem', backgroundColor: 'var(--background)', border: '2px solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', gap: '0.5rem' }}>
+                <IconInput icon={EditSvg} placeholder='Version Number...' inputRef={versionName} onMouseEnter={() => versionName.current?.select()} onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                         addVersion()
                     }
                 }} />
-                <button className='button' style={{ width: 32, height: 32, fontSize: '1.5rem' }} onClick={addVersion}>
-                    <div className='container' style={{ width: '100%', height: '100%' }}>+</div>
-                </button>
-            </EditorDiv>
-            {error && <label style={{ color: 'var(--badAccent)' }}>{error}</label>}
-        </EditorDiv>
+                {error && <label style={{ color: 'var(--badAccent)' }}>{error}</label>}
+                <div className='container' style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+                    <IconTextButton icon={Cross} text={"Cancel"} className='invalidButtonLike' style={{}} onClick={() => setAddNewVersion(false)} />
+                    <IconTextButton icon={Plus} text={"Add"} className='accentedButtonLike' style={{}} onClick={addVersion} />
+                </div>
+            </div>
+        </div>
     }
 
-    return <EditorDiv style={{ flexDirection: 'row', justifyContent: 'center', width: 'fit-content' }}>
-        <button className='button' style={{ fontSize: '1rem', width: '100%', maxWidth: '196px' }} onClick={toggleDisplay}>Add new version</button>
-    </EditorDiv>
+    return <div>
+        <button className='compactButton' style={{ background: 'none' }} onClick={() => toggleDisplay()}>+ New</button>
+    </div>
+
 }
 
 function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies: PackDependency[], onRemoveDependency: () => void }) {
     const [elements, setElements] = useState<JSX.Element[]>([]);
 
     const getDeps = async () => {
-        console.log(dependencies)
+        // console.log(dependencies)
         dependencies.sort((a, b) => a.id.localeCompare(b.id))
         let elements: JSX.Element[] = []
         for (let i = 0; i < dependencies.length; i++) {
@@ -309,16 +324,19 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
 
             const metaData = await (await fetch(`https://api.smithed.dev/v2/packs/${d.id}/meta`)).json()
 
-            elements.push(<button key={"btn" + d.id + d.version} className='button' style={{ width: 18, height: 18, backgroundColor: 'var(--badAccent)' }} onClick={() => {
-                dependencies.splice(i, 1)
-                onRemoveDependency()
-            }}>
-                <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Cross style={{ width: '12px', height: '12px', flexShrink: 0, stroke: 'var(--buttonText)' }} />
-                </div>
-            </button>)
-            elements.push(<label key={"id" + d.id + d.version} style={{ paddingRight: 16, borderRight: '2px solid var(--background)' }}>{metaData.rawId}</label>)
-            elements.push(<label key={"version" + d.id + d.version}>{d.version}</label>)
+            elements.push(<div className='container' key={d.id} style={{ flexDirection: 'row', width: '100%', gap: '0.5rem' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
+                    <circle cx="2" cy="2" r="2" fill="var(--foreground)" />
+                </svg>
+                <label key={"id" + d.id + d.version}>{metaData.rawId} v{d.version}</label>
+                <div style={{ flexGrow: 1 }} />
+                <button key={"btn" + d.id + d.version} className='buttonLike invalidButtonLike' onClick={() => {
+                    dependencies.splice(i, 1)
+                    onRemoveDependency()
+                }}>
+                    <Trash fill="var(--disturbing)" />
+                </button>
+            </div>)
         }
 
         setElements(elements)
@@ -326,7 +344,42 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
 
     useEffect(() => { getDeps() }, [dependencies.flatMap(d => d.id + d.version).join('')])
 
-    return <div style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gridTemplateRows: 'auto', alignItems: 'center', columnGap: 16, rowGap: 8 }}>
+    return <div className="container" style={{ alignItems: 'start', width: '100%', gap: '1rem' }}>
+        {elements}
+    </div>
+}
+
+function RenderContributors({ contributors, owner, onRemoveContributor }: { contributors: string[], owner: string, onRemoveContributor: () => void }) {
+    const [elements, setElements] = useState<JSX.Element[]>([]);
+
+    const getDeps = async () => {
+        let elements: JSX.Element[] = []
+
+        for (let i = 0; i < contributors.length; i++) {
+            const contributor = contributors[i]
+            const userData: UserData = await (await fetch(`https://api.smithed.dev/v2/users/${contributor}`)).json()
+
+            elements.push(<div className='container' key={contributor} style={{ flexDirection: 'row', width: '100%', gap: '0.5rem' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
+                    <circle cx="2" cy="2" r="2" fill="var(--foreground)" />
+                </svg>
+                <label key={"name" + contributor}>{userData.displayName}</label>
+                <div style={{ flexGrow: 1 }} />
+                {contributor !== owner && <button key={"btn" + contributor} className='buttonLike invalidButtonLike' onClick={() => {
+                    contributors.splice(i, 1)
+                    onRemoveContributor()
+                }}>
+                    <Trash fill="var(--disturbing)" />
+                </button>}
+            </div>)
+        }
+
+        setElements(elements)
+    }
+
+    useEffect(() => { getDeps() }, [...contributors])
+
+    return <div className="container" style={{ alignItems: 'start', width: '100%', gap: '1rem' }}>
         {elements}
     </div>
 }
@@ -336,9 +389,9 @@ function NewDependency({ dependencies, onAddDependency }: { dependencies: PackDe
     const versionRef = useRef<HTMLInputElement>(null)
 
     return <EditorDiv style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <input ref={idRef} style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white' }} placeholder='Dependency (<Owner>:<ID>)...' />
-        <input ref={versionRef} style={{ width: '100%', backgroundColor: 'var(--background)', color: 'white' }} placeholder='Version...' />
-        <button className='button' style={{ width: 32, height: 32, fontSize: '1.5rem', borderRadius: '50%', flexShrink: 0 }} onClick={async () => {
+        <IconInput icon={Folder} inputRef={idRef} style={{ width: '100%', color: 'white' }} placeholder='dependency' />
+        <IconInput inputRef={versionRef} style={{ width: 'fit-content', color: 'white' }} placeholder='version' />
+        <button className='buttonLike accentedButtonLike' onClick={async () => {
             if (idRef.current == null || versionRef.current == null)
                 return
 
@@ -363,7 +416,7 @@ function NewDependency({ dependencies, onAddDependency }: { dependencies: PackDe
 
             onAddDependency()
         }}>
-            <div className='container' style={{ width: '100%', height: '100%' }}>+</div>
+            <Plus />
         </button>
     </EditorDiv>
 }
@@ -377,14 +430,14 @@ interface SavingState {
     }
 }
 
-function SavingModal({state, changeState}: {state: SavingState, changeState: (state: SavingState) => void}) {
+function SavingModal({ state, changeState }: { state: SavingState, changeState: (state: SavingState) => void }) {
     const modalContainer = useRef<HTMLDivElement>(null)
     const modalBody = useRef<HTMLDivElement>(null)
-    
+
 
     const closeModal = (initialDelay: number) => setTimeout(async () => {
-        const delay = (delay: number) => new Promise((resolve) => {setTimeout(resolve, delay)})
-        
+        const delay = (delay: number) => new Promise((resolve) => { setTimeout(resolve, delay) })
+
         // Have to reset these first for some reason
         modalBody.current?.style.setProperty('animation', '')
         modalContainer.current?.style.setProperty('animation', '')
@@ -392,12 +445,12 @@ function SavingModal({state, changeState}: {state: SavingState, changeState: (st
         modalBody.current?.style.setProperty('animation', 'slideInContent 0.6s reverse')
         modalContainer.current?.style.setProperty('animation', 'fadeInBackground 1s ease-in-out reverse')
         await delay(0.6 * 1000 - 10)
-        changeState({mode: 'off'})
-       
+        changeState({ mode: 'off' })
+
     }, initialDelay)
 
     useEffect(() => {
-        if(state.mode === 'saved') {
+        if (state.mode === 'saved') {
             var timeout = closeModal(2000)
         }
         return () => {
@@ -405,34 +458,115 @@ function SavingModal({state, changeState}: {state: SavingState, changeState: (st
         }
     }, [state])
 
-    if(state.mode === 'off')
-        return <div style={{display: 'none', position: 'absolute'}}/>
+    if (state.mode === 'off')
+        return <div style={{ display: 'none', position: 'absolute' }} />
 
 
 
-    return <div style={{ display: 'flex', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', fontSize: '1.125rem', justifyContent: 'center', alignItems: 'center', color: 'var(--goodAccent)', backgroundColor: 'rgba(0,0,0,0.5)', animation: 'fadeInBackground 1s ease-in-out' }} ref={modalContainer}>
-        <div className='container' style={{ backgroundColor: 'var(--backgroundAccent)', border: '4px solid var(--background)', width: '100%', maxWidth: 384, aspectRatio: '2 / 1', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 1s', transition: 'transform 0.6s cubic-bezier(0.87, 0, 0.13, 1)' }} ref={modalBody}>
-            
+    return <div style={{ display: 'flex', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', fontSize: '1.125rem', justifyContent: 'center', alignItems: 'center', color: 'var(--goodAccent)', backgroundColor: 'rgba(0,0,0,0.5)', animation: 'fadeInBackground 1s ease-in-out', zIndex: 10 }} ref={modalContainer}>
+        <div className='container' style={{ backgroundColor: 'var(--section)', border: '2px solid var(--border)', width: '100%', maxWidth: 384, aspectRatio: '2 / 1', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 1s', transition: 'transform 0.6s cubic-bezier(0.87, 0, 0.13, 1)' }} ref={modalBody}>
+
             {state.mode === 'saving' && <div>
                 <h3 style={{ margin: 0 }}>Saving pack...</h3>
                 <Spinner />
             </div>}
             {state.mode === 'saved' && <div>
-                <label style={{ margin: 0, fontSize: '2rem', color: 'var(--goodAccent)' }}>Pack saved!</label>
+                <label style={{ margin: 0, fontSize: '2rem', color: 'var(--success)' }}>Pack saved!</label>
             </div>}
-            {state.mode === 'error' && <div className='container' style={{alignItems: 'center', height: '100%'}}>
-                <h3 style={{margin: 0, width: '100%', textAlign: 'center'}}>An error occured</h3>
-                <label style={{color: 'var(--subText)', width: '100%', textAlign: 'center'}}>
+            {state.mode === 'error' && <div className='container' style={{ alignItems: 'center', height: '100%' }}>
+                <h3 style={{ margin: 0, width: '100%', textAlign: 'center' }}>An error occured</h3>
+                <label style={{ color: 'var(--subText)', width: '100%', textAlign: 'center' }}>
                     {state.error?.error}
-                    <label style={{color: 'var(--badAccent)'}}> {state.error?.statusCode}</label>
+                    <label style={{ color: 'var(--badAccent)' }}> {state.error?.statusCode}</label>
                 </label>
-                <p style={{flexGrow: 1, width:'100%'}}>
+                <p style={{ flexGrow: 1, width: '100%' }}>
                     {state.error?.message.replace('body/data/', '')}
                 </p>
-                <button className='button' onClick={() => closeModal(0)}>
+                <button className='buttonLike invalidButtonLike' onClick={() => closeModal(0)}>
                     Close
                 </button>
             </div>}
+        </div>
+    </div>
+}
+function AddContributor({ contributors, setContributors, owner }: { contributors: string[], setContributors: (c: string[]) => void, owner: string }) {
+    const [contributorToAdd, setContributorToAdd] = useState<string>('')
+    return <div className='container' style={{ width: '100%', gap: '1.5rem' }}>
+        <div className='container' style={{ flexDirection: 'row', justifyContent: 'start', width: '100%', gap: '1rem', fontWeight: 600 }}>
+            <Account />Contributors
+        </div>
+        <div className='container' style={{ width: '100%', flexDirection: 'row', gap: '0.5rem' }}>
+            <IconInput icon={Account} placeholder='Username/UID' style={{ width: '100%' }} onChange={(e) => setContributorToAdd(e.currentTarget.value)} />
+            <button className='buttonLike accentedButtonLike' onClick={async () => {
+                const response = await fetch(`https://api.smithed.dev/v2/users/${contributorToAdd}`)
+                if (!response.ok)
+                    return alert('Could not find user ' + contributorToAdd)
+
+                const { uid } = await response.json()
+
+                setContributors([...contributors, uid])
+
+            }} disabled={contributorToAdd === ''}><Plus /></button>
+        </div>
+        <RenderContributors contributors={contributors} owner={owner} onRemoveContributor={() => setContributors([...contributors])} />
+    </div>
+}
+
+export function GalleryManager({ display }: { display: { gallery?: string[] } }) {
+    const [selectedImage, setSelectedImage] = useState(0)
+    const [images, setImages] = useState<string[]>([])
+
+    useEffect(() => {
+        setImages(display.gallery ?? [])
+    }, [...(display.gallery ?? [])])
+
+    const fileUploadRef = useRef<HTMLInputElement>(null);
+
+    async function OnFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.currentTarget.files?.item(0)
+
+        // console.log(file);
+        if (file === undefined || file == null)
+            return
+
+        if (file.size > 1024 * 1024)
+            return alert('Selected image exceeds 1MB')
+
+        const result = await new Promise<string>((resolve) => {
+            const fileReader = new FileReader()
+            fileReader.readAsDataURL(file);
+            fileReader.onloadend = () => {
+                resolve(fileReader.result as string)
+            }
+        })
+
+        if (display.gallery === undefined)
+            display.gallery = []
+
+        display.gallery.push(result)
+        setImages([...display.gallery])
+        setSelectedImage(display.gallery.length - 1)
+    }
+
+    return <div className='container' style={{ gap: '1rem', width: '100%' }}>
+        <input ref={fileUploadRef} type="file" accept='image/png, image/jpeg' hidden onChange={OnFileUpload} />
+        {display.gallery && display.gallery.length >= 1 && <div style={{ width: '100%', position: 'relative' }}>
+            <img style={{ width: '100%', borderRadius: 'var(--defaultBorderRadius)' }} src={images[selectedImage]} />
+            <button className='buttonLike' style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', padding: '0.5rem' }} onClick={() => {
+                display.gallery?.splice(selectedImage, 1)
+                setImages([...(display.gallery ?? [])])
+                setSelectedImage(selectedImage > 0 ? selectedImage - 1 : 0)
+            }}>
+                <Trash style={{ width: '1rem', height: '1rem', fill: 'var(--text)' }} />
+            </button>
+        </div>}
+        <div className='container' style={{ flexDirection: 'row', width: '100%', gap: '0.5rem' }}>
+            {images.map((g, idx) =>
+                <img key={`gImg${idx}`} src={g} className='galleryImageButton' onClick={() => setSelectedImage(idx)} />
+            )}
+            <span className="buttonLike" style={{ background: images.length > 0 ? 'none' : undefined, width: images.length == 0 ? '100%' : undefined }} onClick={() => {
+                fileUploadRef.current?.click()
+            }}><Plus />{images.length === 0 ? 'Upload image' : ''}</span>
         </div>
     </div>
 }
@@ -444,17 +578,23 @@ export default function Edit() {
     const [packData, setPackData] = useState<PackData>()
     const [versions, setVersions] = useState<PackVersion[]>([])
     const [categories, setCategories] = useState<string[]>([])
+
+    const [metaData, setMetaData] = useState<PackMetaData>()
+    const [contributors, setContributors] = useState<string[]>([])
+    const [contributorToAdd, setContributorToAdd] = useState<string>('')
+
     const [selectedVersion, setSelectedVersion] = useState(0)
     const [mcVersions, setMCVersions] = useState<string[]>([])
     const [supportedVersions, setSupportedVersions] = useState<MinecraftVersion[] | undefined>([])
     const [savingState, setSavingState] = useState<SavingState>({ mode: 'off' })
-    const deleteButtonRef = useRef<HTMLLabelElement>(null)
     const saveTextRef = useRef<HTMLDivElement>(null)
     let deleteConfirmation = 0;
 
     useEffect(() => {
         if (packData && packData.versions[selectedVersion])
             packData.versions[selectedVersion].dependencies ??= []
+        if (packData && !packData.display.urls)
+            packData.display.urls = {}
         setSupportedVersions(packData?.versions[selectedVersion]?.supports ?? [])
     }, [packData, selectedVersion])
 
@@ -487,121 +627,166 @@ export default function Edit() {
             v.dependencies ??= []
         })
 
+        const metaData: PackMetaData = await (await fetch(`https://api.smithed.dev/v2/packs/${pack}/meta`, { cache: 'no-cache' })).json()
+
         setPackData(data)
+        setMetaData(metaData)
+        setContributors([...metaData.contributors])
         setVersions(data.versions)
         setCategories(data.categories)
 
     }
     useEffect(() => { onLoad() }, [pack, user])
 
-    if (user == null) return <div style={{ animation: 'fadeIn 1s' }}>
-        <ErrorPage title="Error 401" description='Not signed in!' returnLink='/' returnMessage='Back to Home' />
+    if (user == null) return <div className='container' style={{ height: '100%' }}>
+        <h1>You must be signed in to create/edit a pack</h1>
+        <div className='container' style={{ gap: '1rem', flexDirection: 'row' }}>
+            <IconTextButton icon={Account} text={"Login"} href="/account" className="accentedButtonLike" />
+            <IconTextButton icon={Home} text={"Go Home"} href="/" />
+        </div>
     </div>
     if (packData === undefined) return <div className="container" style={{ width: '100%', height: '100vh', boxSizing: 'border-box' }}>
         <Spinner />
     </div>
 
     const updateVersions = () => { setVersions(Object.create(packData.versions)) }
-    return <div className="container" style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, flexDirection: 'row', alignItems: 'start', justifyContent: 'flex-start', boxSizing: 'border-box' }}>
-        <div className='editorContainer'>
-            <div className='container' style={{ width: '100%', boxSizing: 'border-box', gap: 48 }}>
-                <Editor title={'Id'}>
-                    <StringInput description='Unique ID that others can reference your pack by' reference={packData} attr={'id'} disabled={!isNew} header={''} />
-                </Editor>
-                <Editor title={'Display'} style={{ gridColumn: 1 }}>
-                    <StringInput description='Name of the pack' reference={packData.display} attr={'name'} />
-                    <StringInput description='Short description of the pack' reference={packData.display} attr={'description'} />
-                    <ImageURLInput description='URL to the icon of the pack' reference={packData.display} attr={'icon'} width={64} height={64} />
-                    <MarkdownURLInput description='URL to the ReadME of the pack' reference={packData.display} attr={'webPage'} />
-                    <DropdownSelectionInput description='Categories' reference={packData} attr={'categories'} options={packCategories} onChange={() => { setCategories(Object.create(packData.categories)) }} />
-                    <label>{categories?.sort().join(', ')}</label>
-                </Editor>
-            </div>
-            <Editor title={'Versions'}>
-                <EditorDiv style={{ alignItems: 'center' }}>
-                    <EditorDiv style={{ width: '100%' }}>
-                        {versions.length != 0 && <EditorDiv style={{ flexDirection: 'row' }}>
-                            <Selection values={versions.map(v => v.name)} onChange={setSelectedVersion} defaultValue={selectedVersion} />
-                        </EditorDiv>}
-                        <EditorDiv style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-                            {versions.length > 1 && <button style={{ width: 32, height: 32, backgroundColor: 'var(--badAccent)' }} className='button' onClick={() => {
-                                if (deleteButtonRef.current == null) return
+    const savePack = async () => {
+        // console.log(packData)
 
-                                if (deleteConfirmation === 0) {
-                                    deleteConfirmation = 1;
-                                    deleteButtonRef.current.hidden = false
-                                } else {
-                                    packData.versions.splice(selectedVersion, 1)
-                                    if (selectedVersion >= packData.versions.length)
-                                        setSelectedVersion(packData.versions.length - 1)
-                                    updateVersions()
-                                    deleteConfirmation = 0;
-                                    deleteButtonRef.current.hidden = true
-                                }
-                            }} onMouseLeave={() => {
-                                deleteConfirmation = 0;
-                                if (deleteButtonRef.current != null) {
-                                    deleteButtonRef.current.hidden = true
-                                }
-                            }}>
-                                <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                    <Trash style={{ width: '24px', height: '24px', flexShrink: 0, stroke: 'var(--buttonText)' }} />
-                                    <label ref={deleteButtonRef} style={{ position: 'absolute', marginTop: -84, zIndex: 10, backgroundColor: 'var(--backgroundAccent)', border: '4px solid var(--background)', padding: 8, borderRadius: 'var(--defaultBorderRadius)', animation: 'fadeIn 0.25s ease-in-out', width: 'max-content', fontSize: '1rem' }} hidden>{'Press again to confirm'}</label>
-                                </div>
-                            </button>}
-                            <NewVersion data={packData.versions} onAddVersion={() => {
-                                setVersions(Object.create(packData.versions));
-                                setSelectedVersion(packData.versions.length - 1)
-                            }} />
-                        </EditorDiv>
-                    </EditorDiv>
-                </EditorDiv>
-                {versions.length > 0 && <EditorDiv>
-                    <DownloadURLInput reference={packData.versions[selectedVersion]?.downloads} attr='datapack' header='Datapack Download' description='Raw URL to the download for the datapack' />
-                    <DownloadURLInput reference={packData.versions[selectedVersion]?.downloads} attr='resourcepack' header='Resourcepack Download' description='Raw URL to the download for the resourcepack' />
-                    <DropdownSelectionInput reference={packData.versions[selectedVersion]} attr='supports' description='Supported Minecraft Versions' options={mcVersions} onChange={() => {
+        setSavingState({ mode: 'saving' })
+
+
+        if (!isNew) {
+            var resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}?token=${await user.getIdToken()}`, { method: 'PATCH', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
+        } else {
+            var resp = await fetch(`https://api.smithed.dev/v2/packs?token=${await user.getIdToken()}&id=${packData.id}`, {
+                method: 'POST', body: JSON.stringify({ data: packData }), headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+        }
+
+        if (metaData && contributors !== metaData.contributors) {
+
+            if (!contributors.includes(metaData.owner))
+                contributors.push(metaData.owner)
+
+            const newContributors = contributors.filter(c => !metaData.contributors.includes(c))
+            const delContributors = metaData.contributors.filter(c => !contributors.includes(c))
+
+
+            const uid = !isNew ? pack : packData.id
+
+            if (newContributors.length > 0)
+                await fetch(`https://api.smithed.dev/v2/packs/${uid}/contributors?token=${await user.getIdToken()}&` + newContributors.map(c => "contributors=" + c).join('&'), { method: 'POST' })
+            if (delContributors.length > 0)
+                await fetch(`https://api.smithed.dev/v2/packs/${uid}/contributors?token=${await user.getIdToken()}&` + delContributors.map(c => "contributors=" + c).join('&'), { method: 'DELETE' })
+
+        }
+
+
+        if (resp.status !== HTTPResponses.OK && resp.status !== HTTPResponses.CREATED) {
+            const error = await resp.json()
+
+            setSavingState({ mode: 'error', error: error })
+        } else {
+            setSavingState({ mode: 'saved' })
+        }
+    }
+    const Divider = () => <div style={{ height: '0.25rem', background: 'var(--highlight)', width: '100%' }} />
+
+
+    const NavigatorColumn = () => <div className='container' style={{ width: '100%', alignItems: 'end', justifyContent: 'start' }}>
+        {/* <div className='container' style={{position: 'fixed', alignItems: 'start', paddingRight: '4rem'}}>
+            <a>Basic Information</a>
+            <a>Versions</a>
+            <a>Pack Controls</a>
+        </div> */}
+    </div>
+
+    const CenterColumn = () => <div className='editorContainer'>
+        <div className='container' style={{ width: '100%', gap: '1rem', alignItems: 'start' }}>
+            <div className="container" style={{ fontWeight: 600, flexDirection: 'row', gap: '1rem' }}>
+                <TextSvg /> Basic information
+            </div>
+            <StringInput reference={packData} attr={'id'} disabled={!isNew} svg={Star}
+                description='Unique ID that others can reference your pack by' />
+            <ImageURLInput description='URL to the icon of the pack' reference={packData.display} attr={'icon'} width={64} height={64} placeholder='icon_url' svg={At} />
+            <DropdownSelectionInput
+                description='Choose categories that fit your pack'
+                reference={packData} attr={'categories'} placeholder={'Categories'}
+                options={packCategories} onChange={() => { setCategories(Object.create(packData.categories)) }} />
+            <StringInput reference={packData.display} attr={'name'} svg={Jigsaw}
+                description='Name of the pack' />
+            <MarkdownURLInput description='URL to the ReadME of the pack' reference={packData.display} attr={'webPage'} placeholder='readme_url' />
+            <StringInput reference={packData.display.urls ?? {}} attr={'discord'} placeholder='discord_url' svg={Globe} description='URL to your discord' />
+            <StringInput reference={packData.display.urls ?? {}} attr={'homepage'} placeholder='official_site_url' svg={Globe} description='URL to your official site' />
+            <StringInput reference={packData.display.urls ?? {}} attr={'source'} placeholder='source_url' svg={Globe} description='URL to your source code' />
+            <StringInput reference={packData.display} attr={'description'} svg={TextSvg}
+                description='Short description of the pack' multiline />
+            <div className='container' style={{ width: '100%', flexDirection: 'column', gap: 8, alignItems: 'start' }}>
+                <ChooseBox placeholder='Visibility' choices={[
+                    { content: 'Public', value: 'false' },
+                    { content: 'Unlisted', value: 'true' }]
+                } onChange={(v) => packData.display.hidden = v === 'true' ? true : false} defaultValue={packData.display.hidden ? 'true' : 'false'} />
+                <span style={{ color: 'var(--border)' }}>How should the pack appear in browse</span>
+            </div>
+
+        </div>
+        <Divider />
+        <div className='container' style={{ width: '100%', gap: '1rem', alignItems: 'start' }}>
+            <div className="container" style={{ fontWeight: 600, flexDirection: 'row', gap: '1rem' }}>
+                <Folder /> Gallery
+            </div>
+            <GalleryManager display={packData.display} />
+        </div>
+        <Divider />
+        <div className='container' style={{ width: '100%', gap: '1rem' }}>
+            <div className='container' style={{ flexDirection: 'row', marginBottom: '-1rem', justifyContent: 'space-between', width: '100%' }}>
+                <div className="container" style={{ fontWeight: 600, flexDirection: 'row', gap: '1rem' }}>
+                    <Folder /> Versions
+                </div>
+                <NewVersion data={packData.versions} onAddVersion={() => {
+                    setVersions(Object.create(packData.versions));
+                    setSelectedVersion(packData.versions.length - 1)
+                }} />
+            </div>
+            {versions.length != 0 && <EditorDiv style={{ flexDirection: 'row' }}>
+                <Selection values={versions.map(v => v.name)} onChange={setSelectedVersion} defaultValue={selectedVersion} />
+            </EditorDiv>}
+            <EditorDiv style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+                {versions.length > 0 && <div className='container' style={{ width: '100%', gap: '1.5rem' }}>
+                    <DownloadURLInput reference={packData.versions[selectedVersion]?.downloads} attr='datapack' placeholder='datapack_url' description='Raw URL to the download for the datapack' />
+                    <DownloadURLInput reference={packData.versions[selectedVersion]?.downloads} attr='resourcepack' placeholder='resourcepack_url' description='Raw URL to the download for the resourcepack' />
+                    <DropdownSelectionInput reference={packData.versions[selectedVersion]} attr='supports' placeholder='Supports' description='Supported Minecraft Versions' options={mcVersions} onChange={() => {
+
                         const s = packData.versions[selectedVersion].supports
                         s.sort((a, b) => compare(coerce(a) ?? '', coerce(b) ?? ''))
-                        setSupportedVersions(Object.create(s))
+                        setSupportedVersions([...s])
                     }} />
-                    <label>{supportedVersions?.map(s =>
-                        <label>- {s}<br /></label>
-                    )}</label>
-                    <AttributeHeader attr={'Dependencies'} />
                     <NewDependency dependencies={versions[selectedVersion].dependencies} onAddDependency={updateVersions} />
                     <RenderDependencies dependencies={versions[selectedVersion].dependencies} onRemoveDependency={updateVersions} />
-                </EditorDiv>}
-            </Editor>
-        </div >
-        <div className='container' style={{ flexDirection: 'row', position: 'fixed', bottom: 8, right: 8, justifySelf: 'center', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, gap: 16, border: '4px solid var(--background)', boxSizing: 'border-box' }}>
-            <button className='button' style={{ width: 36, height: 36 }} title='Back' onClick={() => {
-                navigate(-1)
-            }}><Back style={{ stroke: 'var(--buttonText)', fill: 'var(--buttonText)' }} /></button>
-            <button className='button' style={{ width: 36, height: 36 }} title='Save' onClick={async () => {
-                console.log(packData)
-
-                setSavingState({ mode: 'saving' })
-
-
-                if (!isNew) {
-                    var resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}?token=${await user.getIdToken()}`, { method: 'PATCH', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
-                } else {
-                    var resp = await fetch(`https://api.smithed.dev/v2/packs?token=${await user.getIdToken()}&id=${packData.id}`, {
-                        method: 'POST', body: JSON.stringify({ data: packData }), headers: {
-                            "Content-Type": "application/json"
-                        }
-                    })
-                }
-
-                if (resp.status !== HTTPResponses.OK && resp.status !== HTTPResponses.CREATED) {
-                    const error = await resp.json()
-
-                    setSavingState({ mode: 'error', error: error })
-                } else {
-                    setSavingState({ mode: 'saved' })
-                }
-            }}><Save style={{ stroke: 'var(--buttonText)' }} /></button>
+                </div>}
+            </EditorDiv>
         </div>
-        <SavingModal state={savingState} changeState={setSavingState}/>
+        <Divider />
+        {user.uid === metaData?.owner && <AddContributor contributors={contributors} setContributors={setContributors} owner={metaData.owner} />}
+        {user.uid === metaData?.owner && <Divider />}
+        <div className='container' style={{ flexDirection: 'row', width: '100%', gap: '1rem' }}>
+            <IconTextButton className='buttonLike invalidButtonLike' text='Cancel' icon={Cross} onClick={() => {
+                navigate(-1)
+            }} />
+            <IconTextButton className='buttonLike successButtonLike' text='Save' icon={Check} onClick={savePack} />
+        </div>
+    </div >
+
+
+
+    return <div className="container" style={{ width: '100%', height: '100%', flexDirection: 'row', alignItems: 'start', justifyContent: 'center', boxSizing: 'border-box' }}>
+        <div className='editorOrganizer'>
+            <NavigatorColumn />
+            <CenterColumn />
+        </div>
+        <SavingModal state={savingState} changeState={setSavingState} />
     </div >
 }

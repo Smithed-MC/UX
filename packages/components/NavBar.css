@@ -1,8 +1,24 @@
 .navButtonClosed {
     opacity: 0.5;
 }
+
 .navButtonClosed:hover {
     opacity: 1;
+}
+
+.navBarBundle {
+    background: color-mix(in srgb, var(--warning) 10%, transparent) !important;
+    color: var(--warning) !important;
+    width: min-content !important;
+}
+
+.navBarBundle>label {
+    overflow: hidden;
+    width: min-content ;
+}
+
+.navBarBundle:hover {
+    border: 2px solid var(--warning) !important;
 }
 
 
@@ -39,6 +55,62 @@
     100% {
         left: 32;
         width: calc(100%);
-        color: var(--buttonText);
+        color: var(--foreground);
+    }
+}
+
+
+.navBarContainer {
+    gap: 2rem;
+}
+
+@media screen and (max-width: 64rem) {
+    .navBarBundle>label, .navBarBundle>div {
+        display: none;
+    }
+    .navBarBundle {
+        flex-grow: 0 !important;
+        width: min-content !important;
+    }
+}
+
+@media screen and (max-width: 52rem) {
+    .navBarBundle {
+        display: none !important;
+    }
+}
+
+@media screen and (max-width: 56rem) {
+    .navBarHide {
+        display: none !important;
+    }
+}
+
+@media screen and (max-width: 43rem) {
+
+    .navBarContainer {
+        gap: 0.25rem;
+    }
+
+    .navBarOption>div,
+    .navBarOption>label {
+        display: none;
+    }
+
+    .navBarOption {
+        height: 3rem !important;
+        flex-grow: 1;
+    }
+
+    .navBarOption.start {
+        border-radius: var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius);
+    }
+
+    .navBarOption.middle {
+        border-radius: 0;
+    }
+
+    .navBarOption.end {
+        border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0;
     }
 }

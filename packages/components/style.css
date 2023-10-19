@@ -28,7 +28,7 @@
     filter: brightness(100%);
     font-family: 'Inconsolata';
     cursor: pointer;
-    color: var(--buttonText);
+    color: var(--foreground);
     padding: 8px;
     border-radius: var(--defaultBorderRadius);
     text-align: center;

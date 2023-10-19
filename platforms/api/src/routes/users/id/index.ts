@@ -5,6 +5,7 @@ import { sanitize } from '../../sanitize.js'
 import { HTTPResponses, UserData, UserDataSchema } from 'data-types'
 import { getUIDFromToken } from 'database'
 import { getAuth } from 'firebase-admin/auth'
+
 import { useId } from 'react'
 import fetch from 'node-fetch'
 

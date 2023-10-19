@@ -1,27 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap');
 :root {
-    font-family: 'Inconsolata';
-    background-image: linear-gradient(var(--background), var(--backgroundDark));
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: fixed;
+    font-family: Lexend;
     position: absolute;
+    font-weight: 300;
     min-height: 100%;
     min-width: 100%;
+    background: var(--background);
 
-    --background: #2a2a38;
-    --backgroundDark: #1b1924;
-    --backgroundAccent: #12121f;
+    --bold: #000000;
+    --background: #121213;
+    --section: #1D1F21;
+    --highlight: #2E2E31;
+    --border: #4B4B4B;
+    --foreground: #FFF8F0;
     --accent: #1b48c4;
-    --accent2: #6b83c5;
+    --accent2: #23A3FF;
+    
+    --warning: #E8AA03;
+    --disturbing: #C41B48;
+    --success: #1BC443;
+    --secondary: #C41B9C;
+
+    --backgroundDark: #1b1924;
+
     --badAccent: rgb(255, 72, 72);
     --goodAccent: rgb(144, 255, 71);
-    --buttonText: #fff;
+    --foreground: #fff;
     --text: #fff;
     --codeText: rgb(255, 247, 136);
     --subText: #aaa;
     --smallScreenSize: 640px;
 
-    --defaultBorderRadius: 10px;
+    --defaultBorderRadius: 1rem;
+
+    --mobileCutoff: 43rem;
+
     overflow: hidden;
 }
 
@@ -38,57 +51,59 @@
         url('./fonts/DoppioOne-Regular.ttf') format('truetype')
 }
 
+/* @font-face {
+    font-family: 'Lexend';
+    src: local('Lexend'),
+        url('./fonts/Lexend-VariableFont_wght.ttf') format('truetype variations');
+} */
+
+
 div {
-    font-family: Inconsolata;
+    font-family: Lexend;
     color: var(--text)
 }
 
 h1 {
-    font-size: clamp(calc(3rem * var(--headerModifier)), calc(4rem * var(--headerModifier)), calc(4rem * var(--headerModifier)));
-    font-family: DoppioOne;
-    letter-spacing: 2px;
+    font-size: 1.5rem;
+    font-weight: 600;
 }
 
 h2 {
-    font-size: clamp(calc(2.5rem * var(--headerModifier)), calc(3.5rem * var(--headerModifier)), calc(3.5rem * var(--headerModifier)));
-    font-family: DoppioOne;
-    font-weight: normal;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
 }
 
+
 code {
-    color: var(--codeText);
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 8px;
+    background-color: var(--highlight);
+    font-family: Inconsolata;
+    color:rgba(255, 255, 255, 0.7);
+    padding: 0.125rem;
     box-sizing: border-box;
-    line-height: 36px;
-    border-radius: var(--defaultBorderRadius);
+    line-height: 1.5rem;
+    border-radius: 0.125rem;
 }
 
 
 pre {
     color: var(--codeText);
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--highlight);
     padding: 16px;
     border-radius: var(--defaultBorderRadius);
 }
 
-
-a {
-    color: var(--accent2);
-    cursor: pointer;
+pre>code {
+    background-color: transparent !important;
+    white-space: break-spaces;
+    line-height: normal;
 }
-
-a:hover {
-    filter: brightness(85%)
-}
-
-a:active {
-    filter: brightness(60%)
-}
-
 
 details {
-    background-color: var(--backgroundAccent);
+    background-color: var(--section);
     padding: 16px;
     border-radius: var(--defaultBorderRadius);
     margin-bottom: 4px;
@@ -116,7 +131,7 @@ summary:active {
     border-radius: var(--defaultBorderRadius);
     /* roundness of the scroll thumb */
     /* creates padding around scroll thumb */
-    border: 2px solid var(--backgroundAccent);
+    border: 2px solid var(--section);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -124,47 +139,96 @@ summary:active {
 }
 
 
-input,
-select {
+.input, select {
     border: none;
     border-radius: var(--defaultBorderRadius);
-    padding: 8px;
-    font-family: Inconsolata;
+    font-family: Lexend;
     font-size: 1rem;
-    border-bottom: 2px solid var(--accent);
-    border-right: 2px solid var(--accent);
+    border: 2px solid transparent;
     box-sizing: border-box;
+}
 
+select {
+    padding: 0px 8px;
+}
+
+.input {
+    padding: 8px 16px;
+}
+
+.input:focus, select:focus {
+    outline: none;
+    border: 2px solid var(--accent);
+}
+
+.input:hover {
+    border: 2px solid var(--border);
 }
 
 select select {
     background-color: red;
 }
 
-input:disabled {
+.input:disabled {
     color: var(--subText) !important;
     font-style: italic;
 }
 
-input[type="email"],
-input[type="password"],
-input[type="text"],
-textarea,
-select {
-    background-color: var(--background);
+.input, select {
+    background-color: var(--bold);
+    border: 2px solid var(--border);
+    color: var(--foreground);
+    width: 19.25rem;
+    height: 2.25rem;
+}
+.input>svg>path {
+    fill: var(--border)
+}
 
-    color: var(--text);
-    width: 256px;
+.input:focus, select:focus {
+    border: 2px solid var(--foreground);
+}
+
+.input:focus>svg>path {
+    fill: var(--foreground);
 }
 
 input::placeholder {
-    color: var(--subText)
+    color: var(--border);
+    font-weight: 500;
+}
+
+.invalidInput {
+    border: 2px solid var(--disturbing) !important;
+    color: var(--disturbing) !important;
+    animation: invalidShake 0.33s ease-in-out;
+}
+
+
+.invalidInput>svg>path {
+    fill: var(--disturbing);
+}
+
+
+@keyframes invalidShake {
+    25% {
+        transform: translateX(0.25rem);
+    }
+    50% {
+        transform: translateX(0rem);
+    }
+    75% {
+        transform: translateX(-0.25rem);
+    }
+    100% {
+        transform: translateX(0rem);
+    }
 }
 
 input[type="button"] {
     background-color: var(--accent);
     width: 128px;
-    color: var(--buttonText);
+    color: var(--foreground);
 }
 
 input[type="button"]:hover,
@@ -183,11 +247,186 @@ input[type="button"]:active {
 
 
 select {
-    background-image: url(./assets/green_down-arrow.png);
-    background-blend-mode: overlay;
-    background-position: right;
-    background-repeat: no-repeat;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+    background-image: url(./assets/green_down-arrow.png) !important;
+    background-position: 95% !important;
+    background-repeat: no-repeat !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    cursor: pointer !important;
+    overflow: visible;
+}
+
+button, .buttonLike {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 16px;
+    gap: 16px;
+
+    font-weight: 400;
+    
+    height: 36px;
+    
+    text-decoration: none;
+    /* Section */
+
+    white-space: nowrap;
+    
+    box-sizing: border-box;
+    background: var(--section);
+    border-radius: 16px;
+    border: 2px solid transparent;
+
+    
+    font-family: 'Lexend';
+    font-size: 1rem;
+    
+    color: var(--foreground);
+
+    transition: background-color, border 0.1s;
+    cursor: pointer;
+
+    width: min-content;
+}
+.buttonLike>label {
     cursor: pointer;
 }
+
+button:hover:not(:disabled), .buttonLike:hover:not(:disabled) {
+    /* Highlight */
+
+    background: var(--section);
+    /* Border */
+
+    border: 2px solid var(--border);
+}
+
+.invalidButtonLike:hover {
+    border-color: var(--disturbing) !important;
+    background: color-mix(
+        in srgb,
+        var(--disturbing) 25%,
+        transparent
+    ) !important;
+}
+
+.highlightButtonLike:hover {
+    background-color: var(--highlight) !important;
+}
+
+
+button:focus:not(:disabled), .buttonLike:focus:not(:disabled) {
+    outline: none;
+    border: 2px solid var(--foreground);
+}
+
+
+button:active:not(:disabled), .buttonLike:active:not(:disabled) {
+    filter: brightness(90%);
+}
+
+button:disabled, .buttonLike:disabled {
+    opacity: 0.5 !important;
+    cursor: default;
+}
+
+.accentedButtonLike {
+    background-color: var(--accent);
+}
+
+.disturbingButtonLike {
+    background-color: var(--disturbing);
+}
+
+.invalidButtonLike {
+    background: color-mix(
+        in srgb,
+        var(--disturbing) 25%,
+        transparent
+    )
+}
+
+.highlightButtonLike {
+    background-color: var(--highlight);
+}
+
+.successButtonLike {
+    background-color: var(--success);
+}
+
+.secondaryButtonLike {
+    background-color: var(--secondary);
+}
+
+
+.footerContainer {
+    display: grid;
+    grid-template: auto / 66% 16% 16%;
+    padding: 64px 0px;
+    box-sizing: border-box;
+}
+
+.footerLargeGroup,
+.footerSmallGroup {
+    justify-content: start;
+}
+
+.footerSmallGroup {
+    width: 100%;
+    gap: 16px;
+}
+
+.footerLargeGroup {
+    width: 100%;
+    align-items: start;
+}
+
+a {
+    color: var(--accent2)
+}
+
+a:hover[href] {
+    opacity: 0.85;
+}
+
+@media screen and (max-width: 70rem) { 
+    .main {
+        padding: 0px 16px !important;
+    }   
+    .outlet {
+        padding: 0px 16px !important;
+    }
+}
+
+@media screen and (max-width: 50rem) {
+    .footerContainer {
+        padding: 64px 16px !important;
+        grid-template: auto auto auto / auto;
+        align-items: center;
+        gap: 64px;
+    }
+
+    .footerLargeGroup {
+        align-items: center;
+        text-align: center;
+        grid-row: 3;
+    }
+}
+
+.compactButton { 
+    color: var(--foreground);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.compactButton:hover[href],
+.compactButton:hover[onClick] {
+    text-decoration: underline;
+}
+
+.compactButton:active[href],
+.compactButton:active[onClick] {
+    opacity: 0.9;
+}
+

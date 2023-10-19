@@ -1,0 +1,87 @@
+.launchContentContainer {
+	padding-bottom: 5rem;
+}
+
+.smithedLogoContainer {
+	margin-top: -4.5%;
+	margin-bottom: 1%;
+}
+
+.bigSmithedLogo {
+	scale: 55%;
+}
+
+.bigSmithedText {
+	font-size: 41px;
+	margin-top: -21%;
+	color: var(--foreground);
+}
+
+.smithedVersion {
+	font-size: 22px;
+	margin-top: 3%;
+	color: var(--border);
+}
+
+.launchSectionHeader {
+	font-size: 30px;
+}
+
+.showSelectedBundle {
+	display: inline;
+	width: 100%;
+	font-size: 18px;
+}
+
+.bundleSelector {
+	display: flex;
+	width: 100%;
+}
+
+.launchButton {
+	scale: 135%;
+	display: flex;
+}
+
+.launchFooter {
+	background-color: var(--section);
+	width: min(100%);
+	padding: 1.5rem;
+	border-top: 2px solid var(--border);
+	position: fixed;
+	bottom: 0px;
+	left: 0px;
+	box-sizing: border-box;
+	flex-direction: row;
+	gap: 2rem;
+	justify-content: space-evenly;
+}
+
+.launchFooterLeft {
+	justify-content: flex-start;
+	flex: 1 1;
+
+	padding-left: 1rem;
+}
+
+.launchFooterCenter {
+	justify-content: center;
+	flex-grow: 1;
+}
+
+.launchFooterRight {
+	justify-content: flex-end;
+	flex: 1;
+	padding-right: 1rem;
+}
+
+.launchPopup {
+	background-color: var(--section);
+	padding: 2rem;
+	position: fixed;
+	left: 50vw;
+	top: 40vh;
+	transform: translate(-50%, -50%);
+	-webkit-transform: translate(-50%, -50%);
+	border-radius: 16px;
+}
