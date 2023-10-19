@@ -210,7 +210,7 @@ export function NavBar(props: NavBarProps) {
     const curBundle = bundles.find(b => b.uid === selectedBundle)
 
     return (
-        <div className="container navBarContainer" style={{ flexDirection: 'row', width: '100%', boxSizing: 'border-box', zIndex: 100 }}>
+        <div className="container navBarContainer" style={{ flexDirection: 'row', width: '100%', boxSizing: 'border-box', zIndex: 1 }}>
             <a className='navBarHide' style={{ fontSize: '24px', lineHeight: '30px', fontWeight: '700', fontFamily: 'Lexend', color: 'var(--foreground)', textDecoration: 'none' }} href={props.logoUrl}>Smithed</a>
             <div className='navBarHide' style={{ width: 1, height: 36, background: 'var(--foreground)' }} />
             
