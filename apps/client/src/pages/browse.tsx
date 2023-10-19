@@ -12,19 +12,19 @@ import { BrowsePageData, PACKS_PER_PAGE, createBrowseSearchParams } from "../loa
 
 
 
-function RenderPages({totalPacks, currentPage, params}: {totalPacks: number, currentPage: number, params: URLSearchParams}) {
-    const numberOfPages = Math.ceil(totalPacks/PACKS_PER_PAGE)
+function RenderPages({ totalPacks, currentPage, params }: { totalPacks: number, currentPage: number, params: URLSearchParams }) {
+    const numberOfPages = Math.ceil(totalPacks / PACKS_PER_PAGE)
 
-    const formatSelected = (page: number) => `[${page + 1}]` 
+    const formatSelected = (page: number) => `[${page + 1}]`
 
     currentPage = Math.min(currentPage, numberOfPages - 1)
 
     let pageLinks = []
-    for(let p = 0; p < numberOfPages; p++) {
+    for (let p = 0; p < numberOfPages; p++) {
         pageLinks.push(<a className={`browsePageButton ${currentPage === p ? 'selected' : ''}`} href={`/browse?page=${p}&` + params}>{p + 1}</a>)
     }
 
-    return <div className="container" key="pages" style={{flexDirection: 'row', gap: '0.25rem', width: '100%', justifyContent: 'center'}}>
+    return <div className="container" key="pages" style={{ flexDirection: 'row', gap: '0.25rem', width: '100%', justifyContent: 'center' }}>
         {pageLinks}
     </div>
 }
@@ -40,7 +40,7 @@ export default function Browse(props: any) {
 
     const dispatch = useAppDispatch()
 
-    const { count: totalPacks, packs } = useLoaderData() as BrowsePageData 
+    const { count: totalPacks, packs } = useLoaderData() as BrowsePageData
 
     const [categories, setCategories] = useState(new Set(category != null ? typeof category === 'string' ? [category] : category : []))
     const [versions, setVersions] = useState(new Set(version != null ? typeof version === 'string' ? [version] : version : []))
@@ -63,7 +63,7 @@ export default function Browse(props: any) {
             version: versions,
             sort: packSort,
         })
-        if(page)
+        if (page)
             params.set('page', page as string)
         navigate('/browse?' + params)
     }
@@ -87,20 +87,20 @@ export default function Browse(props: any) {
                         onChange={(e) => {
                             updateUrl(e.currentTarget.value.replaceAll(' ', '+'));
                         }} />
-                    <ChooseBox placeholder="Sort" style={{ maxWidth: '13rem', zIndex: 3 }} defaultValue={(sort == null ? 'downloads' : sort) as string} choices={Object.keys(SortOptions).map(opt => ({ value: opt.toLowerCase(), content: opt }))} onChange={v => {
+                    <ChooseBox placeholder="Sort" style={{ maxWidth: '13rem' }} defaultValue={(sort == null ? 'downloads' : sort) as string} choices={Object.keys(SortOptions).map(opt => ({ value: opt.toLowerCase(), content: opt }))} onChange={v => {
                         if (typeof v === 'string')
                             setPackSort(v)
                     }} />
                 </div>
                 <div className="container" style={{ flexDirection: 'row', justifyContent: 'space-evenly', width: '100%', gap: '1rem' }}>
-                    <ChooseBox placeholder="Category" style={{ flexGrow: 1, zIndex: 2 }} defaultValue={Array.from(categories.values()).filter(c => c != null).map(c => c as string)} choices={packCategories.map(cat => { return { value: cat, content: cat } })} multiselect onChange={(v) => {
+                    <ChooseBox placeholder="Category" style={{ flexGrow: 1 }} defaultValue={Array.from(categories.values()).filter(c => c != null).map(c => c as string)} choices={packCategories.map(cat => { return { value: cat, content: cat } })} multiselect onChange={(v) => {
                         setCategories(new Set(typeof v === 'string' ? [v] : v))
                     }} />
-                    <ChooseBox placeholder="Version" style={{ flexGrow: 1, zIndex: 2 }} defaultValue={Array.from(versions.values()).filter(c => c != null).map(c => c as string)} choices={supportedMinecraftVersions.map(v => { return { value: v, content: v } })} multiselect onChange={(v) => {
+                    <ChooseBox placeholder="Version" style={{ flexGrow: 1 }} defaultValue={Array.from(versions.values()).filter(c => c != null).map(c => c as string)} choices={supportedMinecraftVersions.map(v => { return { value: v, content: v } })} multiselect onChange={(v) => {
                         setVersions(new Set(typeof v === 'string' ? [v] : v))
                     }} />
                 </div>
-                {packs.length > 1 && <RenderPages totalPacks={totalPacks} currentPage={page != null ? Number.parseInt(page as string) : 0} params={createBrowseSearchParams(params)}/>}
+                {packs.length > 1 && <RenderPages totalPacks={totalPacks} currentPage={page != null ? Number.parseInt(page as string) : 0} params={createBrowseSearchParams(params)} />}
             </div>
             <div className="packCardContainer" id="packCardContainer">
                 {
@@ -127,7 +127,7 @@ export default function Browse(props: any) {
 
                 {packs.length === 0 && <h1>Looks like there's nothing matching these criteria</h1>}
             </div>
-            {packs.length >= 3 && <RenderPages totalPacks={totalPacks} currentPage={page != null ? Number.parseInt(page as string) : 0} params={createBrowseSearchParams(params)}/>}
+            {packs.length >= 3 && <RenderPages totalPacks={totalPacks} currentPage={page != null ? Number.parseInt(page as string) : 0} params={createBrowseSearchParams(params)} />}
         </div>
     </div>
 
