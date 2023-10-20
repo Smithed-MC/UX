@@ -11,7 +11,7 @@ import {
 	LocalBundleConfig,
 	OutputMessageEvent,
 } from "../../types";
-import { MinecraftVersion } from 'data-types';
+import { MinecraftVersion } from "data-types";
 import { Smithed } from "components/svg";
 import { getChooseBoxBundles } from "../../util";
 import BundleList from "./BundleList";
@@ -194,10 +194,6 @@ function LaunchFooter({ selectedBundle, onSetAuthDisplay }: LaunchFooterProps) {
 						{
 							value: "online",
 							content: "Play online",
-						},
-						{
-							value: "offline",
-							content: "Play offline",
 						},
 					]}
 					placeholder="Mode"
