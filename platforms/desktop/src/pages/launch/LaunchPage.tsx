@@ -175,7 +175,7 @@ function LaunchFooter({ selectedBundle, onSetAuthDisplay }: LaunchFooterProps) {
 						href={
 							selectedBundle !== undefined
 								? `/editLocalBundle/${selectedBundle}`
-								: ""
+								: null
 						}
 					/>
 				</div>
