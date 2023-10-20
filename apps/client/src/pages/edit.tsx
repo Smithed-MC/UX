@@ -67,7 +67,9 @@ function StringInput({ reference, attr, description, header, disabled, svg, plac
                 title={description} />}
             {multiline &&
                 <textarea className='input' placeholder={placeholder ?? attr}
-                    style={{ minWidth: '100%', maxWidth: '100%', minHeight: '6.75rem', textAlign: 'start' }} defaultValue={reference[attr]}></textarea>
+                    style={{ minWidth: '100%', maxWidth: '100%', minHeight: '6.75rem', textAlign: 'start' }} defaultValue={reference[attr]} onChange={(e) => {
+                        reference[attr] = e.currentTarget.value;
+                    }}></textarea>
             }
             {/* <span style={{ color: 'var(--border)' }}>{description}</span> */}
         </div>
