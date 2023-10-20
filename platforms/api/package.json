@@ -7,7 +7,9 @@
   "types": "src/index.ts",
   "scripts": {
     "test": "ts-node-esm ./tests/index.test.ts",
-    "dev": "ts-node-esm ./src/index.ts"
+    "dev": "ts-node-esm ./src/index.ts",
+    "lint": "tsc",
+    "build": "tsc"
   },
   "dependencies": {
     "data-types": "*",
