@@ -178,7 +178,7 @@ export default function GalleryPackCard({ id, packData, onClick, state, style, p
                 <div className='galleryImage' style={{ position: 'relative' }}>
                     {fallback && <div style={{ backgroundColor: 'var(--accent)', width: '100%', height: '100%', flexGrow: 1 }} />}
                     {(!data?.display.gallery || data?.display.gallery.length == 0) && !fallback
-                        && <img style={{ width: '100%', filter: 'blur(0.25rem)' }} src={data?.display.icon} onError={(e) => setFallback(true)}
+                        && <img style={{ width: '100%', filter: 'saturate(50%) brightness(50%)' }} src={data?.display.icon} onError={(e) => setFallback(true)}
                             onClick={() => {
                                 if (!card.current)
                                     return
