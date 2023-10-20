@@ -138,7 +138,7 @@ export default function Home(props: any) {
                     <img src={launcher_graphic} />
                 </div>
             </div>
-            <IconTextButton className="disturbingButtonLike" text={"Download Experimental"} iconElement={<Download style={{ width: 16, fill: 'var(--foreground)' }} />} style={{ width: 'fit-content' }} href="https://nightly.link/Smithed-MC/UX/workflows/nightly/master" />
+            <IconTextButton className="disturbingButtonLike" text={"Download Experimental"} iconElement={<Download style={{ width: 16, fill: 'var(--foreground)' }} />} style={{ width: 'fit-content' }} href="https://nightly.link/Smithed-MC/UX/workflows/nightly/main" />
         </div>
 
         <Divider />
