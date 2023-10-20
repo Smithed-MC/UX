@@ -803,12 +803,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0bd4b30a6560bbd9b4620f4de34c3f14f60848e58a9b7216801afcb4c7b31c3c"
 
 [[package]]
-name = "dyn-clone"
-version = "1.0.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbfc4744c1b8f2a09adc0e55242f60b1af195d88596bd8700be74418c056c555"
-
-[[package]]
 name = "either"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1861,9 +1855,9 @@ checksum = "a3e378b66a060d48947b590737b30a1be76706c8dd7b8ba0f2fe3989c68a853f"
 
 [[package]]
 name = "mcvm"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "45b934804e6d801fbbe1b4af053fc7d8c8689bad30ed1b54d3be9b8a56169377"
+checksum = "22a0ab8eb680e4a7ebe6498cf9d39690b818680ab7b9507eda4b688e0cb240bd"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1881,7 +1875,6 @@ dependencies = [
  "oauth2",
  "rand 0.8.5",
  "reqwest",
- "schemars",
  "serde",
  "serde_json",
  "sha2",
@@ -1895,41 +1888,38 @@ dependencies = [
 
 [[package]]
 name = "mcvm_parse"
-version = "0.8.0"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4679648f5ffbe974bec7752574797c28f8bbcec8390c5c9c2ec0ded43b72277e"
+checksum = "ee37eb290f47f4ae9b1b292b308403afe7c0e8edeee104c98e5e6da436bc8270"
 dependencies = [
  "anyhow",
  "mcvm_shared",
- "schemars",
  "serde",
 ]
 
 [[package]]
 name = "mcvm_pkg"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9caf1275000431e7bf954c025e2cbf69cb331cf93e63429aa7dbb84d9f944b44"
+checksum = "f84833cc1cff224bbef3b892810aa1bb058bf2bc13dd0c3c9b6d09de2cb983ca"
 dependencies = [
  "anyhow",
  "async-trait",
  "itertools",
  "mcvm_parse",
  "mcvm_shared",
- "schemars",
  "serde",
  "serde_json",
 ]
 
 [[package]]
 name = "mcvm_shared"
-version = "0.8.0"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "19d84aacac0ed017298681b8561cd04917e045981f1ce4ae8b88ac5f885afa4c"
+checksum = "14a46f53d01ce6f412e1480beb24773df233e90a5f953fac79b5fd5880cd0fb1"
 dependencies = [
  "anyhow",
  "current_locale",
- "schemars",
  "serde",
 ]
 
@@ -2978,30 +2968,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "schemars"
-version = "0.8.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f7b0ce13155372a76ee2e1c5ffba1fe61ede73fbea5630d61eee6fac4929c0c"
-dependencies = [
- "dyn-clone",
- "schemars_derive",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "schemars_derive"
-version = "0.8.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e85e2a16b12bdb763244c69ab79363d71db2b4b918a2def53f80b02e0574b13c"
-dependencies = [
- "proc-macro2",
- "quote",
- "serde_derive_internals",
- "syn 1.0.103",
-]
-
-[[package]]
 name = "scoped-tls"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3117,17 +3083,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.37",
-]
-
-[[package]]
-name = "serde_derive_internals"
-version = "0.26.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85bf8229e7920a9f636479437026331ce11aa132b4dde37d121944a44d6e5f3c"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.103",
 ]
 
 [[package]]

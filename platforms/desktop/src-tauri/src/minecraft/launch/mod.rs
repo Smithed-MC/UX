@@ -92,7 +92,7 @@ pub async fn launch_bundle(
             .iter()
             .find(|(.., profile)| profile.instances.contains(&instance.id))
             .expect("Instance does not belong to any profiles");
-        instance
+        let mut handle = instance
             .launch(
                 &paths,
                 &mut lock,
@@ -101,7 +101,8 @@ pub async fn launch_bundle(
                 ClientId::new(super::auth::CLIENT_ID.into()),
                 output,
             )
-            .await?
+            .await?;
+        handle.process.wait()?;
     } else {
         bail!("Unknown instance '{}'", instance);
     }

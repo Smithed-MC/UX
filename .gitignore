@@ -16,4 +16,5 @@ temp/
 sitemap.xml
 vite.config.ts.*
 
+.beet_cache
 .DS_Store
