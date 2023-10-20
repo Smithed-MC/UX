@@ -1,7 +1,8 @@
 import { useParams } from "react-router-dom";
 import { Bundle } from "./user";
+import { DownloadButtonFn } from "../inject";
 
-export default function Bundles() {
+export default function Bundles({buttonDownloadFn}: {buttonDownloadFn: DownloadButtonFn}) {
     const { bundleId } = useParams()
 
     if (!bundleId) 

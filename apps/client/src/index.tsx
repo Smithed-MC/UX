@@ -175,7 +175,7 @@ export const subRoutes: any[] = [
     },
     {
         path: 'bundles/:bundleId',
-        element: <Bundles />
+        element: <Bundles buttonDownloadFn={getDefaultInject().bundleDownloadButton}/>
     }
 ]
 
