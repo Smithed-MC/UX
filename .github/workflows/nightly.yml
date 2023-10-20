@@ -6,7 +6,7 @@ on:
   push:
     branches:
     # this will run on the electron branch
-      - master
+      - main
 # this is where the magic happens, each job happens in parallel btw
 
 jobs:
