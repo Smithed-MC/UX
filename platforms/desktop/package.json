@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "vite:dev": "vite",
-    "vite:build": "tsc && vite build",
+    "vite:build": "vite build",
     "vite:preview": "vite preview",
     "dev": "tauri dev",
     "build": "tauri build",
