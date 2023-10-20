@@ -113,7 +113,7 @@ function Footer() {
     return <div className='container' style={{ width: '100%', backgroundColor: 'var(--bold)', borderTop: '2px solid var(--border)' }}>
         <div className="footerContainer" style={{ width: 'min(70rem, 100vw)', paddingLeft: 16 }}>
             <div className='container footerLargeGroup'>
-                <div className="container" style={{ flexDirection: 'row', fontWeight: 600, fontSize: '3rem', justifyContent: 'center', gap: 16 }}>
+                <div className="container" style={{ flexDirection: 'row', fontWeight: 600, fontSize: '3rem', justifyContent: 'center', gap: 10 }}>
                     <Logo style={{height: '4rem', width: '4rem'}} />
                     Smithed
                 </div>
