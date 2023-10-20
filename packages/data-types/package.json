@@ -1,5 +1,5 @@
 {
-  "name": "@smithed-mc/data-types",
+  "name": "data-types",
   "version": "0.1.2",
   "description": "",
   "main": "index.tsx",

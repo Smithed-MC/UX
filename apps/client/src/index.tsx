@@ -20,7 +20,7 @@ import { loadBrowseData, loadHomePageData, loadUserPageData } from './loaders.js
 import User from './pages/user.js'
 import { selectSelectedBundle, selectUsersBundles, setSelectedBundle, setUsersBundles, store } from 'store'
 import { useAppDispatch, useAppSelector } from 'hooks'
-import { PackBundle } from '@smithed-mc/data-types'
+import { PackBundle } from 'data-types'
 import { Helmet } from 'react-helmet'
 import { ClientInject, getDefaultInject } from './inject.js'
 

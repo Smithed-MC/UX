@@ -1,5 +1,5 @@
 import { ChooseBox, IconInput, IconTextButton, svg } from "components";
-import { MinecraftVersion } from '@smithed-mc/data-types';
+import { MinecraftVersion } from 'data-types';
 import { availableMinecraftVersionsChooseBox } from "../types";
 import { invoke } from "@tauri-apps/api";
 import { useState } from "react";

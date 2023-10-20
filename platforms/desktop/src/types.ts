@@ -4,7 +4,7 @@ import {
 	MinecraftVersion,
 	PackReference,
 	supportedMinecraftVersions,
-} from '@smithed-mc/data-types';
+} from 'data-types';
 
 export type ConfiguredLocalBundles = {
 	[id: string]: LocalBundleConfig;

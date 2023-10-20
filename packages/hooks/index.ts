@@ -3,7 +3,7 @@ import { getAuth, User } from 'firebase/auth'
 import { useLocation } from "react-router-dom"
 import * as queryString from "query-string"
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
-import { UserData } from '@smithed-mc/data-types'
+import { UserData } from 'data-types'
 
 import {AppDispatch, RootState} from 'store'
 

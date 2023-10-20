@@ -1,7 +1,7 @@
 import { e } from '@tauri-apps/api/event-2a9960e7'
 import { ChooseBox, ErrorPage, IconInput, IconTextButton, MarkdownRenderer, Spinner } from 'components'
 import { Back, Cross, Info, Left, Right, Trash, Edit as EditSvg, Globe, Browse, Plus, Picture, Download, Check, Folder, Jigsaw, Line, Star, Text as TextSvg, At, Refresh, File, Account, Home, List } from 'components/svg'
-import { HTTPResponses, MinecraftVersion, PackData, PackDependency, PackMetaData, PackVersion, UserData, packCategories } from '@smithed-mc/data-types'
+import { HTTPResponses, MinecraftVersion, PackData, PackDependency, PackMetaData, PackVersion, UserData, packCategories } from 'data-types'
 import { formatDownloadURL } from 'formatters'
 import { useFirebaseUser, useQueryParams } from 'hooks'
 import React, { CSSProperties, useEffect, useRef, useState } from 'react'

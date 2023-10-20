@@ -1,7 +1,7 @@
 import { Type } from "@sinclair/typebox";
 import { API_APP, sendError } from "../../../app.js";
 import { getUserDoc } from "./index.js";
-import { HTTPResponses } from '@smithed-mc/data-types';
+import { HTTPResponses } from 'data-types';
 import { getFirestore } from "firebase-admin/firestore";
 
 

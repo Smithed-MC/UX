@@ -1,6 +1,6 @@
 import { ChooseBox, IconInput, IconTextButton } from "components";
 import { Edit, Check, Cross, Account } from "components/svg";
-import { HTTPResponses, MinecraftVersion, PackBundle, supportedMinecraftVersions } from '@smithed-mc/data-types';
+import { HTTPResponses, MinecraftVersion, PackBundle, supportedMinecraftVersions } from 'data-types';
 import { useAppDispatch, useAppSelector, useFirebaseUser } from "hooks";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";

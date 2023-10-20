@@ -7,7 +7,7 @@ import fastifyRedis from '@fastify/redis'
 import fastifyCors from '@fastify/cors'
 
 import * as fs from 'fs';
-import { HTTPResponses } from '@smithed-mc/data-types';
+import { HTTPResponses } from 'data-types';
 import abCache from 'abstract-cache'
 import IORedis from 'ioredis'
 

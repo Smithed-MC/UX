@@ -1,6 +1,6 @@
 import { GalleryPackCard, IconTextButton, NavBar, NavButton, PackCard } from "components";
 import React, { useEffect, useRef, useState } from "react";
-import { PackData } from '@smithed-mc/data-types';
+import { PackData } from 'data-types';
 import { Browse, Clock, ColoredLogo, Download, Download as DownloadIcon, Globe, Logo, Search, Smithed } from 'components/svg.js'
 
 import launcher_graphic from '../assets/launcher_graphic.png'

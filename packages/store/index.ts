@@ -1,6 +1,6 @@
 import * as toolkitRaw from '@reduxjs/toolkit';
 const { createSlice, configureStore } = ((toolkitRaw as any).default ?? toolkitRaw) as typeof toolkitRaw;
-import {PackBundle} from '@smithed-mc/data-types'
+import {PackBundle} from 'data-types'
 
 function getDefault<T>(key: string, defaultValue: T) {
     if (import.meta.env.SSR)

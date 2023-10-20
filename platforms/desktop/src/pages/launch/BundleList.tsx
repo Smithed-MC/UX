@@ -4,7 +4,7 @@ import "./BundleList.css";
 import { invoke } from "@tauri-apps/api";
 import libraries_box from "client/src/assets/libraries_box.png";
 import { IconTextButton, svg } from "components";
-import { MinecraftVersion } from '@smithed-mc/data-types';
+import { MinecraftVersion } from 'data-types';
 import CreateBundle from "../../components/CreateBundle";
 
 function BundleList({ onSelect }: BundleListProps) {

@@ -1,5 +1,5 @@
 import { PackVersionDownload } from "components";
-import { PackData, PackEntry } from '@smithed-mc/data-types';
+import { PackData, PackEntry } from 'data-types';
 import React from "react";
 import './download.css'
 import semver from 'semver'

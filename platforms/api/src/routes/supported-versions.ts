@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
 import { API_APP } from "../app.js";
-import { HTTPResponses, supportedMinecraftVersions } from '@smithed-mc/data-types';
+import { HTTPResponses, supportedMinecraftVersions } from 'data-types';
 
 /*
  * @route GET /supported-versions

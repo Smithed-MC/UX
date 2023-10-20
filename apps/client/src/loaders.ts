@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs } from "react-router-dom"
 import * as querystring from 'query-string'
 import { getAuth } from "firebase/auth"
-import { PackBundle, PackData, SortOptions } from '@smithed-mc/data-types'
+import { PackBundle, PackData, SortOptions } from 'data-types'
 
 async function getUserData(id: string) {
     const userDataResponse = await fetch(`https://api.smithed.dev/v2/users/${id}`)

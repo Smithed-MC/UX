@@ -16,5 +16,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "postcss.config.js", "../../packages/image-encode/defs.d.ts"],
+  "include": ["src", "../../packages/image-encode/defs.d.ts"],
 }

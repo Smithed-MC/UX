@@ -1,4 +1,4 @@
-import { HTTPResponses, MinecraftVersion, PackBundle, PackData, PackDependency, UserData, supportedMinecraftVersions } from '@smithed-mc/data-types'
+import { HTTPResponses, MinecraftVersion, PackBundle, PackData, PackDependency, UserData, supportedMinecraftVersions } from 'data-types'
 import { useEffect, useRef, useState } from 'react'
 import { useLoaderData, useNavigate, useParams } from 'react-router-dom'
 import { formatDownloads } from 'formatters'

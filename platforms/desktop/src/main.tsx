@@ -7,7 +7,7 @@ import { ClientInject, populateRouteProps, subRoutes } from "client";
 import { IconTextButton, svg } from "components";
 import AddToBundle from "./components/AddToBundle";
 import { invoke } from "@tauri-apps/api";
-import { PackReference } from '@smithed-mc/data-types';
+import { PackReference } from 'data-types';
 import EditLocalBundle from "./pages/EditLocalBundle";
 import ImportBundle from "./components/ImportBundle";
 
