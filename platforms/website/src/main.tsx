@@ -4,6 +4,5 @@ import './index.css'
 
 export default function Main() {
   return <React.StrictMode>
-    <Client platform="website" />
   </React.StrictMode>
 }
