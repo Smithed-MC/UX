@@ -29,8 +29,8 @@ interface PackCardProps {
     [key: string]: any
 }
 
-function CarouselDot({ selected }: { selected?: boolean }) {
-    return <div style={{ width: '0.5rem', height: '0.5rem' }} className='container'>
+function CarouselDot({ selected, onClick }: { selected?: boolean, onClick: () => void }) {
+    return <div style={{ width: '0.5rem', height: '0.5rem' }} className='container' onClick={onClick}>
         <svg xmlns="http://www.w3.org/2000/svg" width="9" height="8" viewBox="0 0 9 8" fill="none">
             <circle cx="4.5" cy="4" r="4" fill={selected ? "var(--foreground)" : "var(--border)"} style={{ transition: 'all 0.2s ease-in-out' }} />
         </svg>
@@ -198,18 +198,30 @@ export default function GalleryPackCard({ id, packData, onClick, state, style, p
                     {displayGallery && data?.display.gallery && <div className='carousel'>
                         <button className='buttonLike'
                             style={{ height: '2.5rem', backgroundColor: 'var(--background)' }}
-                            onClick={() => setCurrentImage(Math.max(currentImage - 1, 0))}
+                            onClick={() => {
+                                if (currentImage == 0) {
+                                    setCurrentImage((data?.display.gallery?.length?? 1) - 1);
+                                } else {
+                                    setCurrentImage(Math.max(currentImage - 1, 0));
+                                }
+                            }}
                         >
-                            <Right style={{ height: '1rem', color: currentImage === 0 ? 'var(--border)' : 'var(--foreground)', scale: '-1' }} />
+                            <Right style={{ height: '1rem', color: 'var(--foreground)', scale: '-1' }} />
                         </button>
                         <div className='container' style={{ padding: '1rem 2rem', backgroundColor: 'var(--background)', borderRadius: '2rem', gap: '1rem', flexDirection: 'row' }}>
-                            {data?.display.gallery.map((_, i) => <CarouselDot selected={currentImage === i} />)}
+                            {data?.display.gallery.map((_, i) => <CarouselDot selected={currentImage === i} onClick={() => setCurrentImage(i)} />)}
                         </div>
                         <button className='buttonLike'
                             style={{ height: '2.5rem', backgroundColor: 'var(--background)' }}
-                            onClick={() => setCurrentImage(Math.min(currentImage + 1, (data?.display.gallery?.length ?? 1) - 1))}
+                            onClick={() => {
+                                if (currentImage == (data?.display.gallery?.length?? 1) - 1) {
+                                    setCurrentImage(0);
+                                } else {
+                                    setCurrentImage(Math.min(currentImage + 1, (data?.display.gallery?.length ?? 1) - 1))
+                                }
+                            }}
                         >
-                            <Right style={{ height: '1rem', color: currentImage === data?.display.gallery.length - 1 ? 'var(--border)' : 'var(--foreground)' }} />
+                            <Right style={{ height: '1rem', color: 'var(--foreground)' }} />
                         </button>
                     </div>}
                 </div>
