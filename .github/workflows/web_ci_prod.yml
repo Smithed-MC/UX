@@ -1,16 +1,17 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: Website CI
+name: Website CI - Production Branch
 
 on:
   push:
-    branches: [ "main", "production" ]
+    branches: [ "production" ]
   pull_request:
-    branches: [ "main" ]
-  pull_request_target:
     branches: [ "production" ]
 
+env: 
+  BRANCH: production
+  
 jobs:
   build:
 
@@ -36,4 +37,4 @@ jobs:
         token: ${{ secrets.PAT }}
         repository: Smithed-MC/DevOps
         event-type: update
-        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "${{ github.ref_name }}", "branch": "${{ github.ref_name }}"}'
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "$BRANCH", "branch": "$BRANCH"}'
