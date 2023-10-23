@@ -28,3 +28,9 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npx turbo run build --filter=api --filter=website
+    - name: Deploy to DevOps
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        repository: Smithed-MC/DevOps
+        event-type: update
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "Smithed-MC/UX", "branch": "${{ github.ref_name }}"}'
