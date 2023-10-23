@@ -37,4 +37,4 @@ jobs:
         token: ${{ secrets.PAT }}
         repository: Smithed-MC/DevOps
         event-type: update
-        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "$BRANCH", "branch": "$BRANCH"}'
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "production", "branch": "production"}'
