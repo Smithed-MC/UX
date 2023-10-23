@@ -9,9 +9,6 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env: 
-  BRANCH: main
-  
 jobs:
   build:
 
@@ -37,4 +34,4 @@ jobs:
         token: ${{ secrets.PAT }}
         repository: Smithed-MC/DevOps
         event-type: update
-        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "$BRANCH", "branch": "$BRANCH"}'
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "main", "branch": "main"}'
