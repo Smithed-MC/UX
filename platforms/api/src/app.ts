@@ -89,10 +89,24 @@ export async function setupApp() {
         await registerCacheMemory()
 
 
-    await API_APP.register(fastifyCors, {
-        origin: '*',
-        allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
-        methods: '*'
+    // await API_APP.register(fastifyCors, {
+    //     origin: '*',
+    //     allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
+    //     methods: ['GET','PUT','POST','PATCH','DELETE']
+    // })
+
+    API_APP.addHook('preHandler', (request, reply, done) => {
+        reply.header("Access-Control-Allow-Origin", "*");
+        reply.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, OPTIONS, DELETE");
+        reply.header("Access-Control-Allow-Headers",  "*");
+
+        const isPreflight = /options/i.test(request.method);
+        if (isPreflight) {
+            return reply.send();
+        }
+            
+        done();
+
     })
 
     await importRoutes('routes')

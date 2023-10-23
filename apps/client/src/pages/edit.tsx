@@ -659,7 +659,7 @@ export default function Edit() {
 
 
         if (!isNew) {
-            var resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}?token=${await user.getIdToken()}`, { method: 'PATCH', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
+            var resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}?token=${await user.getIdToken()}`, { method: 'PATCH', cache: 'no-cache', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
         } else {
             var resp = await fetch(`https://api.smithed.dev/v2/packs?token=${await user.getIdToken()}&id=${packData.id}`, {
                 method: 'POST', body: JSON.stringify({ data: packData }), headers: {
