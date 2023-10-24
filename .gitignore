@@ -18,3 +18,5 @@ vite.config.ts.*
 
 .beet_cache
 .DS_Store
+
+docker-compose.dev.yaml
