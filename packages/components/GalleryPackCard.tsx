@@ -229,7 +229,7 @@ export default function GalleryPackCard({ id, packData, onClick, state, style, p
                     <span style={{ fontWeight: 600, fontSize: '1.5rem', gridArea: 'name' }}>{data?.display.name}</span>
                     <p className='description' style={{ opacity: displayGallery ? 0 : undefined, width: displayGallery ? 0 : undefined, height: displayGallery ? 0 : undefined, display: displayGallery ? 'none' : undefined }}>{data?.display.description}</p>
                     <span className='author' style={{ opacity: displayGallery ? 0 : undefined, width: displayGallery ? 0 : undefined, height: displayGallery ? 0 : undefined, display: displayGallery ? 'none' : undefined }}>
-                        {`by `}<a style={{color: 'var(--text)'}} href={`/${author}`}>{author}</a>{data?.categories ? " • " + data?.categories[0] : ''}
+                        {`by `}<a style={{color: 'var(--text)'}} href={`/${author}`}>{author}</a>{(data?.categories && data.categories.length > 0) ? " • " + data?.categories[0] : ''}
                     </span>
                     <span className='downloads' style={{ opacity: displayGallery ? 0 : undefined, width: displayGallery ? 0 : undefined, height: displayGallery ? 0 : undefined, display: displayGallery ? 'none' : undefined, paddingTop: '0.075rem' }}>
                         {formatDownloads(metaData ? metaData.stats.downloads.total : 0)} Download{metaData?.stats.downloads.total !== 1 ? 's' : ''}
