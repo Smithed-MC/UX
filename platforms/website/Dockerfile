@@ -14,9 +14,10 @@ RUN npm i
 RUN mkdir ./platforms
 COPY ./platforms/website ./platforms/website
 
+ENV VITE_NIGHTLY ${VITE_NIGHTLY}
+
 RUN npx turbo run build --filter=website
 
 EXPOSE ${PORT}
-ENV VITE_NIGHTLY ${VITE_NIGHTLY}
 
 CMD ["npm", "run", "web:serve"]
