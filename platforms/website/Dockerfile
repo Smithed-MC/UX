@@ -14,7 +14,8 @@ RUN npm i
 RUN mkdir ./platforms
 COPY ./platforms/website ./platforms/website
 
-RUN npx turbo run build --filter=website
+ARG VITE_NIGHTLY=false
+RUN VITE_NIGHTLY=${VITE_NIGHTLY} npx turbo run build --filter=website
 
 EXPOSE ${PORT}
 
