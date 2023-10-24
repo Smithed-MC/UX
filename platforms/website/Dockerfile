@@ -17,5 +17,6 @@ COPY ./platforms/website ./platforms/website
 RUN npx turbo run build --filter=website
 
 EXPOSE ${PORT}
+ENV VITE_NIGHTLY ${VITE_NIGHTLY}
 
 CMD ["npm", "run", "web:serve"]
