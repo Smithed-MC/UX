@@ -395,7 +395,7 @@ a:hover[href] {
         padding: 0px 16px !important;
     }   
     .outlet {
-        padding: 0px 16px !important;
+        padding: 16px 16px !important;
     }
 }
 

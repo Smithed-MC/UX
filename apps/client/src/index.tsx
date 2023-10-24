@@ -1,6 +1,6 @@
 import { NavBar, RootError } from 'components'
-import { useEffect } from 'react'
-import { createBrowserRouter, Outlet, RouterProvider, ScrollRestoration } from 'react-router-dom'
+import { useEffect, useState, useTransition } from 'react'
+import { createBrowserRouter, Outlet, RouterProvider, ScrollRestoration, useLocation } from 'react-router-dom'
 import { initializeApp } from 'firebase/app'
 import { User as FirebaseUser } from 'firebase/auth'
 
@@ -24,7 +24,7 @@ import { PackBundle } from 'data-types'
 import { Helmet } from 'react-helmet'
 import { ClientInject, getDefaultInject } from './inject.js'
 
-import { Logo } from 'components/svg.js'
+import { Cross, Logo } from 'components/svg.js'
 
 export type { ClientInject } from './inject.js'
 
@@ -49,6 +49,8 @@ initializeApp({
 export function ClientApplet(props: ClientProps) {
     const dispatch = useAppDispatch()
     const selectedBundle = useAppSelector(selectSelectedBundle)
+    const [hideWarning, setHideWarning] = useState(false)
+    const location = useLocation();
 
     function resetBundleData() {
         dispatch(setUsersBundles([]))
@@ -66,7 +68,7 @@ export function ClientApplet(props: ClientProps) {
 
         const bundleIds: string[] = await resp.json()
 
-        if(bundleIds.find(b => b === selectedBundle) === undefined)
+        if (bundleIds.find(b => b === selectedBundle) === undefined)
             dispatch(setSelectedBundle(''))
 
         const getData = async (id: string) => {
@@ -85,6 +87,8 @@ export function ClientApplet(props: ClientProps) {
         if (import.meta.env.SSR)
             return
 
+        setHideWarning(!!sessionStorage.getItem("hereBeDragons"))
+
         const unsub = getAuth().onAuthStateChanged(async user => {
             await loadBundles(user)
         })
@@ -94,14 +98,42 @@ export function ClientApplet(props: ClientProps) {
         }
     }, [])
 
-    return <div className="container" style={{ position: 'absolute', top: 0, left: 0, height: '100%', paddingTop: '16px', boxSizing: 'border-box', gap: 32, justifyContent: 'safe start', alignItems: 'center', width: '100%', overflowY: 'auto', overflowX: 'hidden', scrollbarGutter: 'stable' }}>
+    return <div className="container" style={{ position: 'absolute', top: 0, left: 0, height: '100%', boxSizing: 'border-box', justifyContent: 'safe start', alignItems: 'center', width: '100%', overflowY: 'auto', overflowX: 'hidden', scrollbarGutter: 'stable' }}>
         <ScrollRestoration />
         <Helmet>
             <title>Smithed</title>
             <meta name="description" content="Datapacks: the community, the tooling; all bundled into the perfect package." />
             <meta name="og:image" content="/icon.png" />
         </Helmet>
-        <div className='container outlet' style={{ width: 'min(70rem, 100%)', gap: '4rem', boxSizing: 'border-box', flexGrow: 1, justifyContent: 'start' }}>
+        {import.meta.env.VITE_NIGHTLY && !hideWarning && <div id="nightlyWarningBar" style={{
+            width: '100%',
+            borderBottom: '2px solid var(--warning)',
+            backgroundColor: 'color-mix(in srgb, transparent 80%, var(--warning) 20%)',
+            padding: '0.5rem 1rem', boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'row',
+            position: 'relative',
+        }}>
+            <span>
+                {"You are currently on the unstable branch. "}
+                <a href={"https://smithed.net" + location.pathname + location.search}>Click here</a>
+                {" to go to safety."}
+            </span>
+            <Cross style={{ alignSelf: 'center', position: 'absolute', right: '1rem'}} onClick={() => {
+                sessionStorage.setItem("hereBeDragons", "true")
+                const warningBar = document.getElementById("nightlyWarningBar")
+                if (warningBar == null) 
+                    return setHideWarning(true)
+
+                warningBar.animate([
+                    {marginTop: "0"},
+                    {marginTop: `-${warningBar.clientHeight}px`}
+                ], {easing: 'ease-in-out', duration: 200})
+
+                setTimeout(() => setHideWarning(true), 199)
+            }}/>
+        </div>}
+        <div className='container outlet' style={{ width: 'min(70rem, 100%)', gap: '4rem', boxSizing: 'border-box', flexGrow: 1, justifyContent: 'start', paddingTop: '1rem' }}>
             <NavBar getTabs={props.inject.getNavbarTabs} logoUrl={props.inject.logoUrl} />
             <Outlet />
         </div>
@@ -114,7 +146,7 @@ function Footer() {
         <div className="footerContainer" style={{ width: 'min(70rem, 100vw)', paddingLeft: 16 }}>
             <div className='container footerLargeGroup'>
                 <div className="container" style={{ flexDirection: 'row', fontWeight: 600, fontSize: '3rem', justifyContent: 'center', gap: 10 }}>
-                    <Logo style={{height: '4rem', width: '4rem'}} />
+                    <Logo style={{ height: '4rem', width: '4rem' }} />
                     Smithed
                 </div>
 
@@ -175,7 +207,7 @@ export const subRoutes: any[] = [
     },
     {
         path: 'bundles/:bundleId',
-        element: <Bundles buttonDownloadFn={getDefaultInject().bundleDownloadButton}/>
+        element: <Bundles buttonDownloadFn={getDefaultInject().bundleDownloadButton} />
     }
 ]
 
@@ -184,7 +216,7 @@ export const routes = [
         path: '/',
         children: subRoutes,
         element: <Provider store={store}>
-            <ClientApplet platform='website' inject={getDefaultInject()}/>
+            <ClientApplet platform='website' inject={getDefaultInject()} />
         </Provider>,
         errorElement: <RootError />
     }
@@ -194,7 +226,7 @@ export const routes = [
 export function populateRouteProps(props: ClientProps) {
     console.log("Populate");
     routes[0].element = <Provider store={store}>
-        <ClientApplet {...props}/>
+        <ClientApplet {...props} />
     </Provider>;
     subRoutes[5].element = <User showBackButton={props.inject.showBackButton} bundleDownloadButton={props.inject.bundleDownloadButton} />;
     subRoutes[6].element = <Packs packDownloadButton={props.inject.packDownloadButton} showBackButton={props.inject.showBackButton} />;
