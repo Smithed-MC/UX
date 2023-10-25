@@ -72,7 +72,6 @@ export async function formatDownloadURL(url: string) {
 
 export function correctGithubLinks(url: string) {
     const matches = /(https:\/\/)?(www\.)?github\.com\/(\S[^\/]+)\/(\S[^\/]+)\/(\S[^\/]+)\/(\S[^?\s]+)/g.exec(url)
-    console.log(matches)
     if (matches == null || matches.length === 0)
         return url
 
