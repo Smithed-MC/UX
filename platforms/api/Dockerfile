@@ -32,7 +32,6 @@ RUN npm i -g typescript
 
 WORKDIR /code
 
-COPY ./apps ./apps
 COPY ./packages ./packages
 COPY ./package.json ./package.json
 COPY ./package-lock.json ./package-lock.json

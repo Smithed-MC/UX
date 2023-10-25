@@ -32,14 +32,17 @@ async function getOwner(id: string) {
 
 async function getFullview(packData?: PackData) {
     if (packData !== undefined && packData.display.webPage !== undefined) {
+        // console.log(packData.display.webPage)
         try {
             
             const response = await fetch(correctGithubLinks(packData.display.webPage))
+            // console.log(response.status, response.statusText)
             if (response.ok) {
+                // console.log('returning text')
                 return await response.text()
             }
         } catch {
-            return ''
+            return 'An occured loading pack\'s readme'
         }
     } 
     return ''
