@@ -275,7 +275,6 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
     const metaData: PackMetaData | undefined = loaderData.metaData
     const owner: UserData | undefined = loaderData.owner
     const fullview: string = loaderData.fullview
-
     const [showBundleSelection, setShowBundleSelection] = useState(false)
 
     const [injectPopup, setInjectPopup] = useState<undefined | JSX.Element>(undefined);
@@ -334,7 +333,7 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
             </div>
         </div>
         <div style={{ maxWidth: '53rem' }}>
-            {fullview !== '' && <MarkdownRenderer style={{}}>{fullview.replace(/<!-- HIDE -->([^]*?)<!-- HIDE END -->\n?/g, '')}</MarkdownRenderer>}
+            {fullview !== '' && <MarkdownRenderer style={{}}>{fullview.replace(/<!-- HIDE -->(.?\n?)+<!-- END HIDE -->/g, '')}</MarkdownRenderer>}
         </div>
         {injectPopup}
     </div>
