@@ -62,13 +62,13 @@ jobs:
       name: Build App MacOS
       run: npx turbo run build --filter=desktop
       env:
-        APP_BUILD_TARGET: --target universal-apple-darwin
+        APP_BUILD_TARGET: '--target universal-apple-darwin'
 
     - if: ${{ matrix.os == 'windows-latest'}}
       name: Build App Windows
-      run: npx turbo run build --filter=desktop
+      run: echo $APP_BUILD_TARGET && npx turbo run build --filter=desktop
       env:
-        APP_BUILD_TARGET: --target i686-pc-windows-msvc
+        APP_BUILD_TARGET: '--target i686-pc-windows-msvc'
 
     - if: ${{ matrix.os == 'ubuntu-latest'}}
       name: Build App Ubuntu
