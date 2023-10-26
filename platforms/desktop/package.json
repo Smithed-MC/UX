@@ -8,7 +8,7 @@
     "vite:build": "vite build",
     "vite:preview": "vite preview",
     "dev": "tauri dev",
-    "build": "tauri build $APP_BUILD_TARGET",
+    "build": "tauri build",
     "tauri": "tauri"
   },
   "dependencies": {

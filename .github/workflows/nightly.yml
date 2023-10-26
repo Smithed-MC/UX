@@ -60,21 +60,11 @@ jobs:
 
     - if: ${{ matrix.os == 'macos-latest'}}
       name: Build App MacOS
-      run: npx turbo run build --filter=desktop
-      env:
-        APP_BUILD_TARGET: '--target universal-apple-darwin'
+      run: npx turbo run build --filter=desktop -- --target universal-apple-darwin
 
-    - if: ${{ matrix.os == 'windows-latest'}}
-      name: Build App Windows
-      run: echo $APP_BUILD_TARGET && npx turbo run build --filter=desktop
-      env:
-        APP_BUILD_TARGET: '--target i686-pc-windows-msvc'
-
-    - if: ${{ matrix.os == 'ubuntu-latest'}}
-      name: Build App Ubuntu
+    - if: ${{ matrix.os != 'macos-latest'}}
+      name: Build App
       run: npx turbo run build --filter=desktop
-      env:
-        APP_BUILD_TARGET: ''
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.1
