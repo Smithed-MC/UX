@@ -29,8 +29,8 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v3.5.1
       with:
-        node-version: 17.x
         cache: 'npm'
+        node-version: 18
     - name: Setup Rust environment
       # You may pin to the exact commit or the version.
       # uses: raftario/setup-rust-action@f74294776374514bbcc27b4623c1b220ef9394bf
