@@ -55,13 +55,17 @@ jobs:
       name: Install MacOS Dependencies
       run: |
         npm i turbo-darwin-64 @tauri-apps/cli-darwin-x64 && 
-        rustup target add aarch64-apple-darwin &&
-        echo "TARGET=--target universal-apple-darwin" >> $GITHUB_ENV
+        rustup target add aarch64-apple-darwin
     - run: npm i
-    - name: Build App
+
+    - if: ${{ matrix.os == 'macos-latest'}}
+      name: Build App MacOS
       run: npx turbo run build --filter=desktop
       env:
-        TARGET: ${{env.TARGET || '--'}}
+        TARGET: --target universal-apple-darwin
+    - if: ${{ matrix.os != 'macos-latest'}}
+      name: Build App
+      run: npx turbo run build --filter=desktop
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.1
       with:
