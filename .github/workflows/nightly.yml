@@ -39,6 +39,7 @@ jobs:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         
     - if: ${{ matrix.os == 'ubuntu-latest'}}
+      name: Install Ubuntu Dependencies
       run: |
             npm i turbo-linux-64 @tauri-apps/cli-linux-x64-gnu && 
             sudo apt update &&
@@ -51,7 +52,8 @@ jobs:
                 libayatana-appindicator3-dev \
                 librsvg2-dev
     - if: ${{ matrix.os == 'macos-latest'}}
-      run: npm i turbo-darwin-64 @tauri-apps/cli-darwin-x64
+      name: Install MacOS Dependencies
+      run: npm i turbo-darwin-64 @tauri-apps/cli-darwin-x64 && rustup target add aarch64-apple-darwin
     - run: npm i
     - name: Build App
       run: npm run build
