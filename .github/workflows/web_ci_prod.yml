@@ -6,8 +6,6 @@ name: Website CI - Production Branch
 on:
   push:
     branches: [ "production" ]
-  pull_request:
-    branches: [ "production" ]
 
 env: 
   BRANCH: production

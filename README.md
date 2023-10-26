@@ -6,7 +6,7 @@
 If you are looking for the Docker configuration that runs the backend, go [here](https://github.com/Smithed-MC/Dockers)
 
 ## Downloading
-The latest stable version of the launcher can be downloaded from the [website](https://smithed.dev/)
+The latest stable version of the launcher can be downloaded from the [website](https://smithed.net/)
 
 ## Building
 ### Prerequisites

@@ -28,7 +28,8 @@ const getPackSchema = Type.Object({
     start: Type.Integer({minimum: 0, default: 0}),
     category: Type.Array(Type.String(), {default: []}),
     hidden: Type.Optional(Type.Boolean({default: false})),
-    version: Type.Array(MinecraftVersionSchema, {default: []})
+    version: Type.Array(MinecraftVersionSchema, {default: []}),
+    scope: Type.Optional(Type.Array(Type.String()))
 })
 
 /*
@@ -56,10 +57,13 @@ const getPackSchema = Type.Object({
  * @query hidden: boolean = false
  * Should unlisted packs be returned. 
  * 
- * @return OK: string[]
+ * @query scope: string[]?
+ * A list of variable lookups starting with `data.` or `meta.`
+ * 
+ * @return OK: {id: string, displayName: string, data?: any, meta?: any}
  *  
- * @example Get a list of packs that are marked as Extensive
- * fetch('https://api.smithed.dev/v2/packs?category=Extensive')
+ * @example Get a list of packs that are marked as Extensive and their descriptions
+ * fetch('https://api.smithed.dev/v2/packs?category=Extensive&scope=data.display.description')
  */
 API_APP.route({
     method: "GET",
@@ -68,9 +72,9 @@ API_APP.route({
         querystring: getPackSchema
     }, 
     handler: async (request, reply) => {
-        const {search, sort, limit, start, category, hidden: includeHidden, version} = request.query;
+        const {search, sort, limit, start, category, hidden: includeHidden, version, scope} = request.query;
 
-        let packs: { id: string; displayName: string; }[] = await getPacks(request, search, includeHidden, sort, category, version);
+        let packs: { id: string; displayName: string; }[] = await getPacks(request, search, includeHidden, sort, category, version, scope);
         
         return packs.slice(start, start + limit)
     } 
@@ -101,7 +105,7 @@ API_APP.route({
     method: 'GET',
     url: '/packs/count',
     schema: {
-        querystring: Type.Omit(getPackSchema, ['limit', 'start', 'sort'])
+        querystring: Type.Omit(getPackSchema, ['limit', 'start', 'sort', 'scope'])
     },
     handler: async (request, reply) => {
         const {search, category, hidden: includeHidden, version} = request.query;
@@ -193,7 +197,7 @@ API_APP.route({
     }
 })
 
-async function getPacks(request: any, search: string | undefined, includeHidden: boolean | undefined, sort: SortOptions, category: string[], version: string[]) {
+async function getPacks(request: any, search: string | undefined, includeHidden: boolean | undefined, sort: SortOptions, category: string[], version: string[], scope?: string[]) {
     const requestIdentifier = 'GET-PACKS::' + Object.values(request.query);
     const tryCachedResult = await get(requestIdentifier);
 
@@ -201,13 +205,75 @@ async function getPacks(request: any, search: string | undefined, includeHidden:
     if (tryCachedResult) {
         packs = tryCachedResult.item;
     } else {
-        packs = await filterPacksByQuery(search, includeHidden, sort, category, version);
+        packs = await filterPacksByQuery(search, includeHidden, sort, category, version, scope);
         await set(requestIdentifier, packs, 5 * 60 * 1000);
     }
     return packs;
 }
 
-async function filterPacksByQuery(search: string | undefined, includeHidden: boolean | undefined, sort: SortOptions, category: string[], version: MinecraftVersion[]) {
+function getDataAtPath(root: any, path: string[]): any {
+    let key = path.shift()
+    if (key === undefined || root === undefined)
+        return root;
+
+    return {[key]: getDataAtPath(root[key], path)}
+}
+
+function deepMerge(a: any, b: any): any {
+    for (const key in b) {
+      if (b.hasOwnProperty(key)) {
+        if (a[key] && typeof a[key] === 'object' && typeof b[key] === 'object') {
+          a[key] = deepMerge(a[key], b[key]);
+        } else {
+          a[key] = b[key];
+        }
+      }
+    }
+    return a;
+  }
+  
+
+function getReturnData(p: ReceivedPackResult, scope?: string[]) {
+    let data: any = { 
+        id: p.docId, 
+        displayName: p.docData.data?.display.name 
+    };
+
+    if (scope) {
+        let scopedData: any = {}
+        for (let s of scope) {
+            const parts = s.split('.')
+
+            if (parts[0] !== 'meta' && parts[0] !== 'data')
+                continue;
+            if (parts[0] === 'meta' && parts[1] === 'data')
+                continue;
+
+            if (parts[0] === 'meta' && parts[1] === 'rawId')
+                parts[1] = 'id'
+
+            const retrievedData = getDataAtPath(p.docData, parts[0] === 'meta' ? [...parts.slice(1)] : [...parts])
+
+            if (retrievedData === undefined)
+                continue;
+
+            if (parts[0] === 'meta') {
+                scopedData.meta = deepMerge(scopedData.meta ?? {}, retrievedData)
+
+                if (parts[1] === 'id')
+                    scopedData.meta.rawId = scopedData.meta.id
+            }
+            else
+                scopedData = deepMerge(scopedData, retrievedData)
+        }
+
+        data = {...data, ...scopedData}
+    }
+
+    return data
+}
+
+async function filterPacksByQuery(search: string | undefined, includeHidden: boolean | undefined, sort: SortOptions, category: string[], version: MinecraftVersion[], scope?: string[]) {
     const requestIdentifier = 'STORED-PACKS';
     const tryCachedResult = await get(requestIdentifier);
     let packs: ReceivedPackResult[];
@@ -246,6 +312,5 @@ async function filterPacksByQuery(search: string | undefined, includeHidden: boo
     if (version.length > 0)
         packs = packs.filter(p => p.docData.data?.versions.find(v => v.supports.findIndex(mcV => version.includes(mcV)) !== -1))
 
-
-    return packs.map(p => ({ id: p.docId, displayName: p.docData.data?.display.name }));
+    return packs.map(p => getReturnData(p, scope));
 }

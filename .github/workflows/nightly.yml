@@ -29,8 +29,8 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v3.5.1
       with:
-        node-version: 17.x
         cache: 'npm'
+        node-version: 18
     - name: Setup Rust environment
       # You may pin to the exact commit or the version.
       # uses: raftario/setup-rust-action@f74294776374514bbcc27b4623c1b220ef9394bf
@@ -39,6 +39,7 @@ jobs:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         
     - if: ${{ matrix.os == 'ubuntu-latest'}}
+      name: Install Ubuntu Dependencies
       run: |
             npm i turbo-linux-64 @tauri-apps/cli-linux-x64-gnu && 
             sudo apt update &&
@@ -51,10 +52,20 @@ jobs:
                 libayatana-appindicator3-dev \
                 librsvg2-dev
     - if: ${{ matrix.os == 'macos-latest'}}
-      run: npm i turbo-darwin-64 @tauri-apps/cli-darwin-x64
+      name: Install MacOS Dependencies
+      run: |
+        npm i turbo-darwin-64 @tauri-apps/cli-darwin-x64 && 
+        rustup target add aarch64-apple-darwin
     - run: npm i
-    - name: Build App
-      run: npm run build
+
+    - if: ${{ matrix.os == 'macos-latest'}}
+      name: Build App MacOS
+      run: npx turbo run build --filter=desktop -- --target universal-apple-darwin
+
+    - if: ${{ matrix.os != 'macos-latest'}}
+      name: Build App
+      run: npx turbo run build --filter=desktop
+
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.1
       with:
