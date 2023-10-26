@@ -19,6 +19,7 @@ interface PackCardProps {
     id: string,
     packEntry?: PackEntry,
     packData?: PackData,
+    packMeta?: PackMetaData
     state?: 'editable' | 'add',
     style?: CSSProperties,
     parentStyle?: CSSProperties,
@@ -37,9 +38,9 @@ function CarouselDot({ selected, onClick }: { selected?: boolean, onClick: () =>
     </div>
 }
 
-export default function GalleryPackCard({ id, packData, onClick, state, style, parentStyle, bundleData, user, addWidget, ...props }: PackCardProps) {
+export default function GalleryPackCard({ id, packData, packMeta, onClick, state, style, parentStyle, bundleData, user, addWidget, ...props }: PackCardProps) {
     const [data, setData] = useState<PackData | undefined>(packData)
-    const [metaData, setMetaData] = useState<PackMetaData>()
+    const [metaData, setMetaData] = useState<PackMetaData | undefined>(packMeta)
     const [fallback, setFallback] = useState<boolean>(data?.display.icon !== undefined || data?.display.gallery !== undefined)
     const [author, setAuthor] = useState('')
 
@@ -52,11 +53,15 @@ export default function GalleryPackCard({ id, packData, onClick, state, style, p
     const navigate = useNavigate()
 
     async function getData() {
+        if (packData !== undefined)
+            return;
+
         const response = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
         if (!response.ok)
             return void setData(undefined)
         const data = await response.json()
         setData(data)
+        console.log('data wasn\'t passed')
     }
 
     async function getAuthor(ownerId: string) {
@@ -82,16 +87,21 @@ export default function GalleryPackCard({ id, packData, onClick, state, style, p
     }
 
     async function onLoad() {
-        const metaDataResponse = await fetch(`https://api.smithed.dev/v2/packs/${id}/meta`)
-        if (!metaDataResponse.ok) {
-            setData(undefined)
-            return
+        let owner = ''
+        if (metaData === undefined) {
+            const metaDataResponse = await fetch(`https://api.smithed.dev/v2/packs/${id}/meta`)
+            if (!metaDataResponse.ok) {
+                setData(undefined)
+                return
+            }
+            const fetchedMeta = await metaDataResponse.json()    
+            setMetaData(fetchedMeta)
+            owner = fetchedMeta.owner
+        } else {
+            owner = metaData.owner
         }
-        const metaData = await metaDataResponse.json()
 
-        await Promise.all([getData(), getAuthor(metaData.owner)])
-
-        setMetaData(metaData)
+        await Promise.all([getData(), getAuthor(owner)])
 
         setFallback(false)
 

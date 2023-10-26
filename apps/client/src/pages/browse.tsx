@@ -21,7 +21,7 @@ function RenderPages({ totalPacks, currentPage, params }: { totalPacks: number, 
 
     let pageLinks = []
     for (let p = 0; p < numberOfPages; p++) {
-        pageLinks.push(<a className={`browsePageButton ${currentPage === p ? 'selected' : ''}`} href={`/browse?page=${p}&` + params}>{p + 1}</a>)
+        pageLinks.push(<a key={'pageButton' + p} className={`browsePageButton ${currentPage === p ? 'selected' : ''}`} href={`/browse?page=${p}&` + params}>{p + 1}</a>)
     }
 
     return <div className="container" key="pages" style={{ flexDirection: 'row', gap: '0.25rem', width: '100%', justifyContent: 'center' }}>
@@ -41,7 +41,6 @@ export default function Browse(props: any) {
     const dispatch = useAppDispatch()
 
     const { count: totalPacks, packs } = useLoaderData() as BrowsePageData
-
     const [categories, setCategories] = useState(new Set(category != null ? typeof category === 'string' ? [category] : category : []))
     const [versions, setVersions] = useState(new Set(version != null ? typeof version === 'string' ? [version] : version : []))
 
@@ -110,6 +109,8 @@ export default function Browse(props: any) {
                         parentStyle={{ zIndex: addPack === p.id ? 1 : undefined }}
                         style={{ border: p.id === showWidget ? '2px solid var(--accent)' : '' }}
                         bundleData={bundles.find(b => b.uid === selectedBundle)}
+                        packData={p.pack}
+                        packMeta={p.meta}
                         user={user}
                         addWidget={<AddToBundleModal
                             trigger={

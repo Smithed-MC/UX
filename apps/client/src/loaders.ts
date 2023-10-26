@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs } from "react-router-dom"
 import * as querystring from 'query-string'
 import { getAuth } from "firebase/auth"
-import { PackBundle, PackData, SortOptions } from 'data-types'
+import { PackBundle, PackData, PackMetaData, SortOptions } from 'data-types'
 
 async function getUserData(id: string) {
     const userDataResponse = await fetch(`https://api.smithed.dev/v2/users/${id}`)
@@ -124,16 +124,23 @@ async function getTotalCount(params: URLSearchParams): Promise<number> {
 
 export const PACKS_PER_PAGE = 20
 
-async function getPackEntriesForBrowse(params: URLSearchParams, page: number): Promise<{id: string, displayName: string}[]> {
+const BROWSE_SCOPES = [
+    'data',
+    'meta.owner',
+    'meta.rawId',
+    'meta.stats'
+]
+
+async function getPackEntriesForBrowse(params: URLSearchParams, page: number): Promise<{id: string, displayName: string, data: PackData, meta: PackMetaData}[]> {
     params.set('start', (page * PACKS_PER_PAGE).toString())
     params.set('limit', PACKS_PER_PAGE.toString())
-    const response = await fetch('https://api.smithed.dev/v2/packs?' + params.toString())
+    const response = await fetch(`https://api.smithed.dev/v2/packs?scope=${BROWSE_SCOPES.join('&scope=')}&` + params.toString())
     return response.ok ? await response.json() : []
 }
 
 export interface BrowsePageData {
     count: number,
-    packs: {id: string, pack: PackData}[]
+    packs: {id: string, pack: PackData, meta: PackMetaData}[]
 }
 
 export function createBrowseSearchParams(parsedParams: any) {
@@ -161,7 +168,7 @@ export async function loadBrowseData({ request }: { request: Request }) {
     const count = await getTotalCount(params)
     const packEntries = await getPackEntriesForBrowse(params, Math.max(0, Math.min(page, Math.ceil(count / PACKS_PER_PAGE) - 1)))
 
-    const packs = await Promise.all(packEntries.map(p => getPackData(p.id)))
+    const packs = packEntries.map(p => ({id: p.id, pack: p.data, meta: p.meta}))
 
     return {count, packs: packs}
 } 

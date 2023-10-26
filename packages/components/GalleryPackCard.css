@@ -192,12 +192,12 @@
 
 @keyframes galleryPackCardShake {
     33% {
-        margin-left: -1rem;
+        transform: translateX(-1rem);
     }
     66% {
-        margin-left: 1rem;
+        transform: translateX(1rem);
     }
     100% {
-        margin-left: 0rem;
+        transform: translateX(0rem);
     }
 }
