@@ -63,9 +63,19 @@ jobs:
       run: npx turbo run build --filter=desktop
       env:
         TARGET: --target universal-apple-darwin
-    - if: ${{ matrix.os != 'macos-latest'}}
-      name: Build App
+
+    - if: ${{ matrix.os == 'windows-latest'}}
+      name: Build App Windows
       run: npx turbo run build --filter=desktop
+      env:
+        TARGET: --target i686-pc-windows-msvc
+
+    - if: ${{ matrix.os == 'ubuntu-latest'}}
+      name: Build App Ubuntu
+      run: npx turbo run build --filter=desktop
+      env:
+        TARGET: --
+
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.1
       with:
