@@ -111,6 +111,7 @@ export default function Browse(props: any) {
                         bundleData={bundles.find(b => b.uid === selectedBundle)}
                         packData={p.pack}
                         packMeta={p.meta}
+                        packAuthor={p.author}
                         user={user}
                         addWidget={<AddToBundleModal
                             trigger={

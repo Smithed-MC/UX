@@ -128,19 +128,37 @@ const BROWSE_SCOPES = [
     'data',
     'meta.owner',
     'meta.rawId',
-    'meta.stats'
+    'meta.stats',
+    'owner.displayName'
 ]
 
-async function getPackEntriesForBrowse(params: URLSearchParams, page: number): Promise<{id: string, displayName: string, data: PackData, meta: PackMetaData}[]> {
+type PackApiInfo = {
+    id: string
+    displayName: string
+    data: PackData
+    meta: PackMetaData,
+    owner: {
+        displayName: string
+    }
+}
+
+async function getPackEntriesForBrowse(params: URLSearchParams, page: number): Promise<PackApiInfo[]> {
     params.set('start', (page * PACKS_PER_PAGE).toString())
     params.set('limit', PACKS_PER_PAGE.toString())
     const response = await fetch(`https://api.smithed.dev/v2/packs?scope=${BROWSE_SCOPES.join('&scope=')}&` + params.toString())
     return response.ok ? await response.json() : []
 }
 
+type BrowsePackData = {
+    id: string
+    pack: PackData
+    meta: PackMetaData,
+    author: string
+}
+
 export interface BrowsePageData {
     count: number,
-    packs: {id: string, pack: PackData, meta: PackMetaData}[]
+    packs: BrowsePackData[]
 }
 
 export function createBrowseSearchParams(parsedParams: any) {
@@ -159,16 +177,23 @@ export function createBrowseSearchParams(parsedParams: any) {
     return params
 } 
 
-export async function loadBrowseData({ request }: { request: Request }) {
+export async function loadBrowseData({ request }: { request: Request }): Promise<BrowsePageData> {
     const {page: pageParam, ...parsedParams} = querystring.parse(request.url.split('?')[1])
     const params = createBrowseSearchParams(parsedParams)
 
-    const page = pageParam ? Number.parseInt(pageParam as string) : 0
-
     const count = await getTotalCount(params)
-    const packEntries = await getPackEntriesForBrowse(params, Math.max(0, Math.min(page, Math.ceil(count / PACKS_PER_PAGE) - 1)))
 
-    const packs = packEntries.map(p => ({id: p.id, pack: p.data, meta: p.meta}))
+    let page = pageParam ? Number.parseInt(pageParam as string) : 0
+    page = Math.max(0, Math.min(page, Math.ceil(count / PACKS_PER_PAGE) - 1))
+
+    
+    const packEntries = await getPackEntriesForBrowse(params, page)
+    const packs: BrowsePackData[] = packEntries.map(p => ({
+        id: p.id, 
+        pack: p.data, 
+        meta: p.meta,
+        author: p.owner.displayName
+    }))
 
     return {count, packs: packs}
 } 
