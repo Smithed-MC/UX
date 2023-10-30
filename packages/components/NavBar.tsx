@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector, useFirebaseUser, useQueryParams, useSmi
 
 import './style.css'
 import './NavBar.css'
-import { Check, Cross, Download, Jigsaw, MenuBars, Save, Trash } from './svg.js'
+import { Check, Cross, Download, Jigsaw, Logo, MenuBars, Save, Trash } from './svg.js'
 import { IconTextButton } from './IconTextButton'
 import { Discord as DiscordSvg, Home as HomeSvg, Browse as BrowseSvg, Account as AccountSvg } from 'components/svg.js'
 import { selectSelectedBundle, selectUsersBundles, setUsersBundles } from 'store'
@@ -142,14 +142,14 @@ export function EditBundle({ close }: EditBundleProps) {
             </div>}
             <div className='container' style={{ flexDirection: 'row', width: '100%', gap: '1rem' }}>
                 <IconTextButton className="invalidButtonLike" icon={Cross} text={"Cancel"} onClick={close} />
-                {packs.length > 0 && <a className='buttonLike' style={{fill: 'var(--foreground)', padding: '0.5rem'}} href={`https://api.smithed.dev/v2/bundles/${curBundle.uid}/download`}><Download/></a>}
+                {packs.length > 0 && <a className='buttonLike' style={{ fill: 'var(--foreground)', padding: '0.5rem' }} href={`https://api.smithed.dev/v2/bundles/${curBundle.uid}/download`}><Download /></a>}
                 {packs.length > 0 && <IconTextButton className='accentedButtonLike' icon={Check} text={"Save"} onClick={async () => {
                     if (user == null)
                         return
-                    
+
                     const newBundle: PackBundle = {
                         ...curBundle,
-                        packs: packs.map(p => ({id: p.id, version: p.version}))
+                        packs: packs.map(p => ({ id: p.id, version: p.version }))
                     }
 
                     const resp = await fetch(`https://api.smithed.dev/v2/bundles/${curBundle.uid}?token=${await user.getIdToken()}`, {
@@ -157,10 +157,10 @@ export function EditBundle({ close }: EditBundleProps) {
                         body: JSON.stringify({
                             data: newBundle
                         }),
-                        headers: {"Content-Type": "application/json"}
+                        headers: { "Content-Type": "application/json" }
                     })
 
-                    if(!resp.ok)
+                    if (!resp.ok)
                         return alert(await resp.text())
 
                     let newBundles = [...bundles]
@@ -211,9 +211,10 @@ export function NavBar(props: NavBarProps) {
 
     return (
         <div className="container navBarContainer" style={{ flexDirection: 'row', width: '100%', boxSizing: 'border-box', zIndex: 1 }}>
+            <Logo className='navBarHide' style={{ width: '1.5rem', height: '1.5rem' }} />
             <a className='navBarHide' style={{ fontSize: '24px', lineHeight: '30px', fontWeight: '700', fontFamily: 'Lexend', color: 'var(--foreground)', textDecoration: 'none' }} href={props.logoUrl}>Smithed</a>
             <div className='navBarHide' style={{ width: 1, height: 36, background: 'var(--foreground)' }} />
-            
+
             {props.getTabs && props.getTabs()}
             <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'row', gap: '2rem', justifyContent: 'end', overflow: 'hidden' }}>
                 {selectedBundle !== '' && !import.meta.env.SSR &&

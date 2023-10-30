@@ -42,6 +42,7 @@ import { ReactComponent as Refresh } from './assets/refresh.svg'
 import { ReactComponent as Smithed } from './assets/smithed.svg'
 import { ReactComponent as Play } from './assets/play.svg'
 import { ReactComponent as Copy } from './assets/copy.svg'
+import { ReactComponent as FlagCrossed } from './assets/flag_crossed.svg'
 
 export {
     Account,
@@ -87,5 +88,6 @@ export {
     Refresh,
     Smithed,
     Play,
-    Copy
+    Copy,
+    FlagCrossed
 }
