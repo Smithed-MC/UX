@@ -75,37 +75,43 @@ export async function loadUserPageData({ params }: any) {
 
 
 export interface HomePageData {
-    trendingPacks: { id: string, pack: PackData }[],
-    downloadedPacks: { id: string, pack: PackData }[],
-    newestPacks: { id: string, pack: PackData }[]
+    trendingPacks: DataForPackCards[],
+    newestPacks: DataForPackCards[]
 }
 
-async function getTopPacksBySort(sort: SortOptions): Promise<{ id: string; displayName: string }[]> {
-    const resp = await fetch(`https://api.smithed.dev/v2/packs?sort=${sort.toLowerCase()}`)
+async function getTopPacksBySort(sort: SortOptions): Promise<PackApiInfo[]> {
+    const resp = await fetch(`https://api.smithed.dev/v2/packs?sort=${sort.toLowerCase()}&scope=` + BROWSE_SCOPES.join('&scope='))
     return await resp.json()
 }
 
 export async function loadHomePageData(): Promise<HomePageData> {
-    let downloadedPackIds = await getTopPacksBySort(SortOptions.Downloads)
-    let newestPackIds = await getTopPacksBySort(SortOptions.Newest)
-    let trendingPackIds = await getTopPacksBySort(SortOptions.Trending)
+    let newestPacks = await getTopPacksBySort(SortOptions.Newest)
+    let trendingPacks = await getTopPacksBySort(SortOptions.Trending)
 
-    newestPackIds = newestPackIds
+    newestPacks = newestPacks
         .filter(np =>
-            !downloadedPackIds.find(dp => dp.id === np.id) &&
-            !trendingPackIds.find(dp => dp.id === np.id))
+            !trendingPacks.find(dp => dp.id === np.id))
         .slice(0, 5)
-    trendingPackIds = trendingPackIds
+    trendingPacks = trendingPacks
         .filter(np =>
-            !downloadedPackIds.find(dp => dp.id === np.id) &&
-            !newestPackIds.find(dp => dp.id === np.id))
+            !newestPacks.find(dp => dp.id === np.id))
         .slice(0, 5)
-    downloadedPackIds = downloadedPackIds.slice(0, 5)
 
     return {
-        newestPacks: await Promise.all(newestPackIds.map(p => getPackData(p.id))),
-        downloadedPacks: await Promise.all(downloadedPackIds.map(p => getPackData(p.id))),
-        trendingPacks: await Promise.all(trendingPackIds.map(p => getPackData(p.id)))
+        newestPacks: newestPacks.map(p => ({
+            id: p.id,
+            displayName: p.displayName,
+            pack: p.data,
+            meta: p.meta,
+            author: p.owner.displayName
+        })),
+        trendingPacks: trendingPacks.map(p => ({
+            id: p.id,
+            displayName: p.displayName,
+            pack: p.data,
+            meta: p.meta,
+            author: p.owner.displayName
+        }))
     }
 }
 
@@ -149,7 +155,7 @@ async function getPackEntriesForBrowse(params: URLSearchParams, page: number): P
     return response.ok ? await response.json() : []
 }
 
-type BrowsePackData = {
+export type DataForPackCards = {
     id: string
     pack: PackData
     meta: PackMetaData,
@@ -158,7 +164,7 @@ type BrowsePackData = {
 
 export interface BrowsePageData {
     count: number,
-    packs: BrowsePackData[]
+    packs: DataForPackCards[]
 }
 
 export function createBrowseSearchParams(parsedParams: any) {
@@ -188,7 +194,7 @@ export async function loadBrowseData({ request }: { request: Request }): Promise
 
     
     const packEntries = await getPackEntriesForBrowse(params, page)
-    const packs: BrowsePackData[] = packEntries.map(p => ({
+    const packs: DataForPackCards[] = packEntries.map(p => ({
         id: p.id, 
         pack: p.data, 
         meta: p.meta,

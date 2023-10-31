@@ -60,7 +60,7 @@
 
 div {
     font-family: Lexend;
-    color: var(--text)
+    color: var(--foreground)
 }
 
 h1 {
@@ -334,7 +334,9 @@ button:disabled, .buttonLike:disabled {
 .accentedButtonLike {
     background-color: var(--accent);
 }
-
+.secondaryAccentButtonLike {
+    background-color: var(--accent2);
+}
 .disturbingButtonLike {
     background-color: var(--disturbing);
 }
