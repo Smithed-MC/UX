@@ -32,7 +32,7 @@ function CarouselDot({ selected, onClick }: { selected?: boolean, onClick: () =>
     </div>
 }
 
-export default function GalleryPackCard({ id, packData, packMeta, onClick, state, style, parentStyle, bundleData, user, addWidget, packAuthor, ...props }: PackCardProps) {
+export default function GalleryPackCard({ id, packData, packMeta, onClick, state, style, parentStyle, bundleData, user, addWidget, packAuthor, ref, ...props }: PackCardProps) {
     const [data, setData] = useState<PackData | undefined>(packData)
     const [metaData, setMetaData] = useState<PackMetaData | undefined>(packMeta)
     const [fallback, setFallback] = useState<boolean>(data?.display.icon !== undefined || data?.display.gallery !== undefined)
@@ -102,7 +102,7 @@ export default function GalleryPackCard({ id, packData, packMeta, onClick, state
     useMemo(() => { onLoad(); }, [id])
 
 
-    return <div className={`galleryPackCardContainer${displayGallery ? ' displayGallery' : ''}`} style={{ ...parentStyle }}>
+    return <div ref={ref} className={`galleryPackCardContainer${displayGallery ? ' displayGallery' : ''}`} style={{ ...parentStyle }}>
         <div style={{ height: '100%', width: '100%' }}>
             <div className={`galleryPackCard${displayGallery ? ' displayGallery' : ''}`} key={id} ref={card} onClick={(e) => {
                 if (!(e.target instanceof HTMLDivElement || e.target instanceof HTMLLabelElement)) return
