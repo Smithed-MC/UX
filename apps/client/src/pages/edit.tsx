@@ -88,7 +88,7 @@ function ImageURLInput({ reference, attr, width, height, description, header, pl
     useEffect(() => setFallback(false), [src])
 
     return <EditorDiv style={{ flexDirection: 'row', gap: '1rem' }}>
-        <div className='container' style={{ width: '4rem', height: '4rem', border: '2px solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--section)', overflow: 'hidden' }}>
+        <div className='container' style={{ width: '4rem', height: '4rem', border: '0.125rem solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--section)', overflow: 'hidden' }}>
             {fallback && <span style={{ fontSize: '0.625rem' }}>PREVIEW</span>}
             {!fallback && <img src={src} style={{ width: '100%', height: '100%' }} onError={() => setFallback(true)} />}
         </div>
@@ -134,7 +134,7 @@ function MarkdownURLInput({ reference, attr, description, placeholder, svg }: Ed
                 </button>
             </div>
             {showPreview && <div className='container' style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', justifyContent: 'start', padding: 16, zIndex: 100, boxSizing: 'border-box' }}>
-                <div className='container' style={{ backgroundColor: 'var(--section)', width: '100%', height: 'calc(100%)', padding: 16, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)', border: '2px solid var(--border)', overflow: 'hidden', overflowY: 'auto' }}>
+                <div className='container' style={{ backgroundColor: 'var(--section)', width: '100%', height: 'calc(100%)', padding: 16, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)', border: '0.125rem solid var(--border)', overflow: 'hidden', overflowY: 'auto' }}>
                     <MarkdownRenderer style={{ flexGrow: 1, width: '100%', height: '100%' }}>
                         {showPreview}
                     </MarkdownRenderer>
@@ -293,7 +293,7 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
 
     if (addNewVersion) {
         return <div style={{ position: 'fixed', top: 0, left: 0, display: 'flex', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', background: 'rgba(0,0,0,0.5', zIndex: 100 }}>
-            <div className="container" style={{ alignItems: 'center', padding: '1rem', backgroundColor: 'var(--background)', border: '2px solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', gap: '0.5rem' }}>
+            <div className="container" style={{ alignItems: 'center', padding: '1rem', backgroundColor: 'var(--background)', border: '0.125rem solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', gap: '0.5rem' }}>
                 <IconInput icon={EditSvg} placeholder='Version Number...' inputRef={versionName} onMouseEnter={() => versionName.current?.select()} onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                         addVersion()
@@ -466,7 +466,7 @@ function SavingModal({ state, changeState }: { state: SavingState, changeState: 
 
 
     return <div style={{ display: 'flex', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', fontSize: '1.125rem', justifyContent: 'center', alignItems: 'center', color: 'var(--goodAccent)', backgroundColor: 'rgba(0,0,0,0.5)', animation: 'fadeInBackground 1s ease-in-out', zIndex: 10 }} ref={modalContainer}>
-        <div className='container' style={{ backgroundColor: 'var(--section)', border: '2px solid var(--border)', width: '100%', maxWidth: 384, aspectRatio: '2 / 1', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 1s', transition: 'transform 0.6s cubic-bezier(0.87, 0, 0.13, 1)' }} ref={modalBody}>
+        <div className='container' style={{ backgroundColor: 'var(--section)', border: '0.125rem solid var(--border)', width: '100%', maxWidth: 384, aspectRatio: '2 / 1', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 1s', transition: 'transform 0.6s cubic-bezier(0.87, 0, 0.13, 1)' }} ref={modalBody}>
 
             {state.mode === 'saving' && <div>
                 <h3 style={{ margin: 0 }}>Saving pack...</h3>

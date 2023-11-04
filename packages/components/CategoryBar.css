@@ -1,0 +1,64 @@
+.categoryBar {
+    background-color: var(--bold);
+    padding: 0.5rem;
+    border-radius: calc(var(--defaultBorderRadius) * 1.5);
+    flex-direction: row;
+    width: 100%;
+    gap: 1rem;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.categoryBar>.psuedoBackground {
+    background-color: var(--section);
+    position: absolute;
+    transition: all 0.3s cubic-bezier(0.76, 0, 0.24, 1);
+    border-radius: var(--defaultBorderRadius);
+}
+
+.categoryChoice {
+    flex-grow: 1;
+    padding: 0.5rem;
+    border-radius: var(--defaultBorderRadius);
+    box-sizing: border-box;
+    transition: background-color 0.25s ease-in-out, all 0.1s ease-in-out;
+    width: 100%;
+    z-index: 0;
+    cursor: pointer;
+    border: 0.125rem solid transparent;
+    background-color: transparent;
+    position: relative;
+    font-size: 1rem;
+}
+
+.categoryChoice:disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+.categoryChoice.selected {
+    transition-delay: background-color 0.2s;
+    z-index: 1;
+    background-color: var(--section);
+}
+
+.categoryChoice:not(:disabled):where(
+    :has(>*:nth-child(n + 2):not(:hover)), 
+    :has(>*:only-child)
+):hover {
+    border: 0.125rem solid var(--border);
+    background-color: transparent !important;
+}
+.categoryChoice:not(:disabled):where(
+    :has(>*:nth-child(n + 2):not(:hover)), 
+    :has(>*:only-child)
+):active  {
+    border: 0.125rem solid var(--foreground);
+    opacity: 0.6;
+}
+
+@media screen and (max-width: 43rem) {
+    .categoryChoice>.content>*:not(:first-child) {
+        display: none;
+    }
+}

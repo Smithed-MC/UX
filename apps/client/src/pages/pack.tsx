@@ -3,11 +3,10 @@ import React, { useEffect, useState } from "react"
 import { PackData, PackMetaData, UserData } from 'data-types'
 import PackInfo from "../widget/packInfo"
 import Download from "../widget/download"
-import { Spinner } from "components"
+import { DownloadButton, Spinner } from "components"
 import './pack.css'
 import { Helmet } from "react-helmet"
 import { correctGithubLinks } from "formatters"
-import { DownloadButtonFn } from "../inject"
 
 async function getPack(id: string) {
     const response = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
@@ -88,6 +87,6 @@ export default function Packs({packDownloadButton, showBackButton}: PacksProps) 
 }
 
 export interface PacksProps {
-    packDownloadButton: DownloadButtonFn,
+    packDownloadButton: DownloadButton,
     showBackButton: boolean,
 }

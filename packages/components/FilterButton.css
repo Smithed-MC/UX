@@ -1,5 +1,5 @@
 .filter-button {
-    border: 2px solid transparent;
+    border: 0.125rem solid transparent;
     border-radius: var(--defaultBorderRadius);
     color: var(--highlight);
     background-color: var(--section);
@@ -13,17 +13,17 @@
 }
 
 .filter-button:hover {
-    border: 2px solid var(--border);
+    border: 0.125rem solid var(--border);
 }
 
 .filter-button.selected {
     opacity: 1;
     background: var(--success);
     color: var(--foreground);
-    border: 2px solid var(--success);
+    border: 0.125rem solid var(--success);
 }
 
 .filter-button.selected:hover {
     background: var(--section);
-    border: 2px solid var(--border);
+    border: 0.125rem solid var(--border);
 }

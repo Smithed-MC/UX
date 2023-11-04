@@ -107,7 +107,7 @@ export default function Browse(props: any) {
                         key={p.id} id={p.id} state={selectedBundle !== '' ? 'add' : undefined}
                         onClick={() => onClick(p.id)}
                         parentStyle={{ zIndex: addPack === p.id ? 1 : undefined }}
-                        style={{ border: p.id === showWidget ? '2px solid var(--accent)' : '' }}
+                        style={{ border: p.id === showWidget ? '0.125rem solid var(--accent)' : '' }}
                         bundleData={bundles.find(b => b.uid === selectedBundle)}
                         packData={p.pack}
                         packMeta={p.meta}

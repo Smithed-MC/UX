@@ -1,4 +1,4 @@
-import { IconTextButton } from "components";
+import { DownloadButton, IconTextButton } from "components";
 import { svg } from "components";
 import { Download } from "components/svg";
 
@@ -6,16 +6,12 @@ export interface ClientInject {
 	getNavbarTabs: () => JSX.Element[];
 	enableFooter: boolean;
 	logoUrl: string;
-	packDownloadButton: DownloadButtonFn;
-	bundleDownloadButton: DownloadButtonFn;
+	packDownloadButton: DownloadButton;
+	bundleDownloadButton: DownloadButton;
 	showBackButton: boolean;
 }
 
-export type DownloadButtonFn = (
-	id: string,
-	openPopup: (element: JSX.Element) => void,
-	closePopup: () => void
-) => JSX.Element;
+
 
 export function getDefaultInject(): ClientInject {
 	return {
@@ -44,7 +40,7 @@ export function getDefaultInject(): ClientInject {
 		],
 		enableFooter: true,
 		logoUrl: "/",
-		packDownloadButton: (id) => (
+		packDownloadButton: ({id}) => (
 			<IconTextButton
 				className="accentedButtonLike"
 				iconElement={<Download fill="var(--foreground)" />}
@@ -55,11 +51,11 @@ export function getDefaultInject(): ClientInject {
 			/>
 		),
 		showBackButton: false,
-		bundleDownloadButton: (id) => (
+		bundleDownloadButton: ({id}) => (
 			<IconTextButton
 				text={"Download"}
 				iconElement={<Download fill="var(--foreground)" />}
-				className="accentedButtonLike bundleControlButton"
+				className="bundleButtonLike bundleControlButton"
 				reverse={true}
 				href={`https://api.smithed.dev/v2/bundles/${id}/download`}
 			/>

@@ -1,29 +1,29 @@
-import { HTTPResponses, MinecraftVersion, PackBundle, PackData, PackDependency, UserData, supportedMinecraftVersions } from 'data-types'
+import { MinecraftVersion, PackBundle, PackData, PackMetaData, UserData } from 'data-types'
 import { useEffect, useRef, useState } from 'react'
 import { useLoaderData, useNavigate, useParams } from 'react-router-dom'
 import { formatDownloads } from 'formatters'
 import './user.css'
-import { IconInput, IconTextButton, PackCard, Spinner, SvgButton } from 'components'
-import { useAppDispatch, useFirebaseUser, useQueryParams } from 'hooks'
-import { Account, BackArrow, Check, Clock, Cross, Discord, Download, Edit, Folder, Home, Jigsaw, Line, List, NewFolder, Plus, SignOut, Trash, Upload } from 'components/svg'
-import EditButton from 'components/EditButton'
+import { CategoryBar, CategoryChoice, DownloadButton, GalleryPackCard, IconTextButton } from 'components'
+import { useFirebaseUser, useQueryParams } from 'hooks'
+import { Account, At, BackArrow, Check, Cross, Discord, Download, Edit, Folder, Home, Jigsaw, Line, Plus, Upload } from 'components/svg'
 import { Helmet } from 'react-helmet'
 import { getAuth } from 'firebase/auth'
-import DownloadButton from 'components/DownloadButton'
-import AddRemovePackButton from 'components/AddRemovePackButton'
 import { User as FirebaseUser } from 'firebase/auth'
 import { prettyTimeDifference } from 'formatters'
 import { CreateBundle } from '../widget/bundle'
-import { setSelectedBundle } from 'store'
-import { DownloadButtonFn } from '../inject'
-import BackButton from '../widget/BackButton'
+import { BundleCard } from 'components/BundleCard'
 
 interface UserStats {
     totalDownloads: number,
     dailyDownloads: number
-    packs: { id: string, pack: PackData }[],
+    packs: { id: string, pack: PackData, meta: PackMetaData }[],
     bundles: string[],
     id: string,
+}
+
+interface UserTabComponent {
+    editable: boolean,
+    visible: boolean
 }
 
 function CreationButton({ text, onPress }: { text: string, onPress: () => void }) {
@@ -32,117 +32,6 @@ function CreationButton({ text, onPress }: { text: string, onPress: () => void }
         <button className='button container wobbleHover' style={{ fontSize: 48, width: 48, height: 48, justifyContent: 'center', borderRadius: '50%' }} onClick={onPress}>
             <label>+</label>
         </button>
-    </div>
-}
-
-export function Bundle({ id, editable, showOwner, bundleDownloadButton }: { id: string, editable: boolean, showOwner?: boolean, bundleDownloadButton: DownloadButtonFn }) {
-    const [rawBundleData, setRawBundleData] = useState<PackBundle | undefined>()
-    const [containedPacks, setContainedPacks] = useState<[string, string, string][]>()
-    const [ownerName, setOwnerName] = useState('')
-    const [showConfirmation, setShowConfirmation] = useState<boolean>(false)
-    const [injectPopup, setInjectPopup] = useState<undefined | JSX.Element>(undefined);
-    const parentElement = useRef<HTMLDivElement>(null)
-    const firebaseUser = useFirebaseUser()
-    const dispatch = useAppDispatch()
-
-    async function getPackName(pack: PackDependency): Promise<[string, string, string] | undefined> {
-        const resp = await fetch(`https://api.smithed.dev/v2/packs/${pack.id}`)
-        if (!resp.ok)
-            return undefined
-        const data: PackData = await resp.json()
-
-        return [pack.id, data.display.name, pack.version];
-    }
-    async function getOwnerName(uid: string) {
-        const resp = await fetch(`https://api.smithed.dev/v2/users/${uid}`)
-        if (!resp.ok)
-            return
-
-        const data: { displayName: string } = await resp.json()
-
-        setOwnerName(data.displayName)
-    }
-
-    async function loadBundleData() {
-        const resp = await fetch(`https://api.smithed.dev/v2/bundles/${id}`)
-
-        if (!resp.ok)
-            return
-
-        const data: PackBundle = await resp.json()
-
-        const promises = data.packs.map(p => getPackName(p))
-        const results = (await Promise.all(promises)).filter(r => r !== undefined)
-
-        if (showOwner)
-            await getOwnerName(data.owner)
-
-        setRawBundleData(data)
-        setContainedPacks(results as [string, string, string][])
-    }
-
-    useEffect(() => { loadBundleData() }, [id])
-
-    if (rawBundleData === undefined) return <div style={{ display: 'none' }} />
-
-    return <div className='container' style={{ flexDirection: 'row', width: '100%', padding: 16, borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--section)', boxSizing: 'border-box', gap: 16 }} ref={parentElement}>
-
-        <div className='container' style={{ alignItems: 'start', gap: '1rem', flexGrow: 1, justifyContent: 'start', height: '100%' }}>
-            <div className='container' style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-                <div>
-                    <label style={{ fontSize: '1.5rem', fontWeight: 600 }}>{rawBundleData.name}</label>
-                    {showOwner === true && <div style={{ display: 'flex', fontSize: '1.125rem', alignItems: 'center', gap: 8 }}>
-                        Created By
-                        <label style={{ backgroundColor: 'var(--background)', padding: 8, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)' }}>
-                            {ownerName}
-                        </label>
-                    </div>}
-                    <div style={{ display: 'flex', fontSize: '1.125rem', alignItems: 'center', gap: 8 }}>
-                        for version {rawBundleData.version}
-                    </div>
-                </div>
-                <div className='container bundleControls'>
-                    {editable && <div className="buttonLike invalidButtonLike bundleControlButton" onClick={() => {
-                        setShowConfirmation(true)
-                    }}>
-                        <Trash fill="var(--disturbing)" />
-                    </div>}
-                    {editable && <a className='buttonLike highlightButtonLike bundleControlButton' href={`/browse`} onClick={(e) => {
-                        dispatch(setSelectedBundle(rawBundleData.uid))
-                    }}><NewFolder /></a>}
-                    {rawBundleData.uid !== undefined && bundleDownloadButton(rawBundleData.uid, (element) => {setInjectPopup(element)}, () => {setInjectPopup(undefined)})}
-                    {/* <IconTextButton text={"Download"} iconElement={<Download fill="var(--foreground)" />} className="accentedButtonLike bundleControlButton" reverse={true} href={`https://api.smithed.dev/v2/bundles/${rawBundleData.uid}/download`} /> */}
-                </div>
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
-                {containedPacks?.map(p => <div style={{ display: 'flex', backgroundColor: 'var(--highlight)', alignItems: 'center', gap: '1rem', padding: '0.5rem 1rem', borderRadius: 'var(--defaultBorderRadius)' }}>
-                    <a className="compactButton" href={`/packs/${p[0]}`}>{p[1]}</a>
-                    <div style={{ width: 2, height: '100%', backgroundColor: 'var(--border)' }} />
-                    {p[2].startsWith('v') ? '' : 'v'}{p[2]}
-                </div>)}
-                {(containedPacks === undefined || containedPacks.length === 0) && <label style={{ color: 'var(--subText)' }}>No packs added</label>}
-            </div>
-        </div>
-        {showConfirmation && <div className='container' style={{ position: 'fixed', zIndex: 100, backgroundColor: 'rgba(0,0,0,0.5)', width: '100%', height: '100%', top: 0, left: 0, justifyContent: 'center', animation: 'fadeInBackground 1s' }}>
-            <div className='container' style={{ backgroundColor: 'var(--background)', borderRadius: 'var(--defaultBorderRadius)', padding: 16, animation: 'slideInContent 0.5s ease-in-out', border: '2px solid var(--border)', gap: 16 }}>
-                <h3 style={{ margin: 4 }}>Are you sure you want to remove "{rawBundleData.name}"?</h3>
-                <div className='container' style={{ flexDirection: 'row', gap: 16 }}>
-                    <IconTextButton className="accentedButtonLike" text={"Cancel"} icon={Cross} onClick={() => setShowConfirmation(false)}/>
-                    <IconTextButton className="invalidButtonLike" text={"Confirm"} icon={Check} onClick={async () => {
-                        if (firebaseUser == null)
-                            return setShowConfirmation(false)
-                        const resp = await fetch(`https://api.smithed.dev/v2/bundles/${rawBundleData.uid}?token=${await firebaseUser.getIdToken()}`, { method: 'DELETE' })
-                        if (!resp.ok) {
-                            alert(resp.statusText)
-                        } else {
-                            parentElement.current?.style.setProperty('display', 'none');
-                        }
-                        setShowConfirmation(false)
-                    }}/>
-                </div>
-            </div>
-        </div>}
-        {injectPopup}
     </div>
 }
 
@@ -160,7 +49,7 @@ function CreateBundleModal({ user, showModal, addPack }: { user: FirebaseUser | 
 
 
     return <div className="container" style={{ position: 'fixed', width: '100%', height: '100%', top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 50%)', animation: 'fadeInBackground 0.5s' }}>
-        <div className='container' style={{ backgroundColor: 'var(--background)', border: '2px solid var(--border)', boxSizing: 'border-box', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 0.5s ease-in-out' }}>
+        <div className='container' style={{ backgroundColor: 'var(--background)', border: '0.125rem solid var(--border)', boxSizing: 'border-box', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 0.5s ease-in-out' }}>
             <CreateBundle close={close} finish={close} showCloseButton showEditButton />
         </div>
     </div>
@@ -168,15 +57,71 @@ function CreateBundleModal({ user, showModal, addPack }: { user: FirebaseUser | 
 
 export interface UserProps {
     showBackButton?: boolean;
-    bundleDownloadButton: DownloadButtonFn,
+    bundleDownloadButton: DownloadButton,
 }
 
-export default function User({showBackButton, bundleDownloadButton}: UserProps) {
-    const { owner: userId } = useParams()
-    const firebaseUser = useFirebaseUser()
+function UserPacks({ user, packs, editable, visible }: { user: UserData, packs: { id: string, pack: PackData, meta: PackMetaData }[] } & UserTabComponent) {
     const navigate = useNavigate()
-    const { user, userStats }: { user: UserData|undefined, userStats: UserStats } = useLoaderData() as any
 
+    return <div className='userContentGrid' style={{ display: visible ? 'grid' : 'none' }}>
+        {packs
+            .sort((a, b) => a.meta.stats.downloads.total - b.meta.stats.downloads.total)
+            .sort(p => p.meta.owner === user.uid ? 1 : -1)
+            .reverse()
+            .map(p => <GalleryPackCard
+                state={editable ? 'editable' : undefined}
+                id={p.id}
+                packData={p.pack} o
+                nClick={() => { navigate(`../packs/${p}`) }}
+            />)
+        }
+        {editable && packs.length == 0 && <div className="container" style={{ gap: '1rem' }}>
+            Looks like you don't have any packs!
+            <IconTextButton icon={Plus} text={"Make one here"} className="accentedButtonLike" href="/edit?new=true" />
+        </div>}
+    </div>
+}
+
+function UserBundles({ bundles, editable, bundleDownloadButton, visible }: { bundles: string[], bundleDownloadButton: DownloadButton } & UserTabComponent) {
+    return <div className='userContentGrid' style={{ display: visible ? 'grid' : 'none' }}>
+        {bundles?.map(b => <BundleCard key={b} id={b} editable={editable} bundleDownloadButton={bundleDownloadButton} />)}
+    </div>
+}
+
+function UserAbout({ userStats, visible }: { userStats: UserStats } & UserTabComponent) {
+
+    function Stat({ name, value, icon }: { name: string, value: number | string | undefined, icon: any }) {
+        return <div className='statDisplay'>
+            {icon}
+            <div style={{ width: 2, backgroundColor: 'var(--border)', height: '1rem' }} />
+            <label className='statText'>{value} {name}{value == 1 ? '' : 's'}</label>
+        </div>
+    }
+
+    return <div className='container' style={{ width: '100%', display: visible ? 'flex' : 'none' }}>
+        <div className='statGrid'>
+            <span className='title' style={{ gridRow: '1 / 3', gridColumn: 1, alignSelf: 'start' }}><Download /> Downloads</span>
+            <div className='divider' />
+            <span className='title'>Total</span>
+            <div className='divider' />
+            <span className='title'>Today</span>
+            <div className='divider' />
+            <span>{formatDownloads(userStats?.totalDownloads ?? 0)}</span>
+            <div className='divider' />
+            <span>{formatDownloads(userStats?.dailyDownloads ?? 0)}</span>
+        </div>
+    </div>
+}
+
+export default function User({ showBackButton, bundleDownloadButton }: UserProps) {
+    const { owner: userId } = useParams()
+    const { tab: defaultTab } = useQueryParams()
+    const firebaseUser = useFirebaseUser()
+
+    const navigate = useNavigate()
+    const { user, userStats }: { user: UserData | undefined, userStats: UserStats } = useLoaderData() as any
+
+    const [tab, setTab] = useState(defaultTab ?? 'userPacks')
     const [editable, setEditable] = useState<boolean>(false)
     const [editingUserData, setEditingUserData] = useState(false)
 
@@ -191,22 +136,15 @@ export default function User({showBackButton, bundleDownloadButton}: UserProps) 
     }, [firebaseUser])
 
     if (user === undefined) {
-        return <div className='container' style={{height: '100%'}}>
+        return <div className='container' style={{ height: '100%' }}>
             <h1>Looks like this page or user doesn't exist!</h1>
-            <div className="container" style={{flexDirection: 'row', gap: '1rem'}}>
-                <IconTextButton icon={Home} text={"Take me home"} className="accentedButtonLike" href="/"/>
-                <IconTextButton icon={Discord} text={"Report a problem"} href="https://smithed.dev/discord"/>
+            <div className="container" style={{ flexDirection: 'row', gap: '1rem' }}>
+                <IconTextButton icon={Home} text={"Take me home"} className="accentedButtonLike" href="/" />
+                <IconTextButton icon={Discord} text={"Report a problem"} href="https://smithed.dev/discord" />
             </div>
         </div>
     }
 
-    function Stat({ name, value, icon }: { name: string, value: number | string | undefined, icon: any }) {
-        return <div className='statDisplay'>
-            {icon}
-            <div style={{ width: 2, backgroundColor: 'var(--border)', height: '1rem' }} />
-            <label className='statText'>{value} {name}{value == 1 ? '' : 's'}</label>
-        </div>
-    }
 
     let pageDescription = `Check out ${user?.displayName}'s page!`
     if (userStats.packs.length >= 1)
@@ -217,136 +155,125 @@ export default function User({showBackButton, bundleDownloadButton}: UserProps) 
 
 
     if (userStats === undefined) return <div></div>
-    return <div className='container' style={{ width: '100%', boxSizing: 'border-box', height: '100%', overflowY: 'auto', overflowX: 'hidden', justifyContent: 'safe start' }}>
+    return <div className='container' style={{ gap: '5rem', boxSizing: 'border-box', width: '100%' }}>
         <Helmet>
             <meta name="og:site_name" content="Smithed" />
             <title>{user?.displayName}</title>
             <meta name="description" content={pageDescription} />
-            {user?.pfp && <meta name="og:image" content={`https://api.smithed.dev/v2/users/${user.uid}/pfp`}/>}
+            {user?.pfp && <meta name="og:image" content={`https://api.smithed.dev/v2/users/${user.uid}/pfp`} />}
         </Helmet>
-        <div className='container userContentRoot' style={{ gap: '4rem', boxSizing: 'border-box', maxWidth: '46.25rem' }}>
-            <div className='flexDirection' style={{ width: '100%', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', gap: 16, boxSizing: 'border-box' }}>
-                <div className='statContainer' style={{ width: '100%' }}>
-                    <div className="container" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div className='userIconAndName'>
-                            <div style={{ gridArea: 'image', width: 64, height: 64, overflow: 'hidden', borderRadius: 'var(--defaultBorderRadius)', display: 'flex' }}>
-                                {!showFallbackPFP && !import.meta.env.SSR && <img src={pfp ?? ""} style={{ width: 64, height: 64, margin: 0 }} width={64} height={64} onError={(e) => setShowFallbackPFP(true)} />}
-                                {showFallbackPFP && <div className='userFallbackPFP'><Account style={{ width: 32, height: 32 }} /></div>}
 
-                                {editingUserData && <button style={{ width: 64, height: 64, position: 'absolute', backgroundColor: 'rgba(0,0,0,0.50)' }} onClick={() => {
-                                    pfpUploadRef.current?.click()
-                                }}>
-                                    <Upload fill="var(--foreground)" style={{ width: 32, height: 32 }} />
-                                    <input ref={pfpUploadRef} type="file" accept='image/png, image/jpeg' style={{ display: 'none' }} onChange={async (e) => {
-                                        const file = e.currentTarget.files?.item(0)
+        <div className='flexDirection' style={{ width: '100%', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', gap: 16, boxSizing: 'border-box' }}>
+            <div className='container' style={{ width: '100%', gap: '2rem' }}>
+                {user?.banner && <div className='container' style={{ width: '100%', height: '10rem', overflow: 'hidden', position: 'relative', borderRadius: 'var(--defaultBorderRadius)' }}>
+                    <img src={user?.banner} style={{ position: 'absolute', width: '100%' }} />
+                </div>}
+                <div className="container" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className='userIconAndName'>
 
-                                        // console.log(file);
-                                        if (file === undefined || file == null)
-                                            return
+                        <div style={{ gridArea: 'image', width: 64, height: 64, overflow: 'hidden', borderRadius: 'var(--defaultBorderRadius)', display: 'flex' }}>
+                            {!showFallbackPFP && !import.meta.env.SSR && <img src={pfp ?? ""} style={{ width: 64, height: 64, margin: 0 }} width={64} height={64} onError={(e) => setShowFallbackPFP(true)} />}
+                            {showFallbackPFP && <div className='userFallbackPFP'><Account style={{ width: 32, height: 32 }} /></div>}
 
-                                        if (file.size > 1024 * 1024)
-                                            return alert('Selected image exceeds 1MB')
+                            {editingUserData && <button style={{ width: 64, height: 64, position: 'absolute', backgroundColor: 'rgba(0,0,0,0.50)' }} onClick={() => {
+                                pfpUploadRef.current?.click()
+                            }}>
+                                <Upload fill="var(--foreground)" style={{ width: 32, height: 32 }} />
+                                <input ref={pfpUploadRef} type="file" accept='image/png, image/jpeg' style={{ display: 'none' }} onChange={async (e) => {
+                                    const file = e.currentTarget.files?.item(0)
 
-                                        const result = await new Promise<string>((resolve) => {
-                                            const fileReader = new FileReader()
-                                            fileReader.readAsDataURL(file);
-                                            fileReader.onloadend = () => {
-                                                resolve(fileReader.result as string)
-                                            }
-                                        })
+                                    // console.log(file);
+                                    if (file === undefined || file == null)
+                                        return
 
-                                        // console.log(result)
-                                        setPFP(result)
-                                        setShowFallbackPFP(false)
-                                    }} />
-                                </button>}
-                            </div>
-                            <label className='userName'>{user?.displayName}</label>
-                            <label className='userJoinTime'>Joined {prettyTimeDifference(user?.creationTime ?? 0)} ago</label>
-                        </div>
-                        {editable && <div className="container profileControlContainer">
-                            <a href="../account" className="buttonLike profileControl first" title="Sign Out" onClick={() => { getAuth().signOut() }} >
-                                <div style={{ display: 'flex', flexDirection: 'row', gap: 2, width: 16, height: 16, alignItems: 'center' }}>
-                                    <BackArrow />
-                                    <Line fill="var(--foreground)" />
-                                </div>
-                            </a>
-                            {!editingUserData && <IconTextButton className="accentedButtonLike profileControl last" text={'Edit'} icon={Edit} reverse={true} onClick={() => setEditingUserData(true)} />}
-                            {editingUserData && <IconTextButton className="successButtonLike profileControl last" text={'Save'} icon={Check} reverse={true} onClick={async () => {
-                                if (firebaseUser == null)
-                                    return
-                                const resp = await fetch(`https://api.smithed.dev/v2/users/${firebaseUser.uid}?token=${await firebaseUser.getIdToken()}`, {
-                                    method: 'PATCH',
-                                    body: JSON.stringify({
-                                        data: {
-                                            pfp: pfp
+                                    if (file.size > 1024 * 1024)
+                                        return alert('Selected image exceeds 1MB')
+
+                                    const result = await new Promise<string>((resolve) => {
+                                        const fileReader = new FileReader()
+                                        fileReader.readAsDataURL(file);
+                                        fileReader.onloadend = () => {
+                                            resolve(fileReader.result as string)
                                         }
-                                    }),
-                                    headers: {
-                                        'Content-Type': 'application/json'
+                                    })
+
+                                    // console.log(result)
+                                    setPFP(result)
+                                    setShowFallbackPFP(false)
+                                }} />
+                            </button>}
+                        </div>
+                        <label className='userName'>{user?.displayName}</label>
+                        <label className='userJoinTime'>Joined {prettyTimeDifference(user?.creationTime ?? 0)} ago</label>
+                    </div>
+                    {editable && <div className="container profileControlContainer">
+                        <a href="../account" className="buttonLike profileControl first" title="Sign Out" onClick={() => { getAuth().signOut() }} >
+                            <div style={{ display: 'flex', flexDirection: 'row', gap: 2, width: 16, height: 16, alignItems: 'center' }}>
+                                <BackArrow />
+                                <Line fill="var(--foreground)" />
+                            </div>
+                        </a>
+                        {!editingUserData && <IconTextButton className="accentedButtonLike profileControl last" text={'Edit'} icon={Edit} reverse={true} onClick={() => setEditingUserData(true)} />}
+                        {editingUserData && <IconTextButton className="successButtonLike profileControl last" text={'Save'} icon={Check} reverse={true} onClick={async () => {
+                            if (firebaseUser == null)
+                                return
+                            const resp = await fetch(`https://api.smithed.dev/v2/users/${firebaseUser.uid}?token=${await firebaseUser.getIdToken()}`, {
+                                method: 'PATCH',
+                                body: JSON.stringify({
+                                    data: {
+                                        pfp: pfp
                                     }
-                                })
+                                }),
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            })
 
-                                if (!resp.ok)
-                                    alert(await resp.text())
+                            if (!resp.ok)
+                                alert(await resp.text())
 
-                                if (user !== undefined)
-                                    user.pfp = pfp
-                                setEditingUserData(false)
-                            }}
-                            />}
-                            {editingUserData && <button className='buttonLike invalidButtonLike' onClick={() => {
-                                setPFP(user?.pfp)
-                                setShowFallbackPFP(false)
-                                setEditingUserData(false)
-                            }}><Cross /></button>}
-                        </div>}
+                            if (user !== undefined)
+                                user.pfp = pfp
+                            setEditingUserData(false)
+                        }}
+                        />}
+                        {editingUserData && <button className='buttonLike invalidButtonLike' onClick={() => {
+                            setPFP(user?.pfp)
+                            setShowFallbackPFP(false)
+                            setEditingUserData(false)
+                        }}><Cross /></button>}
+                    </div>}
 
-                    </div>
-                    <div className='statBoxes container '>
-                        {showBackButton && <><BackButton /></>}
-                        <Stat icon={<Jigsaw fill={'var(--foreground)'} />} name='Total Pack' value={userStats?.packs?.length ?? 0} />
-                        <Stat icon={<Download fill={'var(--foreground)'} />} name='Total Download' value={formatDownloads(userStats?.totalDownloads ?? 0)} />
-                        <Stat icon={<Clock fill={'var(--foreground)'} />} name='Daily Download' value={formatDownloads(userStats?.dailyDownloads ?? 0)} />
-                    </div>
                 </div>
             </div>
-            {(userStats.packs.length > 0 || editable) && <div className='container' style={{ width: '100%', gap: '1rem' }}>
-                <div className='container' style={{ flexDirection: 'row', justifyContent: 'start', gap: '0.5rem', width: '100%' }}>
-                    <List />
-                    <label>Packs:</label>
-                    <div style={{ flexGrow: 1 }} />
-                    {userStats.packs.length >= 1 && editable && <a className='compactButton' href="/edit?new=true">+ New</a>}
-                </div>
-                {userStats?.packs.map(p => <PackCard state={editable ? 'editable' : undefined} id={p.id} packData={p.pack} onClick={() => { navigate(`../packs/${p}`) }} />)}
-                {editable && userStats.packs.length == 0 && <div className="container" style={{gap: '1rem'}}>
-                    Looks like you don't have any packs!
-                    <IconTextButton icon={Plus} text={"Make one here"} className="accentedButtonLike" href="/edit?new=true"/>
+        </div>
+        <CategoryBar onChange={(v) => { setTab(v); navigate('?tab=' + v) }} defaultValue={tab as string}>
+            <CategoryChoice value="userPacks" text='Packs' icon={<Jigsaw />} disabled={userStats.packs.length === 0}>
+                {editable && <div className='container' style={{ position: 'absolute', right: '1rem', height: '100%', zIndex: 1 }}>
+                    <a className="container newContentButton" href="/edit?new=true" >
+                        <Plus />
+                    </a>
                 </div>}
-            </div>}
-            {(userStats.bundles.length > 0 || editable) && <div className='container' style={{ width: '100%', gap: '1rem' }}>
-                <div className='container' style={{ flexDirection: 'row', justifyContent: 'start', gap: '0.5rem', width: '100%' }}>
-                    <Folder />
-                    <label>Bundles:</label>
-                    <div style={{ flexGrow: 1 }} />
-                    {editable && userStats.bundles.length >= 1 && <a className='compactButton' href="" onClick={(e) => {
+            </CategoryChoice>
+            <CategoryChoice value="userBundles" text='Bundles' icon={<Folder />} disabled={userStats.bundles.length === 0}>
+                {editable && <div className='container' style={{ position: 'absolute', right: '1rem', height: '100%', zIndex: 1 }}>
+                    <a className="container newContentButton" onClick={(e) => {
                         e.preventDefault()
                         setShowBundleCreationModal(true)
-                    }}>+ New</a>}
-                </div>
-                {editable && <div className='container' style={{ width: '100%', gap: '1rem' }}>
-                    {showBundleCreationModal && firebaseUser && <CreateBundleModal showModal={setShowBundleCreationModal} addPack={(value: PackBundle) => {
-                        navigate('')
-                    }} user={firebaseUser} />}
+                    }} >
+                        <Plus />
+                    </a>
                 </div>}
-                {userStats.bundles?.map(b => <Bundle key={b} id={b} editable={editable} bundleDownloadButton={bundleDownloadButton} />)}
-                {editable && userStats.bundles.length == 0 && <div className="container" style={{gap: '1rem'}}>
-                    Need to group some packs together?
-                    <IconTextButton icon={Plus} text={"Click here"} className="accentedButtonLike" onClick={() => {
-                        setShowBundleCreationModal(true)
-                    }}/>
-                </div>}
-            </div>}
-        </div>
+            </CategoryChoice>
+            <CategoryChoice value="about" text='About' icon={<At />} />
+        </CategoryBar>
+
+        <UserPacks visible={tab === 'userPacks'} user={user} packs={userStats.packs} editable={editable} />
+        <UserBundles visible={tab === 'userBundles'} bundles={userStats.bundles} editable={editable} bundleDownloadButton={bundleDownloadButton} />
+        <UserAbout visible={tab === 'about'} userStats={userStats} editable={editable} />
+
+        {showBundleCreationModal && firebaseUser && <CreateBundleModal showModal={setShowBundleCreationModal} addPack={(value: PackBundle) => {
+            navigate('')
+        }} user={firebaseUser} />}
     </div>
 } 

@@ -4,7 +4,7 @@
     grid-template: auto auto / auto auto;
     grid-auto-flow: column;
     padding: 8px 0px;
-    gap: 16px 12px;
+    gap: 1rem 12px;
     box-sizing: border-box;
 }
 
@@ -25,7 +25,7 @@
     width: 50%;
     margin: 0;
     align-items: start;
-    gap: 16px;
+    gap: 1rem;
 }
 
 .homeImageContainer {

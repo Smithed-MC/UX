@@ -18,7 +18,7 @@
 }
 
 .navBarBundle:hover {
-    border: 2px solid var(--warning) !important;
+    border: 0.125rem solid var(--warning) !important;
 }
 
 

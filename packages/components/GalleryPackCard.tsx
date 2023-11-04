@@ -93,7 +93,7 @@ export default function GalleryPackCard({ id, packData, packMeta, onClick, state
         if (author === 'Smithed') {
             badges.push(<Logo style={{ width: '1rem', height: '1rem' }} />)
         }
-        if (packData?.versions.every(v => v.downloads.resourcepack === undefined || v.downloads.resourcepack === ''))
+        if (packData?.versions?.every(v => v.downloads.resourcepack === undefined || v.downloads.resourcepack === ''))
             badges.push(<FlagCrossed style={{width: '1rem', height: '1rem'}}/>)
 
         setBadges(badges)

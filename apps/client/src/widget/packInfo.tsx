@@ -1,19 +1,15 @@
-import { tauri } from "@tauri-apps/api";
 import { open } from '@tauri-apps/api/shell'
-import { IconTextButton, markdownOptions, MarkdownRenderer, Spinner } from "components";
-import { Cross, Discord, Download, Github, Globe, Plus, Right, Warning } from "components/svg";
-import { MinecraftVersion, MinecraftVersionSchema, PackBundle, PackData, PackEntry, PackMetaData, supportedMinecraftVersions, UserData } from 'data-types';
-import Markdown, { MarkdownToJSX } from "markdown-to-jsx";
-import React, { useEffect, useRef, useState } from "react";
-import { useFormAction, useLoaderData, useNavigate } from "react-router-dom";
+import { DownloadButton, IconTextButton, markdownOptions, MarkdownRenderer } from "components";
+import { Discord, Download, Github, Globe, Plus, Right, Warning } from "components/svg";
+import { MinecraftVersion, PackBundle, PackData, PackEntry, PackMetaData, supportedMinecraftVersions, UserData } from 'data-types';
+import React, { useRef, useState } from "react";
+import { useLoaderData } from "react-router-dom";
 import './packInfo.css'
 import { coerce, compare } from "semver";
 import { prettyTimeDifference } from "formatters";
 import { useAppDispatch, useAppSelector, useFirebaseUser } from "hooks";
 import { selectSelectedBundle, selectUsersBundles, setSelectedBundle, setUsersBundles } from "store";
 import { CreateBundle } from "./bundle";
-import { Bundle } from "../pages/user";
-import { DownloadButtonFn } from "../inject";
 import BackButton from "./BackButton";
 
 interface PackInfoProps {
@@ -24,7 +20,7 @@ interface PackInfoProps {
     fixed: boolean
     onClose: () => void
     style?: React.CSSProperties
-    downloadButton: DownloadButtonFn
+    downloadButton: DownloadButton
     showBackButton: boolean
 }
 
@@ -267,7 +263,7 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
 }
 
 
-export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style, downloadButton, showBackButton }: PackInfoProps) {
+export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style, downloadButton: DownloadButton, showBackButton }: PackInfoProps) {
     const loaderData = useLoaderData() as any
     // console.log(loaderData)
 
@@ -308,7 +304,7 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
                     id={id}
                 />
                 <div className="container" style={{ gap: '0.5rem' }}>
-                    {downloadButton(id, (element) => { setInjectPopup(element) }, () => { setInjectPopup(undefined) })}
+                    <DownloadButton id={id} openPopup={(element) => { setInjectPopup(element) }} closePopup={() => { setInjectPopup(undefined) }}/>
                     <label style={{ color: 'var(--border)' }}>{(() => {
                         const version = packData?.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? '')).at(-1)
 

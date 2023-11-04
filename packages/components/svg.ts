@@ -43,7 +43,7 @@ import { ReactComponent as Smithed } from './assets/smithed.svg'
 import { ReactComponent as Play } from './assets/play.svg'
 import { ReactComponent as Copy } from './assets/copy.svg'
 import { ReactComponent as FlagCrossed } from './assets/flag_crossed.svg'
-
+import { ReactComponent as Gear } from './assets/gear.svg'
 export {
     Account,
     AddToBundle,
@@ -89,5 +89,6 @@ export {
     Smithed,
     Play,
     Copy,
-    FlagCrossed
+    FlagCrossed,
+    Gear
 }

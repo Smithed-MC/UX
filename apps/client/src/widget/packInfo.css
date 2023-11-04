@@ -104,7 +104,7 @@
     box-sizing: border-box;
     background-color: var(--background);
     border-radius: var(--defaultBorderRadius);
-    border: 2px solid var(--border);
+    border: 0.125rem solid var(--border);
 
     height: 100%;
     overflow-x: hidden;

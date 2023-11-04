@@ -27,9 +27,11 @@ async function getBundleData(id: string): Promise<PackBundle | undefined> {
     return bundleDataResponse.ok ? await bundleDataResponse.json() : undefined
 }
 
-async function getPackData(id: string): Promise<{ id: string, pack: PackData }> {
+async function getPackData(id: string): Promise<{ id: string, pack: PackData, meta: PackMetaData }> {
     const packDataResponse = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
-    return { id: id, pack: await packDataResponse.json() }
+    const packMetaResponse = await fetch(`https://api.smithed.dev/v2/packs/${id}/meta`)
+
+    return { id: id, pack: await packDataResponse.json(), meta: await packMetaResponse.json() }
 }
 
 async function getDownloads(id: string, packs: string[]) {
