@@ -64,6 +64,10 @@ export default function CategoryBar({ children, defaultValue, onChange }: Catego
         return () => window.removeEventListener('resize', onResize)
     }, [])
 
+    useEffect(() => {
+        setValue(defaultValue)
+    }, [defaultValue])
+
     function wrapOnClick(c: React.ReactElement<CategoryChoiceProps>) {
         let props = c.props
         const onClick = (e: React.MouseEvent<HTMLButtonElement>) => {

@@ -59,7 +59,7 @@ export async function loadUserPageData({ params }: any) {
 
 
     const [user, packIds, bundles] = await Promise.all([getUserData(id), getUserPacks(id), getBundles(id)])
-    console.log(packIds)
+    // console.log(packIds)
     const packs = await Promise.all(packIds.map(p => getPackData(p)))
 
     const [totalDownloads, dailyDownloads] = await getDownloads(id ?? '', packIds)

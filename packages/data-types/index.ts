@@ -107,7 +107,8 @@ export const UserDataSchema = Type.Object({
     creationTime: Type.Number(),
     uid: Type.String(),
     pfp: Type.Optional(Type.String()),
-    banner: Type.Optional(Type.String())
+    banner: Type.Optional(Type.String()),
+    biography: Type.Optional(Type.String())
 })
 
 export enum SortOptions {

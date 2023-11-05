@@ -3,9 +3,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useLoaderData, useNavigate, useParams } from 'react-router-dom'
 import { formatDownloads } from 'formatters'
 import './user.css'
-import { CategoryBar, CategoryChoice, DownloadButton, GalleryPackCard, IconTextButton } from 'components'
+import { CategoryBar, CategoryChoice, DownloadButton, GalleryPackCard, IconTextButton, MarkdownRenderer } from 'components'
 import { useFirebaseUser, useQueryParams } from 'hooks'
-import { Account, At, BackArrow, Check, Cross, Discord, Download, Edit, Folder, Home, Jigsaw, Line, Plus, Upload } from 'components/svg'
+import { Account, At, BackArrow, Check, Cross, Discord, Download, Edit, Folder, Home, Jigsaw, Line, Plus, Trash, Upload } from 'components/svg'
 import { Helmet } from 'react-helmet'
 import { getAuth } from 'firebase/auth'
 import { User as FirebaseUser } from 'firebase/auth'
@@ -23,7 +23,8 @@ interface UserStats {
 
 interface UserTabComponent {
     editable: boolean,
-    visible: boolean
+    visible: boolean,
+    isEditing: boolean
 }
 
 function CreationButton({ text, onPress }: { text: string, onPress: () => void }) {
@@ -88,7 +89,7 @@ function UserBundles({ bundles, editable, bundleDownloadButton, visible }: { bun
     </div>
 }
 
-function UserAbout({ userStats, visible }: { userStats: UserStats } & UserTabComponent) {
+function UserAbout({ userStats, visible, isEditing, biography, setBiography }: { userStats: UserStats, biography: string, setBiography: (v: string) => void} & UserTabComponent) {
 
     function Stat({ name, value, icon }: { name: string, value: number | string | undefined, icon: any }) {
         return <div className='statDisplay'>
@@ -98,7 +99,30 @@ function UserAbout({ userStats, visible }: { userStats: UserStats } & UserTabCom
         </div>
     }
 
-    return <div className='container' style={{ width: '100%', display: visible ? 'flex' : 'none' }}>
+    useEffect(() => {
+        const bioElement = document.getElementById("userBiography")
+        if (!bioElement) 
+            return
+        bioElement.innerText = biography
+    }, [isEditing])
+
+    return <div className='container' style={{ width: '100%', display: visible ? 'flex' : 'none', resize: 'vertical', gap: '2rem'}} >
+        {isEditing && <span id="userBiography" style={{
+            width: '100%', padding: '1rem', 
+            backgroundColor: 'var(--section)', boxSizing: 'border-box', 
+            borderRadius: 'var(--defaultBorderRadius)'
+        }} contentEditable role="textbox" onInput={(e) => {
+            setBiography(e.currentTarget.innerText ?? '')
+            console.log(e.currentTarget.innerText)
+        }}>
+            {biography}
+        </span>}
+        {!isEditing && <div style={{width: '100%'}}>
+            <MarkdownRenderer>
+                {biography}
+            </MarkdownRenderer>
+        </div>}
+
         <div className='statGrid'>
             <span className='title' style={{ gridRow: '1 / 3', gridColumn: 1, alignSelf: 'start' }}><Download /> Downloads</span>
             <div className='divider' />
@@ -126,6 +150,9 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
     const [editingUserData, setEditingUserData] = useState(false)
 
     const [pfp, setPFP] = useState(user?.pfp)
+    const [banner, setBanner] = useState(user?.banner)
+    const [biography, setBiography] = useState(user?.biography)
+
     const [showBundleCreationModal, setShowBundleCreationModal] = useState(false)
     const [showFallbackPFP, setShowFallbackPFP] = useState(false)
 
@@ -134,6 +161,24 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
     useEffect(() => {
         setEditable(userId === firebaseUser?.uid)
     }, [firebaseUser])
+
+    async function convertToDataURL(file: File | null | undefined) {
+        if (file == null || file === undefined)
+            return undefined
+
+        if (file.size > 1024 * 1024) {
+            alert('Selected image exceeds 1MB')
+            return undefined
+        }
+
+        return await new Promise<string>((resolve) => {
+            const fileReader = new FileReader()
+            fileReader.readAsDataURL(file);
+            fileReader.onloadend = () => {
+                resolve(fileReader.result as string)
+            }
+        })
+    }
 
     if (user === undefined) {
         return <div className='container' style={{ height: '100%' }}>
@@ -165,12 +210,35 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
 
         <div className='flexDirection' style={{ width: '100%', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', gap: 16, boxSizing: 'border-box' }}>
             <div className='container' style={{ width: '100%', gap: '2rem' }}>
-                {user?.banner && <div className='container' style={{ width: '100%', height: '10rem', overflow: 'hidden', position: 'relative', borderRadius: 'var(--defaultBorderRadius)' }}>
-                    <img src={user?.banner} style={{ position: 'absolute', width: '100%' }} />
+                {(banner || editingUserData) && <div className='container' style={{ width: '100%', height: '10rem', overflow: 'hidden', position: 'relative', borderRadius: 'var(--defaultBorderRadius)' }}>
+                    {banner && <img src={banner} style={{ position: 'absolute', width: '100%' }} />}
+
+                    {editingUserData && <div className='container' style={{ zIndex: 0, width: '100%', height: '100%', backgroundColor: `rgba(0,0,0,${banner ? '0.6' : '1'})`, position: 'relative' }}>
+                        <button className='container' style={{width: '6rem', height: '6rem', background: 'none'}} onClick={() => {
+                            document.getElementById("userProfileBannerUpload")?.click()
+                        }}>
+                            <Upload style={{ width: '3rem', height: '3rem' }} />
+                        </button>
+
+                        <button className='invalidButtonLike' style={{position: 'absolute', top: '1rem', right: '1rem', boxSizing: 'content-box', width: '1rem', height: '1rem'}} onClick={() => {
+                            setBanner('')
+                        }}>
+                            <Trash style={{width: '1rem', height: '1rem', position: 'absolute'}}/>
+                        </button>
+
+                        <input hidden id="userProfileBannerUpload" type="file" accept="image/png, image/jpeg" onChange={async e => {
+                            const file = e.currentTarget.files?.item(0)
+                            const result = await convertToDataURL(file)
+
+                            if (result === undefined)
+                                return
+                            setBanner(result)
+                        }} />
+                    </div>}
                 </div>}
+
                 <div className="container" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div className='userIconAndName'>
-
                         <div style={{ gridArea: 'image', width: 64, height: 64, overflow: 'hidden', borderRadius: 'var(--defaultBorderRadius)', display: 'flex' }}>
                             {!showFallbackPFP && !import.meta.env.SSR && <img src={pfp ?? ""} style={{ width: 64, height: 64, margin: 0 }} width={64} height={64} onError={(e) => setShowFallbackPFP(true)} />}
                             {showFallbackPFP && <div className='userFallbackPFP'><Account style={{ width: 32, height: 32 }} /></div>}
@@ -181,23 +249,11 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
                                 <Upload fill="var(--foreground)" style={{ width: 32, height: 32 }} />
                                 <input ref={pfpUploadRef} type="file" accept='image/png, image/jpeg' style={{ display: 'none' }} onChange={async (e) => {
                                     const file = e.currentTarget.files?.item(0)
+                                    const result = await convertToDataURL(file)
 
-                                    // console.log(file);
-                                    if (file === undefined || file == null)
+                                    if (result === undefined)
                                         return
 
-                                    if (file.size > 1024 * 1024)
-                                        return alert('Selected image exceeds 1MB')
-
-                                    const result = await new Promise<string>((resolve) => {
-                                        const fileReader = new FileReader()
-                                        fileReader.readAsDataURL(file);
-                                        fileReader.onloadend = () => {
-                                            resolve(fileReader.result as string)
-                                        }
-                                    })
-
-                                    // console.log(result)
                                     setPFP(result)
                                     setShowFallbackPFP(false)
                                 }} />
@@ -213,7 +269,10 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
                                 <Line fill="var(--foreground)" />
                             </div>
                         </a>
-                        {!editingUserData && <IconTextButton className="accentedButtonLike profileControl last" text={'Edit'} icon={Edit} reverse={true} onClick={() => setEditingUserData(true)} />}
+                        {!editingUserData && <IconTextButton className="accentedButtonLike profileControl last" text={'Edit'} icon={Edit} reverse={true} onClick={() => {
+                            setEditingUserData(true)
+                            setTab('about')
+                        }} />}
                         {editingUserData && <IconTextButton className="successButtonLike profileControl last" text={'Save'} icon={Check} reverse={true} onClick={async () => {
                             if (firebaseUser == null)
                                 return
@@ -221,7 +280,9 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
                                 method: 'PATCH',
                                 body: JSON.stringify({
                                     data: {
-                                        pfp: pfp
+                                        pfp: pfp,
+                                        banner: banner,
+                                        biography: biography
                                     }
                                 }),
                                 headers: {
@@ -232,13 +293,18 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
                             if (!resp.ok)
                                 alert(await resp.text())
 
-                            if (user !== undefined)
+                            if (user !== undefined) {
                                 user.pfp = pfp
+                                user.banner = banner
+                                user.biography = biography
+                            }
                             setEditingUserData(false)
                         }}
                         />}
                         {editingUserData && <button className='buttonLike invalidButtonLike' onClick={() => {
                             setPFP(user?.pfp)
+                            setBanner(user?.banner)
+                            setBiography(user?.biography)
                             setShowFallbackPFP(false)
                             setEditingUserData(false)
                         }}><Cross /></button>}
@@ -247,30 +313,32 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
                 </div>
             </div>
         </div>
-        <CategoryBar onChange={(v) => { setTab(v); navigate('?tab=' + v) }} defaultValue={tab as string}>
-            <CategoryChoice value="userPacks" text='Packs' icon={<Jigsaw />} disabled={userStats.packs.length === 0}>
-                {editable && <div className='container' style={{ position: 'absolute', right: '1rem', height: '100%', zIndex: 1 }}>
-                    <a className="container newContentButton" href="/edit?new=true" >
-                        <Plus />
-                    </a>
-                </div>}
-            </CategoryChoice>
-            <CategoryChoice value="userBundles" text='Bundles' icon={<Folder />} disabled={userStats.bundles.length === 0}>
-                {editable && <div className='container' style={{ position: 'absolute', right: '1rem', height: '100%', zIndex: 1 }}>
-                    <a className="container newContentButton" onClick={(e) => {
-                        e.preventDefault()
-                        setShowBundleCreationModal(true)
-                    }} >
-                        <Plus />
-                    </a>
-                </div>}
-            </CategoryChoice>
-            <CategoryChoice value="about" text='About' icon={<At />} />
-        </CategoryBar>
+        <div className='container' style={{ gap: '2rem', width: '100%' }}>
+            <CategoryBar onChange={(v) => { setTab(v); navigate('?tab=' + v) }} defaultValue={tab as string}>
+                <CategoryChoice value="userPacks" text='Packs' icon={<Jigsaw />} disabled={userStats.packs.length === 0}>
+                    {editable && <div className='container' style={{ position: 'absolute', right: '1rem', height: '100%', zIndex: 1 }}>
+                        <a className="container newContentButton" href="/edit?new=true" >
+                            <Plus />
+                        </a>
+                    </div>}
+                </CategoryChoice>
+                <CategoryChoice value="userBundles" text='Bundles' icon={<Folder />} disabled={userStats.bundles.length === 0}>
+                    {editable && <div className='container' style={{ position: 'absolute', right: '1rem', height: '100%', zIndex: 1 }}>
+                        <a className="container newContentButton" onClick={(e) => {
+                            e.preventDefault()
+                            setShowBundleCreationModal(true)
+                        }} >
+                            <Plus />
+                        </a>
+                    </div>}
+                </CategoryChoice>
+                <CategoryChoice value="about" text='About' icon={<At />} />
+            </CategoryBar>
 
-        <UserPacks visible={tab === 'userPacks'} user={user} packs={userStats.packs} editable={editable} />
-        <UserBundles visible={tab === 'userBundles'} bundles={userStats.bundles} editable={editable} bundleDownloadButton={bundleDownloadButton} />
-        <UserAbout visible={tab === 'about'} userStats={userStats} editable={editable} />
+            <UserPacks isEditing={editingUserData} visible={tab === 'userPacks'} user={user} packs={userStats.packs} editable={editable} />
+            <UserBundles isEditing={editingUserData} visible={tab === 'userBundles'} bundles={userStats.bundles} editable={editable} bundleDownloadButton={bundleDownloadButton} />
+            <UserAbout isEditing={editingUserData} visible={tab === 'about'} userStats={userStats} biography={user.biography!} setBiography={setBiography} editable={editable} />
+        </div>
 
         {showBundleCreationModal && firebaseUser && <CreateBundleModal showModal={setShowBundleCreationModal} addPack={(value: PackBundle) => {
             navigate('')
