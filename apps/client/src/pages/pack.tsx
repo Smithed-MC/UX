@@ -41,7 +41,7 @@ async function getFullview(packData?: PackData) {
                 return await response.text()
             }
         } catch {
-            return 'An occured loading pack\'s readme'
+            return 'An error occured loading pack\'s readme'
         }
     } 
     return ''
