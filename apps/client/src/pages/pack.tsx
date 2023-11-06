@@ -9,21 +9,21 @@ import { Helmet } from "react-helmet"
 import { correctGithubLinks } from "formatters"
 
 async function getPack(id: string) {
-    const response = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
+    const response = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${id}`)
     if (!response.ok) return undefined
     const data = await response.json()
     return data as PackData
 }
 
 async function getMeta(id: string) {
-    const response = await fetch(`https://api.smithed.dev/v2/packs/${id}/meta`)
+    const response = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${id}/meta`)
     if (!response.ok) return undefined
     const data = await response.json()
     return data as PackMetaData
 }
 
 async function getOwner(id: string) {
-    const response = await fetch(`https://api.smithed.dev/v2/users/${id}`)
+    const response = await fetch(import.meta.env.VITE_API_SERVER + `/users/${id}`)
     if (!response.ok) return undefined
     const data = await response.json()
     return data as UserData

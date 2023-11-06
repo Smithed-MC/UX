@@ -12,7 +12,7 @@ import abCache from 'abstract-cache'
 import IORedis from 'ioredis'
 
 
-export const API_APP = fastify().withTypeProvider<TypeBoxTypeProvider>();
+export const API_APP = fastify({logger: false}).withTypeProvider<TypeBoxTypeProvider>();
 
 export function sendError(reply: FastifyReply, code: HTTPResponses, message: string) {
     reply.status(code).send({ statusCode: code, error: HTTPResponses[code], message: message })
@@ -57,7 +57,7 @@ async function registerCacheRedis() {
 
     await API_APP.register(
         fastifyCaching,
-        { privacy: fastifyCaching.privacy.NOCACHE, cache: abcache }
+        { cache: abcache }
     )
 }
 
@@ -89,25 +89,25 @@ export async function setupApp() {
         await registerCacheMemory()
 
 
-    // await API_APP.register(fastifyCors, {
-    //     origin: '*',
-    //     allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
-    //     methods: ['GET','PUT','POST','PATCH','DELETE']
-    // })
-
-    API_APP.addHook('preHandler', (request, reply, done) => {
-        reply.header("Access-Control-Allow-Origin", "*");
-        reply.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, OPTIONS, DELETE");
-        reply.header("Access-Control-Allow-Headers",  "*");
-
-        const isPreflight = /options/i.test(request.method);
-        if (isPreflight) {
-            return reply.send();
-        }
-            
-        done();
-
+    await API_APP.register(fastifyCors, {
+        origin: '*',
+        allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
+        methods: ['GET','PUT','POST','PATCH','DELETE']
     })
+
+    // API_APP.addHook('preHandler', (request, reply, done) => {
+    //     reply.header("Access-Control-Allow-Origin", "*");
+    //     reply.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, OPTIONS, DELETE");
+    //     reply.header("Access-Control-Allow-Headers",  "*");
+
+    //     const isPreflight = /options/i.test(request.method);
+    //     if (isPreflight) {
+    //         return reply.send();
+    //     }
+            
+    //     done();
+
+    // })
 
     await importRoutes('routes')
 

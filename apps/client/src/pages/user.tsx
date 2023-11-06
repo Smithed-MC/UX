@@ -159,7 +159,7 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
     const pfpUploadRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
-        setEditable(userId === firebaseUser?.uid)
+        setEditable(userId === firebaseUser?.uid || (user !== undefined && firebaseUser?.uid === user.uid))
     }, [firebaseUser])
 
     async function convertToDataURL(file: File | null | undefined) {
@@ -205,7 +205,7 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
             <meta name="og:site_name" content="Smithed" />
             <title>{user?.displayName}</title>
             <meta name="description" content={pageDescription} />
-            {user?.pfp && <meta name="og:image" content={`https://api.smithed.dev/v2/users/${user.uid}/pfp`} />}
+            {user?.pfp && <meta name="og:image" content={import.meta.env.VITE_API_SERVER + `/users/${user.uid}/pfp`} />}
         </Helmet>
 
         <div className='flexDirection' style={{ width: '100%', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', gap: 16, boxSizing: 'border-box' }}>
@@ -276,7 +276,7 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
                         {editingUserData && <IconTextButton className="successButtonLike profileControl last" text={'Save'} icon={Check} reverse={true} onClick={async () => {
                             if (firebaseUser == null)
                                 return
-                            const resp = await fetch(`https://api.smithed.dev/v2/users/${firebaseUser.uid}?token=${await firebaseUser.getIdToken()}`, {
+                            const resp = await fetch(import.meta.env.VITE_API_SERVER + `/users/${firebaseUser.uid}?token=${await firebaseUser.getIdToken()}`, {
                                 method: 'PATCH',
                                 body: JSON.stringify({
                                     data: {

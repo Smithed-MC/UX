@@ -17,7 +17,7 @@ export function BundleCard({ id, editable, showOwner, bundleDownloadButton: Down
     const dispatch = useAppDispatch();
 
     async function getPackName(pack: PackDependency): Promise<[string, string, string] | undefined> {
-        const resp = await fetch(`https://api.smithed.dev/v2/packs/${pack.id}`);
+        const resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${pack.id}`);
         if (!resp.ok)
             return undefined;
         const data: PackData = await resp.json();
@@ -25,7 +25,7 @@ export function BundleCard({ id, editable, showOwner, bundleDownloadButton: Down
         return [pack.id, data.display.name, pack.version];
     }
     async function getOwnerName(uid: string) {
-        const resp = await fetch(`https://api.smithed.dev/v2/users/${uid}`);
+        const resp = await fetch(import.meta.env.VITE_API_SERVER + `/users/${uid}`);
         if (!resp.ok)
             return;
 
@@ -35,7 +35,7 @@ export function BundleCard({ id, editable, showOwner, bundleDownloadButton: Down
     }
 
     async function loadBundleData() {
-        const resp = await fetch(`https://api.smithed.dev/v2/bundles/${id}`);
+        const resp = await fetch(import.meta.env.VITE_API_SERVER + `/bundles/${id}`);
 
         if (!resp.ok)
             return;
@@ -89,7 +89,7 @@ export function BundleCard({ id, editable, showOwner, bundleDownloadButton: Down
                         dispatch(setSelectedBundle(rawBundleData.uid));
                     }}><NewFolder /></a>}
                     {rawBundleData.uid !== undefined && <DownloadButton id={rawBundleData.uid} openPopup={(element) => { setInjectPopup(element); }} closePopup={() => { setInjectPopup(undefined); }}/>}
-                    {/* <IconTextButton text={"Download"} iconElement={<Download fill="var(--foreground)" />} className="accentedButtonLike bundleControlButton" reverse={true} href={`https://api.smithed.dev/v2/bundles/${rawBundleData.uid}/download`} /> */}
+                    {/* <IconTextButton text={"Download"} iconElement={<Download fill="var(--foreground)" />} className="accentedButtonLike bundleControlButton" reverse={true} href={import.meta.env.VITE_API_SERVER + `/bundles/${rawBundleData.uid}/download`} /> */}
                 </div>
             </div>
 
@@ -102,7 +102,7 @@ export function BundleCard({ id, editable, showOwner, bundleDownloadButton: Down
                     <IconTextButton className="invalidButtonLike" text={"Confirm"} icon={Check} onClick={async () => {
                         if (firebaseUser == null)
                             return setShowConfirmation(false);
-                        const resp = await fetch(`https://api.smithed.dev/v2/bundles/${rawBundleData.uid}?token=${await firebaseUser.getIdToken()}`, { method: 'DELETE' });
+                        const resp = await fetch(import.meta.env.VITE_API_SERVER + `/bundles/${rawBundleData.uid}?token=${await firebaseUser.getIdToken()}`, { method: 'DELETE' });
                         if (!resp.ok) {
                             alert(resp.statusText);
                         } else {

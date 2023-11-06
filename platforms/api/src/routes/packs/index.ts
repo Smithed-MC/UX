@@ -242,8 +242,8 @@ const FIELDS_TO_OMIT: {[key: string]: string[]} = {
 }
 
 async function getOwnerData(p: ReceivedPackResult) {
-    const ownerDoc = await getFirestore().collection('users').doc(p.docData.owner).get()
-    return await ownerDoc.data()
+    const owner = p.docData.owner
+    return await (await API_APP.inject('/users/' + owner)).json()
 }
 
 async function getReturnData(p: ReceivedPackResult, scope?: string[]) {
@@ -329,5 +329,8 @@ async function filterPacksByQuery(search: string | undefined, includeHidden: boo
     if (version.length > 0)
         packs = packs.filter(p => p.docData.data?.versions.find(v => v.supports.findIndex(mcV => version.includes(mcV)) !== -1))
 
-    return await Promise.all(packs.map(p => getReturnData(p, scope)));
+    // console.time('Time to get return data')
+    const returnData = await Promise.all(packs.map(p => getReturnData(p, scope)))
+    // console.timeEnd('Time to get return data')
+    return returnData;
 }

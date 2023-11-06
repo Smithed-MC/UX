@@ -105,7 +105,7 @@ export function EditBundle({ close }: EditBundleProps) {
     const [packs, setPacks] = useState<{ id: string, version: string, pack: PackData }[]>([])
 
     async function fetchPackData(id: string, version: string) {
-        const resp = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
+        const resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${id}`)
         return { id, version, pack: await resp.json() }
     }
 
@@ -142,7 +142,7 @@ export function EditBundle({ close }: EditBundleProps) {
             </div>}
             <div className='container' style={{ flexDirection: 'row', width: '100%', gap: '1rem' }}>
                 <IconTextButton className="invalidButtonLike" icon={Cross} text={"Cancel"} onClick={close} />
-                {packs.length > 0 && <a className='buttonLike' style={{ fill: 'var(--foreground)', padding: '0.5rem' }} href={`https://api.smithed.dev/v2/bundles/${curBundle.uid}/download`}><Download /></a>}
+                {packs.length > 0 && <a className='buttonLike' style={{ fill: 'var(--foreground)', padding: '0.5rem' }} href={import.meta.env.VITE_API_SERVER + `/bundles/${curBundle.uid}/download`}><Download /></a>}
                 {packs.length > 0 && <IconTextButton className='accentedButtonLike' icon={Check} text={"Save"} onClick={async () => {
                     if (user == null)
                         return
@@ -152,7 +152,7 @@ export function EditBundle({ close }: EditBundleProps) {
                         packs: packs.map(p => ({ id: p.id, version: p.version }))
                     }
 
-                    const resp = await fetch(`https://api.smithed.dev/v2/bundles/${curBundle.uid}?token=${await user.getIdToken()}`, {
+                    const resp = await fetch(import.meta.env.VITE_API_SERVER + `/bundles/${curBundle.uid}?token=${await user.getIdToken()}`, {
                         method: 'PUT',
                         body: JSON.stringify({
                             data: newBundle
@@ -224,7 +224,7 @@ export function NavBar(props: NavBarProps) {
                             <span style={{ flexShrink: 0 }}>[{curBundle?.packs.length}]</span>
                         </div>} iconElement={<Jigsaw style={{ flexShrink: 0 }} />} reverse onClick={() => setEditBundleOpen(!editBundleOpen)} />
                 }
-                <IconTextButton className="navBarOption end" text={user != null ? user.displayName : 'Login'} href="/account" icon={AccountSvg} reverse={true} />
+                <IconTextButton className="navBarOption end" text={user != null ? user.displayName : 'Login'} href={user != null ? "/" + user.displayName : "/account"} icon={AccountSvg} reverse={true} />
             </div>
             {editBundleOpen && <EditBundle close={() => setEditBundleOpen(false)} />}
         </div>

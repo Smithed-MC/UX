@@ -49,7 +49,7 @@ export default function GalleryPackCard({ id, packData, packMeta, onClick, state
         if (packData !== undefined)
             return;
 
-        const response = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
+        const response = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${id}`)
         if (!response.ok)
             return void setData(undefined)
         const data = await response.json()
@@ -61,7 +61,7 @@ export default function GalleryPackCard({ id, packData, packMeta, onClick, state
         if (author !== undefined)
             return;
 
-        const response = await fetch(`https://api.smithed.dev/v2/users/${ownerId}`)
+        const response = await fetch(import.meta.env.VITE_API_SERVER + `/users/${ownerId}`)
         if (!response.ok)
             return void setAuthor('')
         const data = await response.json()
@@ -73,7 +73,7 @@ export default function GalleryPackCard({ id, packData, packMeta, onClick, state
     async function onLoad() {
         let owner = ''
         if (metaData === undefined) {
-            const metaDataResponse = await fetch(`https://api.smithed.dev/v2/packs/${id}/meta`)
+            const metaDataResponse = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${id}/meta`)
             if (!metaDataResponse.ok) {
                 setData(undefined)
                 return

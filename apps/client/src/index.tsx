@@ -61,8 +61,8 @@ export function ClientApplet(props: ClientProps) {
         if (user == null) {
             return resetBundleData()
         }
-
-        const resp = await fetch(`https://api.smithed.dev/v2/users/${user.uid}/bundles`)
+        
+        const resp = await fetch(import.meta.env.VITE_API_SERVER + `/users/${user.uid}/bundles`)
         if (!resp.ok)
             return resetBundleData()
 
@@ -72,7 +72,7 @@ export function ClientApplet(props: ClientProps) {
             dispatch(setSelectedBundle(''))
 
         const getData = async (id: string) => {
-            const resp = await fetch(`https://api.smithed.dev/v2/bundles/${id}`)
+            const resp = await fetch(import.meta.env.VITE_API_SERVER + `/bundles/${id}`)
 
             if (!resp.ok)
                 return undefined

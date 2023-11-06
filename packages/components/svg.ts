@@ -44,6 +44,7 @@ import { ReactComponent as Play } from './assets/play.svg'
 import { ReactComponent as Copy } from './assets/copy.svg'
 import { ReactComponent as FlagCrossed } from './assets/flag_crossed.svg'
 import { ReactComponent as Gear } from './assets/gear.svg'
+import { ReactComponent as CurlyBraces } from './assets/curly_braces.svg'
 export {
     Account,
     AddToBundle,
@@ -90,5 +91,6 @@ export {
     Play,
     Copy,
     FlagCrossed,
-    Gear
+    Gear,
+    CurlyBraces
 }

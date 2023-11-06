@@ -6,16 +6,19 @@ import svgr from 'vite-plugin-svgr'
 export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) }; // <-
   console.log('VITE_NIGHTLY', process.env.VITE_NIGHTLY)
+  console.log('VITE_API_SERVER', process.env.VITE_API_SERVER)
 
   return defineConfig({
     plugins: [svgr(), react()],
     resolve: {
       alias: {
-        "node:url": 'url'
+        "node:url": 'url',
+        "import.meta.env.VITE_API_SERVER": (process.env.VITE_API_SERVER ?? 'https://api.smithed.dev/v2')
       },
     },
     define: {
-      "import.meta.env.VITE_NIGHTLY": (process.env.VITE_NIGHTLY && process.env.VITE_NIGHTLY === 'true') ? true : false
+      "import.meta.env.VITE_NIGHTLY": (process.env.VITE_NIGHTLY && process.env.VITE_NIGHTLY === 'true') ? true : false,
+      
     },
     build: {
       ssrEmitAssets: true,

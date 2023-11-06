@@ -112,6 +112,6 @@ export const CategoryChoice = React.forwardRef(function ({ selected, onClick, ch
             <div style={{ width: '0.125rem', height: '1.25rem', backgroundColor: 'var(--foreground)', opacity: 0.2 }} />
             <span>{text}</span>
         </div>
-        {children}
+        {selected && children}
     </button>
 })

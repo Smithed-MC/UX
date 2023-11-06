@@ -1,6 +1,6 @@
 import { DownloadButton, IconTextButton } from "components";
 import { svg } from "components";
-import { Download } from "components/svg";
+import { Download, Right } from "components/svg";
 
 export interface ClientInject {
 	getNavbarTabs: () => JSX.Element[];
@@ -40,14 +40,15 @@ export function getDefaultInject(): ClientInject {
 		],
 		enableFooter: true,
 		logoUrl: "/",
-		packDownloadButton: ({id}) => (
+		packDownloadButton: ({id, ...props}) => (
 			<IconTextButton
 				className="accentedButtonLike"
-				iconElement={<Download fill="var(--foreground)" />}
+				iconElement={<Right fill="var(--foreground)" style={{transform: 'rotate(90deg)'}}/>}
 				text={"Download"}
 				reverse
-				href={`https://api.smithed.dev/v2/download?pack=${id}`}
+				href={import.meta.env.VITE_API_SERVER + `/download?pack=${id}`}
 				rel="nofollow"
+				{...props}
 			/>
 		),
 		showBackButton: false,
@@ -57,7 +58,7 @@ export function getDefaultInject(): ClientInject {
 				iconElement={<Download fill="var(--foreground)" />}
 				className="bundleButtonLike bundleControlButton"
 				reverse={true}
-				href={`https://api.smithed.dev/v2/bundles/${id}/download`}
+				href={import.meta.env.VITE_API_SERVER + `/bundles/${id}/download`}
 			/>
 		),
 	};

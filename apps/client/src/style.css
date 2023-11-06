@@ -427,13 +427,12 @@ a:hover[href] {
     text-decoration: none;
 }
 
-.compactButton:hover[href],
-.compactButton:hover[onClick] {
+.compactButton:hover:where(a[href], a[onClick], :not(a)) {
     text-decoration: underline;
 }
 
-.compactButton:active[href],
-.compactButton:active[onClick] {
+
+.compactButton:active:where(a[href], a[onClick], :not(a))  {
     opacity: 0.9;
 }
 

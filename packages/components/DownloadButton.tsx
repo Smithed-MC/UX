@@ -9,5 +9,6 @@ interface DownloadButtonProps {
 export type DownloadButton = (props: {
     id: string,
     openPopup: (element: JSX.Element) => void,
-    closePopup: () => void
+    closePopup: () => void,
+    [key: string]: any
 }) => JSX.Element;
