@@ -105,14 +105,14 @@ export async function loadHomePageData(): Promise<HomePageData> {
             displayName: p.displayName,
             pack: p.data,
             meta: p.meta,
-            author: p.owner.displayName
+
         })),
         trendingPacks: trendingPacks.map(p => ({
             id: p.id,
             displayName: p.displayName,
             pack: p.data,
             meta: p.meta,
-            author: p.owner.displayName
+
         }))
     }
 }
@@ -137,7 +137,6 @@ const BROWSE_SCOPES = [
     'meta.owner',
     'meta.rawId',
     'meta.stats',
-    'owner.displayName'
 ]
 
 type PackApiInfo = {
@@ -161,7 +160,7 @@ export type DataForPackCards = {
     id: string
     pack: PackData
     meta: PackMetaData,
-    author: string
+    author?: string
 }
 
 export interface BrowsePageData {
@@ -183,10 +182,10 @@ export function createBrowseSearchParams(parsedParams: any) {
     if (version)
         setMultiple(params, 'version', version)
     return params
-} 
+}
 
 export async function loadBrowseData({ request }: { request: Request }): Promise<BrowsePageData> {
-    const {page: pageParam, ...parsedParams} = querystring.parse(request.url.split('?')[1])
+    const { page: pageParam, ...parsedParams } = querystring.parse(request.url.split('?')[1])
     const params = createBrowseSearchParams(parsedParams)
 
     const count = await getTotalCount(params)
@@ -194,14 +193,14 @@ export async function loadBrowseData({ request }: { request: Request }): Promise
     let page = pageParam ? Number.parseInt(pageParam as string) : 0
     page = Math.max(0, Math.min(page, Math.ceil(count / PACKS_PER_PAGE) - 1))
 
-    
+
     const packEntries = await getPackEntriesForBrowse(params, page)
     const packs: DataForPackCards[] = packEntries.map(p => ({
-        id: p.id, 
-        pack: p.data, 
+        id: p.id,
+        pack: p.data,
         meta: p.meta,
-        author: p.owner.displayName
+        author: undefined
     }))
 
-    return {count, packs: packs}
+    return { count, packs: packs }
 } 

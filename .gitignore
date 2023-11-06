@@ -20,3 +20,5 @@ vite.config.ts.*
 .DS_Store
 
 docker-compose.dev.yaml
+
+typesense.ts
