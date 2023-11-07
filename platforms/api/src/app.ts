@@ -5,17 +5,29 @@ import fastify, { FastifyReply } from "fastify";
 import fastifyCaching from '@fastify/caching'
 import fastifyRedis from '@fastify/redis'
 import fastifyCors from '@fastify/cors'
-
+import fastifyRequestLogger from '@mgcrea/fastify-request-logger'
 import * as fs from 'fs';
 import { HTTPResponses } from 'data-types';
 import abCache from 'abstract-cache'
 import IORedis from 'ioredis'
 
 
-export const API_APP = fastify({logger: false}).withTypeProvider<TypeBoxTypeProvider>();
+
+export const API_APP = fastify({
+    logger: {
+        level: "debug",
+        transport: {
+            target: "@mgcrea/pino-pretty-compact",
+            options: { translateTime: "HH:MM:ss Z", ignore: "pid,hostname" },
+        },
+    },
+    disableRequestLogging: true,
+}).withTypeProvider<TypeBoxTypeProvider>();
+
+API_APP.register(fastifyRequestLogger);
 
 export function sendError(reply: FastifyReply, code: HTTPResponses, message: string) {
-    reply.status(code).send({ statusCode: code, error: HTTPResponses[code], message: message })
+    reply.status(code).header('Access-Control-Allow-Origin', '*').send({ statusCode: code, error: HTTPResponses[code], message: message })
 }
 
 export async function importRoutes(dirPath: string) {
@@ -36,7 +48,7 @@ export async function importRoutes(dirPath: string) {
 }
 
 
-export let REDIS: IORedis|undefined = undefined
+export let REDIS: IORedis | undefined = undefined
 
 async function registerCacheRedis() {
     const redis = new IORedis({ host: process.env.DOCKER ? 'redis' : '127.0.0.1' })
@@ -92,7 +104,7 @@ export async function setupApp() {
     await API_APP.register(fastifyCors, {
         origin: '*',
         allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
-        methods: ['GET','PUT','POST','PATCH','DELETE']
+        methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE']
     })
 
     // API_APP.addHook('preHandler', (request, reply, done) => {
@@ -104,7 +116,7 @@ export async function setupApp() {
     //     if (isPreflight) {
     //         return reply.send();
     //     }
-            
+
     //     done();
 
     // })
@@ -114,11 +126,11 @@ export async function setupApp() {
     return API_APP;
 }
 
-export async function get(key: string): Promise<{item: any, stored: number, tll: number}|undefined> {
+export async function get(key: string): Promise<{ item: any, stored: number, tll: number } | undefined> {
     return new Promise((resolve, reject) => {
         API_APP.cache.get(key, (error, result) => {
-            if(error) return resolve(undefined)
-            return resolve(result as {item: any, stored: number, tll: number})
+            if (error) return resolve(undefined)
+            return resolve(result as { item: any, stored: number, tll: number })
         })
     })
 }
@@ -126,7 +138,7 @@ export async function get(key: string): Promise<{item: any, stored: number, tll:
 export async function set(key: string, data: any, expires: number): Promise<void> {
     return new Promise((resolve, reject) => {
         API_APP.cache.set(key, data, expires, (error) => {
-            if(error) return reject(error)
+            if (error) return reject(error)
             return resolve()
         })
     })

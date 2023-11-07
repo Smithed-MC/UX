@@ -92,7 +92,7 @@ API_APP.route({
             await set(requestIdentifier, result.path, 3600 * 1000)
 
             
-            console.log('sending')
+            request.log.info('sending')
 
             reply
                 .header('Access-Control-Expose-Headers', 'Content-Disposition')    

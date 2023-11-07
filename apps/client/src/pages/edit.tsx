@@ -657,44 +657,58 @@ export default function Edit() {
 
         setSavingState({ mode: 'saving' })
 
-
-        if (!isNew) {
-            var resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${pack}?token=${await user.getIdToken()}`, { method: 'PATCH', cache: 'no-cache', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
-        } else {
-            var resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs?token=${await user.getIdToken()}&id=${packData.id}`, {
-                method: 'POST', body: JSON.stringify({ data: packData }), headers: {
-                    "Content-Type": "application/json"
-                }
-            })
+        try {
+            if (!isNew) {
+                var resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${pack}?token=${await user.getIdToken()}`, { 
+                    method: 'PATCH', cache: 'no-cache', 
+                    body: JSON.stringify({ data: packData }), headers: { 
+                        "Content-Type": "application/json"
+                    }
+                })
+            } else {
+                var resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs?token=${await user.getIdToken()}&id=${packData.id}`, {
+                    method: 'POST', body: JSON.stringify({ data: packData }), headers: {
+                        "Content-Type": "application/json",
+                        "Referrer-Policy": 'no-referrer'
+                    }
+                })
+            }
+    
+            if (metaData && contributors !== metaData.contributors) {
+    
+                if (!contributors.includes(metaData.owner))
+                    contributors.push(metaData.owner)
+    
+                const newContributors = contributors.filter(c => !metaData.contributors.includes(c))
+                const delContributors = metaData.contributors.filter(c => !contributors.includes(c))
+    
+    
+                const uid = !isNew ? pack : packData.id
+    
+                if (newContributors.length > 0)
+                    await fetch(import.meta.env.VITE_API_SERVER + `/packs/${uid}/contributors?token=${await user.getIdToken()}&` + newContributors.map(c => "contributors=" + c).join('&'), { method: 'POST' })
+                if (delContributors.length > 0)
+                    await fetch(import.meta.env.VITE_API_SERVER + `/packs/${uid}/contributors?token=${await user.getIdToken()}&` + delContributors.map(c => "contributors=" + c).join('&'), { method: 'DELETE' })
+    
+            }
+    
+    
+            if (resp.status !== HTTPResponses.OK && resp.status !== HTTPResponses.CREATED) {
+                const error = await resp.json()
+                console.log(error)
+                setSavingState({ mode: 'error', error: error })
+            } else {
+                setSavingState({ mode: 'saved' })
+            }
         }
-
-        if (metaData && contributors !== metaData.contributors) {
-
-            if (!contributors.includes(metaData.owner))
-                contributors.push(metaData.owner)
-
-            const newContributors = contributors.filter(c => !metaData.contributors.includes(c))
-            const delContributors = metaData.contributors.filter(c => !contributors.includes(c))
-
-
-            const uid = !isNew ? pack : packData.id
-
-            if (newContributors.length > 0)
-                await fetch(import.meta.env.VITE_API_SERVER + `/packs/${uid}/contributors?token=${await user.getIdToken()}&` + newContributors.map(c => "contributors=" + c).join('&'), { method: 'POST' })
-            if (delContributors.length > 0)
-                await fetch(import.meta.env.VITE_API_SERVER + `/packs/${uid}/contributors?token=${await user.getIdToken()}&` + delContributors.map(c => "contributors=" + c).join('&'), { method: 'DELETE' })
-
-        }
-
-
-        if (resp.status !== HTTPResponses.OK && resp.status !== HTTPResponses.CREATED) {
-            const error = await resp.json()
-
-            setSavingState({ mode: 'error', error: error })
-        } else {
-            setSavingState({ mode: 'saved' })
+        catch (e) {
+            const error = e as TypeError
+            console.log(error.message)
+            const formattedError = {message: error.message, statusCode: 500, error: error.name }
+            setSavingState({ mode: 'error', error: formattedError})
         }
     }
+        
     const Divider = () => <div style={{ height: '0.25rem', background: 'var(--highlight)', width: '100%' }} />
 
 

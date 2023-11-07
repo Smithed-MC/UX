@@ -33,7 +33,7 @@ API_APP.route({
         const requestIdentifier = 'GET-PACK-VERSIONS::' + id
         const tryCachedResult = await get(requestIdentifier)
         if(tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
-            console.log('served cached /packs/', id, '/versions')
+            request.log.info('served cached /packs/', id, '/versions')
             return tryCachedResult.item
         }
 

@@ -1,4 +1,5 @@
 import { DocumentReference, getFirestore } from "firebase-admin/firestore";
+import { API_APP } from "../app.js";
 
 function generateIndex(field: string, minLength: number) {
     field = field.toLowerCase()
@@ -24,7 +25,7 @@ function indexData(name: string, id: string) {
 }
 
 export async function checkIndices() {
-    console.log('Calculating Metrics...')
+    API_APP.log.info('Calculating Metrics...')
     const docs = await getFirestore().collection("packs").listDocuments()
 
 

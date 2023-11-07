@@ -29,6 +29,7 @@ API_APP.route({
     handler: async (request, reply) => {
         const {id} = request.params
 
+        request.log.info('Querying Firebase for User w/ ID ' + id)
         const userDoc = await getUserDoc(id)
         if(userDoc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, 'User not found')

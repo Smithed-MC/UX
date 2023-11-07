@@ -74,6 +74,7 @@ function UserPacks({ user, packs, editable, visible }: { user: UserData, packs: 
                 id={p.id}
                 packData={p.pack} o
                 nClick={() => { navigate(`../packs/${p}`) }}
+                
             />)
         }
         {editable && packs.length == 0 && <div className="container" style={{ gap: '1rem' }}>

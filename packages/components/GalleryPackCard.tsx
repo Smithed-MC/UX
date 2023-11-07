@@ -5,7 +5,8 @@ import './GalleryPackCard.css'
 import { compare, coerce } from 'semver'
 import { User } from 'firebase/auth'
 import { IconTextButton } from './IconTextButton.js'
-import { Download, FlagCrossed, Logo, Refresh, Right } from './svg.js'
+import { Download, Edit, FlagCrossed, Logo, Refresh, Right } from './svg.js'
+import { useNavigate } from 'react-router-dom'
 
 
 interface PackCardProps {
@@ -42,6 +43,8 @@ export default function GalleryPackCard({ id, packData, packMeta, onClick, state
 
     const [displayGallery, setDisplayGallery] = useState(false)
     const [currentImage, setCurrentImage] = useState(0)
+
+    const navigate = useNavigate()
 
     const card = useRef<HTMLDivElement>(null)
 
@@ -182,6 +185,7 @@ export default function GalleryPackCard({ id, packData, packMeta, onClick, state
                     </span>
                     <div className='container' style={{ flexDirection: 'row', gap: '1rem', placeSelf: 'end', gridArea: 'open' }}>
                         {addWidget}
+                        {state === 'editable' && <a className='buttonLike accentedButtonLike' href={'/edit?pack=' + id}><Edit/></a>}
                         <IconTextButton className="accentedButtonLike" text={"Open"} icon={Right} reverse={true} href={`/packs/${metaData ? metaData.rawId : id}`} />
                     </div>
                 </div>

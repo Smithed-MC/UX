@@ -329,8 +329,6 @@ async function filterPacksByQuery(search: string | undefined, includeHidden: boo
     if (version.length > 0)
         packs = packs.filter(p => p.docData.data?.versions.find(v => v.supports.findIndex(mcV => version.includes(mcV)) !== -1))
 
-    // console.time('Time to get return data')
     const returnData = await Promise.all(packs.map(p => getReturnData(p, scope)))
-    // console.timeEnd('Time to get return data')
     return returnData;
 }
