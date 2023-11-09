@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+dotenv.config()
 import { API_APP, importRoutes, setupApp } from './app.js'
 import { initialize } from 'database'
 import dotenv from 'dotenv'
@@ -7,7 +8,6 @@ import { calculateDownloads } from './tasks/createMetrics.js'
 import { deleteTempFiles } from './tasks/deleteTempFiles.js'
 import { checkIndices } from './tasks/checkIndices.js'
 
-dotenv.config()
 
 export type Queryable = FirebaseFirestore.Query | FirebaseFirestore.CollectionReference;
 

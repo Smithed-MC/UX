@@ -15,13 +15,13 @@ import { BrowsePageData, PACKS_PER_PAGE, createBrowseSearchParams } from "../loa
 function RenderPages({ totalPacks, currentPage, params }: { totalPacks: number, currentPage: number, params: URLSearchParams }) {
     const numberOfPages = Math.ceil(totalPacks / PACKS_PER_PAGE)
 
-    const formatSelected = (page: number) => `[${page + 1}]`
+    const formatSelected = (page: number) => `[${page}]`
 
-    currentPage = Math.min(currentPage, numberOfPages - 1)
+    currentPage = Math.min(currentPage, numberOfPages)
 
     let pageLinks = []
-    for (let p = 0; p < numberOfPages; p++) {
-        pageLinks.push(<a key={'pageButton' + p} className={`browsePageButton ${currentPage === p ? 'selected' : ''}`} href={`/browse?page=${p}&` + params}>{p + 1}</a>)
+    for (let p = 1; p <= numberOfPages; p++) {
+        pageLinks.push(<a key={'pageButton' + p} className={`browsePageButton ${currentPage === p ? 'selected' : ''}`} href={`/browse?page=${p}&` + params}>{p}</a>)
     }
 
     return <div className="container" key="pages" style={{ flexDirection: 'row', gap: '0.25rem', width: '100%', justifyContent: 'center' }}>

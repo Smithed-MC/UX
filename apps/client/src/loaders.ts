@@ -137,6 +137,7 @@ const BROWSE_SCOPES = [
     'meta.owner',
     'meta.rawId',
     'meta.stats',
+    'owner.displayName'
 ]
 
 type PackApiInfo = {
@@ -150,7 +151,7 @@ type PackApiInfo = {
 }
 
 async function getPackEntriesForBrowse(params: URLSearchParams, page: number): Promise<PackApiInfo[]> {
-    params.set('start', (page * PACKS_PER_PAGE).toString())
+    params.set('page', page.toString())
     params.set('limit', PACKS_PER_PAGE.toString())
     const response = await fetch(import.meta.env.VITE_API_SERVER + `/packs?scope=${BROWSE_SCOPES.join('&scope=')}&` + params.toString())
     return response.ok ? await response.json() : []
@@ -190,8 +191,8 @@ export async function loadBrowseData({ request }: { request: Request }): Promise
 
     const count = await getTotalCount(params)
 
-    let page = pageParam ? Number.parseInt(pageParam as string) : 0
-    page = Math.max(0, Math.min(page, Math.ceil(count / PACKS_PER_PAGE) - 1))
+    let page = pageParam ? Number.parseInt(pageParam as string) : 1
+    page = Math.max(1, Math.min(page, Math.ceil(count / PACKS_PER_PAGE)))
 
 
     const packEntries = await getPackEntriesForBrowse(params, page)
@@ -199,7 +200,7 @@ export async function loadBrowseData({ request }: { request: Request }): Promise
         id: p.id,
         pack: p.data,
         meta: p.meta,
-        author: undefined
+        author: p.owner.displayName
     }))
 
     return { count, packs: packs }

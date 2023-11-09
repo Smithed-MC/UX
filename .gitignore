@@ -22,3 +22,6 @@ vite.config.ts.*
 docker-compose.dev.yaml
 
 typesense.ts
+
+**/data-types/index.d.ts
+**/data-types/index.js

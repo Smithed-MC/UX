@@ -10,8 +10,10 @@ import * as fs from 'fs';
 import { HTTPResponses } from 'data-types';
 import abCache from 'abstract-cache'
 import IORedis from 'ioredis'
+import { Client } from "typesense";
 
 
+export let TYPESENSE_APP: Client
 
 export const API_APP = fastify({
     logger: {
@@ -90,6 +92,12 @@ async function registerCacheMemory() {
 
 export async function setupApp() {
     await initialize()
+    TYPESENSE_APP = new Client({
+        apiKey: process.env.TYPESENSE_API_KEY ?? '',
+        nodes: [
+            {host: "typesense.smithed.dev", protocol: "https", port: 443}
+        ]
+    })
 
     if (process.env.REDIS) {
 
