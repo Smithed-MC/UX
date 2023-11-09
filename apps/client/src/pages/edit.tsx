@@ -88,7 +88,7 @@ function ImageURLInput({ reference, attr, width, height, description, header, pl
     useEffect(() => setFallback(false), [src])
 
     return <EditorDiv style={{ flexDirection: 'row', gap: '1rem' }}>
-        <div className='container' style={{ width: '4rem', height: '4rem', border: '2px solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--section)', overflow: 'hidden' }}>
+        <div className='container' style={{ width: '4rem', height: '4rem', border: '0.125rem solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', backgroundColor: 'var(--section)', overflow: 'hidden' }}>
             {fallback && <span style={{ fontSize: '0.625rem' }}>PREVIEW</span>}
             {!fallback && <img src={src} style={{ width: '100%', height: '100%' }} onError={() => setFallback(true)} />}
         </div>
@@ -134,7 +134,7 @@ function MarkdownURLInput({ reference, attr, description, placeholder, svg }: Ed
                 </button>
             </div>
             {showPreview && <div className='container' style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', justifyContent: 'start', padding: 16, zIndex: 100, boxSizing: 'border-box' }}>
-                <div className='container' style={{ backgroundColor: 'var(--section)', width: '100%', height: 'calc(100%)', padding: 16, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)', border: '2px solid var(--border)', overflow: 'hidden', overflowY: 'auto' }}>
+                <div className='container' style={{ backgroundColor: 'var(--section)', width: '100%', height: 'calc(100%)', padding: 16, boxSizing: 'border-box', borderRadius: 'var(--defaultBorderRadius)', border: '0.125rem solid var(--border)', overflow: 'hidden', overflowY: 'auto' }}>
                     <MarkdownRenderer style={{ flexGrow: 1, width: '100%', height: '100%' }}>
                         {showPreview}
                     </MarkdownRenderer>
@@ -165,7 +165,7 @@ function DownloadURLInput({ reference, attr, description, placeholder }: EditorI
                     const url = reference[attr]
                     if (url === '') return void setError('No URL is specified')
 
-                    const resp = await fetch(`https://api.smithed.dev/v2/validate-download?url=${url}`)
+                    const resp = await fetch(import.meta.env.VITE_API_SERVER + `/validate-download?url=${url}`)
                     const status = await resp.json()
 
                     if (!resp.ok) return void setError(status)
@@ -293,7 +293,7 @@ function NewVersion({ data, onAddVersion }: { data: PackVersion[], onAddVersion:
 
     if (addNewVersion) {
         return <div style={{ position: 'fixed', top: 0, left: 0, display: 'flex', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', background: 'rgba(0,0,0,0.5', zIndex: 100 }}>
-            <div className="container" style={{ alignItems: 'center', padding: '1rem', backgroundColor: 'var(--background)', border: '2px solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', gap: '0.5rem' }}>
+            <div className="container" style={{ alignItems: 'center', padding: '1rem', backgroundColor: 'var(--background)', border: '0.125rem solid var(--border)', borderRadius: 'var(--defaultBorderRadius)', gap: '0.5rem' }}>
                 <IconInput icon={EditSvg} placeholder='Version Number...' inputRef={versionName} onMouseEnter={() => versionName.current?.select()} onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                         addVersion()
@@ -324,7 +324,7 @@ function RenderDependencies({ dependencies, onRemoveDependency }: { dependencies
         for (let i = 0; i < dependencies.length; i++) {
             const d = dependencies[i]
 
-            const metaData = await (await fetch(`https://api.smithed.dev/v2/packs/${d.id}/meta`)).json()
+            const metaData = await (await fetch(import.meta.env.VITE_API_SERVER + `/packs/${d.id}/meta`)).json()
 
             elements.push(<div className='container' key={d.id} style={{ flexDirection: 'row', width: '100%', gap: '0.5rem' }}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
@@ -359,7 +359,7 @@ function RenderContributors({ contributors, owner, onRemoveContributor }: { cont
 
         for (let i = 0; i < contributors.length; i++) {
             const contributor = contributors[i]
-            const userData: UserData = await (await fetch(`https://api.smithed.dev/v2/users/${contributor}`)).json()
+            const userData: UserData = await (await fetch(import.meta.env.VITE_API_SERVER + `/users/${contributor}`)).json()
 
             elements.push(<div className='container' key={contributor} style={{ flexDirection: 'row', width: '100%', gap: '0.5rem' }}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4" fill="none">
@@ -400,7 +400,7 @@ function NewDependency({ dependencies, onAddDependency }: { dependencies: PackDe
             const rawId = idRef.current.value
             const version = versionRef.current.value
 
-            const metaDataResponse = await fetch(`https://api.smithed.dev/v2/packs/${rawId}/meta`)
+            const metaDataResponse = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${rawId}/meta`)
             if (!metaDataResponse.ok)
                 alert('Invalid pack id!')
             const metaData = await metaDataResponse.json()
@@ -466,7 +466,7 @@ function SavingModal({ state, changeState }: { state: SavingState, changeState: 
 
 
     return <div style={{ display: 'flex', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', fontSize: '1.125rem', justifyContent: 'center', alignItems: 'center', color: 'var(--goodAccent)', backgroundColor: 'rgba(0,0,0,0.5)', animation: 'fadeInBackground 1s ease-in-out', zIndex: 10 }} ref={modalContainer}>
-        <div className='container' style={{ backgroundColor: 'var(--section)', border: '2px solid var(--border)', width: '100%', maxWidth: 384, aspectRatio: '2 / 1', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 1s', transition: 'transform 0.6s cubic-bezier(0.87, 0, 0.13, 1)' }} ref={modalBody}>
+        <div className='container' style={{ backgroundColor: 'var(--section)', border: '0.125rem solid var(--border)', width: '100%', maxWidth: 384, aspectRatio: '2 / 1', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 1s', transition: 'transform 0.6s cubic-bezier(0.87, 0, 0.13, 1)' }} ref={modalBody}>
 
             {state.mode === 'saving' && <div>
                 <h3 style={{ margin: 0 }}>Saving pack...</h3>
@@ -500,7 +500,7 @@ function AddContributor({ contributors, setContributors, owner }: { contributors
         <div className='container' style={{ width: '100%', flexDirection: 'row', gap: '0.5rem' }}>
             <IconInput icon={Account} placeholder='Username/UID' style={{ width: '100%' }} onChange={(e) => setContributorToAdd(e.currentTarget.value)} />
             <button className='buttonLike accentedButtonLike' onClick={async () => {
-                const response = await fetch(`https://api.smithed.dev/v2/users/${contributorToAdd}`)
+                const response = await fetch(import.meta.env.VITE_API_SERVER + `/users/${contributorToAdd}`)
                 if (!response.ok)
                     return alert('Could not find user ' + contributorToAdd)
 
@@ -603,7 +603,7 @@ export default function Edit() {
     async function onLoad() {
         if (user == null) return
 
-        const versions: string[] = await (await fetch(`https://api.smithed.dev/v2/supported-versions`)).json()
+        const versions: string[] = await (await fetch(import.meta.env.VITE_API_SERVER + `/supported-versions`)).json()
         setMCVersions(versions)
 
         if (isNew) {
@@ -622,14 +622,14 @@ export default function Edit() {
             return
         }
 
-        const data: PackData = await (await fetch(`https://api.smithed.dev/v2/packs/${pack}`, { cache: 'no-cache' })).json()
+        const data: PackData = await (await fetch(import.meta.env.VITE_API_SERVER + `/packs/${pack}`, { cache: 'no-cache' })).json()
         data.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
 
         data.versions.forEach(v => {
             v.dependencies ??= []
         })
 
-        const metaData: PackMetaData = await (await fetch(`https://api.smithed.dev/v2/packs/${pack}/meta`, { cache: 'no-cache' })).json()
+        const metaData: PackMetaData = await (await fetch(import.meta.env.VITE_API_SERVER + `/packs/${pack}/meta`, { cache: 'no-cache' })).json()
 
         setPackData(data)
         setMetaData(metaData)
@@ -657,44 +657,58 @@ export default function Edit() {
 
         setSavingState({ mode: 'saving' })
 
-
-        if (!isNew) {
-            var resp = await fetch(`https://api.smithed.dev/v2/packs/${pack}?token=${await user.getIdToken()}`, { method: 'PATCH', cache: 'no-cache', body: JSON.stringify({ data: packData }), headers: { "Content-Type": "application/json" } })
-        } else {
-            var resp = await fetch(`https://api.smithed.dev/v2/packs?token=${await user.getIdToken()}&id=${packData.id}`, {
-                method: 'POST', body: JSON.stringify({ data: packData }), headers: {
-                    "Content-Type": "application/json"
-                }
-            })
+        try {
+            if (!isNew) {
+                var resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${pack}?token=${await user.getIdToken()}`, { 
+                    method: 'PATCH', cache: 'no-cache', 
+                    body: JSON.stringify({ data: packData }), headers: { 
+                        "Content-Type": "application/json"
+                    }
+                })
+            } else {
+                var resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs?token=${await user.getIdToken()}&id=${packData.id}`, {
+                    method: 'POST', body: JSON.stringify({ data: packData }), headers: {
+                        "Content-Type": "application/json",
+                        "Referrer-Policy": 'no-referrer'
+                    }
+                })
+            }
+    
+            if (metaData && contributors !== metaData.contributors) {
+    
+                if (!contributors.includes(metaData.owner))
+                    contributors.push(metaData.owner)
+    
+                const newContributors = contributors.filter(c => !metaData.contributors.includes(c))
+                const delContributors = metaData.contributors.filter(c => !contributors.includes(c))
+    
+    
+                const uid = !isNew ? pack : packData.id
+    
+                if (newContributors.length > 0)
+                    await fetch(import.meta.env.VITE_API_SERVER + `/packs/${uid}/contributors?token=${await user.getIdToken()}&` + newContributors.map(c => "contributors=" + c).join('&'), { method: 'POST' })
+                if (delContributors.length > 0)
+                    await fetch(import.meta.env.VITE_API_SERVER + `/packs/${uid}/contributors?token=${await user.getIdToken()}&` + delContributors.map(c => "contributors=" + c).join('&'), { method: 'DELETE' })
+    
+            }
+    
+    
+            if (resp.status !== HTTPResponses.OK && resp.status !== HTTPResponses.CREATED) {
+                const error = await resp.json()
+                console.log(error)
+                setSavingState({ mode: 'error', error: error })
+            } else {
+                setSavingState({ mode: 'saved' })
+            }
         }
-
-        if (metaData && contributors !== metaData.contributors) {
-
-            if (!contributors.includes(metaData.owner))
-                contributors.push(metaData.owner)
-
-            const newContributors = contributors.filter(c => !metaData.contributors.includes(c))
-            const delContributors = metaData.contributors.filter(c => !contributors.includes(c))
-
-
-            const uid = !isNew ? pack : packData.id
-
-            if (newContributors.length > 0)
-                await fetch(`https://api.smithed.dev/v2/packs/${uid}/contributors?token=${await user.getIdToken()}&` + newContributors.map(c => "contributors=" + c).join('&'), { method: 'POST' })
-            if (delContributors.length > 0)
-                await fetch(`https://api.smithed.dev/v2/packs/${uid}/contributors?token=${await user.getIdToken()}&` + delContributors.map(c => "contributors=" + c).join('&'), { method: 'DELETE' })
-
-        }
-
-
-        if (resp.status !== HTTPResponses.OK && resp.status !== HTTPResponses.CREATED) {
-            const error = await resp.json()
-
-            setSavingState({ mode: 'error', error: error })
-        } else {
-            setSavingState({ mode: 'saved' })
+        catch (e) {
+            const error = e as TypeError
+            console.log(error.message)
+            const formattedError = {message: error.message, statusCode: 500, error: error.name }
+            setSavingState({ mode: 'error', error: formattedError})
         }
     }
+        
     const Divider = () => <div style={{ height: '0.25rem', background: 'var(--highlight)', width: '100%' }} />
 
 

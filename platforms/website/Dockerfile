@@ -15,7 +15,7 @@ RUN mkdir ./platforms
 COPY ./platforms/website ./platforms/website
 
 ARG VITE_NIGHTLY=false
-RUN VITE_NIGHTLY=${VITE_NIGHTLY} npx turbo run build --filter=website
+RUN VITE_NIGHTLY=${VITE_NIGHTLY} VITE_API_SERVER=https://api.smithed.dev/v2 npx turbo run build --filter=website
 
 EXPOSE ${PORT}
 

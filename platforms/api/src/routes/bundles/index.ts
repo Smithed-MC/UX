@@ -10,7 +10,7 @@ export async function getBundleDoc(id: string) {
     const firestore = getFirestore()
     const packs = firestore.collection('bundles')
 
-    console.log('Querying for bundle',id)
+    API_APP.log.info('Querying for bundle',id)
     const doc = await packs.doc(id).get()
     if (doc.exists) {
         return doc

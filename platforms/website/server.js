@@ -50,6 +50,7 @@ async function getMetadata(url = '') {
 
 const distFolder = "dist/client"
 const isProd = process.env.NODE_ENV === 'production' || process.env.SERVER_ENV === 'production'
+const sitemap = await generateSitemap(distFolder)
 
 console.log('Is server production?', isProd)
 console.log('Running on port:', process.env.PORT)
@@ -73,11 +74,11 @@ async function createServer() {
         // express router (express.Router()), you should use router.use
         app.use(vite.middlewares)
     } else {
-        await generateSitemap(distFolder)
-
         app.get('/sitemap.xml', (req, res, next) => {
+            console.log(req.baseUrl, req.originalUrl, req.url, req.hostname)
+
             res.setHeader("Content-Type", "application/xml")
-            res.send(fs.readFileSync(path.resolve(distFolder, "sitemap.xml")))
+            res.send(sitemap.replace(/%s/g, req.header('host')))
         })
         app.use(express.static(distFolder, {index: false}))
     }

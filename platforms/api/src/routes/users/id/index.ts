@@ -14,7 +14,6 @@ export async function getUserDoc(id: string) {
     const firestore = getFirestore()
     const packs = firestore.collection('users')
 
-    console.log('Querying for user', id)
     const doc = await packs.doc(id).get()
     if (doc.exists) {
         return doc
@@ -55,10 +54,11 @@ API_APP.route({
         const requestIdentifier = 'GET-USER::' + id
         const tryCachedResult = await get(requestIdentifier)
         if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
-            console.log('served cached /users/', id)
+            request.log.info('served cached /users/', id)
             return tryCachedResult.item
         }
 
+        request.log.info('Querying Firebase for User w/ ID ' + id)
         const userDoc = await getUserDoc(id)
 
         if (userDoc === undefined)
@@ -99,10 +99,11 @@ API_APP.route({
         
         if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
             reply.header('Content-Type', 'image/png')
-            console.log('served cached /users/', id)
+            request.log.info('served cached /users/', id)
             return tryCachedResult.item
         }
 
+        request.log.info('Querying Firebase for User w/ ID ' + id)
         const userDoc = await getUserDoc(id)
 
         if (userDoc === undefined)
@@ -140,6 +141,7 @@ async function setUserData(request: any, reply: any) {
         return sendError(reply, HTTPResponses.FORBIDDEN, `You do not own this account!`)
 
 
+    request.log.info('Querying Firebase for User w/ ID ' + userId)
     const doc = await getUserDoc(userId)
     if (doc === undefined)
         return sendError(reply, HTTPResponses.NOT_FOUND, `User with ID ${userId} was not found`)
@@ -240,6 +242,7 @@ API_APP.route({
         const { id } = request.params
         const { token, displayName } = request.query
 
+        request.log.info('Querying Firebase for User w/ ID ' + id)
         const userDoc = await getUserDoc(id)
 
         const uidFromToken = await getUIDFromToken(token)

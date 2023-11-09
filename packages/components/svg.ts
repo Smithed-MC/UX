@@ -42,7 +42,9 @@ import { ReactComponent as Refresh } from './assets/refresh.svg'
 import { ReactComponent as Smithed } from './assets/smithed.svg'
 import { ReactComponent as Play } from './assets/play.svg'
 import { ReactComponent as Copy } from './assets/copy.svg'
-
+import { ReactComponent as FlagCrossed } from './assets/flag_crossed.svg'
+import { ReactComponent as Gear } from './assets/gear.svg'
+import { ReactComponent as CurlyBraces } from './assets/curly_braces.svg'
 export {
     Account,
     AddToBundle,
@@ -87,5 +89,8 @@ export {
     Refresh,
     Smithed,
     Play,
-    Copy
+    Copy,
+    FlagCrossed,
+    Gear,
+    CurlyBraces
 }

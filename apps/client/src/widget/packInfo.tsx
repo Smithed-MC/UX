@@ -1,19 +1,15 @@
-import { tauri } from "@tauri-apps/api";
 import { open } from '@tauri-apps/api/shell'
-import { IconTextButton, markdownOptions, MarkdownRenderer, Spinner } from "components";
-import { Cross, Discord, Download, Github, Globe, Plus, Right, Warning } from "components/svg";
-import { MinecraftVersion, MinecraftVersionSchema, PackBundle, PackData, PackEntry, PackMetaData, supportedMinecraftVersions, UserData } from 'data-types';
-import Markdown, { MarkdownToJSX } from "markdown-to-jsx";
-import React, { useEffect, useRef, useState } from "react";
-import { useFormAction, useLoaderData, useNavigate } from "react-router-dom";
+import { DownloadButton, IconTextButton, markdownOptions, MarkdownRenderer } from "components";
+import { Cross, CurlyBraces, Discord, Download, Github, Globe, Jigsaw, Picture, Plus, Right, Warning } from "components/svg";
+import { MinecraftVersion, PackBundle, PackData, PackEntry, PackMetaData, PackVersion, supportedMinecraftVersions, UserData } from 'data-types';
+import React, { createContext, MouseEventHandler, useRef, useState } from "react";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import './packInfo.css'
 import { coerce, compare } from "semver";
 import { prettyTimeDifference } from "formatters";
 import { useAppDispatch, useAppSelector, useFirebaseUser } from "hooks";
 import { selectSelectedBundle, selectUsersBundles, setSelectedBundle, setUsersBundles } from "store";
 import { CreateBundle } from "./bundle";
-import { Bundle } from "../pages/user";
-import { DownloadButtonFn } from "../inject";
 import BackButton from "./BackButton";
 
 interface PackInfoProps {
@@ -24,12 +20,76 @@ interface PackInfoProps {
     fixed: boolean
     onClose: () => void
     style?: React.CSSProperties
-    downloadButton: DownloadButtonFn
+    downloadButton: DownloadButton
     showBackButton: boolean
 }
 
 if (!import.meta.env.SSR && window.__TAURI_IPC__ !== undefined && markdownOptions !== undefined) {
     markdownOptions.a = ({ children, ...props }) => (<a {...props} target="_blank" href={undefined} onClick={(e) => { open(props.href ?? '') }}>{children}</a>)
+}
+
+function WidgetOption({ isOutdated, onClick, children, icon }: { isOutdated: boolean, onClick?: () => void, children?: any, icon?: JSX.Element }) {
+    return <div className={`buttonLike container ${isOutdated ? 'invalidButtonLike' : 'accentedButtonLike'}`}
+        style={{ width: '100%', flexDirection: 'row', justifyContent: 'start', gap: '1rem', backgroundColor: 'transparent' }}
+        onClick={onClick}
+    >
+        {children}
+        <div style={{ flexGrow: 1 }} />
+        {isOutdated && <Warning style={{ fill: 'var(--disturbing)' }} />}
+        <div style={{ width: '0.125rem', height: '100%', background: 'var(--foreground)', opacity: 0.25 }} />
+        {icon ?? <Right style={{ fill: isOutdated ? 'var(--disturbing)' : '' }} />}
+    </div>
+}
+
+function showSupportedVersions(packData: PackData, onClick: (v: string) => void) {
+    const longestVersion = [...supportedMinecraftVersions].sort((a, b) => a.length - b.length).at(-1)!
+
+    return [...supportedMinecraftVersions]
+        .sort((a, b) => compare(coerce(a) ?? '', coerce(b) ?? ''))
+        .reverse()
+        .filter((mcVersion) =>
+            packData.versions.find(v =>
+                v.supports.includes(mcVersion)
+            ) !== undefined
+        ).map(v => {
+            const sortedVersions = packData?.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? '')).reverse()
+            const attachedVersion = sortedVersions?.find(ver => ver.supports.includes(v))
+            const latestVersion = sortedVersions?.at(0)
+
+            const isOutdated = latestVersion !== attachedVersion
+
+            return <WidgetOption isOutdated={isOutdated} onClick={() => onClick(v)}>
+                <span style={{ color: isOutdated ? 'var(--disturbing)' : '', fontWeight: 600, position: 'relative' }}>
+                    <span style={{ opacity: 0 }}>{longestVersion}</span>
+                    <span style={{ position: 'absolute', left: 0 }}>{v}</span>
+                </span>
+                <span style={{ opacity: 0.25, paddingRight: '2rem' }}>
+                    {!attachedVersion?.name.startsWith("v") && "v"}{attachedVersion?.name}
+                </span>
+            </WidgetOption>
+        })
+}
+
+function showPackVersions(packData: PackData, gameVersion: string, onClick: (v: PackVersion) => void, download?: boolean) {
+    const versions = packData.versions
+        .filter((v) => v.supports.includes(gameVersion))
+        .sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
+        .reverse()
+
+    const longestVersion = versions.length >= 1 ? versions.reduce((p, n) => p.name.length > n.name.length ? p : n).name : ''
+
+    return versions.map((v, idx) => {
+        const isOutdated = idx !== 0
+
+        return <WidgetOption isOutdated={false} onClick={() => onClick(v)} icon={download ? <Download /> : undefined}>
+            <span style={{ fontWeight: 600, position: 'relative' }}>
+                <span style={{ opacity: 0 }}>{longestVersion}</span>
+                <span style={{ position: 'absolute', left: 0 }}>{v.name}</span>
+            </span>            <span style={{ opacity: isOutdated ? 0 : 0.25 }}>
+                Latest
+            </span>
+        </WidgetOption>
+    })
 }
 
 export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { trigger: JSX.Element, isOpen: boolean, close: () => void, packData?: PackData, id: string }) {
@@ -45,6 +105,7 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
 
     const [minecraftVersion, setMinecraftVersion] = useState<MinecraftVersion | undefined>(selectedBundle !== '' ? bundles.find(b => b.uid === selectedBundle)?.version : undefined)
     const [bundle, setBundle] = useState<PackBundle | undefined>(selectedBundle !== '' ? bundles.find(b => b.uid === selectedBundle) : undefined)
+
 
     const changePage = (direction: 'left' | 'right') => {
         const pages = [
@@ -65,45 +126,17 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
         setDirection(direction)
     }
 
-    function WidgetOption({ isOutdated, onClick, children }: { isOutdated: boolean, onClick?: () => void, children?: any }) {
-        return <div className={`buttonLike container ${isOutdated ? 'invalidButtonLike' : 'accentedButtonLike'}`}
-            style={{ width: '100%', flexDirection: 'row', justifyContent: 'start', gap: '0.5rem' }}
-            onClick={onClick}
-        >
-            {children}
-            <div style={{ flexGrow: 1 }} />
-            {isOutdated && <Warning style={{ fill: 'var(--disturbing)' }} />}
-            <Right style={{ fill: isOutdated ? 'var(--disturbing)' : '' }} />
-        </div>
-    }
+
 
     const SelectMinecraftVersionPage = () => <div className="container addToBundlePage">
         <div className="container" style={{ animationName: 'slideIn' + direction, gap: '1.5rem' }}>
 
             <div className="container" style={{ gap: '1rem', width: '100%' }}>
                 <label style={{ fontWeight: 600 }}>Choose Minecraft version</label>
-                {supportedMinecraftVersions
-                    .filter((mcVersion) =>
-                        packData?.versions.find(v =>
-                            v.supports.includes(mcVersion)
-                        ) !== undefined
-                    ).reverse().map(v => {
-                        const sortedVersions = packData?.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? '')).reverse()
-                        const attachedVersion = sortedVersions?.find(ver => ver.supports.includes(v))
-                        const latestVersion = sortedVersions?.at(0)
-
-                        const isOutdated = latestVersion !== attachedVersion
-
-                        return <WidgetOption isOutdated={isOutdated} onClick={() => {
-                            setMinecraftVersion(v)
-                            changePage('right')
-                        }}>
-                            <label style={{ color: isOutdated ? 'var(--disturbing)' : '', fontWeight: 600 }}>{v}</label>
-                            <label style={{ opacity: 0.25 }}>
-                                {!attachedVersion?.name.startsWith("v") && "v"}{attachedVersion?.name}
-                            </label>
-                        </WidgetOption>
-                    })}
+                {showSupportedVersions(packData!, (v) => {
+                    setMinecraftVersion(v)
+                    changePage('right')
+                })}
             </div>
             <div className="container compactButton" style={{ flexDirection: 'row', gap: '0.5rem', fontWeight: '700' }} onClick={() => {
                 close()
@@ -118,72 +151,61 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
         </div>
     </div>
     const SelectPackVersionPage = () => {
-        const versions = packData?.versions
-            .filter((v) => v.supports.includes(bundle?.version ?? ''))
-            .sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
-            .reverse()
+
         return <div className="container addToBundlePage">
             <div className="container" style={{ animationName: 'slideIn' + direction, gap: '1.5rem' }}>
                 <div className="container" style={{ gap: '1rem', width: '100%' }}>
 
                     <label style={{ fontWeight: 600, textAlign: 'center' }}>Choose Datapack version for "{bundle?.name}"</label>
-                    {versions?.map((v, idx) => {
-                        const isOutdated = idx !== 0
+                    {showPackVersions(packData!, bundle?.version ?? '', async (v) => {
+                        if (bundle === undefined)
+                            return
 
-                        return <WidgetOption isOutdated={isOutdated} onClick={async () => {
-                            if (bundle === undefined)
-                                return
+                        const packs = [...bundle.packs]
+                        const containedPack = packs.findIndex(p => p.id === id)
+                        if (containedPack != -1) {
+                            packs.splice(containedPack, 1)
+                        }
+                        packs.push({
+                            id: id,
+                            version: v.name
+                        })
 
-                            const packs = [...bundle.packs]
-                            const containedPack = packs.findIndex(p => p.id === id)
-                            if (containedPack != -1) {
-                                packs.splice(containedPack, 1)
-                            }
-                            packs.push({
-                                id: id,
-                                version: v.name
+
+                        const newData = {
+                            ...bundle,
+                            packs: packs
+                        }
+                        // console.log(newData)
+
+                        const resp = await fetch(import.meta.env.VITE_API_SERVER + `/bundles/${bundle.uid}?token=${await user?.getIdToken()}`, {
+                            method: 'PUT',
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                data: newData
                             })
+                        })
 
+                        if (!resp.ok)
+                            alert(await resp.text())
 
-                            const newData = {
-                                ...bundle,
-                                packs: packs
-                            }
-                            // console.log(newData)
+                        setPage('mcVersion')
+                        setDirection('right')
 
-                            const resp = await fetch(`https://api.smithed.dev/v2/bundles/${bundle.uid}?token=${await user?.getIdToken()}`, {
-                                method: 'PUT',
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify({
-                                    data: newData
-                                })
-                            })
+                        const newBundles = [...bundles]
+                        newBundles.splice(newBundles.findIndex(b => b.uid === bundle.uid), 1)
+                        newBundles.push(newData)
 
-                            if (!resp.ok)
-                                alert(await resp.text())
-
-                            setPage('mcVersion')
-                            setDirection('right')
-
-                            const newBundles = [...bundles]
-                            newBundles.splice(newBundles.findIndex(b => b.uid === bundle.uid), 1)
-                            newBundles.push(newData)
-
-                            dispatch(setUsersBundles(newBundles))
-                            dispatch(setSelectedBundle(bundle.uid))
-                            close()
-                        }}>
-                            <label style={{ color: isOutdated ? 'var(--disturbing)' : 'var(--foreground)' }}>{v.name}</label>
-                            <label style={{ opacity: 0.25 }}>
-                            </label>
-                        </WidgetOption>
+                        dispatch(setUsersBundles(newBundles))
+                        dispatch(setSelectedBundle(bundle.uid))
+                        close()
                     })}
                 </div>
-                {versions?.length === 0 && <span style={{ color: 'var(--disturbing)' }}>Pack has no versions for {minecraftVersion}</span>}
+                {packData?.versions?.length === 0 && <span style={{ color: 'var(--disturbing)' }}>Pack has no versions for {minecraftVersion}</span>}
                 <div className="container compactButton" style={{ flexDirection: 'row', gap: '0.5rem', fontWeight: '700' }} onClick={() => {
-                    if (versions?.length === 0) {
+                    if (packData?.versions?.length === 0) {
                         setPage('mcVersion')
                         setDirection('left')
                     } else {
@@ -249,11 +271,11 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
                 marginLeft: '-50%',
                 animation: 'fadeIn 0.25s ease-in-out'
             }}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="30" viewBox="0 0 36 30" fill="none">
+                {/* <svg xmlns="http://www.w3.org/2000/svg" width="36" height="30" viewBox="0 0 36 30" fill="none">
                     <path d="M18.866 3.5L18 2L17.134 3.5L3.27757 27.5L2.41154 29H4.14359H31.8564H33.5885L32.7224 27.5L18.866 3.5Z" fill="#121213" stroke="#4B4B4B" stroke-width="2" />
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" width="34" height="30" viewBox="0 0 34 30" fill="none" style={{ marginTop: -26, zIndex: 1, marginBottom: '-0.25rem' }}>
-                    <path d="M17 0L33.8875 29.25H0.112505L17 0Z" fill="#121213" />
+                </svg> */}
+                <svg xmlns="http://www.w3.org/2000/svg" width="34" height="30" viewBox="0 0 34 30" fill="none" style={{ zIndex: 1, marginBottom: '-0.25rem' }}>
+                    <path d="M17 0L33.8875 29.25H0.112505L17 0Z" fill="var(--bold)" />
                 </svg>
                 <div>
                     {page === 'mcVersion' && <SelectMinecraftVersionPage />}
@@ -266,8 +288,110 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
     </div>
 }
 
+interface ModalContext {
+    close: MouseEventHandler
+}
 
-export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style, downloadButton, showBackButton }: PackInfoProps) {
+const ModalContext = createContext<ModalContext>({ close: () => { } })
+
+function Modal({ trigger, content, onClose }: {
+    trigger: React.ReactElement,
+    content?: (ctx: ModalContext) => React.ReactElement,
+    onClose?: () => void
+}) {
+    const [open, setOpen] = useState(false)
+
+    trigger = React.createElement(trigger.type, {
+        ...trigger.props,
+        onClick: (e: MouseEvent) => {
+            e.preventDefault()
+            setOpen(!open)
+            if (!open && onClose)
+                onClose()
+        }
+    })
+
+    return <div className="container" style={{ position: 'relative' }} onMouseLeave={() => setOpen(false)}>
+        {trigger}
+        <div className="container" style={{ position: 'absolute', top: 'calc(100% - 0.5rem)', padding: '1rem 1rem 1rem 1rem', zIndex: open ? 0 : -100, opacity: open ? 1 : 0, transition: 'all 0.25s ease-in-out' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="34" height="30" viewBox="0 0 34 30" fill="none" style={{ zIndex: 1, marginBottom: '-0.25rem' }}>
+                <path d="M17 0L33.8875 29.25H0.112505L17 0Z" fill="var(--bold)" />
+            </svg>
+            <div style={{ padding: '0.5rem', background: 'var(--bold)', borderRadius: 'var(--defaultBorderRadius)', boxSizing: 'border-box', minWidth: '4rem', width: 'max-content' }}>
+                {content && content({
+                    close: (e) => { e?.preventDefault(); setOpen(false); if (onClose) onClose() }
+                })}
+            </div>
+        </div>
+    </div>
+}
+
+function DownloadPackModal({ children, packData, packId }: { children: JSX.Element, packData: PackData, packId: string }) {
+    const [page, setPage] = useState<'mode' | 'gameVersion' | 'packVersion'>('mode')
+    const [downloadMode, setDownloadMode] = useState<string>()
+    const [gameVersion, setMinecraftVersion] = useState<string>()
+    // const [packVersion, setPackVersion] = useState<string>()
+    const [showAllVersions, setShowAllVersions] = useState<string>()
+
+    const navigate = useNavigate()
+
+    function DownloadOption({ text, value, icon, color }: { text: string, value: string, icon: JSX.Element | string, color?: string }) {
+        return <div className='container compactButton' style={{ flexDirection: 'row', gap: '1rem', width: '100%', padding: '0.5rem 1rem', boxSizing: 'border-box', color: color }} onClick={() => {
+            setDownloadMode(value)
+            setPage('gameVersion')
+        }}>
+            <span style={{ flexGrow: 1 }}>{text}</span>
+            <div style={{ width: '0.125rem', height: '1.25rem', opacity: 0.25, background: color ?? 'var(--foreground)' }} />
+            {icon}
+        </div>
+    }
+
+    const packVersions = showPackVersions(packData!, gameVersion!, (v) => {
+        window.open(import.meta.env.VITE_API_SERVER + `/download?pack=${packId}@${v.name}&version=${gameVersion}&mode=${downloadMode}`)
+    }, true)
+
+    const BackButton = ({ page }: { page: 'mode' | 'gameVersion' | 'packVersion' }) => <div className='container compactButton' style={{ flexDirection: 'row', gap: '0.5rem', marginTop: '0.5rem' }} onClick={() => setPage(page)}>
+        <Right style={{ transform: 'rotate(180deg)' }} /> Back
+    </div>
+
+    return <Modal
+        trigger={children}
+        onClose={() => {
+            setPage('mode')
+        }}
+        content={({ close }) => (<>
+            {page === 'mode' && <>
+                <DownloadOption value='datapack' text={"Datapack"} icon={<Jigsaw />} />
+                <DownloadOption value='resourcepack' text={"Resourcepack"} icon={<Picture />} />
+                <DownloadOption value='both' text={"Combined"} icon={<CurlyBraces />} color={'var(--success)'} />
+
+                <div className='container compactButton' style={{ flexDirection: 'row', gap: '0.5rem', marginTop: '0.5rem' }} onClick={close}>
+                    <Cross /> Close
+                </div>
+            </>}
+
+            {page === 'gameVersion' && <div className="container" style={{ width: 'max-content', gap: '0.5rem' }}>
+                <span style={{ fontWeight: 700, width: '100%', padding: '0.5rem 1rem', boxSizing: 'border-box', textAlign: 'center' }}>Choose Minecraft Version</span>
+                <div style={{ width: '100%', height: '0.125rem', backgroundColor: 'var(--border)' }} />
+                {showSupportedVersions(packData!, (v) => {
+                    setMinecraftVersion(v)
+                    setPage('packVersion')
+                })}
+                <BackButton page={'mode'} />
+            </div>}
+
+            {page === 'packVersion' && <div className={`container packDownloadVersions ${showAllVersions ? 'showAll' : ''}`} style={{ width: 'max-content', gap: '0.5rem' }}>
+                <span style={{ fontWeight: 700, width: '100%', padding: '0.5rem 1rem', boxSizing: 'border-box', textAlign: 'center' }}>Choose Pack Version</span>
+                <div style={{ width: '100%', height: '0.125rem', backgroundColor: 'var(--border)' }} />
+                {packVersions}
+                <BackButton page={'gameVersion'} />
+            </div>}
+
+        </>)} />
+}
+
+
+export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style, downloadButton: DownloadButton, showBackButton }: PackInfoProps) {
     const loaderData = useLoaderData() as any
     // console.log(loaderData)
 
@@ -277,11 +401,12 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
     const fullview: string = loaderData.fullview
     // console.log(fullview)
     const [showBundleSelection, setShowBundleSelection] = useState(false)
-
     const [injectPopup, setInjectPopup] = useState<undefined | JSX.Element>(undefined);
 
     const parentDiv = useRef<HTMLDivElement>(null)
     const spinnerDiv = useRef<HTMLDivElement>(null)
+
+
 
     return <div className='container packInfoRoot' style={{ width: '100%', gap: '4rem', ...style }}>
         <div className="packPageHeader" style={{}}>
@@ -295,7 +420,6 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
                 </label>
             </div>
             <div className="downloadContainer">
-
                 <AddToBundleModal
                     trigger={
                         <div className="buttonLike" style={{ display: 'flex' }} onClick={() => setShowBundleSelection(true)}>
@@ -308,7 +432,13 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
                     id={id}
                 />
                 <div className="container" style={{ gap: '0.5rem' }}>
-                    {downloadButton(id, (element) => { setInjectPopup(element) }, () => { setInjectPopup(undefined) })}
+                    <DownloadPackModal packData={packData!} packId={id}>
+                        <DownloadButton
+                            id={id}
+                            openPopup={(element) => { setInjectPopup(element) }}
+                            closePopup={() => { setInjectPopup(undefined) }}
+                        />
+                    </DownloadPackModal>
                     <label style={{ color: 'var(--border)' }}>{(() => {
                         const version = packData?.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? '')).at(-1)
 
@@ -330,7 +460,7 @@ export default function PackInfo({ yOffset, packEntry, id, fixed, onClose, style
                 {packData?.display.urls?.source && packData?.display.urls?.source.length > 0 &&
                     <IconTextButton className={"packInfoMediaButton"} icon={Github} text={"Source code"} href={packData?.display.urls?.source} />
                 }
-                <IconTextButton className="accentedButtonLike packInfoSmallDownload packInfoMediaButton" iconElement={<Download fill="var(--foreground)" />} text={"Download"} href={`https://api.smithed.dev/v2/download?pack=${id}`} rel="nofollow" />
+                <IconTextButton className="accentedButtonLike packInfoSmallDownload packInfoMediaButton" iconElement={<Download fill="var(--foreground)" />} text={"Download"} href={import.meta.env.VITE_API_SERVER + `/download?pack=${id}`} rel="nofollow" />
             </div>
         </div>
         <div style={{ maxWidth: '53rem' }}>

@@ -4,7 +4,7 @@
     grid-template: auto auto / auto auto;
     grid-auto-flow: column;
     padding: 8px 0px;
-    gap: 16px 12px;
+    gap: 1rem 12px;
     box-sizing: border-box;
 }
 
@@ -18,13 +18,14 @@
 .homeSectionContainer {
     align-items: start;
     gap: 24px;
+    width: 100%;
 }
 
 .homeTextContainer {
     width: 50%;
     margin: 0;
     align-items: start;
-    gap: 16px;
+    gap: 1rem;
 }
 
 .homeImageContainer {
@@ -32,6 +33,44 @@
     width: 50%;
     display: flex;
     justify-content: right;
+}
+
+.homeStyledPackCard {
+    width: 100%;
+}
+.homeStyledPackCard:nth-child(1) {
+    position: absolute;
+    /* bottom: calc(100% + 2rem); */
+    opacity: 0;
+}
+.homeStyledPackCard:nth-child(2) {
+    position: relative;
+    opacity: 1;
+}
+.homeStyledPackCard:nth-child(n + 3) {
+    display: none;
+}
+
+@keyframes packShowcaseSlideIn {
+    0% {
+        bottom: calc(100% + 2rem);
+        opacity: 0;
+    }
+    100% {
+        bottom: 0%;
+        opacity: 1;
+    }
+}
+
+@keyframes packShowcaseSlideOut {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
 }
 
 @media screen and (max-width: 70rem) {
@@ -52,25 +91,27 @@
     .homeSectionContainer {
         align-items: center;
     }
+
+    @keyframes packShowcaseSlideIn {
+        0% {
+            right: calc(100% + 2rem);
+            opacity: 0;
+        }
+        100% {
+            right: 0%;
+            opacity: 1;
+        }
+    }
+    
+    @keyframes packShowcaseSlideOut {
+        0% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
 }
 
-@keyframes packShowcaseSlideIn {
-    0% {
-        margin-left: -80vw;
-        opacity: 0;
-    }
-    100% {
-        margin-left: 0;
-        opacity: 1;
-    }
-}
-
-@keyframes packShowcaseSlideOut {
-    0% {
-        margin-left: 0;
-    }
-    100% {
-        margin-left: 80vw;
-        opacity: 0;
-    }
-}

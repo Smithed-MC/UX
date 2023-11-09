@@ -43,7 +43,7 @@ export default function PackCard({ id, packData, onClick, state, style, parentSt
     const navigate = useNavigate()
 
     async function getData() {
-        const response = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
+        const response = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${id}`)
         if (!response.ok)
             return void setData(undefined)
         const data = await response.json()
@@ -51,7 +51,7 @@ export default function PackCard({ id, packData, onClick, state, style, parentSt
     }
 
     async function getAuthor(ownerId: string) {
-        const response = await fetch(`https://api.smithed.dev/v2/users/${ownerId}`)
+        const response = await fetch(import.meta.env.VITE_API_SERVER + `/users/${ownerId}`)
         if (!response.ok)
             return void setAuthor('')
         const data = await response.json()
@@ -60,7 +60,7 @@ export default function PackCard({ id, packData, onClick, state, style, parentSt
 
 
     async function onLoad() {
-        const metaDataResponse = await fetch(`https://api.smithed.dev/v2/packs/${id}/meta`)
+        const metaDataResponse = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${id}/meta`)
         if (!metaDataResponse.ok) {
             setData(undefined)
             return
@@ -100,7 +100,7 @@ export default function PackCard({ id, packData, onClick, state, style, parentSt
 
         const token = await user.getIdToken()
 
-        await fetch(`https://api.smithed.dev/v2/bundles/${bundleData.uid}?token=${token}`, { method: 'PUT', headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data: bundleData }) })
+        await fetch(import.meta.env.VITE_API_SERVER + `/bundles/${bundleData.uid}?token=${token}`, { method: 'PUT', headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data: bundleData }) })
     }
 
     useEffect(() => { setContained(bundleData?.packs.find(p => p.id === id) !== undefined) }, [bundleData])
@@ -164,7 +164,7 @@ export default function PackCard({ id, packData, onClick, state, style, parentSt
 }
 
 // <div className='container' style={{ flexDirection: 'row', justifyContent: 'right', gap: 8 }}>
-//                     {state !== 'add' && <DownloadButton link={`https://api.smithed.dev/v2/download?pack=${id}`} />}
+//                     {state !== 'add' && <DownloadButton link={import.meta.env.VITE_API_SERVER + `/download?pack=${id}`} />}
 //                     {showInvalidTooltip && <div style={{ position: 'fixed', animation: 'fadeIn 0.5s', marginRight: 40, backgroundColor: 'var(--accent)', padding: 8, paddingRight: 16, borderRadius: 'var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius)' }}>Pack does not support {bundleData?.version}</div>}
 //                     {state === 'add' && <AddRemovePackButton add={!contained} onClick={onAddClick} disabled={validForBundle} onMouseOver={() => {
 //                         if (validForBundle) setShowInvalidTooltip(true)

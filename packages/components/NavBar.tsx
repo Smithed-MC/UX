@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector, useFirebaseUser, useQueryParams, useSmi
 
 import './style.css'
 import './NavBar.css'
-import { Check, Cross, Download, Jigsaw, MenuBars, Save, Trash } from './svg.js'
+import { Check, Cross, Download, Jigsaw, Logo, MenuBars, Save, Trash } from './svg.js'
 import { IconTextButton } from './IconTextButton'
 import { Discord as DiscordSvg, Home as HomeSvg, Browse as BrowseSvg, Account as AccountSvg } from 'components/svg.js'
 import { selectSelectedBundle, selectUsersBundles, setUsersBundles } from 'store'
@@ -105,7 +105,7 @@ export function EditBundle({ close }: EditBundleProps) {
     const [packs, setPacks] = useState<{ id: string, version: string, pack: PackData }[]>([])
 
     async function fetchPackData(id: string, version: string) {
-        const resp = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
+        const resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${id}`)
         return { id, version, pack: await resp.json() }
     }
 
@@ -123,7 +123,7 @@ export function EditBundle({ close }: EditBundleProps) {
         return <div></div>
 
     return <div className="container" style={{ position: 'fixed', width: '100%', height: '100%', top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 50%)', animation: 'fadeInBackground 0.5s' }}>
-        <div className='container' style={{ backgroundColor: 'var(--background)', border: '2px solid var(--border)', boxSizing: 'border-box', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 0.5s ease-in-out', alignItems: 'start' }}>
+        <div className='container' style={{ backgroundColor: 'var(--background)', border: '0.125rem solid var(--border)', boxSizing: 'border-box', padding: 16, borderRadius: 'var(--defaultBorderRadius)', gap: 16, animation: 'slideInContent 0.5s ease-in-out', alignItems: 'start' }}>
             <span style={{ fontWeight: 600, fontSize: '1.25rem' }}>{curBundle.name}</span>
             {packs.length > 0 && <div className='container' style={{ alignItems: 'start', gap: '0.5rem', width: '100%' }}>
                 <span style={{ fontWeight: 600 }}>Packs:</span>
@@ -142,25 +142,25 @@ export function EditBundle({ close }: EditBundleProps) {
             </div>}
             <div className='container' style={{ flexDirection: 'row', width: '100%', gap: '1rem' }}>
                 <IconTextButton className="invalidButtonLike" icon={Cross} text={"Cancel"} onClick={close} />
-                {packs.length > 0 && <a className='buttonLike' style={{fill: 'var(--foreground)', padding: '0.5rem'}} href={`https://api.smithed.dev/v2/bundles/${curBundle.uid}/download`}><Download/></a>}
+                {packs.length > 0 && <a className='buttonLike' style={{ fill: 'var(--foreground)', padding: '0.5rem' }} href={import.meta.env.VITE_API_SERVER + `/bundles/${curBundle.uid}/download`}><Download /></a>}
                 {packs.length > 0 && <IconTextButton className='accentedButtonLike' icon={Check} text={"Save"} onClick={async () => {
                     if (user == null)
                         return
-                    
+
                     const newBundle: PackBundle = {
                         ...curBundle,
-                        packs: packs.map(p => ({id: p.id, version: p.version}))
+                        packs: packs.map(p => ({ id: p.id, version: p.version }))
                     }
 
-                    const resp = await fetch(`https://api.smithed.dev/v2/bundles/${curBundle.uid}?token=${await user.getIdToken()}`, {
+                    const resp = await fetch(import.meta.env.VITE_API_SERVER + `/bundles/${curBundle.uid}?token=${await user.getIdToken()}`, {
                         method: 'PUT',
                         body: JSON.stringify({
                             data: newBundle
                         }),
-                        headers: {"Content-Type": "application/json"}
+                        headers: { "Content-Type": "application/json" }
                     })
 
-                    if(!resp.ok)
+                    if (!resp.ok)
                         return alert(await resp.text())
 
                     let newBundles = [...bundles]
@@ -211,9 +211,10 @@ export function NavBar(props: NavBarProps) {
 
     return (
         <div className="container navBarContainer" style={{ flexDirection: 'row', width: '100%', boxSizing: 'border-box', zIndex: 1 }}>
+            <Logo className='navBarHide' style={{ width: '1.5rem', height: '1.5rem' }} />
             <a className='navBarHide' style={{ fontSize: '24px', lineHeight: '30px', fontWeight: '700', fontFamily: 'Lexend', color: 'var(--foreground)', textDecoration: 'none' }} href={props.logoUrl}>Smithed</a>
             <div className='navBarHide' style={{ width: 1, height: 36, background: 'var(--foreground)' }} />
-            
+
             {props.getTabs && props.getTabs()}
             <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'row', gap: '2rem', justifyContent: 'end', overflow: 'hidden' }}>
                 {selectedBundle !== '' && !import.meta.env.SSR &&
@@ -223,7 +224,7 @@ export function NavBar(props: NavBarProps) {
                             <span style={{ flexShrink: 0 }}>[{curBundle?.packs.length}]</span>
                         </div>} iconElement={<Jigsaw style={{ flexShrink: 0 }} />} reverse onClick={() => setEditBundleOpen(!editBundleOpen)} />
                 }
-                <IconTextButton className="navBarOption end" text={user != null ? user.displayName : 'Login'} href="/account" icon={AccountSvg} reverse={true} />
+                <IconTextButton className="navBarOption end" text={user != null ? user.displayName : 'Login'} href={user != null ? "/" + user.displayName : "/account"} icon={AccountSvg} reverse={true} />
             </div>
             {editBundleOpen && <EditBundle close={() => setEditBundleOpen(false)} />}
         </div>

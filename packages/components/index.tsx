@@ -1,6 +1,5 @@
 import { NavButton, NavBar } from "./NavBar";
 import PackCard from "./PackCard";
-import PackVersionDownload from "./PackVersionDownload";
 import Spinner from "./Spinner";
 import * as svg from "./svg";
 import "./style.css";
@@ -13,13 +12,14 @@ import { IconTextButton } from "./IconTextButton";
 import IconInput from "./IconInput";
 import { ChooseBox } from "./ChooseBox";
 import GalleryPackCard from './GalleryPackCard'
+import CategoryBar, { CategoryChoice } from "./CategoryBar";
+import { DownloadButton } from "./DownloadButton";
 
 export {
 	NavButton,
 	NavBar,
 	PackCard,
 	Spinner,
-	PackVersionDownload,
 	svg,
 	ErrorPage,
 	MarkdownRenderer,
@@ -30,5 +30,8 @@ export {
 	IconTextButton,
 	IconInput,
 	ChooseBox,
-  GalleryPackCard
+	GalleryPackCard,
+	CategoryBar,
+	CategoryChoice,
+	type DownloadButton
 };

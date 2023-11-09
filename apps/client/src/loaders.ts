@@ -4,32 +4,34 @@ import { getAuth } from "firebase/auth"
 import { PackBundle, PackData, PackMetaData, SortOptions } from 'data-types'
 
 async function getUserData(id: string) {
-    const userDataResponse = await fetch(`https://api.smithed.dev/v2/users/${id}`)
+    const userDataResponse = await fetch(import.meta.env.VITE_API_SERVER + `/users/${id}`)
     if (!userDataResponse.ok) return undefined
     return await userDataResponse.json()
 }
 
 async function getUserPacks(id: string) {
-    const userPacksResponse = await fetch(`https://api.smithed.dev/v2/users/${id}/packs`)
+    const userPacksResponse = await fetch(import.meta.env.VITE_API_SERVER + `/users/${id}/packs`)
     const packIds: string[] = userPacksResponse.ok ? (await userPacksResponse.json()) : []
 
     return packIds
 }
 async function getBundles(id: string) {
-    const userBundlesResponse = await fetch(`https://api.smithed.dev/v2/users/${id}/bundles`)
+    const userBundlesResponse = await fetch(import.meta.env.VITE_API_SERVER + `/users/${id}/bundles`)
     const bundleIds: string[] = userBundlesResponse.ok ? (await userBundlesResponse.json()) : []
 
     return bundleIds
 }
 
 async function getBundleData(id: string): Promise<PackBundle | undefined> {
-    const bundleDataResponse = await fetch(`https://api.smithed.dev/v2/bundles/${id}`)
+    const bundleDataResponse = await fetch(import.meta.env.VITE_API_SERVER + `/bundles/${id}`)
     return bundleDataResponse.ok ? await bundleDataResponse.json() : undefined
 }
 
-async function getPackData(id: string): Promise<{ id: string, pack: PackData }> {
-    const packDataResponse = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
-    return { id: id, pack: await packDataResponse.json() }
+async function getPackData(id: string): Promise<{ id: string, pack: PackData, meta: PackMetaData }> {
+    const packDataResponse = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${id}`)
+    const packMetaResponse = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${id}/meta`)
+
+    return { id: id, pack: await packDataResponse.json(), meta: await packMetaResponse.json() }
 }
 
 async function getDownloads(id: string, packs: string[]) {
@@ -41,7 +43,7 @@ async function getDownloads(id: string, packs: string[]) {
 
     for (let pack of packs) {
         try {
-            const packEntry = await (await fetch(`https://api.smithed.dev/v2/packs/${pack}/meta`)).json()
+            const packEntry = await (await fetch(import.meta.env.VITE_API_SERVER + `/packs/${pack}/meta`)).json()
             total += packEntry.stats.downloads.total
             daily += packEntry.stats.downloads.today ?? 0
         } catch {
@@ -57,7 +59,7 @@ export async function loadUserPageData({ params }: any) {
 
 
     const [user, packIds, bundles] = await Promise.all([getUserData(id), getUserPacks(id), getBundles(id)])
-    console.log(packIds)
+    // console.log(packIds)
     const packs = await Promise.all(packIds.map(p => getPackData(p)))
 
     const [totalDownloads, dailyDownloads] = await getDownloads(id ?? '', packIds)
@@ -75,37 +77,43 @@ export async function loadUserPageData({ params }: any) {
 
 
 export interface HomePageData {
-    trendingPacks: { id: string, pack: PackData }[],
-    downloadedPacks: { id: string, pack: PackData }[],
-    newestPacks: { id: string, pack: PackData }[]
+    trendingPacks: DataForPackCards[],
+    newestPacks: DataForPackCards[]
 }
 
-async function getTopPacksBySort(sort: SortOptions): Promise<{ id: string; displayName: string }[]> {
-    const resp = await fetch(`https://api.smithed.dev/v2/packs?sort=${sort.toLowerCase()}`)
+async function getTopPacksBySort(sort: SortOptions): Promise<PackApiInfo[]> {
+    const resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs?sort=${sort.toLowerCase()}&scope=` + BROWSE_SCOPES.join('&scope='))
     return await resp.json()
 }
 
 export async function loadHomePageData(): Promise<HomePageData> {
-    let downloadedPackIds = await getTopPacksBySort(SortOptions.Downloads)
-    let newestPackIds = await getTopPacksBySort(SortOptions.Newest)
-    let trendingPackIds = await getTopPacksBySort(SortOptions.Trending)
+    let newestPacks = await getTopPacksBySort(SortOptions.Newest)
+    let trendingPacks = await getTopPacksBySort(SortOptions.Trending)
 
-    newestPackIds = newestPackIds
+    newestPacks = newestPacks
         .filter(np =>
-            !downloadedPackIds.find(dp => dp.id === np.id) &&
-            !trendingPackIds.find(dp => dp.id === np.id))
+            !trendingPacks.find(dp => dp.id === np.id))
         .slice(0, 5)
-    trendingPackIds = trendingPackIds
+    trendingPacks = trendingPacks
         .filter(np =>
-            !downloadedPackIds.find(dp => dp.id === np.id) &&
-            !newestPackIds.find(dp => dp.id === np.id))
+            !newestPacks.find(dp => dp.id === np.id))
         .slice(0, 5)
-    downloadedPackIds = downloadedPackIds.slice(0, 5)
 
     return {
-        newestPacks: await Promise.all(newestPackIds.map(p => getPackData(p.id))),
-        downloadedPacks: await Promise.all(downloadedPackIds.map(p => getPackData(p.id))),
-        trendingPacks: await Promise.all(trendingPackIds.map(p => getPackData(p.id)))
+        newestPacks: newestPacks.map(p => ({
+            id: p.id,
+            displayName: p.displayName,
+            pack: p.data,
+            meta: p.meta,
+
+        })),
+        trendingPacks: trendingPacks.map(p => ({
+            id: p.id,
+            displayName: p.displayName,
+            pack: p.data,
+            meta: p.meta,
+
+        }))
     }
 }
 
@@ -118,7 +126,7 @@ function setMultiple(params: URLSearchParams, key: string, value: string | (stri
 }
 
 async function getTotalCount(params: URLSearchParams): Promise<number> {
-    const response = await fetch('https://api.smithed.dev/v2/packs/count?' + params.toString())
+    const response = await fetch(import.meta.env.VITE_API_SERVER + '/packs/count?' + params.toString())
     return response.ok ? await response.json() : 0
 }
 
@@ -128,19 +136,37 @@ const BROWSE_SCOPES = [
     'data',
     'meta.owner',
     'meta.rawId',
-    'meta.stats'
+    'meta.stats',
+    'owner.displayName'
 ]
 
-async function getPackEntriesForBrowse(params: URLSearchParams, page: number): Promise<{id: string, displayName: string, data: PackData, meta: PackMetaData}[]> {
-    params.set('start', (page * PACKS_PER_PAGE).toString())
+type PackApiInfo = {
+    id: string
+    displayName: string
+    data: PackData
+    meta: PackMetaData,
+    owner: {
+        displayName: string
+    }
+}
+
+async function getPackEntriesForBrowse(params: URLSearchParams, page: number): Promise<PackApiInfo[]> {
+    params.set('page', page.toString())
     params.set('limit', PACKS_PER_PAGE.toString())
-    const response = await fetch(`https://api.smithed.dev/v2/packs?scope=${BROWSE_SCOPES.join('&scope=')}&` + params.toString())
+    const response = await fetch(import.meta.env.VITE_API_SERVER + `/packs?scope=${BROWSE_SCOPES.join('&scope=')}&` + params.toString())
     return response.ok ? await response.json() : []
+}
+
+export type DataForPackCards = {
+    id: string
+    pack: PackData
+    meta: PackMetaData,
+    author?: string
 }
 
 export interface BrowsePageData {
     count: number,
-    packs: {id: string, pack: PackData, meta: PackMetaData}[]
+    packs: DataForPackCards[]
 }
 
 export function createBrowseSearchParams(parsedParams: any) {
@@ -157,18 +183,25 @@ export function createBrowseSearchParams(parsedParams: any) {
     if (version)
         setMultiple(params, 'version', version)
     return params
-} 
+}
 
-export async function loadBrowseData({ request }: { request: Request }) {
-    const {page: pageParam, ...parsedParams} = querystring.parse(request.url.split('?')[1])
+export async function loadBrowseData({ request }: { request: Request }): Promise<BrowsePageData> {
+    const { page: pageParam, ...parsedParams } = querystring.parse(request.url.split('?')[1])
     const params = createBrowseSearchParams(parsedParams)
 
-    const page = pageParam ? Number.parseInt(pageParam as string) : 0
-
     const count = await getTotalCount(params)
-    const packEntries = await getPackEntriesForBrowse(params, Math.max(0, Math.min(page, Math.ceil(count / PACKS_PER_PAGE) - 1)))
 
-    const packs = packEntries.map(p => ({id: p.id, pack: p.data, meta: p.meta}))
+    let page = pageParam ? Number.parseInt(pageParam as string) : 1
+    page = Math.max(1, Math.min(page, Math.ceil(count / PACKS_PER_PAGE)))
 
-    return {count, packs: packs}
+
+    const packEntries = await getPackEntriesForBrowse(params, page)
+    const packs: DataForPackCards[] = packEntries.map(p => ({
+        id: p.id,
+        pack: p.data,
+        meta: p.meta,
+        author: p.owner.displayName
+    }))
+
+    return { count, packs: packs }
 } 

@@ -3,28 +3,27 @@ import React, { useEffect, useState } from "react"
 import { PackData, PackMetaData, UserData } from 'data-types'
 import PackInfo from "../widget/packInfo"
 import Download from "../widget/download"
-import { Spinner } from "components"
+import { DownloadButton, Spinner } from "components"
 import './pack.css'
 import { Helmet } from "react-helmet"
 import { correctGithubLinks } from "formatters"
-import { DownloadButtonFn } from "../inject"
 
 async function getPack(id: string) {
-    const response = await fetch(`https://api.smithed.dev/v2/packs/${id}`)
+    const response = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${id}`)
     if (!response.ok) return undefined
     const data = await response.json()
     return data as PackData
 }
 
 async function getMeta(id: string) {
-    const response = await fetch(`https://api.smithed.dev/v2/packs/${id}/meta`)
+    const response = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${id}/meta`)
     if (!response.ok) return undefined
     const data = await response.json()
     return data as PackMetaData
 }
 
 async function getOwner(id: string) {
-    const response = await fetch(`https://api.smithed.dev/v2/users/${id}`)
+    const response = await fetch(import.meta.env.VITE_API_SERVER + `/users/${id}`)
     if (!response.ok) return undefined
     const data = await response.json()
     return data as UserData
@@ -42,7 +41,7 @@ async function getFullview(packData?: PackData) {
                 return await response.text()
             }
         } catch {
-            return 'An occured loading pack\'s readme'
+            return 'An error occured loading pack\'s readme'
         }
     } 
     return ''
@@ -88,6 +87,6 @@ export default function Packs({packDownloadButton, showBackButton}: PacksProps) 
 }
 
 export interface PacksProps {
-    packDownloadButton: DownloadButtonFn,
+    packDownloadButton: DownloadButton,
     showBackButton: boolean,
 }

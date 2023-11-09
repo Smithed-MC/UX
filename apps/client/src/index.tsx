@@ -61,8 +61,8 @@ export function ClientApplet(props: ClientProps) {
         if (user == null) {
             return resetBundleData()
         }
-
-        const resp = await fetch(`https://api.smithed.dev/v2/users/${user.uid}/bundles`)
+        
+        const resp = await fetch(import.meta.env.VITE_API_SERVER + `/users/${user.uid}/bundles`)
         if (!resp.ok)
             return resetBundleData()
 
@@ -72,7 +72,7 @@ export function ClientApplet(props: ClientProps) {
             dispatch(setSelectedBundle(''))
 
         const getData = async (id: string) => {
-            const resp = await fetch(`https://api.smithed.dev/v2/bundles/${id}`)
+            const resp = await fetch(import.meta.env.VITE_API_SERVER + `/bundles/${id}`)
 
             if (!resp.ok)
                 return undefined
@@ -107,7 +107,7 @@ export function ClientApplet(props: ClientProps) {
         </Helmet>
         {import.meta.env.VITE_NIGHTLY && !hideWarning && <div id="nightlyWarningBar" style={{
             width: '100%',
-            borderBottom: '2px solid var(--warning)',
+            borderBottom: '0.125rem solid var(--warning)',
             backgroundColor: 'color-mix(in srgb, transparent 80%, var(--warning) 20%)',
             padding: '0.5rem 1rem', boxSizing: 'border-box',
             display: 'flex',
@@ -142,7 +142,7 @@ export function ClientApplet(props: ClientProps) {
 }
 
 function Footer() {
-    return <div className='container' style={{ width: '100%', backgroundColor: 'var(--bold)', borderTop: '2px solid var(--border)' }}>
+    return <div className='container' style={{ width: '100%', backgroundColor: 'var(--bold)', borderTop: '0.125rem solid var(--border)' }}>
         <div className="footerContainer" style={{ width: 'min(70rem, 100vw)', paddingLeft: 16 }}>
             <div className='container footerLargeGroup'>
                 <div className="container" style={{ flexDirection: 'row', fontWeight: 600, fontSize: '3rem', justifyContent: 'center', gap: 10 }}>

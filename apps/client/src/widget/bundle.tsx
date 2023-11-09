@@ -38,7 +38,7 @@ export function CreateBundle({ close, minecraftVersion, showCloseButton, showEdi
             public: false
         }
 
-        const resp = await fetch(`https://api.smithed.dev/v2/bundles?token=${await user?.getIdToken()}`, {
+        const resp = await fetch(import.meta.env.VITE_API_SERVER + `/bundles?token=${await user?.getIdToken()}`, {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json"

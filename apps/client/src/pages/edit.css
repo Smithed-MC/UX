@@ -44,10 +44,10 @@
     height: 2rem; 
     border-radius: calc(var(--defaultBorderRadius) / 2);
     transition: all 0.1s ease-in-out;
-    border: 2px solid transparent;
+    border: 0.125rem solid transparent;
 }
 .galleryImageButton:hover {
-    border: 2px solid var(--border);
+    border: 0.125rem solid var(--border);
 }
 .galleryImageButton:active {
     opacity: 0.7;

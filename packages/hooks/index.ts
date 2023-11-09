@@ -29,7 +29,7 @@ export function useSmithedUser() {
         if(firebaseUser == null)
             return
 
-        const resp = await fetch(`https://api.smithed.dev/v2/users/${firebaseUser.uid}`)
+        const resp = await fetch(import.meta.env.VITE_API_SERVER + `/users/${firebaseUser.uid}`)
         const data: UserData = await resp.json();
         
         setUser(data)

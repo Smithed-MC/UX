@@ -1,23 +1,25 @@
-import { Type } from '@sinclair/typebox'
-import { API_APP, get, sendError, set } from "../../app.js";
+import { Static, Type } from '@sinclair/typebox'
+import { API_APP, TYPESENSE_APP, get, sendError, set } from "../../app.js";
 import { getFirestore } from 'firebase-admin/firestore'
 import { Queryable } from '../../index.js';
 import { HTTPResponses, MinecraftVersion, MinecraftVersionSchema, PackData, PackDataSchema, SortOptions, SortSchema } from 'data-types';
 import { getUIDFromToken } from 'database';
 import { coerce } from 'semver';
+import { SearchResponseHit } from 'typesense/lib/Typesense/Documents.js';
+import hash from 'hash.js'
 
 type ReceivedPackResult = { docId: string, docData: { data: PackData, _indices: string[], hidden?: boolean, [key: string]: any, owner: string } }
 
-const getSortValue = (sort: SortOptions, a: ReceivedPackResult, b: ReceivedPackResult): number => {
+const getSortValue = (sort: SortOptions): string => {
     switch (sort) {
         case SortOptions.Trending:
-            return b.docData.stats.score - a.docData.stats.score
+            return 'meta.stats.score:desc'
         case SortOptions.Downloads:
-            return b.docData.stats.downloads.total - a.docData.stats.downloads.total
+            return 'meta.stats.downloads.total:desc'
         case SortOptions.Alphabetically:
-            return a.docData.data.display.name.localeCompare(b.docData.data.display.name)
+            return 'data.display.name:asc'
         case SortOptions.Newest:
-            return b.docData.stats.added - a.docData.stats.added
+            return 'meta.stats.added:desc'
     }
 }
 
@@ -26,11 +28,14 @@ const getPackSchema = Type.Object({
     sort: SortSchema,
     limit: Type.Integer({ maximum: 100, minimum: 1, default: 20 }),
     start: Type.Integer({ minimum: 0, default: 0 }),
+    page: Type.Integer({ minimum: 1, default: 1 }),
     category: Type.Array(Type.String(), { default: [] }),
     hidden: Type.Optional(Type.Boolean({ default: false })),
     version: Type.Array(MinecraftVersionSchema, { default: [] }),
     scope: Type.Optional(Type.Array(Type.String()))
 })
+
+type GetPackQuery = Static<typeof getPackSchema>
 
 /*
  * @route GET /packs
@@ -72,11 +77,22 @@ API_APP.route({
         querystring: getPackSchema
     },
     handler: async (request, reply) => {
-        const { search, sort, limit, start, category, hidden: includeHidden, version, scope } = request.query;
+        const requestIdentifier = 'GET-PACKS::' + hash.sha1().update(request.url).digest("hex");
+        const tryCachedResult = await get(requestIdentifier);
 
-        let packs: { id: string; displayName: string; }[] = await getPacks(request, search, includeHidden, sort, category, version, scope);
+        if (tryCachedResult) {
+            return tryCachedResult.item;
+        }
 
-        return packs.slice(start, start + limit)
+        const result = await requestPacksFromTypesense(request.query)
+
+        request.log.info('Found ' + result.found)
+        const packs = result.hits?.map(
+            hit => reformatDocumentData(hit, request.query.scope ?? [])
+        )
+
+        await set(requestIdentifier, packs, 5 * 60 * 1000);
+        return packs
     }
 })
 
@@ -105,14 +121,27 @@ API_APP.route({
     method: 'GET',
     url: '/packs/count',
     schema: {
-        querystring: Type.Omit(getPackSchema, ['limit', 'start', 'sort', 'scope'])
+        querystring: Type.Omit(getPackSchema, ['limit', 'start', 'sort', 'scope', 'page'])
     },
     handler: async (request, reply) => {
-        const { search, category, hidden: includeHidden, version } = request.query;
+        const requestIdentifier = 'GET-PACKS::' + Object.values(request.query);
+        const tryCachedResult = await get(requestIdentifier);
 
-        let packs: { id: string; displayName: string; }[] = await getPacks(request, search, includeHidden, SortOptions.Newest, category, version);
-
-        return packs.length
+        if (tryCachedResult) {
+            return tryCachedResult.item;
+        }
+        const totalFound = (await requestPacksFromTypesense(
+            {
+                ...request.query,
+                limit: 10,
+                start: 0,
+                sort: SortOptions.Downloads,
+                scope: [],
+                page: 1
+            }
+        )).found
+        await set(requestIdentifier, totalFound, 5 * 60 * 1000);
+        return totalFound
     }
 })
 
@@ -197,137 +226,50 @@ API_APP.route({
     }
 })
 
-async function getPacks(request: any, search: string | undefined, includeHidden: boolean | undefined, sort: SortOptions, category: string[], version: string[], scope?: string[]) {
-    const requestIdentifier = 'GET-PACKS::' + Object.values(request.query);
-    const tryCachedResult = await get(requestIdentifier);
+async function requestPacksFromTypesense(query: GetPackQuery) {
+    const { search, sort, limit, start, category, hidden: includeHidden, version, scope, page } = query;
+    const packs = await TYPESENSE_APP.collections('packs').documents().search({
+        q: search ?? '',
+        query_by: [
+            'owner.displayName',
+            'data.display.name',
+            'data.display.description',
+            'readMe'
+        ],
+        filter_by: [
+            ...(category.length > 0 ? category.map(c => 'data.categories:=`' + c + '`') : []),
+            ...(version.length > 0 ? version.map(c => 'data.versions.supports:=`' + c + '`') : []),
+            ...(!includeHidden ? ['meta.hidden: false'] : [])
+        ].join(' && '),
+        include_fields: [
+            'data.display.name',
+            'id',
+            ...(scope ?? [])
+        ],
+        sort_by: getSortValue(sort),
+        limit: limit,
+        offset: start,
+        page: page
+    })
+    return packs
+}
 
-    let packs: { id: string; displayName: string; }[] = [];
-    if (tryCachedResult) {
-        packs = tryCachedResult.item;
-    } else {
-        packs = await filterPacksByQuery(search, includeHidden, sort, category, version, scope);
-        await set(requestIdentifier, packs, 5 * 60 * 1000);
+function reformatDocumentData(result: SearchResponseHit<object>, scope: string[]) {
+    const doc = result.document as any
+
+    const displayName = doc.data.display.name
+
+    if (!scope.includes('data.display.name') && !scope.includes('data.display') && !scope.includes('data'))
+        delete doc.data.display.name
+    if (Object.keys(doc.data.display).length == 0)
+        delete doc.data.display
+    if (Object.keys(doc.data).length == 0)
+        delete doc.data
+
+    return {
+        displayName: displayName,
+        id: doc.id,
+        // highlight: result.highlight,
+        ...doc,
     }
-    return packs;
-}
-
-function getDataAtPath(root: any, path: string[]): any {
-    let key = path.shift()
-    if (key === undefined || root === undefined)
-        return root;
-
-    return { [key]: getDataAtPath(root[key], path) }
-}
-
-function deepMerge(a: any, b: any): any {
-    for (const key in b) {
-        if (b.hasOwnProperty(key)) {
-            if (a[key] && typeof a[key] === 'object' && typeof b[key] === 'object') {
-                a[key] = deepMerge(a[key], b[key]);
-            } else {
-                a[key] = b[key];
-            }
-        }
-    }
-    return a;
-}
-
-const FIELDS_TO_OMIT: {[key: string]: string[]} = {
-    'meta': [
-        'data',
-        '_indices'
-    ],
-    'data': [],
-    'owner': ['pfp']
-}
-
-async function getOwnerData(p: ReceivedPackResult) {
-    const ownerDoc = await getFirestore().collection('users').doc(p.docData.owner).get()
-    return await ownerDoc.data()
-}
-
-async function getReturnData(p: ReceivedPackResult, scope?: string[]) {
-    let data: any = {
-        id: p.docId,
-        displayName: p.docData.data?.display.name
-    };
-
-    if (scope) {
-        let scopedData: any = {}
-        for (let s of scope) {
-            const parts = s.split('.')
-            const root = parts[0]
-
-            if (!(root in FIELDS_TO_OMIT) || (root === 'meta' && parts[1] === 'data'))
-                continue;
-
-            if (root === 'meta' && parts[1] === 'rawId')
-                parts[1] = 'id'
-
-            const targetData = root !== 'owner' ? p.docData : await getOwnerData(p)
-            const retrievedData = getDataAtPath(targetData, root !== 'data' ? [...parts.slice(1)] : [...parts])
-
-
-            if (retrievedData === undefined)
-                continue;
-
-            if (root !== 'data')
-                scopedData[root] = deepMerge(scopedData[root] ?? {}, retrievedData)
-            else
-                scopedData = deepMerge(scopedData, retrievedData)
-
-            for (let f of FIELDS_TO_OMIT[root]) {
-                delete scopedData[root][f]
-            }
-
-            if (root === 'meta' && parts[1] === 'id')
-                scopedData.meta.rawId = scopedData.meta.id
-        }
-
-        data = { ...data, ...scopedData }
-    }
-
-    return data
-}
-
-async function filterPacksByQuery(search: string | undefined, includeHidden: boolean | undefined, sort: SortOptions, category: string[], version: MinecraftVersion[], scope?: string[]) {
-    const requestIdentifier = 'STORED-PACKS';
-    const tryCachedResult = await get(requestIdentifier);
-    let packs: ReceivedPackResult[];
-    if (tryCachedResult) {
-        packs = tryCachedResult.item;
-    } else {
-        const firestore = getFirestore();
-        let query: Queryable = firestore.collection('packs');
-
-        const docs = (await query.get()).docs;
-
-        packs = [];
-        await Promise.allSettled(docs.map(d => (async () => {
-            const data = d.data() as any
-            if (data.data !== undefined)
-                packs.push({ docId: d.id, docData: data });
-        })()));
-
-        await set(requestIdentifier, packs, 5 * 60 * 1000);
-    }
-
-
-    if (search !== undefined && search !== '')
-        packs = packs.filter(p => p.docData._indices?.includes(search.toLowerCase()));
-    if (!includeHidden)
-        packs = packs.filter(p => !p.docData.data.display.hidden);
-
-    packs = packs.sort((a, b) => {
-        return getSortValue(sort, a, b);
-    });
-
-    if (category.length > 0)
-        packs = packs.filter(p => {
-            return category.every(c => p.docData.data.categories?.includes(c))
-        });
-    if (version.length > 0)
-        packs = packs.filter(p => p.docData.data?.versions.find(v => v.supports.findIndex(mcV => version.includes(mcV)) !== -1))
-
-    return await Promise.all(packs.map(p => getReturnData(p, scope)));
 }

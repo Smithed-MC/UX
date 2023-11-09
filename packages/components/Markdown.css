@@ -2,7 +2,7 @@
     display: grid;
     background-color: var(--section);
     border-radius: var(--defaultBorderRadius);
-    border: 2px solid var(--border);
+    border: 0.125rem solid var(--border);
     padding: 1rem;
 
     grid-template-areas: 

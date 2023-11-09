@@ -21,6 +21,8 @@
     --success: #1BC443;
     --secondary: #C41B9C;
 
+    --bundle: #971BC4;
+
     --backgroundDark: #1b1924;
 
     --badAccent: rgb(255, 72, 72);
@@ -60,7 +62,7 @@
 
 div {
     font-family: Lexend;
-    color: var(--text)
+    color: var(--foreground)
 }
 
 h1 {
@@ -131,7 +133,7 @@ summary:active {
     border-radius: var(--defaultBorderRadius);
     /* roundness of the scroll thumb */
     /* creates padding around scroll thumb */
-    border: 2px solid var(--section);
+    border: 0.125rem solid var(--section);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -144,7 +146,7 @@ summary:active {
     border-radius: var(--defaultBorderRadius);
     font-family: Lexend;
     font-size: 1rem;
-    border: 2px solid transparent;
+    border: 0.125rem solid transparent;
     box-sizing: border-box;
 }
 
@@ -158,11 +160,11 @@ select {
 
 .input:focus, select:focus {
     outline: none;
-    border: 2px solid var(--accent);
+    border: 0.125rem solid var(--accent);
 }
 
 .input:hover {
-    border: 2px solid var(--border);
+    border: 0.125rem solid var(--border);
 }
 
 select select {
@@ -176,7 +178,7 @@ select select {
 
 .input, select {
     background-color: var(--bold);
-    border: 2px solid var(--border);
+    border: 0.125rem solid var(--border);
     color: var(--foreground);
     width: 19.25rem;
     height: 2.25rem;
@@ -186,7 +188,7 @@ select select {
 }
 
 .input:focus, select:focus {
-    border: 2px solid var(--foreground);
+    border: 0.125rem solid var(--foreground);
 }
 
 .input:focus>svg>path {
@@ -199,7 +201,7 @@ input::placeholder {
 }
 
 .invalidInput {
-    border: 2px solid var(--disturbing) !important;
+    border: 0.125rem solid var(--disturbing) !important;
     color: var(--disturbing) !important;
     animation: invalidShake 0.33s ease-in-out;
 }
@@ -256,13 +258,13 @@ select {
     overflow: visible;
 }
 
-button, .buttonLike {
+button:not(.exclude), .buttonLike {
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 8px 16px;
-    gap: 16px;
+    padding: 0.5rem 1rem;
+    gap: 1rem;
 
     font-weight: 400;
     
@@ -275,8 +277,8 @@ button, .buttonLike {
     
     box-sizing: border-box;
     background: var(--section);
-    border-radius: 16px;
-    border: 2px solid transparent;
+    border-radius: var(--defaultBorderRadius);
+    border: 0.125rem solid transparent;
 
     
     font-family: 'Lexend';
@@ -293,13 +295,13 @@ button, .buttonLike {
     cursor: pointer;
 }
 
-button:hover:not(:disabled), .buttonLike:hover:not(:disabled) {
+button:hover:not(:disabled):not(.exclude), .buttonLike:hover:not(:disabled) {
     /* Highlight */
 
     background: var(--section);
     /* Border */
 
-    border: 2px solid var(--border);
+    border: 0.125rem solid var(--border);
 }
 
 .invalidButtonLike:hover {
@@ -316,17 +318,17 @@ button:hover:not(:disabled), .buttonLike:hover:not(:disabled) {
 }
 
 
-button:focus:not(:disabled), .buttonLike:focus:not(:disabled) {
+button:focus:not(:disabled):not(.exclude), .buttonLike:focus:not(:disabled) {
     outline: none;
-    border: 2px solid var(--foreground);
+    border: 0.125rem solid var(--foreground);
 }
 
 
-button:active:not(:disabled), .buttonLike:active:not(:disabled) {
+button:active:not(:disabled):not(.exclude), .buttonLike:active:not(:disabled) {
     filter: brightness(90%);
 }
 
-button:disabled, .buttonLike:disabled {
+button:disabled:not(.exclude), .buttonLike:disabled {
     opacity: 0.5 !important;
     cursor: default;
 }
@@ -334,7 +336,9 @@ button:disabled, .buttonLike:disabled {
 .accentedButtonLike {
     background-color: var(--accent);
 }
-
+.secondaryAccentButtonLike {
+    background-color: var(--accent2);
+}
 .disturbingButtonLike {
     background-color: var(--disturbing);
 }
@@ -359,6 +363,9 @@ button:disabled, .buttonLike:disabled {
     background-color: var(--secondary);
 }
 
+.bundleButtonLike {
+    background-color: var(--bundle);
+}
 
 .footerContainer {
     display: grid;
@@ -374,7 +381,7 @@ button:disabled, .buttonLike:disabled {
 
 .footerSmallGroup {
     width: 100%;
-    gap: 16px;
+    gap: 1rem;
 }
 
 .footerLargeGroup {
@@ -420,13 +427,12 @@ a:hover[href] {
     text-decoration: none;
 }
 
-.compactButton:hover[href],
-.compactButton:hover[onClick] {
+.compactButton:hover:where(a[href], a[onClick], :not(a)) {
     text-decoration: underline;
 }
 
-.compactButton:active[href],
-.compactButton:active[onClick] {
+
+.compactButton:active:where(a[href], a[onClick], :not(a))  {
     opacity: 0.9;
 }
 

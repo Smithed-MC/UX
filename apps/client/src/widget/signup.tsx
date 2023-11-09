@@ -28,7 +28,7 @@ export default function SignUp({clickLogin}: {clickLogin: ()=>void}) {
 
         try {
             try {
-                const userDataResp = await fetch(`https://api.smithed.dev/v2/users/${displayName}`)
+                const userDataResp = await fetch(import.meta.env.VITE_API_SERVER + `/users/${displayName}`)
                 if (userDataResp.ok)
                     return setDisplayNameError('Username taken!')
             } catch {
@@ -41,7 +41,7 @@ export default function SignUp({clickLogin}: {clickLogin: ()=>void}) {
             const uid = cred.user.uid;
 
 
-            const resp = await fetch(`https://api.smithed.dev/v2/users/${uid}/setup?token=${token}&displayName=${displayName}`)
+            const resp = await fetch(import.meta.env.VITE_API_SERVER + `/users/${uid}/setup?token=${token}&displayName=${displayName}`)
 
             if (!resp.ok)
                 return alert(await resp.json())

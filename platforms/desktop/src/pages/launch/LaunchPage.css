@@ -47,7 +47,7 @@
 	background-color: var(--section);
 	width: min(100%);
 	padding: 1.5rem;
-	border-top: 2px solid var(--border);
+	border-top: 0.125rem solid var(--border);
 	position: fixed;
 	bottom: 0px;
 	left: 0px;
