@@ -45,6 +45,9 @@ import { ReactComponent as Copy } from './assets/copy.svg'
 import { ReactComponent as FlagCrossed } from './assets/flag_crossed.svg'
 import { ReactComponent as Gear } from './assets/gear.svg'
 import { ReactComponent as CurlyBraces } from './assets/curly_braces.svg'
+import { ReactComponent as YouTube } from './assets/youtube.svg'
+import { ReactComponent as ColorPicker} from './assets/color-picker.svg'
+
 export {
     Account,
     AddToBundle,
@@ -92,5 +95,7 @@ export {
     Copy,
     FlagCrossed,
     Gear,
-    CurlyBraces
+    CurlyBraces,
+    YouTube,
+    ColorPicker
 }

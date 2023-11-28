@@ -26,7 +26,7 @@ export function IconTextButton({
 	onMouseLeave,
 	rel,
 	disabled
-}: IconTextButtonProps & any) {
+}: IconTextButtonProps & React.HTMLProps<HTMLAnchorElement>) {
 	return (
 		<a
 			className={
@@ -40,9 +40,12 @@ export function IconTextButton({
 			onMouseEnter={onMouseEnter}
 			onMouseLeave={onMouseLeave}
 		>
-			{IconSvg !== undefined && typeof IconSvg === "string" && IconSvg}
-			{IconSvg !== undefined && typeof IconSvg !== "string" && <IconSvg />}
-			{iconElement !== undefined && iconElement}
+			<div className='container' style={{ flexShrink: 0, height: '100%' }}>
+				{IconSvg !== undefined && typeof IconSvg === "string" && IconSvg}
+				{IconSvg !== undefined && typeof IconSvg !== "string" && <IconSvg />}
+				{iconElement !== undefined && iconElement}
+			</div>
+
 			{!(IconSvg === undefined && iconElement === undefined) && (
 				<div
 					style={{
@@ -53,7 +56,8 @@ export function IconTextButton({
 					}}
 				/>
 			)}
-			<label>{text}</label>
+
+			<span style={{ flexGrow: 1, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{text}</span>
 		</a>
 	);
 }

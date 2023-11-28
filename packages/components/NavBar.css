@@ -92,8 +92,7 @@
         gap: 0.25rem;
     }
 
-    .navBarOption>div,
-    .navBarOption>label {
+    .navBarOption>*:not(:first-child) {
         display: none;
     }
 

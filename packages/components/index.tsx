@@ -14,6 +14,8 @@ import { ChooseBox } from "./ChooseBox";
 import GalleryPackCard from './GalleryPackCard'
 import CategoryBar, { CategoryChoice } from "./CategoryBar";
 import { DownloadButton } from "./DownloadButton";
+import Modal from './Modal';
+
 
 export {
 	NavButton,
@@ -33,5 +35,6 @@ export {
 	GalleryPackCard,
 	CategoryBar,
 	CategoryChoice,
-	type DownloadButton
+	type DownloadButton,
+	Modal,
 };

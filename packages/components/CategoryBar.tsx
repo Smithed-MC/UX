@@ -12,25 +12,34 @@ export default function CategoryBar({ children, defaultValue, onChange }: Catego
     if (!(children instanceof Array))
         children = [children]
 
-    const setDefaultValue = () => {
+    const [value, setValue] = useState<string>('')
+
+    useEffect(() => {
         if (!(children instanceof Array))
             children = [children]
 
-        defaultValue = children.filter(c => !c.props.disabled)[0].props.value ?? undefined
-    }
-
-
-    if (defaultValue) {
-        let child = children.find(c => c.props.value === defaultValue)
-
-        if (child === undefined || child.props.disabled) {
+        const setDefaultValue = () => {
+            if (!(children instanceof Array))
+                children = [children]
+    
+            defaultValue = children.filter(c => !c.props.disabled)[0].props.value ?? undefined
+        }
+    
+    
+        if (defaultValue) {
+            let child = children.find(c => c.props.value === defaultValue)
+    
+            if (child === undefined || child.props.disabled) {
+                setDefaultValue()
+            }
+        } else {
             setDefaultValue()
         }
-    } else {
-        setDefaultValue()
-    }
 
-    const [value, setValue] = useState(defaultValue)
+        setValue(defaultValue ?? '')
+    }, [])
+    
+
     const selectedChoice = useRef<HTMLButtonElement>(null)
     const backgroundElement = useRef<HTMLDivElement>(null)
 
@@ -38,6 +47,8 @@ export default function CategoryBar({ children, defaultValue, onChange }: Catego
         throw Error("Category bar has duplicate values")
 
     function updateBackgroundSlide(selected: HTMLElement, shouldTransition: boolean = true) {
+        if (selected == null)
+            return
         const selectedRect = selected.getBoundingClientRect();
 
         const backgroundStyle = backgroundElement.current!.style
@@ -46,6 +57,8 @@ export default function CategoryBar({ children, defaultValue, onChange }: Catego
         let transition = backgroundStyle.transition;
         if (!shouldTransition)
             backgroundStyle.setProperty('transition', 'none')
+        else
+            backgroundStyle.removeProperty('transition')
 
         backgroundStyle.setProperty('width', `${selectedRect.width}px`);
         backgroundStyle.setProperty('height', `${selectedRect.height}px`);
@@ -65,7 +78,8 @@ export default function CategoryBar({ children, defaultValue, onChange }: Catego
     }, [])
 
     useEffect(() => {
-        setValue(defaultValue)
+        setValue(defaultValue ?? '')
+        updateBackgroundSlide(selectedChoice.current!, false)
     }, [defaultValue])
 
     function wrapOnClick(c: React.ReactElement<CategoryChoiceProps>) {
