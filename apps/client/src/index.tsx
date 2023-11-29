@@ -1,5 +1,5 @@
 import { NavBar, RootError } from 'components'
-import { useEffect, useState, useTransition } from 'react'
+import { StrictMode, useEffect, useState, useTransition } from 'react'
 import { createBrowserRouter, Outlet, RouterProvider, ScrollRestoration, useLocation } from 'react-router-dom'
 import { initializeApp } from 'firebase/app'
 import { User as FirebaseUser } from 'firebase/auth'
@@ -135,7 +135,9 @@ export function ClientApplet(props: ClientProps) {
         </div>}
         <div className='container outlet' style={{ width: 'min(70rem, 100%)', gap: '4rem', boxSizing: 'border-box', flexGrow: 1, justifyContent: 'start', paddingTop: '1rem', paddingBottom: '1rem' }}>
             <NavBar getTabs={props.inject.getNavbarTabs} logoUrl={props.inject.logoUrl} />
-            <Outlet />
+            <StrictMode>
+                <Outlet />
+            </StrictMode>
         </div>
         {props.inject.enableFooter ? <Footer /> : <br />}
     </div>

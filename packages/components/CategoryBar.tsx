@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { PropsWithChildren, useEffect } from "react"
 import { useRef, useState } from "react"
 import './CategoryBar.css'
 
@@ -82,7 +82,7 @@ export default function CategoryBar({ children, defaultValue, onChange }: Catego
         updateBackgroundSlide(selectedChoice.current!, false)
     }, [defaultValue])
 
-    function wrapOnClick(c: React.ReactElement<CategoryChoiceProps>) {
+    function wrapOnClick(c: React.ReactElement<CategoryChoiceProps & React.HTMLProps<HTMLElement>>) {
         let props = c.props
         const onClick = (e: React.MouseEvent<HTMLButtonElement>) => {
             if (value != props.value) {
@@ -97,6 +97,7 @@ export default function CategoryBar({ children, defaultValue, onChange }: Catego
         }
 
         return <CategoryChoice {...props} 
+            key={props.key ?? props.value}
             onClick={onClick} 
             selected={value === props.value} 
             ref={value === props.value ? selectedChoice : undefined}
@@ -122,7 +123,7 @@ interface CategoryChoiceProps {
 export const CategoryChoice = React.forwardRef(function ({ selected, onClick, children, icon, text, disabled }: CategoryChoiceProps, forwardRef?: React.ForwardedRef<HTMLButtonElement>) {
     return <button className={`exclude container categoryChoice ${selected ? 'selected' : ''}`} onClick={onClick} ref={forwardRef} disabled={disabled}>
         <div className="container content" style={{ gap: '1rem', flexDirection: 'row'}}>
-            <span>{icon}</span>
+            {icon}
             <div style={{ width: '0.125rem', height: '1.25rem', backgroundColor: 'var(--foreground)', opacity: 0.2 }} />
             <span>{text}</span>
         </div>

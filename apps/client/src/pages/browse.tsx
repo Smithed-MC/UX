@@ -1,6 +1,6 @@
 import { PackCard, IconInput, ChooseBox, GalleryPackCard } from "components";
 import React, { useEffect, useRef, useState } from "react";
-import { PackData, SortOptions, packCategories, supportedMinecraftVersions } from 'data-types'
+import { PackData, SortOptions, fullMinecraftVersions, packCategories, supportedMinecraftVersions } from 'data-types'
 import { AddToBundleModal } from "../widget/packInfo.js";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import './browse.css'
@@ -95,7 +95,7 @@ export default function Browse(props: any) {
                     <ChooseBox placeholder="Category" style={{ flexGrow: 1 }} defaultValue={Array.from(categories.values()).filter(c => c != null).map(c => c as string)} choices={packCategories.map(cat => { return { value: cat, content: cat } })} multiselect onChange={(v) => {
                         setCategories(new Set(typeof v === 'string' ? [v] : v))
                     }} />
-                    <ChooseBox placeholder="Version" style={{ flexGrow: 1 }} defaultValue={Array.from(versions.values()).filter(c => c != null).map(c => c as string)} choices={supportedMinecraftVersions.filter(v => !v.endsWith("-dev")).map(v => { return { value: v, content: v } })} multiselect onChange={(v) => {
+                    <ChooseBox placeholder="Version" style={{ flexGrow: 1 }} defaultValue={Array.from(versions.values()).filter(c => c != null).map(c => c as string)} choices={fullMinecraftVersions.map(v => { return { value: v, content: v } })} multiselect onChange={(v) => {
                         setVersions(new Set(typeof v === 'string' ? [v] : v))
                     }} />
                 </div>

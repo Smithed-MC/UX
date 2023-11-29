@@ -10,10 +10,10 @@ async function getUserData(id: string) {
 }
 
 async function getUserPacks(id: string) {
-    const userPacksResponse = await fetch(import.meta.env.VITE_API_SERVER + `/users/${id}/packs`)
-    const packIds: string[] = userPacksResponse.ok ? (await userPacksResponse.json()) : []
+    const userPacksResponse = await fetch(import.meta.env.VITE_API_SERVER + `/users/${id}/packs?&scope=` + BROWSE_SCOPES.join('&scope='))
+    const packs: {id: string, data: PackData, meta: PackMetaData}[] = userPacksResponse.ok ? (await userPacksResponse.json()) : []
 
-    return packIds
+    return packs
 }
 async function getBundles(id: string) {
     const userBundlesResponse = await fetch(import.meta.env.VITE_API_SERVER + `/users/${id}/bundles`)
@@ -34,18 +34,15 @@ async function getPackData(id: string): Promise<{ id: string, pack: PackData, me
     return { id: id, pack: await packDataResponse.json(), meta: await packMetaResponse.json() }
 }
 
-async function getDownloads(id: string, packs: string[]) {
+async function getDownloads(id: string, packs: {meta: PackMetaData}[]) {
     let total = 0;
     let daily = 0;
-
-    const today = new Date().toLocaleDateString(undefined, { timeZone: 'America/New_York' }).replaceAll('/', '-')
 
 
     for (let pack of packs) {
         try {
-            const packEntry = await (await fetch(import.meta.env.VITE_API_SERVER + `/packs/${pack}/meta`)).json()
-            total += packEntry.stats.downloads.total
-            daily += packEntry.stats.downloads.today ?? 0
+            total += pack.meta.stats.downloads.total
+            daily += pack.meta.stats.downloads.today ?? 0
         } catch {
             console.log(`Pack ${pack}`)
         }
@@ -58,11 +55,10 @@ export async function loadUserPageData({ params }: any) {
     const id: string = params.owner
 
 
-    const [user, packIds, bundles] = await Promise.all([getUserData(id), getUserPacks(id), getBundles(id)])
+    const [user, packs, bundles] = await Promise.all([getUserData(id), getUserPacks(id), getBundles(id)])
     // console.log(packIds)
-    const packs = await Promise.all(packIds.map(p => getPackData(p)))
 
-    const [totalDownloads, dailyDownloads] = await getDownloads(id ?? '', packIds)
+    const [totalDownloads, dailyDownloads] = await getDownloads(id ?? '', packs)
 
     const userStats = {
         packs: packs,

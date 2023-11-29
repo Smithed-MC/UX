@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox";
-import { API_APP, sendError } from "../../../app.js";
+import { API_APP, TYPESENSE_APP, sendError } from "../../../app.js";
 import { getUserDoc } from "./index.js";
 import { HTTPResponses } from 'data-types';
 import { getFirestore } from "firebase-admin/firestore";
@@ -24,20 +24,41 @@ API_APP.route({
     schema: {
         params: Type.Object({
             id: Type.String()
+        }),
+        querystring: Type.Object({
+            scope: Type.Optional(Type.Array(Type.String()))
         })
     },
     handler: async (request, reply) => {
         const {id} = request.params
+        const {scope} = request.query
 
         request.log.info('Querying Firebase for User w/ ID ' + id)
         const userDoc = await getUserDoc(id)
         if(userDoc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, 'User not found')
         
-        const packs = getFirestore().collection('packs')
+        const packs = await TYPESENSE_APP.collections('packs').documents().search({
+            q: '',
+            query_by: [
+                'owner.displayName'
+            ],
+            filter_by: [
+                'meta.contributors:=`' + userDoc.id + '`'
+            ].join(' && '),
+            include_fields: [
+                'id',
+                ...(scope ?? [])
+            ],
+        })
 
-        const query = await packs.where('contributors', 'array-contains', userDoc.id).get()
-        
-        return query.docs.map(d => d.id)
+        if (!packs.hits)
+            return []
+
+        if (!scope || scope.length === 0) {
+            return packs.hits.map(p => (p.document as any).id)
+        } else {
+            return packs.hits.map(p => p.document)
+        }
     }
 })

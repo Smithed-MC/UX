@@ -61,7 +61,7 @@ export interface UserProps {
     bundleDownloadButton: DownloadButton,
 }
 
-function UserPacks({ user, packs, editable, visible }: { user: UserData, packs: { id: string, pack: PackData, meta: PackMetaData }[] } & UserTabComponent) {
+function UserPacks({ user, packs, editable, visible }: { user: UserData, packs: { id: string, data: PackData, meta: PackMetaData }[] } & UserTabComponent) {
     const navigate = useNavigate()
 
     return <div className='userContentGrid' style={{ display: visible ? 'grid' : 'none' }}>
@@ -72,8 +72,10 @@ function UserPacks({ user, packs, editable, visible }: { user: UserData, packs: 
             .map(p => <GalleryPackCard
                 state={editable ? 'editable' : undefined}
                 id={p.id}
-                packData={p.pack} o
-                nClick={() => { navigate(`../packs/${p}`) }}
+                packData={p.data}
+                packMeta={p.meta}
+                packAuthor={user.displayName}
+                onClick={() => { navigate(`../packs/${p}`) }}
                 
             />)
         }

@@ -1,7 +1,7 @@
 import { open } from '@tauri-apps/api/shell'
 import { DownloadButton, IconTextButton, markdownOptions, MarkdownRenderer, Modal } from "components";
 import { Cross, CurlyBraces, Discord, Download, Github, Globe, Jigsaw, Picture, Plus, Right, Warning } from "components/svg";
-import { MinecraftVersion, PackBundle, PackData, PackEntry, PackMetaData, PackVersion, supportedMinecraftVersions, UserData } from 'data-types';
+import { fullMinecraftVersions, MinecraftVersion, PackBundle, PackData, PackEntry, PackMetaData, PackVersion, supportedMinecraftVersions, UserData } from 'data-types';
 import React, { createContext, MouseEventHandler, useRef, useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import './packInfo.css'
@@ -42,10 +42,9 @@ function WidgetOption({ isOutdated, onClick, children, icon }: { isOutdated: boo
 }
 
 function showSupportedVersions(packData: PackData, onClick: (v: string) => void) {
-    const longestVersion = [...supportedMinecraftVersions].filter(v => !v.endsWith("-dev")).sort((a, b) => a.length - b.length).at(-1)!
+    const longestVersion = [...fullMinecraftVersions].sort((a, b) => a.length - b.length).at(-1)!
 
-    return [...supportedMinecraftVersions]
-        .filter(v => !v.endsWith("-dev"))
+    return [...fullMinecraftVersions]
         .sort((a, b) => compare(coerce(a) ?? '', coerce(b) ?? ''))
         .reverse()
         .filter((mcVersion) =>
