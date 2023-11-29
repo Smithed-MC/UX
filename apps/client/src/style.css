@@ -398,9 +398,6 @@ a:hover[href] {
 }
 
 @media screen and (max-width: 70rem) { 
-    .main {
-        padding: 0px 16px !important;
-    }   
     .outlet {
         padding: 16px 16px !important;
     }

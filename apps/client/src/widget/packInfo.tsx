@@ -1,7 +1,7 @@
 import { open } from '@tauri-apps/api/shell'
-import { DownloadButton, IconTextButton, markdownOptions, MarkdownRenderer } from "components";
+import { DownloadButton, IconTextButton, markdownOptions, MarkdownRenderer, Modal } from "components";
 import { Cross, CurlyBraces, Discord, Download, Github, Globe, Jigsaw, Picture, Plus, Right, Warning } from "components/svg";
-import { MinecraftVersion, PackBundle, PackData, PackEntry, PackMetaData, PackVersion, supportedMinecraftVersions, UserData } from 'data-types';
+import { fullMinecraftVersions, MinecraftVersion, PackBundle, PackData, PackEntry, PackMetaData, PackVersion, supportedMinecraftVersions, UserData } from 'data-types';
 import React, { createContext, MouseEventHandler, useRef, useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import './packInfo.css'
@@ -42,9 +42,9 @@ function WidgetOption({ isOutdated, onClick, children, icon }: { isOutdated: boo
 }
 
 function showSupportedVersions(packData: PackData, onClick: (v: string) => void) {
-    const longestVersion = [...supportedMinecraftVersions].sort((a, b) => a.length - b.length).at(-1)!
+    const longestVersion = [...fullMinecraftVersions].sort((a, b) => a.length - b.length).at(-1)!
 
-    return [...supportedMinecraftVersions]
+    return [...fullMinecraftVersions]
         .sort((a, b) => compare(coerce(a) ?? '', coerce(b) ?? ''))
         .reverse()
         .filter((mcVersion) =>
@@ -288,43 +288,6 @@ export function AddToBundleModal({ trigger, isOpen, close, packData, id }: { tri
     </div>
 }
 
-interface ModalContext {
-    close: MouseEventHandler
-}
-
-const ModalContext = createContext<ModalContext>({ close: () => { } })
-
-function Modal({ trigger, content, onClose }: {
-    trigger: React.ReactElement,
-    content?: (ctx: ModalContext) => React.ReactElement,
-    onClose?: () => void
-}) {
-    const [open, setOpen] = useState(false)
-
-    trigger = React.createElement(trigger.type, {
-        ...trigger.props,
-        onClick: (e: MouseEvent) => {
-            e.preventDefault()
-            setOpen(!open)
-            if (!open && onClose)
-                onClose()
-        }
-    })
-
-    return <div className="container" style={{ position: 'relative' }} onMouseLeave={() => setOpen(false)}>
-        {trigger}
-        <div className="container" style={{ position: 'absolute', top: 'calc(100% - 0.5rem)', padding: '1rem 1rem 1rem 1rem', zIndex: open ? 0 : -100, opacity: open ? 1 : 0, transition: 'all 0.25s ease-in-out' }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="34" height="30" viewBox="0 0 34 30" fill="none" style={{ zIndex: 1, marginBottom: '-0.25rem' }}>
-                <path d="M17 0L33.8875 29.25H0.112505L17 0Z" fill="var(--bold)" />
-            </svg>
-            <div style={{ padding: '0.5rem', background: 'var(--bold)', borderRadius: 'var(--defaultBorderRadius)', boxSizing: 'border-box', minWidth: '4rem', width: 'max-content' }}>
-                {content && content({
-                    close: (e) => { e?.preventDefault(); setOpen(false); if (onClose) onClose() }
-                })}
-            </div>
-        </div>
-    </div>
-}
 
 function DownloadPackModal({ children, packData, packId }: { children: JSX.Element, packData: PackData, packId: string }) {
     const [page, setPage] = useState<'mode' | 'gameVersion' | 'packVersion'>('mode')

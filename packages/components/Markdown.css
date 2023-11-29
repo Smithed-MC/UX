@@ -9,10 +9,11 @@
         "image header"
         "image description";
 
-    grid-template-columns: auto auto;
+    grid-template-columns: auto 1fr;
     grid-template-rows: min-content 1fr;
 
     align-items: start;
+    place-content: start;
 
     column-gap: 1rem;
     row-gap: 0.5rem;
@@ -26,11 +27,13 @@
     align-items: center;
     gap: 0.5rem;
     height: fit-content;
+    width: 1fr;
 }
 
 .markdownFeatureTemplateHeader>h1, .markdownFeatureTemplate>p {
     text-align: left;
     margin: 0;
+    width: 1fr;
 }
 
 .markdownFeatureTemplateHeader>h1 {

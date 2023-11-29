@@ -9,12 +9,12 @@ interface IconTextButtonProps {
 
 export default function IconInput({ icon: IconSvg, iconElement, className, style, inputRef, ...props }: IconTextButtonProps & React.HTMLProps<HTMLInputElement>) {
 
-    return <div className={'container input ' + className} style={{ flexDirection: 'row', alignItems: 'center', gap: '0.5rem', ...style }}>
-        {(IconSvg || iconElement) && <span className="container" style={{ color: 'var(--border)' }}>
+    return <div key={props.key} className={'container input ' + className} style={{ flexDirection: 'row', alignItems: 'center', gap: '0.5rem', ...style }}>
+        {(IconSvg || iconElement) && <span className="container" style={{ color: 'var(--border)', height: '100%'}}>
             {IconSvg !== undefined && typeof (IconSvg) === 'string' && IconSvg}
             {IconSvg !== undefined && typeof (IconSvg) !== 'string' && <IconSvg />}
             {iconElement !== undefined && iconElement}
         </span>}
-        <input {...props} ref={inputRef} className="childInput" style={{ backgroundColor: 'transparent', border: 'none', fontFamily: 'Lexend', width: '100%', height: '100%', fontSize: '1rem', WebkitUserSelect: 'none', color: 'var(--foreground)' }}></input>
+        <input id={props.id} {...props} ref={inputRef} className="childInput" style={{ backgroundColor: 'transparent', border: 'none', fontFamily: 'Lexend', width: '100%', height: '100%', fontSize: '1rem', WebkitUserSelect: 'none', color: 'var(--foreground)'}}></input>
     </div>
 }

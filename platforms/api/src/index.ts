@@ -18,7 +18,7 @@ async function executeTasks(ignoreTime?: boolean) {
     
   if(now.getMinutes() % 60 === 30 || ignoreTime) {
     calculateDownloads()
-    checkIndices();
+    // checkIndices();
   }
 
   deleteTempFiles()

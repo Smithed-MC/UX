@@ -2,8 +2,9 @@ import { browserLocalPersistence, browserSessionPersistence, getAuth, setPersist
 import React, { useState } from "react";
 import './login.css'
 import { FirebaseError } from "firebase/app";
-import { IconInput, IconTextButton } from "components";
+import { IconInput, IconTextButton, Spinner } from "components";
 import { Right, Key, At } from "components/svg";
+import { useNavigate } from "react-router-dom";
 
 export default function Login({clickSignUp, clickHelp}: {clickSignUp: () => void, clickHelp: () => void}) {
     const [email, setEmail] = useState('')
@@ -12,14 +13,20 @@ export default function Login({clickSignUp, clickHelp}: {clickSignUp: () => void
     const [password, setPassword] = useState('')
     const [staySignedIn, setStaySignedIn] = useState(false)
 
+    const [loggingIn, setLoggingIn] = useState(false)
+
+    const navigate = useNavigate()
+
     // console.log(getAuth().currentUser)
     const login = async () => {
         if(email === '' || password === '') return;
+        setLoggingIn(true)
         try {
-            setPersistence(getAuth(), staySignedIn ? browserLocalPersistence : browserSessionPersistence)
-       
+            await setPersistence(getAuth(), staySignedIn ? browserLocalPersistence : browserSessionPersistence)
             const cred = await signInWithEmailAndPassword(getAuth(), email, password)
+            navigate('/' + cred.user.uid) 
         } catch (e: any) {
+            setLoggingIn(false)
             const error = e as FirebaseError
             // console.log(error.code)
 
@@ -38,7 +45,6 @@ export default function Login({clickSignUp, clickHelp}: {clickSignUp: () => void
                 }
             }
         }
-        
     }
 
     return <div className="container" style={{gap: '1rem'}}>
@@ -64,7 +70,7 @@ export default function Login({clickSignUp, clickHelp}: {clickSignUp: () => void
             <a className="compactButton" style={{opacity: 0.3}} onClick={clickSignUp}>
                 Sign up
             </a>
-            <IconTextButton className="accentedButtonLike" text="Login" icon={Right} reverse={true} onClick={login} disabled={email === '' || password === ''}/>
+            <IconTextButton className="accentedButtonLike" text="Login" iconElement={loggingIn ? <Spinner style={{width: '1rem', height: '1rem', border: '2px solid var(--text)', borderTop: '2px solid var(--accent)'}}/> : <Right/>} reverse={true} onClick={login} disabled={email === '' || password === ''}/>
         </div>
 
     </div>
