@@ -26,12 +26,13 @@ API_APP.route({
             id: Type.String()
         }),
         querystring: Type.Object({
-            scope: Type.Optional(Type.Array(Type.String()))
+            scope: Type.Optional(Type.Array(Type.String())),
+            hidden: Type.Optional(Type.Boolean())
         })
     },
     handler: async (request, reply) => {
         const {id} = request.params
-        const {scope} = request.query
+        const {scope, hidden: includeHidden} = request.query
 
         request.log.info('Querying Firebase for User w/ ID ' + id)
         const userDoc = await getUserDoc(id)
@@ -44,7 +45,8 @@ API_APP.route({
                 'owner.displayName'
             ],
             filter_by: [
-                'meta.contributors:=`' + userDoc.id + '`'
+                'meta.contributors:=`' + userDoc.id + '`',
+                ...(!includeHidden ? ['meta.hidden: false', 'data.display.hidden: false'] : [])
             ].join(' && '),
             include_fields: [
                 'id',

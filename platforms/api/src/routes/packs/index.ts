@@ -239,7 +239,7 @@ async function requestPacksFromTypesense(query: GetPackQuery) {
         filter_by: [
             ...(category.length > 0 ? category.map(c => 'data.categories:=`' + c + '`') : []),
             ...(version.length > 0 ? version.map(c => 'data.versions.supports:=`' + c + '`') : []),
-            ...(!includeHidden ? ['meta.hidden: false'] : [])
+            ...(!includeHidden ? ['meta.hidden: false', 'data.display.hidden: false'] : [])
         ].join(' && '),
         include_fields: [
             'data.display.name',
