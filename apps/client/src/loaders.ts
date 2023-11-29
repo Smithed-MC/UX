@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs } from "react-router-dom"
 import * as querystring from 'query-string'
 import { getAuth } from "firebase/auth"
-import { PackBundle, PackData, PackMetaData, SortOptions } from 'data-types'
+import { PackBundle, PackData, PackMetaData, SortOptions, UserData } from 'data-types'
 
 async function getUserData(id: string) {
     const userDataResponse = await fetch(import.meta.env.VITE_API_SERVER + `/users/${id}`)
@@ -11,7 +11,7 @@ async function getUserData(id: string) {
 
 async function getUserPacks(id: string) {
     const userPacksResponse = await fetch(import.meta.env.VITE_API_SERVER + `/users/${id}/packs?&scope=` + BROWSE_SCOPES.join('&scope='))
-    const packs: {id: string, data: PackData, meta: PackMetaData}[] = userPacksResponse.ok ? (await userPacksResponse.json()) : []
+    const packs: {id: string, data: PackData, meta: PackMetaData, owner: UserData}[] = userPacksResponse.ok ? (await userPacksResponse.json()) : []
 
     return packs
 }
@@ -51,6 +51,14 @@ async function getDownloads(id: string, packs: {meta: PackMetaData}[]) {
     return [total, daily]
 }
 
+export interface UserStats {
+    totalDownloads: number,
+    dailyDownloads: number
+    packs: { id: string, data: PackData, meta: PackMetaData, owner: UserData }[],
+    bundles: string[],
+    id: string,
+}
+
 export async function loadUserPageData({ params }: any) {
     const id: string = params.owner
 
@@ -60,7 +68,7 @@ export async function loadUserPageData({ params }: any) {
 
     const [totalDownloads, dailyDownloads] = await getDownloads(id ?? '', packs)
 
-    const userStats = {
+    const userStats: UserStats = {
         packs: packs,
         bundles: bundles,
         id: id ?? '',

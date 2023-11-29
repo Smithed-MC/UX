@@ -10,47 +10,9 @@ dotenv.config()
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-async function getMetadata(url = '') {
-    if (url === '/') {
-        return {
-            title: 'Smithed',
-            description: 'Datapacks: the community, the tooling; all bundled into the perfect package.',
-            image: 'https://beta.smithed.dev/icon.png'
-        }
-    }
-    if (url.match(/packs\/.+/g)) {
-        const packId = url.split('/')[2]
-
-        const resp = await fetch('https://api.smithed.dev/v2/packs/' + packId)
-        if (!resp.ok)
-            return undefined;
-        const data = await resp.json();
-
-        return {
-            siteName: 'Smithed',
-            title: data.display.name,
-            description: data.display.description,
-            image: data.display.icon ?? undefined
-        }
-    } else if (url.match(/bundles\/.+/g)) {
-        const bundleId = url.split('/')[2]
-
-        const resp = await fetch('https://api.smithed.dev/v2/bundles/' + bundleId)
-        if (!resp.ok)
-            return undefined;
-        const data = await resp.json();
-
-        return {
-            siteName: 'Smithed Bundle',
-            title: data.name
-        }
-    }
-
-}
-
 const distFolder = "dist/client"
 const isProd = process.env.NODE_ENV === 'production' || process.env.SERVER_ENV === 'production'
-const sitemap = await generateSitemap(distFolder)
+const sitemap = isProd ? await generateSitemap(distFolder) : ''
 
 console.log('Is server production?', isProd)
 console.log('Running on port:', process.env.PORT)

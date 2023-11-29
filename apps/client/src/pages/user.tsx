@@ -12,14 +12,8 @@ import { User as FirebaseUser } from 'firebase/auth'
 import { prettyTimeDifference } from 'formatters'
 import { CreateBundle } from '../widget/bundle'
 import { BundleCard } from 'components/BundleCard'
+import { UserStats } from '../loaders'
 
-interface UserStats {
-    totalDownloads: number,
-    dailyDownloads: number
-    packs: { id: string, pack: PackData, meta: PackMetaData }[],
-    bundles: string[],
-    id: string,
-}
 
 interface UserTabComponent {
     editable: boolean,
@@ -61,10 +55,10 @@ export interface UserProps {
     bundleDownloadButton: DownloadButton,
 }
 
-function UserPacks({ user, packs, editable, visible }: { user: UserData, packs: { id: string, data: PackData, meta: PackMetaData }[] } & UserTabComponent) {
+function UserPacks({ user, packs, editable, visible }: { user: UserData, packs: { id: string, data: PackData, meta: PackMetaData, owner: UserData }[] } & UserTabComponent) {
     const navigate = useNavigate()
 
-    return <div className='userContentGrid' style={{ display: visible ? 'grid' : 'none' }}>
+    return <div key="packs" className='userContentGrid' style={{ display: visible ? 'grid' : 'none' }}>
         {packs
             .sort((a, b) => a.meta.stats.downloads.total - b.meta.stats.downloads.total)
             .sort(p => p.meta.owner === user.uid ? 1 : -1)
@@ -74,9 +68,9 @@ function UserPacks({ user, packs, editable, visible }: { user: UserData, packs: 
                 id={p.id}
                 packData={p.data}
                 packMeta={p.meta}
-                packAuthor={user.displayName}
+                packAuthor={p.owner.displayName}
                 onClick={() => { navigate(`../packs/${p}`) }}
-                
+                key={p.id}
             />)
         }
         {editable && packs.length == 0 && <div className="container" style={{ gap: '1rem' }}>
@@ -87,7 +81,7 @@ function UserPacks({ user, packs, editable, visible }: { user: UserData, packs: 
 }
 
 function UserBundles({ bundles, editable, bundleDownloadButton, visible }: { bundles: string[], bundleDownloadButton: DownloadButton } & UserTabComponent) {
-    return <div className='userContentGrid' style={{ display: visible ? 'grid' : 'none' }}>
+    return <div key="bundles" className='userContentGrid' style={{ display: visible ? 'grid' : 'none' }}>
         {bundles?.map(b => <BundleCard key={b} id={b} editable={editable} bundleDownloadButton={bundleDownloadButton} />)}
     </div>
 }
@@ -149,6 +143,7 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
     const { user, userStats }: { user: UserData | undefined, userStats: UserStats } = useLoaderData() as any
 
     const [tab, setTab] = useState(defaultTab ?? 'userPacks')
+    
     const [editable, setEditable] = useState<boolean>(false)
     const [editingUserData, setEditingUserData] = useState(false)
 
@@ -158,7 +153,7 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
 
     const [showBundleCreationModal, setShowBundleCreationModal] = useState(false)
     const [showFallbackPFP, setShowFallbackPFP] = useState(false)
-
+    
     const pfpUploadRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
@@ -243,7 +238,7 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
                 <div className="container" style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div className='userIconAndName'>
                         <div style={{ gridArea: 'image', width: 64, height: 64, overflow: 'hidden', borderRadius: 'var(--defaultBorderRadius)', display: 'flex' }}>
-                            {!showFallbackPFP && !import.meta.env.SSR && <img src={pfp ?? ""} style={{ width: 64, height: 64, margin: 0 }} width={64} height={64} onError={(e) => setShowFallbackPFP(true)} />}
+                            {!showFallbackPFP && <img src={pfp ?? ""} style={{ width: 64, height: 64, margin: 0 }} width={64} height={64} onError={(e) => setShowFallbackPFP(true)} />}
                             {showFallbackPFP && <div className='userFallbackPFP'><Account style={{ width: 32, height: 32 }} /></div>}
 
                             {editingUserData && <button style={{ width: 64, height: 64, position: 'absolute', backgroundColor: 'rgba(0,0,0,0.50)' }} onClick={() => {

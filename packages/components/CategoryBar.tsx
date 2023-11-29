@@ -106,7 +106,7 @@ export default function CategoryBar({ children, defaultValue, onChange }: Catego
 
     return <div className="container categoryBar">
         <div className="psuedoBackground" ref={backgroundElement}/>
-        {children.map(wrapOnClick)}
+        {children.filter(c => !c.props.hidden).map(wrapOnClick)}
     </div>
 }
 
@@ -116,6 +116,7 @@ interface CategoryChoiceProps {
     icon: JSX.Element
     selected?: boolean,
     disabled?: boolean,
+    hidden?: boolean
     children?: any
     onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void 
 }
