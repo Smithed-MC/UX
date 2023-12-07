@@ -23,6 +23,9 @@ impl SmithedConfig {
     /// Opens the config at the default path
     pub fn open(dirs: &ProjectDirs) -> anyhow::Result<SmithedConfig> {
         let path = Self::path(dirs);
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
         if path.exists() {
             let file = File::open(path).context("Failed to open config file")?;
             let mut file = BufReader::new(file);

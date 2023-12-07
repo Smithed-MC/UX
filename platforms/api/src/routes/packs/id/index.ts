@@ -360,8 +360,7 @@ API_APP.route({
 
         const existingContributors: string[] = await doc.get('contributors')
 
-        await doc.ref.set({contributors: existingContributors.filter(v => !contributors.includes(v))
-        }, {merge: true})
+        await doc.ref.set({contributors: existingContributors.filter(v => v === userId || !contributors.includes(v))}, {merge: true})
         return reply.status(HTTPResponses.OK).send('Deleted contributors')
     }
 })

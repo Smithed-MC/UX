@@ -16,10 +16,9 @@ export function BundleCard({ id, editable, showOwner, bundleDownloadButton: Down
     const firebaseUser = useFirebaseUser();
     const dispatch = useAppDispatch();
 
-    async function getPackName(pack: PackDependency): Promise<[string, string, string] | undefined> {
+    async function getPackName(pack: PackDependency): Promise<[string, string, string]> {
         const resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs/${pack.id}`);
-        if (!resp.ok)
-            return undefined;
+
         const data: PackData = await resp.json();
 
         return [pack.id, data.display.name, pack.version];
@@ -43,15 +42,15 @@ export function BundleCard({ id, editable, showOwner, bundleDownloadButton: Down
         const data: PackBundle = await resp.json();
 
         const promises = data.packs.map(p => getPackName(p));
-        const results = (await Promise.all(promises)).filter(r => r !== undefined);
+        const results = (await Promise.all(promises));
 
         await getOwnerName(data.owner);
 
-        setRawBundleData(data);
         setContainedPacks(results as [string, string, string][]);
+        setRawBundleData(data);
     }
 
-    useEffect(() => { loadBundleData(); }, [id]);
+    useEffect(() => { loadBundleData(); }, []);
 
     if (rawBundleData === undefined) return <div style={{ display: 'none' }} />;
 

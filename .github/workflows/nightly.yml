@@ -80,3 +80,6 @@ jobs:
           platforms/desktop/src-tauri/target/release/*.exe
           platforms/desktop/src-tauri/target/release/bundle/macos/*.app
           platforms/desktop/src-tauri/target/release/bundle/dmg/*.dmg
+          platforms/desktop/src-tauri/target/release/bundle/osx/*.app
+          platforms/desktop/src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app
+          platforms/desktop/src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg

@@ -135,9 +135,7 @@ export function ClientApplet(props: ClientProps) {
         </div>}
         <div className='container outlet' style={{ width: 'min(70rem, 100%)', gap: '4rem', boxSizing: 'border-box', flexGrow: 1, justifyContent: 'start', paddingTop: '1rem', paddingBottom: '1rem' }}>
             <NavBar getTabs={props.inject.getNavbarTabs} logoUrl={props.inject.logoUrl} />
-            <StrictMode>
-                <Outlet />
-            </StrictMode>
+            <Outlet />
         </div>
         {props.inject.enableFooter ? <Footer /> : <br />}
     </div>
