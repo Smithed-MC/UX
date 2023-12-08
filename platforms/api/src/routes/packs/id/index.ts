@@ -15,7 +15,7 @@ async function populateContent(gallery: PackGalleryImage[]) {
         const g = gallery[i];
 
         if (typeof (g) === 'object') {
-            
+
             const contents = await getStorage()
                 .bucket()
                 .file(`gallery_images/${g.uid}`)
@@ -115,11 +115,11 @@ const setPack = async (response: any, reply: any) => {
                 const buffer = Buffer.from(g)
                 if (buffer.byteLength > 1024 * 1024)
                     return sendError(reply, HTTPResponses.BAD_REQUEST, `Gallery image ${i} exceeds 1MB`)
-                
+
                 let uid = hash.sha1().update(g).digest("hex")
-                
+
                 getStorage().bucket().file(`gallery_images/${uid}`).save(g)
-                
+
                 packData.display.gallery[i] = {
                     type: 'bucket',
                     uid: uid
@@ -135,6 +135,19 @@ const setPack = async (response: any, reply: any) => {
                 delete g.content;
             }
         }
+
+        const newGallery = packData.display?.gallery
+        const missingImages = existingGallery.filter(existingImg =>
+            newGallery.findIndex((newImg) => typeof (existingImg) === 'object' 
+                && typeof (newImg) === 'object' ? existingImg.uid === newImg.uid : existingImg === newImg) === -1)
+
+        for (const missingImage of missingImages) {
+            if (typeof(missingImage) !== 'object')
+                continue;
+
+            getStorage().bucket().file(`gallery_images/${missingImage.uid}`).delete()
+        }
+
     }
 
     if (packData.versions && packData.versions.length > (await doc.get('data.versions')).length) {
@@ -493,11 +506,15 @@ API_APP.route({
             return tryCachedResult.item
         }
         const gallery = getGallery(id, reply)
+        if (reply.sent)
+            return
+
         await set(requestIdentifier, gallery ?? [], 5 * 60 * 1000);
+        return gallery ?? []
     }
 })
 
-async function getGallery(id: string, reply: FastifyReply): Promise<PackGalleryImage[]|undefined|void> {
+async function getGallery(id: string, reply: FastifyReply): Promise<PackGalleryImage[] | undefined | void> {
     const doc = await getPackDoc(id)
     if (doc === undefined)
         return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${id} was not found`)
@@ -532,7 +549,9 @@ API_APP.route({
         }
 
         const gallery = await getGallery(id, reply)
-        
+        if (reply.sent)
+            return
+
         if (!gallery)
             return sendError(reply, HTTPResponses.NOT_FOUND, `Not gallery for pack ${id}`)
         if (index >= gallery.length)
@@ -540,7 +559,7 @@ API_APP.route({
 
         const img = gallery[index];
 
-        const content = typeof(img) === 'object' ? img.content! : img;
+        const content = typeof (img) === 'object' ? img.content! : img;
         const data = Buffer.from(content.split(',')[1], 'base64')
 
         await set(requestIdentifier, data, 5 * 60 * 1000)
