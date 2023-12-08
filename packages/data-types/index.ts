@@ -66,6 +66,15 @@ export const PackVersionSchema = Type.Object({
     dependencies: Type.Array(PackReferenceSchema)
 })
 
+export const PackGalleryImageSchema = Type.Union([
+    Type.Object({
+        type: Type.Literal('bucket'), 
+        uid: Type.String(),
+        content: Type.Optional(Type.String())
+    }),
+    Type.String()
+])
+
 export const PackDataSchema = Type.Object({
     id: Type.String({minLength: 3}),
     display: Type.Object({
@@ -79,7 +88,7 @@ export const PackDataSchema = Type.Object({
             source: Type.Optional(Type.String()),
             homepage: Type.Optional(Type.String())
         })),
-        gallery: Type.Optional(Type.Array(Type.String()))
+        gallery: Type.Optional(Type.Array(PackGalleryImageSchema))
     }),
     versions: Type.Array(PackVersionSchema, {minItems: 1}),
     categories: Type.Array(PackCategorySchema)
@@ -134,6 +143,7 @@ export type PackVersion = Static<typeof PackVersionSchema>
 export type PackData = Static<typeof PackDataSchema>
 export type PackBundle = Static<typeof BundleSchema>
 export type PackReference = Static<typeof PackReferenceSchema>
+export type PackGalleryImage = Static<typeof PackGalleryImageSchema>
 
 export type UserData = Static<typeof UserDataSchema>
 

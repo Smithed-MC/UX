@@ -1,5 +1,5 @@
-import { CSSProperties, useMemo, useRef, useState } from 'react'
-import { PackBundle, PackData, PackEntry, PackMetaData } from 'data-types'
+import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
+import { PackBundle, PackData, PackEntry, PackGalleryImage, PackMetaData } from 'data-types'
 import { formatDownloads, prettyTimeDifference } from 'formatters'
 import './GalleryPackCard.css'
 import { compare, coerce } from 'semver'
@@ -102,6 +102,13 @@ export default function GalleryPackCard({ id, packData, packMeta, onClick, state
         setBadges(badges)
     }
 
+    async function populateGallery() {
+        if (!data || !data.display || !data.display.gallery) 
+            return;
+
+        data.display.gallery = await (await fetch(import.meta.env.VITE_API_SERVER + '/packs/' + id + '/gallery')).json()
+    }
+    useEffect(() => {populateGallery()}, [data])
     useMemo(() => { onLoad(); }, [id])
 
 
@@ -130,7 +137,7 @@ export default function GalleryPackCard({ id, packData, packMeta, onClick, state
                             }} />
                     }
                     {data?.display.gallery && data?.display.gallery.length > 0 &&
-                        <img className='thumbnail' style={{ width: '100%', cursor: 'pointer' }} src={data?.display.gallery[currentImage]}
+                        <img className='thumbnail' style={{ width: '100%', cursor: 'pointer' }} src={((g: PackGalleryImage) => typeof(g) === 'object' ? g.content ?? `${import.meta.env.VITE_API_SERVER}/packs/${id}/gallery/${currentImage}`  : g)(data?.display.gallery[currentImage])}
                             onClick={() => { setDisplayGallery(!displayGallery) }} />
                     }
                     {displayGallery && data?.display.gallery && <div className='carousel'>
