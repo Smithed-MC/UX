@@ -499,17 +499,17 @@ API_APP.route({
     handler: async (request, reply) => {
         const { id } = request.params;
 
-        const requestIdentifier = 'GET-PACK-GALLERY::' + id
-        const tryCachedResult = await get(requestIdentifier)
-        if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
-            request.log.info('served cached /packs/', id, '/gallery')
-            return tryCachedResult.item
-        }
-        const gallery = getGallery(id, reply)
+        // const requestIdentifier = 'GET-PACK-GALLERY::' + id
+        // const tryCachedResult = await get(requestIdentifier)
+        // if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
+        //     request.log.info('served cached /packs/', id, '/gallery')
+        //     return tryCachedResult.item
+        // }
+        const gallery = await getGallery(id, reply)
         if (reply.sent)
             return
 
-        await set(requestIdentifier, gallery ?? [], 5 * 60 * 1000);
+        // await set(requestIdentifier, gallery ?? [], 5 * 60 * 1000);
         return gallery ?? []
     }
 })
@@ -540,13 +540,13 @@ API_APP.route({
     handler: async (request, reply) => {
         const { id, index } = request.params;
 
-        const requestIdentifier = 'GET-PACK-GALLERY-' + index + '::' + id
-        const tryCachedResult = await get(requestIdentifier)
-        if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
-            request.log.info('served cached /packs/', id, '/gallery/', index)
-            reply.header('Content-Type', 'image/png');
-            return tryCachedResult.item
-        }
+        // const requestIdentifier = 'GET-PACK-GALLERY-' + index + '::' + id
+        // const tryCachedResult = await get(requestIdentifier)
+        // if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
+        //     request.log.info('served cached /packs/', id, '/gallery/', index)
+        //     reply.header('Content-Type', 'image/png');
+        //     return tryCachedResult.item
+        // }
 
         const gallery = await getGallery(id, reply)
         if (reply.sent)
@@ -562,7 +562,7 @@ API_APP.route({
         const content = typeof (img) === 'object' ? img.content! : img;
         const data = Buffer.from(content.split(',')[1], 'base64')
 
-        await set(requestIdentifier, data, 5 * 60 * 1000)
+        // await set(requestIdentifier, data, 5 * 60 * 1000)
         reply.header('Content-Type', 'image/png');
         return data;
     }
