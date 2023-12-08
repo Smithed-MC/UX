@@ -8,7 +8,7 @@ import './NavBar.css'
 import { Check, Cross, Download, Jigsaw, Logo, MenuBars, Save, Trash } from './svg.js'
 import { IconTextButton } from './IconTextButton'
 import { Discord as DiscordSvg, Home as HomeSvg, Browse as BrowseSvg, Account as AccountSvg } from 'components/svg.js'
-import { selectSelectedBundle, selectUsersBundles, setUsersBundles } from 'store'
+import { selectSelectedBundle, selectUserData, selectUsersBundles, setUsersBundles } from 'store'
 import { PackBundle, PackData } from 'data-types'
 
 interface NavButtonProps {
@@ -187,7 +187,7 @@ export function NavBar(props: NavBarProps) {
     const selectedBundle = useAppSelector(selectSelectedBundle)
     const bundles = useAppSelector(selectUsersBundles)
 
-    const user = useSmithedUser()
+    const user = !import.meta.env.SSR ? useAppSelector(selectUserData) : {};
 
 
     useEffect(() => {
@@ -224,7 +224,7 @@ export function NavBar(props: NavBarProps) {
                             <span style={{ flexShrink: 0 }}>[{curBundle?.packs.length}]</span>
                         </div>} iconElement={<Jigsaw style={{ flexShrink: 0 }} />} reverse onClick={() => setEditBundleOpen(!editBundleOpen)} />
                 }
-                <IconTextButton className="navBarOption end" text={user != null ? user.displayName : 'Login'} href={user != null ? "/" + user.displayName : "/account"} icon={AccountSvg} reverse={true} />
+                <IconTextButton className="navBarOption end" text={(user as any)['displayName'] ?? 'Login'} href={"/" + ((user as any)['displayName'] ?? "account")} icon={AccountSvg} reverse={true} />
             </div>
             {editBundleOpen && <EditBundle close={() => setEditBundleOpen(false)} />}
         </div>

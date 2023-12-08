@@ -1,6 +1,6 @@
 import * as toolkitRaw from '@reduxjs/toolkit';
 const { createSlice, configureStore } = ((toolkitRaw as any).default ?? toolkitRaw) as typeof toolkitRaw;
-import {PackBundle} from 'data-types'
+import {PackBundle, UserData} from 'data-types'
 
 function getDefault<T>(key: string, defaultValue: T) {
     if (import.meta.env.SSR)
@@ -22,7 +22,8 @@ function setStorage(key: string, value: any, child: () => void) {
 
 const initialState = {
     selectedBundle: getDefault<string>('selectedBundle', ''),
-    usersBundles: getDefault<PackBundle[]>('usersBundles', [])
+    usersBundles: getDefault<PackBundle[]>('usersBundles', []),
+    userData: getDefault<UserData|{}>('userData', {})
 }
 
 const userSlice = createSlice({
@@ -31,6 +32,7 @@ const userSlice = createSlice({
     reducers: {
         setSelectedBundle: (state, action) => setStorage('selectedBundle', action.payload, () => state.selectedBundle = action.payload),
         setUsersBundles: (state, action) => setStorage('usersBundles', action.payload, () => state.usersBundles = action.payload),
+        setUserData: (state, action) => setStorage('userData', action.payload, () => state.userData = action.payload),
     }
 })
 
@@ -43,7 +45,8 @@ export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
 
 
-export const { setSelectedBundle, setUsersBundles } = userSlice.actions
+export const { setSelectedBundle, setUsersBundles, setUserData } = userSlice.actions
 
 export const selectSelectedBundle = (state: RootState) => state.selectedBundle
 export const selectUsersBundles = (state: RootState) => state.usersBundles
+export const selectUserData = (state: RootState) => state.userData

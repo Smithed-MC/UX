@@ -18,7 +18,7 @@ import Settings from './pages/settings.js'
 import { Provider } from 'react-redux'
 import { loadBrowseData, loadHomePageData, loadUserPageData } from './loaders.js'
 import User from './pages/user.js'
-import { selectSelectedBundle, selectUsersBundles, setSelectedBundle, setUsersBundles, store } from 'store'
+import { selectSelectedBundle, selectUsersBundles, setSelectedBundle, setUserData, setUsersBundles, store } from 'store'
 import { useAppDispatch, useAppSelector } from 'hooks'
 import { PackBundle } from 'data-types'
 import { Helmet } from 'react-helmet'
@@ -83,6 +83,17 @@ export function ClientApplet(props: ClientProps) {
         dispatch(setUsersBundles(bundles))
     }
 
+    async function loadUserData(user: FirebaseUser | null) {
+        if (user == null)
+            return dispatch(setUserData({}))
+
+        const resp = await fetch(import.meta.env.VITE_API_SERVER + `/users/${user.uid}`)
+        if (!resp.ok)
+            return dispatch(setUserData({}))
+
+        dispatch(setUserData(await resp.json()))
+    }
+
     useEffect(() => {
         if (import.meta.env.SSR)
             return
@@ -90,7 +101,8 @@ export function ClientApplet(props: ClientProps) {
         setHideWarning(!!sessionStorage.getItem("hereBeDragons"))
 
         const unsub = getAuth().onAuthStateChanged(async user => {
-            await loadBundles(user)
+            loadBundles(user)
+            loadUserData(user)
         })
 
         return () => {
