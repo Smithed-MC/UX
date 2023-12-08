@@ -1,10 +1,11 @@
 import { CategoryBar, CategoryChoice, ChooseBox, IconInput, IconTextButton, MarkdownRenderer, Modal, PackCard, Spinner } from 'components'
 import { Trash, Globe, Plus, Picture, Check, Jigsaw, Text as TextSvg, At, Refresh, File, Account, Home, Github, YouTube, Discord, ColorPicker, Cross } from 'components/svg'
-import { PackData, PackDependency, PackMetaData, PackVersion, UserData, packCategories, supportedMinecraftVersions } from 'data-types'
+import { PackData, PackDependency, PackGalleryImage, PackMetaData, PackVersion, UserData, packCategories, supportedMinecraftVersions } from 'data-types'
 import { useFirebaseUser, useQueryParams } from 'hooks'
 import React, { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { coerce, compare, satisfies, inc, valid } from 'semver'
+import { gzip } from 'pako'
 import './edit.css'
 
 function EditorDiv({ children, style, ...props }: { children: any, style?: CSSProperties, [key: string]: any }) {
@@ -106,9 +107,9 @@ function SavingModal({ state, changeState }: { state: SavingState, changeState: 
     </div>
 }
 
-export function GalleryManager({ display }: { display: { gallery?: string[] } }) {
+export function GalleryManager({ display }: { display: { gallery?: PackGalleryImage[] } }) {
     const [selectedImage, setSelectedImage] = useState(0)
-    const [images, setImages] = useState<string[]>([])
+    const [images, setImages] = useState<PackGalleryImage[]>([])
 
     useEffect(() => {
         setImages(display.gallery ?? [])
@@ -145,7 +146,7 @@ export function GalleryManager({ display }: { display: { gallery?: string[] } })
     return <>
         <input ref={fileUploadRef} type="file" accept='image/png, image/jpeg' hidden onChange={OnFileUpload} />
         {display.gallery && display.gallery.length >= 1 && <div style={{ width: '100%', position: 'relative' }}>
-            <img style={{ width: '100%', borderRadius: 'var(--defaultBorderRadius)' }} src={images[selectedImage]} />
+            <img style={{ width: '100%', borderRadius: 'var(--defaultBorderRadius)' }} src={((g: PackGalleryImage) => typeof(g) === 'object' ? g.content : g)(images[selectedImage])} />
             <button className='buttonLike' style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', padding: '0.5rem' }} onClick={() => {
                 display.gallery?.splice(selectedImage, 1)
                 setImages([...(display.gallery ?? [])])
@@ -156,7 +157,7 @@ export function GalleryManager({ display }: { display: { gallery?: string[] } })
         </div>}
         <div className='uploaded' style={{ gridColumn: images.length == 0 ? '1/3' : undefined }}>
             {images.map((g, idx) =>
-                <img key={`gImg${idx}`} src={g} className='galleryImageButton' onClick={() => setSelectedImage(idx)} />
+                <img key={`gImg${idx}`} src={typeof(g) === 'object' ? g.content : g} className='galleryImageButton' onClick={() => setSelectedImage(idx)} />
             )}
             <span className="buttonLike galleryUploadImage" style={{ background: images.length > 0 ? 'none' : undefined, width: images.length == 0 ? '100%' : undefined }} onClick={() => {
                 fileUploadRef.current?.click()
@@ -329,16 +330,21 @@ export default function Edit() {
             `/packs/${pack}?token=${token}`
             : `/packs?id=${packData.id}&token=${token}`
 
+        const body = gzip(JSON.stringify({
+            data: packData
+        }))
+        console.log(body.byteLength);
+
         const mainSaveResp = await fetch(
             import.meta.env.VITE_API_SERVER + uri,
             {
                 method: isNew ? 'POST' : 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Content-Encoding': 'gzip'
                 },
-                body: JSON.stringify({
-                    data: packData
-                })
+                body: body,
+                
             }
         )
 
@@ -350,7 +356,7 @@ export default function Edit() {
             return
         }
 
-        if (packMetaData && packMetaData.contributors !== initialContributors) {
+        if (packMetaData && packMetaData.owner === user?.uid && packMetaData.contributors !== initialContributors) {
             const newContributors = packMetaData.contributors.filter(c => !initialContributors.includes(c))
 
             const postContributorsResp = await fetch(
