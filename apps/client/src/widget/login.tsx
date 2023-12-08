@@ -1,4 +1,4 @@
-import { browserLocalPersistence, browserSessionPersistence, getAuth, setPersistence, signInWithEmailAndPassword } from "firebase/auth";
+import { browserLocalPersistence, browserSessionPersistence, getAuth, indexedDBLocalPersistence, setPersistence, signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import './login.css'
 import { FirebaseError } from "firebase/app";
@@ -22,7 +22,7 @@ export default function Login({clickSignUp, clickHelp}: {clickSignUp: () => void
         if(email === '' || password === '') return;
         setLoggingIn(true)
         try {
-            await setPersistence(getAuth(), staySignedIn ? browserLocalPersistence : browserSessionPersistence)
+            await setPersistence(getAuth(), staySignedIn ? indexedDBLocalPersistence : browserSessionPersistence)
             const cred = await signInWithEmailAndPassword(getAuth(), email, password)
             navigate('/' + cred.user.uid) 
         } catch (e: any) {

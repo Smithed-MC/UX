@@ -6,6 +6,8 @@ import fastifyCaching from '@fastify/caching'
 import fastifyRedis from '@fastify/redis'
 import fastifyCors from '@fastify/cors'
 import fastifyRequestLogger from '@mgcrea/fastify-request-logger'
+import fastifyCompress from '@fastify/compress'
+
 import * as fs from 'fs';
 import { HTTPResponses } from 'data-types';
 import abCache from 'abstract-cache'
@@ -23,10 +25,12 @@ export const API_APP = fastify({
             options: { translateTime: "HH:MM:ss Z", ignore: "pid,hostname" },
         },
     },
+    bodyLimit: 30 * 1024 * 1024,
     disableRequestLogging: true,
 }).withTypeProvider<TypeBoxTypeProvider>();
 
 API_APP.register(fastifyRequestLogger);
+API_APP.register(fastifyCompress);
 
 export function sendError(reply: FastifyReply, code: HTTPResponses, message: string) {
     reply.status(code).header('Access-Control-Allow-Origin', '*').send({ statusCode: code, error: HTTPResponses[code], message: message })
@@ -111,7 +115,7 @@ export async function setupApp() {
 
     await API_APP.register(fastifyCors, {
         origin: '*',
-        allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
+        allowedHeaders: '*',
         methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE']
     })
 

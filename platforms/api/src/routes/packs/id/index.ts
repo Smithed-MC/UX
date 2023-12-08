@@ -1,12 +1,30 @@
 import { Static, Type } from "@sinclair/typebox";
 import { API_APP, get, sendError, set } from "../../../app.js";
 import { getFirestore } from "firebase-admin/firestore";
-import { HTTPResponses, PackData, PackDataSchema, PackMetaData } from 'data-types';
+import { getStorage } from 'firebase-admin/storage'
+import { HTTPResponses, PackData, PackDataSchema, PackGalleryImage, PackMetaData } from 'data-types';
 import { getPackDoc, getUIDFromToken } from "database";
-import {FastifyRequest, FastifyReply} from 'fastify'
+import { FastifyRequest, FastifyReply } from 'fastify'
 import { coerce, valid } from "semver";
+import hash from 'hash.js'
 
 
+
+async function populateContent(gallery: PackGalleryImage[]) {
+    for (let i = 0; i < gallery.length; i++) {
+        const g = gallery[i];
+
+        if (typeof (g) === 'object') {
+            
+            const contents = await getStorage()
+                .bucket()
+                .file(`gallery_images/${g.uid}`)
+                .download()
+
+            g.content = contents[0].toString('utf-8')
+        }
+    }
+}
 
 /*
  * @route GET /packs/:id
@@ -34,19 +52,24 @@ API_APP.route({
 
         const requestIdentifier = 'GET-PACK::' + id
         const tryCachedResult = await get(requestIdentifier)
-        if(tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
+        if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
             request.log.info('served cached /packs/', id)
             return tryCachedResult.item
         }
-        
+
 
         const doc = await getPackDoc(id)
         if (doc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${id} was not found`)
 
+        const data: PackData = await doc.get('data');
 
-        await set(requestIdentifier, doc.get('data'), 60*60*1000)
-        return await doc.get('data')
+        if (data.display.gallery) {
+            await populateContent(data.display.gallery)
+        }
+
+        await set(requestIdentifier, data, 60 * 60 * 1000)
+        return data
     }
 })
 
@@ -61,38 +84,72 @@ const setPack = async (response: any, reply: any) => {
     const { token } = response.query
 
     const { data: packData }: { data: PartialPackData } = response.body;
-  
+
     const userId = await getUIDFromToken(token)
-    if(userId === undefined)
+    if (userId === undefined)
         return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
-    
+
 
     const doc = await getPackDoc(packId)
     if (doc === undefined)
         return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
 
-    if(!(await doc.get('contributors')).includes(userId))
+    if (!(await doc.get('contributors')).includes(userId))
         return sendError(reply, HTTPResponses.FORBIDDEN, `You are not a contributor for ${packId}`)
 
     if (packData.versions)
-        for(let v of packData.versions) {
-            if(coerce(v.name) == null)
+        for (let v of packData.versions) {
+            if (coerce(v.name) == null)
                 return sendError(reply, HTTPResponses.BAD_REQUEST, `Version ${v} is not valid semver`)
         }
-    
-    if(packData.versions && packData.versions.length > (await doc.get('data.versions')).length) {
+
+
+    if (packData.display?.gallery) {
+        const existingGallery: PackGalleryImage[] = await doc.get('data.display.gallery')
+        console.log(existingGallery)
+
+        for (let i = 0; i < packData.display.gallery.length; i++) {
+            const g = packData.display.gallery[i];
+
+            if (typeof (g) === 'string') {
+                const buffer = Buffer.from(g)
+                if (buffer.byteLength > 1024 * 1024)
+                    return sendError(reply, HTTPResponses.BAD_REQUEST, `Gallery image ${i} exceeds 1MB`)
+                
+                let uid = hash.sha1().update(g).digest("hex")
+                
+                getStorage().bucket().file(`gallery_images/${uid}`).save(g)
+                
+                packData.display.gallery[i] = {
+                    type: 'bucket',
+                    uid: uid
+                }
+            } else if (g.content) {
+                let uid = hash.sha1().update(g.content).digest("hex")
+
+                if (g.uid !== uid) {
+                    getStorage().bucket().file(`gallery_images/${g.uid}`).delete()
+                    getStorage().bucket().file(`gallery_images/${uid}`).save(g.content)
+                }
+
+                delete g.content;
+            }
+        }
+    }
+
+    if (packData.versions && packData.versions.length > (await doc.get('data.versions')).length) {
         await doc.ref.set({
             stats: {
                 updated: Date.now()
             }
-        }, {merge: true})
+        }, { merge: true })
     }
-        
+
 
     const requestIdentifier = 'GET-PACK::' + packId
-    await set(requestIdentifier, undefined, 1)        
-    
-    await doc.ref.set({data: packData}, {merge: true})
+    await set(requestIdentifier, undefined, 1)
+
+    await doc.ref.set({ data: packData }, { merge: true })
     return reply.status(HTTPResponses.OK).send('Updated data')
 }
 
@@ -195,17 +252,17 @@ API_APP.route({
     handler: async (response, reply) => {
         const { id: packId } = response.params;
         const { token } = response.query
-        
+
         const userId = await getUIDFromToken(token)
-        if(userId === undefined)
+        if (userId === undefined)
             return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
-        
+
 
         const doc = await getPackDoc(packId)
         if (doc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
 
-        if((await doc.get('owner')) !== userId)
+        if ((await doc.get('owner')) !== userId)
             return sendError(reply, HTTPResponses.FORBIDDEN, `You are not the owner of ${packId}`)
 
         await doc.ref.delete()
@@ -236,7 +293,7 @@ API_APP.route({
     },
     handler: async (response, reply) => {
         const { id: packId } = response.params;
-    
+
 
         const doc = await getPackDoc(packId)
         if (doc === undefined)
@@ -284,26 +341,26 @@ API_APP.route({
     handler: async (response, reply) => {
         const { id: packId } = response.params;
         const { token, contributors } = response.query
-        
+
         const userId = await getUIDFromToken(token)
-        if(userId === undefined)
+        if (userId === undefined)
             return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
-        
+
 
         const doc = await getPackDoc(packId)
         if (doc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
 
-        if((await doc.get('owner')) !== userId)
+        if ((await doc.get('owner')) !== userId)
             return sendError(reply, HTTPResponses.FORBIDDEN, `You are not the owner of ${packId}`)
 
         const existingContributors: string[] = await doc.get('contributors')
 
-        for(let c of contributors) 
-            if(!existingContributors.includes(c))
+        for (let c of contributors)
+            if (!existingContributors.includes(c))
                 existingContributors.push(c)
 
-        await doc.ref.set({contributors: existingContributors}, {merge: true})
+        await doc.ref.set({ contributors: existingContributors }, { merge: true })
         return reply.status(HTTPResponses.OK).send('Added contributors')
     }
 })
@@ -345,22 +402,22 @@ API_APP.route({
     handler: async (response, reply) => {
         const { id: packId } = response.params;
         const { token, contributors } = response.query
-        
+
         const userId = await getUIDFromToken(token)
-        if(userId === undefined)
+        if (userId === undefined)
             return sendError(reply, HTTPResponses.UNAUTHORIZED, 'Invalid token')
-        
+
 
         const doc = await getPackDoc(packId)
         if (doc === undefined)
             return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${packId} was not found`)
 
-        if((await doc.get('owner')) !== userId)
+        if ((await doc.get('owner')) !== userId)
             return sendError(reply, HTTPResponses.FORBIDDEN, `You are not the owner of ${packId}`)
 
         const existingContributors: string[] = await doc.get('contributors')
 
-        await doc.ref.set({contributors: existingContributors.filter(v => v === userId || !contributors.includes(v))}, {merge: true})
+        await doc.ref.set({ contributors: existingContributors.filter(v => v === userId || !contributors.includes(v)) }, { merge: true })
         return reply.status(HTTPResponses.OK).send('Deleted contributors')
     }
 })
@@ -390,14 +447,14 @@ API_APP.route({
     handler: async (request, reply) => {
         const { id } = request.params;
 
-        
+
         const requestIdentifier = 'GET-PACK-META::' + id
         const tryCachedResult = await get(requestIdentifier)
-        if(tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
+        if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
             request.log.info('served cached /packs/', id, '/meta')
             return tryCachedResult.item
         }
-        
+
 
         const doc = await getPackDoc(id)
         if (doc === undefined)
@@ -415,5 +472,79 @@ API_APP.route({
 
         await set(requestIdentifier, data, 60 * 60 * 1000)
         return data
+    }
+})
+
+API_APP.route({
+    method: 'GET',
+    url: '/packs/:id/gallery',
+    schema: {
+        params: Type.Object({
+            id: Type.String()
+        })
+    },
+    handler: async (request, reply) => {
+        const { id } = request.params;
+
+        const requestIdentifier = 'GET-PACK-GALLERY::' + id
+        const tryCachedResult = await get(requestIdentifier)
+        if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
+            request.log.info('served cached /packs/', id, '/gallery')
+            return tryCachedResult.item
+        }
+        const gallery = getGallery(id, reply)
+        await set(requestIdentifier, gallery ?? [], 5 * 60 * 1000);
+    }
+})
+
+async function getGallery(id: string, reply: FastifyReply): Promise<PackGalleryImage[]|undefined|void> {
+    const doc = await getPackDoc(id)
+    if (doc === undefined)
+        return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${id} was not found`)
+
+    const gallery: PackGalleryImage[] | undefined = await doc.get('data.display.gallery')
+
+    if (gallery) {
+        await populateContent(gallery)
+    }
+
+    return gallery ?? []
+}
+
+API_APP.route({
+    method: 'GET',
+    url: '/packs/:id/gallery/:index',
+    schema: {
+        params: Type.Object({
+            id: Type.String(),
+            index: Type.Number()
+        })
+    },
+    handler: async (request, reply) => {
+        const { id, index } = request.params;
+
+        const requestIdentifier = 'GET-PACK-GALLERY-' + index + '::' + id
+        const tryCachedResult = await get(requestIdentifier)
+        if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
+            request.log.info('served cached /packs/', id, '/gallery/', index)
+            reply.header('Content-Type', 'image/png');
+            return tryCachedResult.item
+        }
+
+        const gallery = await getGallery(id, reply)
+        
+        if (!gallery)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Not gallery for pack ${id}`)
+        if (index >= gallery.length)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Index ${index} not in bounds for length ${gallery.length}`)
+
+        const img = gallery[index];
+
+        const content = typeof(img) === 'object' ? img.content! : img;
+        const data = Buffer.from(content.split(',')[1], 'base64')
+
+        await set(requestIdentifier, data, 5 * 60 * 1000)
+        reply.header('Content-Type', 'image/png');
+        return data;
     }
 })
