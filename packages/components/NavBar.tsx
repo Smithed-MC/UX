@@ -9,7 +9,7 @@ import { Check, Cross, Download, Jigsaw, Logo, MenuBars, Save, Trash } from './s
 import { IconTextButton } from './IconTextButton'
 import { Discord as DiscordSvg, Home as HomeSvg, Browse as BrowseSvg, Account as AccountSvg } from 'components/svg.js'
 import { selectSelectedBundle, selectUserData, selectUsersBundles, setUsersBundles } from 'store'
-import { PackBundle, PackData } from 'data-types'
+import { PackBundle, PackData, UserData } from 'data-types'
 
 interface NavButtonProps {
     onOpen: () => void
@@ -187,7 +187,12 @@ export function NavBar(props: NavBarProps) {
     const selectedBundle = useAppSelector(selectSelectedBundle)
     const bundles = useAppSelector(selectUsersBundles)
 
-    const user = !import.meta.env.SSR ? useAppSelector(selectUserData) : {};
+    const storedUser = useAppSelector(selectUserData);
+    const [user, setUser] = useState<UserData|{}>({});
+
+    useEffect(() => {
+        setUser(storedUser)
+    }, [storedUser])
 
 
     useEffect(() => {

@@ -91,8 +91,8 @@ async function getTopPacksBySort(sort: SortOptions): Promise<PackApiInfo[]> {
 }
 
 export async function loadHomePageData(): Promise<HomePageData> {
-    let newestPacks = await getTopPacksBySort(SortOptions.Newest)
-    let trendingPacks = await getTopPacksBySort(SortOptions.Trending)
+    console.time()
+    let [newestPacks, trendingPacks] = await Promise.all([getTopPacksBySort(SortOptions.Newest), getTopPacksBySort(SortOptions.Trending)])
 
     newestPacks = newestPacks
         .filter(np =>
@@ -103,20 +103,22 @@ export async function loadHomePageData(): Promise<HomePageData> {
             !newestPacks.find(dp => dp.id === np.id))
         .slice(0, 5)
 
+    console.timeEnd()
+
     return {
         newestPacks: newestPacks.map(p => ({
             id: p.id,
             displayName: p.displayName,
             pack: p.data,
             meta: p.meta,
-
+            author: p.owner.displayName
         })),
         trendingPacks: trendingPacks.map(p => ({
             id: p.id,
             displayName: p.displayName,
             pack: p.data,
             meta: p.meta,
-
+            author: p.owner.displayName
         }))
     }
 }
@@ -137,7 +139,11 @@ async function getTotalCount(params: URLSearchParams): Promise<number> {
 export const PACKS_PER_PAGE = 20
 
 const BROWSE_SCOPES = [
-    'data',
+    'data.display.name',
+    'data.display.description',
+    'data.display.icon',
+    'data.versions',
+    'data.categories',
     'meta.owner',
     'meta.rawId',
     'meta.stats',

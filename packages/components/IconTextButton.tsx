@@ -4,6 +4,7 @@ import {
 	FunctionComponent,
 	SVGProps,
 } from "react";
+import { Link } from "react-router-dom";
 
 interface IconTextButtonProps {
 	text: string | JSX.Element;
@@ -34,6 +35,7 @@ export function IconTextButton({
 			}
 			style={{ flexDirection: reverse ? "row-reverse" : "row", ...style }}
 			href={href}
+			
 			target={target}
 			onClick={onClick}
 			rel={rel}
