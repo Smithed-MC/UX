@@ -106,7 +106,7 @@ export default function Home(props: any) {
         <IconTextButton text={"Explore"} icon={Right} reverse style={{ marginTop: '-2rem' }} href="/browse" />
         <div className="container" style={{ flexDirection: 'row', gap: '1rem', width: '100%' }}>
             <Divider />
-            <span style={{ whiteSpace: 'nowrap', fontWeight: 700, fontSize: '2rem' }}>More smithed</span>
+            <span style={{ whiteSpace: 'nowrap', fontWeight: 700, fontSize: '2rem' }}>More Smithed</span>
             <Divider />
         </div>
         <div className="container homeSectionContainer" style={{ justifyContent: 'center' }}>
