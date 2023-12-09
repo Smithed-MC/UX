@@ -7,6 +7,7 @@ import { getPackDoc, getUIDFromToken } from "database";
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { coerce, valid } from "semver";
 import hash from 'hash.js'
+import { request } from "express";
 
 
 
@@ -106,14 +107,13 @@ const setPack = async (response: any, reply: any) => {
 
     if (packData.display?.gallery) {
         const existingGallery: PackGalleryImage[] = await doc.get('data.display.gallery')
-        console.log(existingGallery)
 
         for (let i = 0; i < packData.display.gallery.length; i++) {
             const g = packData.display.gallery[i];
 
             if (typeof (g) === 'string') {
-                const buffer = Buffer.from(g)
-                if (buffer.byteLength > 1024 * 1024)
+                const buffer = Buffer.from(g.split(',')[1])
+                if (buffer.byteLength > 1324 * 1024)
                     return sendError(reply, HTTPResponses.BAD_REQUEST, `Gallery image ${i} exceeds 1MB`)
 
                 let uid = hash.sha1().update(g).digest("hex")

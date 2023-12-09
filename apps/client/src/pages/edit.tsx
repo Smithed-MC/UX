@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { coerce, compare, satisfies, inc, valid } from 'semver'
 import { gzip } from 'pako'
 import './edit.css'
+import { Buffer } from 'buffer'
 
 function EditorDiv({ children, style, ...props }: { children: any, style?: CSSProperties, [key: string]: any }) {
     return <div className='container' style={{ alignItems: 'start', gap: 8, width: '100%', ...style }} {...props}>{children}</div>
@@ -135,6 +136,7 @@ export function GalleryManager({ display }: { display: { gallery?: PackGalleryIm
             }
         })
 
+
         if (display.gallery === undefined)
             display.gallery = []
 
@@ -146,7 +148,7 @@ export function GalleryManager({ display }: { display: { gallery?: PackGalleryIm
     return <>
         <input ref={fileUploadRef} type="file" accept='image/png, image/jpeg' hidden onChange={OnFileUpload} />
         {display.gallery && display.gallery.length >= 1 && <div style={{ width: '100%', position: 'relative' }}>
-            <img style={{ width: '100%', borderRadius: 'var(--defaultBorderRadius)' }} src={((g: PackGalleryImage) => typeof(g) === 'object' ? g.content : g)(images[selectedImage])} />
+            <img style={{ width: '100%', borderRadius: 'var(--defaultBorderRadius)' }} src={((g: PackGalleryImage) => typeof (g) === 'object' ? g.content : g)(images[selectedImage])} />
             <button className='buttonLike' style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', padding: '0.5rem' }} onClick={() => {
                 display.gallery?.splice(selectedImage, 1)
                 setImages([...(display.gallery ?? [])])
@@ -157,7 +159,7 @@ export function GalleryManager({ display }: { display: { gallery?: PackGalleryIm
         </div>}
         <div className='uploaded' style={{ gridColumn: images.length == 0 ? '1/3' : undefined }}>
             {images.map((g, idx) =>
-                <img key={`gImg${idx}`} src={typeof(g) === 'object' ? g.content : g} className='galleryImageButton' onClick={() => setSelectedImage(idx)} />
+                <img key={`gImg${idx}`} src={typeof (g) === 'object' ? g.content : g} className='galleryImageButton' onClick={() => setSelectedImage(idx)} />
             )}
             <span className="buttonLike galleryUploadImage" style={{ background: images.length > 0 ? 'none' : undefined, width: images.length == 0 ? '100%' : undefined }} onClick={() => {
                 fileUploadRef.current?.click()
@@ -344,7 +346,7 @@ export default function Edit() {
                     'Content-Encoding': 'gzip'
                 },
                 body: body,
-                
+
             }
         )
 
