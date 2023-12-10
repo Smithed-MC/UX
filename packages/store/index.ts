@@ -34,11 +34,15 @@ const userSlice = createSlice({
         setSelectedBundle: (state, action) => setStorage('selectedBundle', action.payload, () => state.selectedBundle = action.payload),
         setUsersBundles: (state, action) => setStorage('usersBundles', action.payload, () => state.usersBundles = action.payload),
         setUserData: (state, action) => {
-            if (Object.keys(action.payload).length > 1)
-                Cookies.set('smithedUser', JSON.stringify(action.payload))
+            if (Object.keys(action.payload).length > 1) {
+                Cookies.set('smithedUser', JSON.stringify({
+                    uid: action.payload.uid,
+                    displayName: action.payload.displayName
+                }))
+            }
             else
                 Cookies.remove('smithedUser')
-            
+
             setStorage('userData', action.payload, () => state.userData = action.payload)
         },
     }
