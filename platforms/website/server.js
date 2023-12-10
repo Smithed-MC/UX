@@ -19,9 +19,14 @@ console.log('Running on port:', process.env.PORT)
 globalThis.fetch = fetch
 
 async function createServer() {
+    const TEMPLATE = isProd ? fs.readFileSync(
+        path.resolve(distFolder, 'index.html'),
+        'utf-8'
+    ) : ''
+    const RENDERER = isProd ? (await import('./dist/server/entry-server.js')).default : undefined
 
     const app = express()
-
+    
     let vite
     if (!isProd) {
         // Create Vite server in middleware mode and configure the app type as
@@ -66,32 +71,28 @@ async function createServer() {
                 )
 
                 template = await vite.transformIndexHtml(url, template)
-
                 render = (await vite.ssrLoadModule('/src/entry-server.tsx')).default
             } else {
-                template = fs.readFileSync(
-                    path.resolve(distFolder, 'index.html'),
-                    'utf-8'
-                )
-
-                const files = fs.readdirSync(distFolder + '/assets')
-
-                render = (await import('./dist/server/entry-server.js')).default
+                template = TEMPLATE
+                render = RENDERER
             }
 
 
+            // console.time('Render content')
             // // 4. render the app HTML. This assumes entry-server.js's exported
             // //     `render` function calls appropriate framework SSR APIs,
             // //    e.g. ReactDOMServer.renderToString()
             const {html: appHtml, helmet} = await render(req, {})
-
+            // console.timeEnd('Render content')
+            // console.time('Replace w/ helmet and ssr')
             // // 5. Inject the app-rendered HTML into the template.
             const html = template
-                .replace(`<!--ssr-outlet-->`, appHtml)
                 .replace(`<!--helmet-title-outlet-->`, helmet.title.toString())
                 .replace(`<!--helmet-meta-outlet-->`, helmet.meta.toString())
                 .replace(`<!--helmet-link-outlet-->`, helmet.link.toString())
-            
+                .replace(`<!--ssr-outlet-->`, appHtml)
+            // console.timeEnd('Replace w/ helmet and ssr')
+
             // // 6. Send the rendered HTML back.
             res.status(200).set({ 'Content-Type': 'text/html' }).end(html)
 

@@ -86,12 +86,12 @@ export interface HomePageData {
 }
 
 async function getTopPacksBySort(sort: SortOptions): Promise<PackApiInfo[]> {
-    const resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs?sort=${sort.toLowerCase()}&scope=` + BROWSE_SCOPES.join('&scope='))
+    const resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs?sort=${sort.toLowerCase()}&limit=10&scope=` + BROWSE_SCOPES.join('&scope='))
     return await resp.json()
 }
 
 export async function loadHomePageData(): Promise<HomePageData> {
-    console.time()
+    // console.time('get & filter packs')
     let [newestPacks, trendingPacks] = await Promise.all([getTopPacksBySort(SortOptions.Newest), getTopPacksBySort(SortOptions.Trending)])
 
     newestPacks = newestPacks
@@ -103,9 +103,9 @@ export async function loadHomePageData(): Promise<HomePageData> {
             !newestPacks.find(dp => dp.id === np.id))
         .slice(0, 5)
 
-    console.timeEnd()
-
-    return {
+    // console.timeEnd('get & filter packs')
+    // console.time('map packData')
+    const returnData = {
         newestPacks: newestPacks.map(p => ({
             id: p.id,
             displayName: p.displayName,
@@ -121,6 +121,8 @@ export async function loadHomePageData(): Promise<HomePageData> {
             author: p.owner.displayName
         }))
     }
+    // console.timeEnd('map packData')
+    return returnData
 }
 
 function setMultiple(params: URLSearchParams, key: string, value: string | (string | null)[]) {
