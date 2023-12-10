@@ -16,17 +16,19 @@ import Bundles from './pages/bundle.js'
 import Settings from './pages/settings.js'
 
 import { Provider } from 'react-redux'
-import { loadBrowseData, loadHomePageData, loadUserPageData } from './loaders.js'
+import { loadBrowseData, loadHomePageData, loadRootData, loadUserPageData } from './loaders.js'
 import User from './pages/user.js'
 import { selectSelectedBundle, selectUsersBundles, setSelectedBundle, setUserData, setUsersBundles, store } from 'store'
 import { useAppDispatch, useAppSelector } from 'hooks'
-import { PackBundle } from 'data-types'
+import { PackBundle, UserData } from 'data-types'
 import { Helmet } from 'react-helmet'
 import { ClientInject, getDefaultInject } from './inject.js'
 
 import { Cross, Logo } from 'components/svg.js'
 
 export type { ClientInject } from './inject.js'
+
+import Cookies from 'js-cookie'
 
 interface ClientProps {
     platform: 'desktop' | 'website',
@@ -57,6 +59,10 @@ export function ClientApplet(props: ClientProps) {
         dispatch(setSelectedBundle(''))
     }
 
+    function resetUserData() {
+        dispatch(setUserData({}))
+    }
+
     async function loadBundles(user: FirebaseUser | null) {
         if (user == null) {
             return resetBundleData()
@@ -85,13 +91,20 @@ export function ClientApplet(props: ClientProps) {
 
     async function loadUserData(user: FirebaseUser | null) {
         if (user == null)
-            return dispatch(setUserData({}))
+            return resetUserData();
 
         const resp = await fetch(import.meta.env.VITE_API_SERVER + `/users/${user.uid}`)
         if (!resp.ok)
-            return dispatch(setUserData({}))
+            return resetUserData()
 
-        dispatch(setUserData(await resp.json()))
+        const userData: UserData = await resp.json();
+
+        const cookieUser = {
+            uid: userData.uid,
+            displayName: userData.displayName
+        }
+
+        dispatch(setUserData(userData))
     }
 
     useEffect(() => {
@@ -103,6 +116,8 @@ export function ClientApplet(props: ClientProps) {
         const unsub = getAuth().onAuthStateChanged(async user => {
             loadBundles(user)
             loadUserData(user)
+
+          
         })
 
         return () => {
@@ -227,6 +242,8 @@ export const routes = [
     {
         path: '/',
         children: subRoutes,
+        loader: loadRootData,
+        id: "root",
         element: <Provider store={store}>
             <ClientApplet platform='website' inject={getDefaultInject()} />
         </Provider>,

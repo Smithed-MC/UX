@@ -1,6 +1,7 @@
 import * as toolkitRaw from '@reduxjs/toolkit';
 const { createSlice, configureStore } = ((toolkitRaw as any).default ?? toolkitRaw) as typeof toolkitRaw;
 import {PackBundle, UserData} from 'data-types'
+import Cookies from 'js-cookie';
 
 function getDefault<T>(key: string, defaultValue: T) {
     if (import.meta.env.SSR)
@@ -32,7 +33,14 @@ const userSlice = createSlice({
     reducers: {
         setSelectedBundle: (state, action) => setStorage('selectedBundle', action.payload, () => state.selectedBundle = action.payload),
         setUsersBundles: (state, action) => setStorage('usersBundles', action.payload, () => state.usersBundles = action.payload),
-        setUserData: (state, action) => setStorage('userData', action.payload, () => state.userData = action.payload),
+        setUserData: (state, action) => {
+            if (Object.keys(action.payload).length > 1)
+                Cookies.set('smithedUser', JSON.stringify(action.payload))
+            else
+                Cookies.remove('smithedUser')
+            
+            setStorage('userData', action.payload, () => state.userData = action.payload)
+        },
     }
 })
 

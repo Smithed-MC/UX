@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react"
 import { getAuth, User } from 'firebase/auth'
-import { useLocation } from "react-router-dom"
+import { useLocation, useRouteLoaderData } from "react-router-dom"
 import * as queryString from "query-string"
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { UserData } from 'data-types'
 
-import {AppDispatch, RootState} from 'store'
+import {AppDispatch, RootState, selectUserData} from 'store'
 
 export function useFirebaseUser() {
     const [user, setUser] = useState<User | null>(getAuth().currentUser)
@@ -22,20 +22,9 @@ export function useFirebaseUser() {
 }
 
 export function useSmithedUser() {
-    const firebaseUser = useFirebaseUser()
-    const [user, setUser] = useState<UserData | undefined>()
+    const user = import.meta.env.SSR ? (useRouteLoaderData("root") as any).user : useAppSelector(selectUserData)
 
-    useEffect(() => { (async () => {
-        if(firebaseUser == null)
-            return
-
-        const resp = await fetch(import.meta.env.VITE_API_SERVER + `/users/${firebaseUser.uid}`)
-        const data: UserData = await resp.json();
-        
-        setUser(data)
-    })()}, [firebaseUser])
-
-    return user
+    return user && Object.keys(user).length > 0 ? user : undefined;
 }
 
 export function useQueryParams() {

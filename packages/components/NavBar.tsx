@@ -187,13 +187,7 @@ export function NavBar(props: NavBarProps) {
     const selectedBundle = useAppSelector(selectSelectedBundle)
     const bundles = useAppSelector(selectUsersBundles)
 
-    const storedUser = useAppSelector(selectUserData);
-    const [user, setUser] = useState<UserData|{}>({});
-
-    useEffect(() => {
-        setUser(storedUser)
-    }, [storedUser])
-
+    const user = useSmithedUser()
 
     useEffect(() => {
         if (selectedBundle === '')
@@ -229,7 +223,7 @@ export function NavBar(props: NavBarProps) {
                             <span style={{ flexShrink: 0 }}>[{curBundle?.packs.length}]</span>
                         </div>} iconElement={<Jigsaw style={{ flexShrink: 0 }} />} reverse onClick={() => setEditBundleOpen(!editBundleOpen)} />
                 }
-                <IconTextButton className="navBarOption end" text={(user as any)['displayName'] ?? 'Login'} href={"/" + ((user as any)['displayName'] ?? "account")} icon={AccountSvg} reverse={true} />
+                <IconTextButton className="navBarOption end" text={user?.displayName ?? 'Login'} href={"/" + (user?.displayName ?? "account")} icon={AccountSvg} reverse={true} />
             </div>
             {editBundleOpen && <EditBundle close={() => setEditBundleOpen(false)} />}
         </div>

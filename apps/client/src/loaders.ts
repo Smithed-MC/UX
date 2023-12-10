@@ -2,6 +2,8 @@ import { LoaderFunctionArgs } from "react-router-dom"
 import * as querystring from 'query-string'
 import { getAuth } from "firebase/auth"
 import { PackBundle, PackData, PackMetaData, SortOptions, UserData } from 'data-types'
+import Cookie from 'cookie'
+import User from "./pages/user"
 
 async function getUserData(id: string) {
     const userDataResponse = await fetch(import.meta.env.VITE_API_SERVER + `/users/${id}`)
@@ -201,6 +203,8 @@ export async function loadBrowseData({ request }: { request: Request }): Promise
     const { page: pageParam, ...parsedParams } = querystring.parse(request.url.split('?')[1])
     const params = createBrowseSearchParams(parsedParams)
 
+    console.log(request.headers)
+
     const count = await getTotalCount(params)
 
     let page = pageParam ? Number.parseInt(pageParam as string) : 1
@@ -217,3 +221,18 @@ export async function loadBrowseData({ request }: { request: Request }): Promise
 
     return { count, packs: packs }
 } 
+
+export async function loadRootData({request}: {request: Request}) {
+    if (import.meta.env.SSR) {
+        const cookie = Cookie.parse(request.headers.get('cookie') ?? '');
+        if (!('smithedUser' in cookie)) {
+            return {user: undefined}
+        }
+        
+        const user = JSON.parse(cookie['smithedUser'])
+
+        return {user: user}
+    }
+
+    return {user: undefined}
+}

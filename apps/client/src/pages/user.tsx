@@ -210,7 +210,7 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
             <meta name="og:site_name" content="Smithed" />
             <title>{user?.displayName}</title>
             <meta name="description" content={pageDescription} />
-            {user?.pfp && <meta name="og:image" content={import.meta.env.VITE_API_SERVER + `/users/${user.uid}/pfp`} />}
+            {user?.pfp && <meta name="og:image" content={import.meta.env.VITE_API_SERVER + `/users/${user?.uid}/pfp`} />}
         </Helmet>
 
         <div className='flexDirection' style={{ width: '100%', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', gap: 16, boxSizing: 'border-box' }}>
