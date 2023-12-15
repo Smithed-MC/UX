@@ -307,6 +307,7 @@ export default function Edit() {
         data.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
 
         data.versions.forEach(v => {
+            v.name = valid(v.name) ? v.name : (coerce(v.name) ?? '0.0.0') as string
             v.dependencies ??= []
         })
 
