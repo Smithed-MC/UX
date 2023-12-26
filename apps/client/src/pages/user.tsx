@@ -4,7 +4,7 @@ import { useLoaderData, useNavigate, useParams } from 'react-router-dom'
 import { formatDownloads } from 'formatters'
 import './user.css'
 import { CategoryBar, CategoryChoice, DownloadButton, GalleryPackCard, IconTextButton, MarkdownRenderer } from 'components'
-import { useFirebaseUser, useQueryParams } from 'hooks'
+import { useAppDispatch, useAppSelector, useFirebaseUser, useQueryParams } from 'hooks'
 import { Account, At, BackArrow, Check, Cross, Discord, Download, Edit, Folder, Home, Jigsaw, Line, Plus, Trash, Upload } from 'components/svg'
 import { Helmet } from 'react-helmet'
 import { getAuth } from 'firebase/auth'
@@ -13,6 +13,7 @@ import { prettyTimeDifference } from 'formatters'
 import { CreateBundle } from '../widget/bundle'
 import { BundleCard } from 'components/BundleCard'
 import { UserStats } from '../loaders'
+import { selectUserData } from 'store'
 
 
 interface UserTabComponent {
@@ -153,12 +154,18 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
 
     const [showBundleCreationModal, setShowBundleCreationModal] = useState(false)
     const [showFallbackPFP, setShowFallbackPFP] = useState(false)
+
+    const dispatch = useAppDispatch()
+    const viewingUser = useAppSelector(selectUserData)
     
     const pfpUploadRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
-        setEditable(userId === firebaseUser?.uid || (user !== undefined && firebaseUser?.uid === user.uid))
-    }, [firebaseUser])
+        if (!('uid' in viewingUser))
+            return
+
+        setEditable(userId === viewingUser.uid || (user !== undefined && viewingUser.uid === user.uid))
+    }, [viewingUser])
 
     async function convertToDataURL(file: File | null | undefined) {
         if (file == null || file === undefined)
@@ -203,7 +210,7 @@ export default function User({ showBackButton, bundleDownloadButton }: UserProps
             <meta name="og:site_name" content="Smithed" />
             <title>{user?.displayName}</title>
             <meta name="description" content={pageDescription} />
-            {user?.pfp && <meta name="og:image" content={import.meta.env.VITE_API_SERVER + `/users/${user.uid}/pfp`} />}
+            {user?.pfp && <meta name="og:image" content={import.meta.env.VITE_API_SERVER + `/users/${user?.uid}/pfp`} />}
         </Helmet>
 
         <div className='flexDirection' style={{ width: '100%', backgroundColor: 'var(--backgroundAccent)', borderRadius: 'var(--defaultBorderRadius)', gap: 16, boxSizing: 'border-box' }}>

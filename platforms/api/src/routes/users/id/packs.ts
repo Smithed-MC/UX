@@ -52,6 +52,7 @@ API_APP.route({
                 'id',
                 ...(scope ?? [])
             ],
+            limit: 100
         })
 
         if (!packs.hits)

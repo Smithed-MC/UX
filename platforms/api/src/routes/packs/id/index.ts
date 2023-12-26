@@ -7,6 +7,7 @@ import { getPackDoc, getUIDFromToken } from "database";
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { coerce, valid } from "semver";
 import hash from 'hash.js'
+import { request } from "express";
 
 
 
@@ -106,14 +107,13 @@ const setPack = async (response: any, reply: any) => {
 
     if (packData.display?.gallery) {
         const existingGallery: PackGalleryImage[] = await doc.get('data.display.gallery')
-        console.log(existingGallery)
 
         for (let i = 0; i < packData.display.gallery.length; i++) {
             const g = packData.display.gallery[i];
 
             if (typeof (g) === 'string') {
-                const buffer = Buffer.from(g)
-                if (buffer.byteLength > 1024 * 1024)
+                const buffer = Buffer.from(g.split(',')[1])
+                if (buffer.byteLength > 1324 * 1024)
                     return sendError(reply, HTTPResponses.BAD_REQUEST, `Gallery image ${i} exceeds 1MB`)
 
                 let uid = hash.sha1().update(g).digest("hex")
@@ -138,11 +138,11 @@ const setPack = async (response: any, reply: any) => {
 
         const newGallery = packData.display?.gallery
         const missingImages = existingGallery.filter(existingImg =>
-            newGallery.findIndex((newImg) => typeof (existingImg) === 'object' 
+            newGallery.findIndex((newImg) => typeof (existingImg) === 'object'
                 && typeof (newImg) === 'object' ? existingImg.uid === newImg.uid : existingImg === newImg) === -1)
 
         for (const missingImage of missingImages) {
-            if (typeof(missingImage) !== 'object')
+            if (typeof (missingImage) !== 'object')
                 continue;
 
             getStorage().bucket().file(`gallery_images/${missingImage.uid}`).delete()
@@ -548,22 +548,35 @@ API_APP.route({
         //     return tryCachedResult.item
         // }
 
-        const gallery = await getGallery(id, reply)
-        if (reply.sent)
-            return
+        const doc = await getPackDoc(id)
+        if (doc === undefined)
+            return sendError(reply, HTTPResponses.NOT_FOUND, `Pack with ID ${id} was not found`)
+
+        const gallery = await doc.get('data.display.gallery')
 
         if (!gallery)
             return sendError(reply, HTTPResponses.NOT_FOUND, `Not gallery for pack ${id}`)
         if (index >= gallery.length)
             return sendError(reply, HTTPResponses.NOT_FOUND, `Index ${index} not in bounds for length ${gallery.length}`)
 
-        const img = gallery[index];
 
-        const content = typeof (img) === 'object' ? img.content! : img;
-        const data = Buffer.from(content.split(',')[1], 'base64')
+        const img: PackGalleryImage = gallery[index];
+
+        reply.header('Content-Type', 'image/png');
+
+        let content: Buffer;
+        if (typeof (img) === 'object') {
+            let buffer = (await getStorage()
+                .bucket()
+                .file(`gallery_images/${img.uid}`)
+                .download())[0]
+
+            content = Buffer.from(buffer.toString('utf8').split(',')[1], 'base64')
+        } else {
+            content = Buffer.from(img.split(',')[1], 'base64');
+        }
 
         // await set(requestIdentifier, data, 5 * 60 * 1000)
-        reply.header('Content-Type', 'image/png');
-        return data;
+        return content;
     }
 })

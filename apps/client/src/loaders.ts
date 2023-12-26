@@ -2,6 +2,8 @@ import { LoaderFunctionArgs } from "react-router-dom"
 import * as querystring from 'query-string'
 import { getAuth } from "firebase/auth"
 import { PackBundle, PackData, PackMetaData, SortOptions, UserData } from 'data-types'
+import Cookie from 'cookie'
+import User from "./pages/user"
 
 async function getUserData(id: string) {
     const userDataResponse = await fetch(import.meta.env.VITE_API_SERVER + `/users/${id}`)
@@ -86,13 +88,13 @@ export interface HomePageData {
 }
 
 async function getTopPacksBySort(sort: SortOptions): Promise<PackApiInfo[]> {
-    const resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs?sort=${sort.toLowerCase()}&scope=` + BROWSE_SCOPES.join('&scope='))
+    const resp = await fetch(import.meta.env.VITE_API_SERVER + `/packs?sort=${sort.toLowerCase()}&limit=10&scope=` + BROWSE_SCOPES.join('&scope='))
     return await resp.json()
 }
 
 export async function loadHomePageData(): Promise<HomePageData> {
-    let newestPacks = await getTopPacksBySort(SortOptions.Newest)
-    let trendingPacks = await getTopPacksBySort(SortOptions.Trending)
+    // console.time('get & filter packs')
+    let [newestPacks, trendingPacks] = await Promise.all([getTopPacksBySort(SortOptions.Newest), getTopPacksBySort(SortOptions.Trending)])
 
     newestPacks = newestPacks
         .filter(np =>
@@ -103,22 +105,26 @@ export async function loadHomePageData(): Promise<HomePageData> {
             !newestPacks.find(dp => dp.id === np.id))
         .slice(0, 5)
 
-    return {
+    // console.timeEnd('get & filter packs')
+    // console.time('map packData')
+    const returnData = {
         newestPacks: newestPacks.map(p => ({
             id: p.id,
             displayName: p.displayName,
             pack: p.data,
             meta: p.meta,
-
+            author: p.owner.displayName
         })),
         trendingPacks: trendingPacks.map(p => ({
             id: p.id,
             displayName: p.displayName,
             pack: p.data,
             meta: p.meta,
-
+            author: p.owner.displayName
         }))
     }
+    // console.timeEnd('map packData')
+    return returnData
 }
 
 function setMultiple(params: URLSearchParams, key: string, value: string | (string | null)[]) {
@@ -137,7 +143,11 @@ async function getTotalCount(params: URLSearchParams): Promise<number> {
 export const PACKS_PER_PAGE = 20
 
 const BROWSE_SCOPES = [
-    'data',
+    'data.display.name',
+    'data.display.description',
+    'data.display.icon',
+    'data.versions',
+    'data.categories',
     'meta.owner',
     'meta.rawId',
     'meta.stats',
@@ -193,6 +203,8 @@ export async function loadBrowseData({ request }: { request: Request }): Promise
     const { page: pageParam, ...parsedParams } = querystring.parse(request.url.split('?')[1])
     const params = createBrowseSearchParams(parsedParams)
 
+    console.log(request.headers)
+
     const count = await getTotalCount(params)
 
     let page = pageParam ? Number.parseInt(pageParam as string) : 1
@@ -209,3 +221,18 @@ export async function loadBrowseData({ request }: { request: Request }): Promise
 
     return { count, packs: packs }
 } 
+
+export async function loadRootData({request}: {request: Request}) {
+    if (import.meta.env.SSR) {
+        const cookie = Cookie.parse(request.headers.get('cookie') ?? '');
+        if (!('smithedUser' in cookie)) {
+            return {user: undefined}
+        }
+        
+        const user = JSON.parse(cookie['smithedUser'])
+
+        return {user: user}
+    }
+
+    return {user: undefined}
+}
