@@ -682,7 +682,7 @@ export default function Edit() {
             if (matches.length > 1)
                 return alert('Resolve version name conflict!')
 
-            if (valid(selectedVersion?.name) == null)
+            if (selectedVersion !== undefined && valid(selectedVersion?.name) == null)
                 return alert('Selected version name is not valid SemVer')
 
             setSelectedVersion(version)
