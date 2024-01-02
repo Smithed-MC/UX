@@ -112,17 +112,19 @@ const setPack = async (response: any, reply: any) => {
             const g = packData.display.gallery[i];
 
             if (typeof (g) === 'string') {
-                const buffer = Buffer.from(g.split(',')[1])
-                if (buffer.byteLength > 1324 * 1024)
-                    return sendError(reply, HTTPResponses.BAD_REQUEST, `Gallery image ${i} exceeds 1MB`)
+                if (!g.startsWith("http")) {
+                    const buffer = Buffer.from(g.split(',')[1])
+                    if (buffer.byteLength > 1324 * 1024)
+                        return sendError(reply, HTTPResponses.BAD_REQUEST, `Gallery image ${i} exceeds 1MB`)
 
-                let uid = hash.sha1().update(g).digest("hex")
+                    let uid = hash.sha1().update(g).digest("hex")
 
-                getStorage().bucket().file(`gallery_images/${uid}`).save(g)
+                    getStorage().bucket().file(`gallery_images/${uid}`).save(g)
 
-                packData.display.gallery[i] = {
-                    type: 'bucket',
-                    uid: uid
+                    packData.display.gallery[i] = {
+                        type: 'bucket',
+                        uid: uid
+                    }
                 }
             } else if (g.content) {
                 let uid = hash.sha1().update(g.content).digest("hex")

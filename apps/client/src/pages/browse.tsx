@@ -17,7 +17,8 @@ function RenderPages({ totalPacks, currentPage, params }: { totalPacks: number, 
 
     const formatSelected = (page: number) => `[${page}]`
 
-    currentPage = Math.min(currentPage, numberOfPages)
+    
+    currentPage = Math.max(1, Math.min(currentPage, numberOfPages))
 
     let pageLinks = []
     for (let p = 1; p <= numberOfPages; p++) {

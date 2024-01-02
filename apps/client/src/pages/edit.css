@@ -80,7 +80,7 @@
     grid-template-columns: calc(50% - 0.5rem) calc(50% - 0.5rem);
     grid-template-rows: auto auto 1fr auto auto;
 
-    overflow: hidden;
+    overflow: visible;
 }
 
 .editProjectDetails>.main>.iconGrid {
@@ -95,7 +95,7 @@
     grid-template-columns: auto 1fr;
     grid-template-rows: auto 1fr;
     gap: 1rem;
-    overflow: hidden;
+    overflow: visible;
 }
 
 

@@ -86,3 +86,7 @@ export function correctGithubLinks(url: string) {
     return `https://raw.githubusercontent.com/${user}/${repo}/${path}`
 
 }
+
+export function sanitize(value: string) {
+    return value.toLowerCase().replaceAll(' ', '-').replace(/(\s+|\[|\]|{|}|\||\\|"|%|~|#|<|>|\?)/g, '');
+}

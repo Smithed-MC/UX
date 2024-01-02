@@ -8,6 +8,7 @@ import { coerce, compare, satisfies, inc, valid } from 'semver'
 import { gzip } from 'pako'
 import './edit.css'
 import { Buffer } from 'buffer'
+import { sanitize } from 'formatters'
 
 function EditorDiv({ children, style, ...props }: { children: any, style?: CSSProperties, [key: string]: any }) {
     return <div className='container' style={{ alignItems: 'start', gap: 8, width: '100%', ...style }} {...props}>{children}</div>
@@ -198,7 +199,9 @@ function setPropertyByPath(obj: any, path: string, data: any) {
             currentObj = currentObj[prop]
         }
     }
-    currentObj[target] = data;
+
+    if (typeof(currentObj) === 'object')
+        currentObj[target] = data;
 }
 
 let depUidToRaw: Record<string, string> = {}
@@ -606,6 +609,21 @@ export default function Edit() {
         </>
     }
 
+    const closeGithubModal = () => document
+        .getElementById("githubImportModal")!
+        .style
+        .setProperty('display', 'none')
+    
+    function updateValue(path: string, content: string) {
+        const input = document.getElementById(path) as HTMLInputElement | null
+        if (input != null) {
+            input.value = content
+            input.src = content
+            console.log(input)
+        }
+
+        setPropertyByPath(packData, path, content)
+    }
 
     const ProjectDetails = () => <div className='editProjectDetails'>
         <div className='main'>
@@ -629,7 +647,75 @@ export default function Edit() {
                 <TextInput area="name" path="display/name" icon={Jigsaw} placeholder='Project name' />
                 <LargeTextInput area="description" path="display/description" placeholder='Short project description' />
             </div>
-            <IconTextButton icon={Github} text="Import from repository" className='accentedButtonLike inputField' style={{ gridArea: 'import' }} reverse />
+            <IconTextButton icon={Github} className='inputField' style={{ gridArea: 'import' }} text="Import from github" reverse onClick={() => document.getElementById("githubImportModal")?.style.setProperty('display', 'flex')} />
+            <div id="githubImportModal" className="container" style={{ display: 'none', position: 'fixed', top: 0, left: 0, backgroundColor: 'rgba(0,0,0,0.25)', width: '100%', height: '100%', zIndex: 10 }}>
+                <div style={{width: 'min-content'}}>
+                    <div className='container' style={{ gap: '1rem', backgroundColor: 'var(--section)', padding: '1rem', borderRadius: 'calc(var(--defaultBorderRadius) * 1.5)', border: '0.125rem solid var(--border)' }}>
+                        <IconInput id="githubUrl" type="url" icon={Globe} placeholder='Github URL' />
+                        <div className='container' style={{flexDirection: 'row', gap: '1rem'}}>
+                            <IconTextButton className="invalidButtonLike" icon={Cross} text={"Cancel"} onClick={closeGithubModal}/>
+                            <IconTextButton className="successButtonLike" icon={Check} text={"Confirm"} onClick={async () => {
+                                const url = (document.getElementById("githubUrl") as HTMLInputElement).value
+                                const match = /https:\/\/(?:www.)?github.com\/([^\/]+)\/([^\/]+)/g.exec(url)
+
+                                if (match == null) {
+                                    alert('Invalid github url!')
+                                    return
+                                }
+
+                                const [_, owner, repo] = match
+                                
+                                let resp = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`)
+
+                                if (!resp.ok) {
+                                    return alert('Failed to fetch files in github repo!\nUrl may be invalid or the repo is private')
+                                }
+
+                                let files: {name: string, path: string, download_url: string, type: string}[] = await resp.json() 
+                                let rootReadme = files.find(f => f.name.toLowerCase() === "readme.md")?.download_url;
+
+                                for (let file of files) {
+                                    if (file.name === 'pack.png' || file.name === 'icon.png') {
+                                        updateValue("display/icon", file.download_url)
+
+                                        const img = document.getElementById('display/icon/img')! as HTMLInputElement
+
+                                        img.src = file.download_url
+                                        img.style.setProperty('display', null)
+
+                                        break
+                                    }
+
+                                    if (file.type === 'dir') {
+                                        files.push(...(await (await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${file.path}`)).json()))
+                                    }
+                                } 
+
+                                
+                                if (rootReadme)
+                                    updateValue("display/webPage", rootReadme)
+
+                                resp = await fetch(`https://api.github.com/repos/${owner}/${repo}`)
+
+                                if (!resp.ok) {
+                                    return alert('Failed to fetch info about github repo!\nUrl may be invalid or the repo is private')
+                                }
+
+                                const repoInfo: {name: string, description: string, homepage: string} = await resp.json()             
+                                const name = repoInfo.name.replace(/([a-z])([A-Z])/g, '$1 $2')
+
+                                updateValue("id", sanitize(name))
+                                updateValue("display/name", name)
+                                updateValue("display/description", repoInfo.description)
+                                updateValue("display/urls/source", `https://github.com/${owner}/${repo}`)
+                                updateValue("display/urls/homepage", repoInfo.homepage)
+
+                                closeGithubModal()
+                            }}/>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <ChooseBox style={{ gridArea: 'visibility' }} placeholder='Visibility' choices={[
                 { content: 'Public', value: 'false' },
                 { content: 'Unlisted', value: 'true' }]
