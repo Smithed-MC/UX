@@ -2,7 +2,7 @@ import { PackCard, IconInput, ChooseBox, GalleryPackCard } from "components";
 import React, { useEffect, useRef, useState } from "react";
 import { PackData, SortOptions, fullMinecraftVersions, packCategories, supportedMinecraftVersions } from 'data-types'
 import { AddToBundleModal } from "../widget/packInfo.js";
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import './browse.css'
 import { useAppDispatch, useAppSelector, useFirebaseUser, useQueryParams } from "hooks";
 import { Browse as BrowseSvg, Plus } from "components/svg.js";
@@ -22,7 +22,10 @@ function RenderPages({ totalPacks, currentPage, params }: { totalPacks: number, 
 
     let pageLinks = []
     for (let p = 1; p <= numberOfPages; p++) {
-        pageLinks.push(<a key={'pageButton' + p} className={`browsePageButton ${currentPage === p ? 'selected' : ''}`} href={`/browse?page=${p}&` + params}>{p}</a>)
+        pageLinks.push(<Link key={'pageButton' + p} className={`browsePageButton ${currentPage === p ? 'selected' : ''}`} to={`/browse?page=${p}&` + params} onClick={() => {
+            const cards = document.getElementById('packCardContainer')! as HTMLDivElement
+            cards.style.setProperty('opacity', '0.2')
+        }}>{p}</Link>)
     }
 
     return <div className="container" key="pages" style={{ flexDirection: 'row', gap: '0.25rem', width: '100%', justifyContent: 'center' }}>
@@ -74,6 +77,10 @@ export default function Browse(props: any) {
     }
 
     useEffect(() => { updateUrl(search) }, [search, categories.size, packSort, versions.size])
+
+    useEffect(() => {
+        document.getElementById("packCardContainer")?.style.setProperty('opacity', '1')
+    }, [page])
 
     return <div className="container" style={{ width: '100%', boxSizing: 'border-box', height: '100%', justifyContent: 'safe start', gap: 32 }}>
         <Helmet>

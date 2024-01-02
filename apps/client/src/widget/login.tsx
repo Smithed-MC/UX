@@ -5,6 +5,7 @@ import { FirebaseError } from "firebase/app";
 import { IconInput, IconTextButton, Spinner } from "components";
 import { Right, Key, At } from "components/svg";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 export default function Login({clickSignUp, clickHelp}: {clickSignUp: () => void, clickHelp: () => void}) {
     const [email, setEmail] = useState('')
@@ -22,8 +23,10 @@ export default function Login({clickSignUp, clickHelp}: {clickSignUp: () => void
         if(email === '' || password === '') return;
         setLoggingIn(true)
         try {
+            Cookies.set('smithedPersistence', staySignedIn ? 'true' : 'false', {expires: 14});
             await setPersistence(getAuth(), staySignedIn ? indexedDBLocalPersistence : browserSessionPersistence)
             const cred = await signInWithEmailAndPassword(getAuth(), email, password)
+
             navigate('/' + cred.user.uid) 
         } catch (e: any) {
             setLoggingIn(false)

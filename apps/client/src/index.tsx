@@ -2,7 +2,7 @@ import { NavBar, RootError } from 'components'
 import { StrictMode, useEffect, useState, useTransition } from 'react'
 import { createBrowserRouter, Outlet, RouterProvider, ScrollRestoration, useLocation } from 'react-router-dom'
 import { initializeApp } from 'firebase/app'
-import { User as FirebaseUser } from 'firebase/auth'
+import { User as FirebaseUser, browserSessionPersistence, indexedDBLocalPersistence, setPersistence } from 'firebase/auth'
 
 import Browse from './pages/browse.js'
 import Home from './pages/home.js'
@@ -114,6 +114,10 @@ export function ClientApplet(props: ClientProps) {
         setHideWarning(!!sessionStorage.getItem("hereBeDragons"))
 
         const unsub = getAuth().onAuthStateChanged(async user => {
+            const persistence = Cookies.get('smithedPersistence') === 'true';
+
+            await setPersistence(getAuth(), persistence ? indexedDBLocalPersistence : browserSessionPersistence)
+
             loadBundles(user)
             loadUserData(user)
 

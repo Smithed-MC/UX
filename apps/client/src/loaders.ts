@@ -203,7 +203,7 @@ export async function loadBrowseData({ request }: { request: Request }): Promise
     const { page: pageParam, ...parsedParams } = querystring.parse(request.url.split('?')[1])
     const params = createBrowseSearchParams(parsedParams)
 
-    console.log(request.headers)
+    // console.log(request.headers)
 
     const count = await getTotalCount(params)
 

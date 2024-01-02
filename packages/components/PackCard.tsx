@@ -158,23 +158,3 @@ export default function PackCard({ id, packData, onClick, state, style, parentSt
     </div>
 }
 
-// <div className='container' style={{ flexDirection: 'row', justifyContent: 'right', gap: 8 }}>
-//                     {state !== 'add' && <DownloadButton link={import.meta.env.VITE_API_SERVER + `/download?pack=${id}`} />}
-//                     {showInvalidTooltip && <div style={{ position: 'fixed', animation: 'fadeIn 0.5s', marginRight: 40, backgroundColor: 'var(--accent)', padding: 8, paddingRight: 16, borderRadius: 'var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius)' }}>Pack does not support {bundleData?.version}</div>}
-//                     {state === 'add' && <AddRemovePackButton add={!contained} onClick={onAddClick} disabled={validForBundle} onMouseOver={() => {
-//                         if (validForBundle) setShowInvalidTooltip(true)
-//                     }} onMouseOut={() => {
-//                         if (validForBundle) setShowInvalidTooltip(false)
-//                     }} />}
-//                     {state === 'editable' && <EditButton link={`../edit?pack=${id}`} />}
-//                 </div>
-
-// 3_4_0
-// breaking
-// true
-// downloads
-// datapack
-// "https://github.com/ICY105/Datapack-Utilities/releases/download/3.4.0/DatapackUtilities_v3.4.0.zip"
-// supports
-// 0
-// "1.18"

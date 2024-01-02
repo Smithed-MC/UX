@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
+import { CSSProperties, FunctionComponent, SVGProps, useEffect, useMemo, useRef, useState } from 'react'
 import { PackBundle, PackData, PackEntry, PackGalleryImage, PackMetaData } from 'data-types'
 import { formatDownloads, prettyTimeDifference } from 'formatters'
 import './GalleryPackCard.css'
@@ -14,7 +14,7 @@ interface PackCardProps {
     packEntry?: PackEntry,
     packData: PackData,
     packMeta: PackMetaData,
-    packAuthor: string,
+    packAuthor?: string,
     state?: 'editable' | 'add',
     style?: CSSProperties,
     parentStyle?: CSSProperties,
@@ -31,6 +31,14 @@ function CarouselDot({ selected, onClick }: { selected?: boolean, onClick: () =>
             <circle cx="4.5" cy="4" r="4" fill={selected ? "var(--foreground)" : "var(--border)"} style={{ transition: 'all 0.2s ease-in-out' }} />
         </svg>
     </div>
+}
+
+function Badge({svg: Svg, title}: {svg: FunctionComponent<SVGProps<SVGSVGElement>>, title: string}) {
+    return <>
+        <div style={{width: '1rem', height: '1rem', position: 'relative'}} title={title}>
+            <Svg style={{width: '1rem', height: '1rem', position: 'absolute'}}/>
+        </div>
+    </>
 }
 
 export default function GalleryPackCard({ id, packData, packMeta, onClick, state, style, parentStyle, bundleData, user, addWidget, packAuthor, ref, ...props }: PackCardProps) {
@@ -53,15 +61,19 @@ export default function GalleryPackCard({ id, packData, packMeta, onClick, state
     async function onLoad() {
         let badges: JSX.Element[] = []
         if (author === 'Smithed') {
-            badges.push(<Logo style={{ width: '1rem', height: '1rem' }} />)
+            badges.push(<Badge title="Official Pack" key="official" svg={Logo}/>)
         }
         if (packData?.versions?.every(v => v.downloads.resourcepack === undefined || v.downloads.resourcepack === ''))
-            badges.push(<FlagCrossed style={{width: '1rem', height: '1rem'}}/>)
+            badges.push(<Badge title="No Resourcepack" key="no-rp" svg={FlagCrossed}/>)
 
         setBadges(badges)
         setData(packData)
         setMetaData(packMeta)
         setAuthor(packAuthor)
+
+        if (!packData.display.icon) {
+            setFallback(true)
+        }
     }
 
     async function populateGallery() {
@@ -87,7 +99,7 @@ export default function GalleryPackCard({ id, packData, packMeta, onClick, state
                 <div className='galleryImage' style={{ position: 'relative' }}>
                     {fallback && <div style={{ backgroundColor: 'var(--accent)', width: '100%', height: '100%', flexGrow: 1 }} />}
                     {(!gallery || gallery.length == 0) && !fallback
-                        && <img style={{ width: '100%', filter: 'saturate(50%) brightness(50%)' }} src={data?.display.icon} onError={(e) => setFallback(true)}
+                        && <img style={{ width: '100%', filter: 'saturate(50%) brightness(50%)' }} src={data?.display.icon} onError={(e) => {setFallback(true)}}
                             onClick={() => {
                                 if (!card.current)
                                     return
