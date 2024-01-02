@@ -15,7 +15,8 @@
     /* grid-template-rows: aut; */
     position: relative;
 
-    transition: all 0.5s;
+    transition: all 0.5s, opacity 0.3s ease-in-out;
+    
 
     gap: 2rem;
 }

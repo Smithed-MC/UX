@@ -23,6 +23,9 @@ function RenderPages({ totalPacks, currentPage, params }: { totalPacks: number, 
     let pageLinks = []
     for (let p = 1; p <= numberOfPages; p++) {
         pageLinks.push(<Link key={'pageButton' + p} className={`browsePageButton ${currentPage === p ? 'selected' : ''}`} to={`/browse?page=${p}&` + params} onClick={() => {
+            if (currentPage === p)
+                return 
+            
             const cards = document.getElementById('packCardContainer')! as HTMLDivElement
             cards.style.setProperty('opacity', '0.2')
         }}>{p}</Link>)
