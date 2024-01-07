@@ -106,7 +106,7 @@ const setPack = async (response: any, reply: any) => {
 
 
     if (packData.display?.gallery) {
-        const existingGallery: PackGalleryImage[] = await doc.get('data.display.gallery')
+        const existingGallery: PackGalleryImage[] = await doc.get('data.display.gallery') ?? []
 
         for (let i = 0; i < packData.display.gallery.length; i++) {
             const g = packData.display.gallery[i];
