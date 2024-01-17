@@ -113,6 +113,7 @@ API_APP.route({
         if(versions.find(v => v.name === versionId))
             return sendError(reply, HTTPResponses.CONFLICT, `Version with ID ${versionId} already exists`)
 
+        versionData.name = versionId;
         versions.push(versionData)
 
         await doc.ref.set({

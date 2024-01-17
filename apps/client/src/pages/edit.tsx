@@ -200,7 +200,7 @@ function setPropertyByPath(obj: any, path: string, data: any) {
         }
     }
 
-    if (typeof(currentObj) === 'object')
+    if (typeof (currentObj) === 'object')
         currentObj[target] = data;
 }
 
@@ -209,7 +209,7 @@ let initialContributors: string[] = []
 
 export default function Edit() {
     const user = useFirebaseUser()
-    const { pack, new: isNew, tab: currentTab } = useQueryParams()
+    const { pack: packIdParam, new: isNew, tab: currentTab } = useQueryParams()
 
     const navigate = useNavigate()
 
@@ -306,7 +306,7 @@ export default function Edit() {
             return
         }
 
-        const data: PackData = await (await fetch(import.meta.env.VITE_API_SERVER + `/packs/${pack}`, { cache: 'no-cache' })).json()
+        const data: PackData = await (await fetch(import.meta.env.VITE_API_SERVER + `/packs/${packIdParam}`, { cache: 'no-cache' })).json()
         data.versions.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
 
         data.versions.forEach(v => {
@@ -314,7 +314,7 @@ export default function Edit() {
             v.dependencies ??= []
         })
 
-        const metaData: PackMetaData = await (await fetch(import.meta.env.VITE_API_SERVER + `/packs/${pack}/meta`, { cache: 'no-cache' })).json()
+        const metaData: PackMetaData = await (await fetch(import.meta.env.VITE_API_SERVER + `/packs/${packIdParam}/meta`, { cache: 'no-cache' })).json()
 
         data.id = metaData.rawId
 
@@ -322,7 +322,7 @@ export default function Edit() {
         initialContributors = [...metaData.contributors]
         setPackMetaData(metaData)
     }
-    useEffect(() => { onLoad() }, [pack, user])
+    useEffect(() => { onLoad() }, [packIdParam, user])
 
     async function savePack() {
         if (packData === undefined)
@@ -332,10 +332,13 @@ export default function Edit() {
 
         const token = await user?.getIdToken()
 
-        const uri = !isNew ?
-            `/packs/${pack}?token=${token}`
-            : `/packs?id=${packData.id}&token=${token}`
+        const packId = isNew ? packData.id : packIdParam
 
+        const uri = isNew ?
+            `/packs?id=${packId}&token=${token}`
+            : `/packs/${packId}?token=${token}`
+
+        console.log(uri)
         const body = gzip(JSON.stringify({
             data: packData
         }))
@@ -367,7 +370,7 @@ export default function Edit() {
 
             const postContributorsResp = await fetch(
                 import.meta.env.VITE_API_SERVER
-                + `/packs/${pack}/contributors?token=${token}&contributors=`
+                + `/packs/${packId}/contributors?token=${token}&contributors=`
                 + newContributors.join('&contributors='),
                 {
                     method: 'POST'
@@ -386,7 +389,7 @@ export default function Edit() {
 
             const delContributorsResp = await fetch(
                 import.meta.env.VITE_API_SERVER
-                + `/packs/${pack}/contributors?token=${token}&contributors=`
+                + `/packs/${packId}/contributors?token=${token}&contributors=`
                 + removedContributors.join('&contributors='),
                 {
                     method: 'DELETE'
@@ -613,7 +616,7 @@ export default function Edit() {
         .getElementById("githubImportModal")!
         .style
         .setProperty('display', 'none')
-    
+
     function updateValue(path: string, content: string) {
         const input = document.getElementById(path) as HTMLInputElement | null
         if (input != null) {
@@ -649,11 +652,11 @@ export default function Edit() {
             </div>
             <IconTextButton icon={Github} className='inputField' style={{ gridArea: 'import' }} text="Import from github" reverse onClick={() => document.getElementById("githubImportModal")?.style.setProperty('display', 'flex')} />
             <div id="githubImportModal" className="container" style={{ display: 'none', position: 'fixed', top: 0, left: 0, backgroundColor: 'rgba(0,0,0,0.25)', width: '100%', height: '100%', zIndex: 10 }}>
-                <div style={{width: 'min-content'}}>
+                <div style={{ width: 'min-content' }}>
                     <div className='container' style={{ gap: '1rem', backgroundColor: 'var(--section)', padding: '1rem', borderRadius: 'calc(var(--defaultBorderRadius) * 1.5)', border: '0.125rem solid var(--border)' }}>
                         <IconInput id="githubUrl" type="url" icon={Globe} placeholder='Github URL' />
-                        <div className='container' style={{flexDirection: 'row', gap: '1rem'}}>
-                            <IconTextButton className="invalidButtonLike" icon={Cross} text={"Cancel"} onClick={closeGithubModal}/>
+                        <div className='container' style={{ flexDirection: 'row', gap: '1rem' }}>
+                            <IconTextButton className="invalidButtonLike" icon={Cross} text={"Cancel"} onClick={closeGithubModal} />
                             <IconTextButton className="successButtonLike" icon={Check} text={"Confirm"} onClick={async () => {
                                 const url = (document.getElementById("githubUrl") as HTMLInputElement).value
                                 const match = /https:\/\/(?:www.)?github.com\/([^\/]+)\/([^\/]+)/g.exec(url)
@@ -664,14 +667,14 @@ export default function Edit() {
                                 }
 
                                 const [_, owner, repo] = match
-                                
+
                                 let resp = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`)
 
                                 if (!resp.ok) {
                                     return alert('Failed to fetch files in github repo!\nUrl may be invalid or the repo is private')
                                 }
 
-                                let files: {name: string, path: string, download_url: string, type: string}[] = await resp.json() 
+                                let files: { name: string, path: string, download_url: string, type: string }[] = await resp.json()
                                 let rootReadme = files.find(f => f.name.toLowerCase() === "readme.md")?.download_url;
 
                                 for (let file of files) {
@@ -689,9 +692,9 @@ export default function Edit() {
                                     if (file.type === 'dir') {
                                         files.push(...(await (await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${file.path}`)).json()))
                                     }
-                                } 
+                                }
 
-                                
+
                                 if (rootReadme)
                                     updateValue("display/webPage", rootReadme)
 
@@ -701,7 +704,7 @@ export default function Edit() {
                                     return alert('Failed to fetch info about github repo!\nUrl may be invalid or the repo is private')
                                 }
 
-                                const repoInfo: {name: string, description: string, homepage: string} = await resp.json()             
+                                const repoInfo: { name: string, description: string, homepage: string } = await resp.json()
                                 const name = repoInfo.name.replace(/([a-z])([A-Z])/g, '$1 $2')
 
                                 updateValue("id", sanitize(name))
@@ -711,7 +714,7 @@ export default function Edit() {
                                 updateValue("display/urls/homepage", repoInfo.homepage)
 
                                 closeGithubModal()
-                            }}/>
+                            }} />
                         </div>
                     </div>
                 </div>
@@ -831,6 +834,7 @@ export default function Edit() {
 
     function Management() {
         const [contributors, setContributors] = useState<{ name: string, id: string }[]>()
+        const [showConfirmDeletion, setShowConfirmDeletion] = useState(false)
 
         async function getPrettyNames() {
             if (!packMetaData)
@@ -897,6 +901,38 @@ export default function Edit() {
                     </button>
                 </div>)}
             </div>
+            {!isNew && <>
+                {!showConfirmDeletion && <IconTextButton className='buttonLike invalidButtonLike' text={"Delete Pack"} icon={Trash} onClick={(e) => {
+                    alert('This action is irreversible, type the pack id to confirm.')
+                    setShowConfirmDeletion(true)
+                }} />}
+                {showConfirmDeletion && <div className="container" style={{ flexDirection: 'row', gap: '1rem'}}>
+                    <IconInput id="confirmationId" icon={At} placeholder='Project id' />
+                    <a className='buttonLike invalidButtonLike' onClick={async () => {
+                        const input = document.getElementById("confirmationId")! as HTMLInputElement
+
+                        if (input.value != packData?.id)
+                            return;
+
+                        const deleteResp = await fetch(
+                            import.meta.env.VITE_API_SERVER
+                            + `/packs/${packIdParam}?token=${await user?.getIdToken()}`,
+                            {
+                                method: 'DELETE'
+                            }
+                        )
+                        
+                        if (deleteResp.ok) {
+                            alert('Pack has been deleted.')
+                            navigate('/' + user?.uid);
+                        } else {
+                            alert('Failed to delete pack.')
+                        }
+                    }}>
+                        <Trash />
+                    </a>
+                </div>}
+            </>}
         </div>
     }
 
