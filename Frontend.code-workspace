@@ -1,8 +1,8 @@
 {
 	"folders": [
 		{
-			"path": "."
-		}
+			"path": ".",
+		},
 	],
 	"settings": {
 		"explorer.excludeGitIgnore": false,
@@ -10,7 +10,7 @@
 			"*.mcmeta": "json",
 			"*.idgas": "json",
 			"*.tdn": "mcfunction",
-			"iostream": "cpp"
-		}
-	}
+			"iostream": "cpp",
+		},
+	},
 }

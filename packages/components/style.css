@@ -1,236 +1,227 @@
 :root {
-    --accent: #1b48c4;
-    font-family: Inconsolata;
-    text-rendering: optimizeLegibility;
+	--accent: #1b48c4;
+	font-family: Inconsolata;
+	text-rendering: optimizeLegibility;
 }
-
 
 @font-face {
-    font-family: 'Inconsolata';
-    src: local('Inconsolata'),
-        url('./fonts/Inconsolata.otf') format('opentype')
+	font-family: "Inconsolata";
+	src:
+		local("Inconsolata"),
+		url("./fonts/Inconsolata.otf") format("opentype");
 }
-
 
 .container {
-    display: flex;
-    flex-direction: column;
-    align-items: safe center;
-    justify-content: safe center;
-    color: var(--text);
+	display: flex;
+	flex-direction: column;
+	align-items: safe center;
+	justify-content: safe center;
+	color: var(--text);
 }
 
-
 .button {
-
-    border-width: 0;
-    background-color: var(--accent);
-    filter: brightness(100%);
-    font-family: 'Inconsolata';
-    cursor: pointer;
-    color: var(--foreground);
-    padding: 8px;
-    border-radius: var(--defaultBorderRadius);
-    text-align: center;
-    text-decoration: none;
-    font-size: 1rem;
-    transition: all 100ms linear;
+	border-width: 0;
+	background-color: var(--accent);
+	filter: brightness(100%);
+	font-family: "Inconsolata";
+	cursor: pointer;
+	color: var(--foreground);
+	padding: 8px;
+	border-radius: var(--defaultBorderRadius);
+	text-align: center;
+	text-decoration: none;
+	font-size: 1rem;
+	transition: all 100ms linear;
 }
 
 .button:disabled {
-    filter:brightness(50%);
-    cursor:default;
+	filter: brightness(50%);
+	cursor: default;
 }
 
 .button:enabled:hover {
-    filter: brightness(80%);
+	filter: brightness(80%);
 }
 
 .button:enabled:active {
-    opacity: 60%;
-    filter: brightness(80%);
-    transform: scale(105%);
+	opacity: 60%;
+	filter: brightness(80%);
+	transform: scale(105%);
 }
 
 .clickable {
-    cursor: pointer;
-    transition: all 100ms linear;
+	cursor: pointer;
+	transition: all 100ms linear;
 }
 
 .clickable:hover {
-    filter: brightness(80%);
+	filter: brightness(80%);
 }
 
 .clickable:active {
-    filter: brightness(60%);
+	filter: brightness(60%);
 }
 
 .wobbleHover:hover {
-    animation: wobble 0.5s infinite ease-in-out;
+	animation: wobble 0.5s infinite ease-in-out;
 }
 .wobbleHover:hover:disabled {
-    animation: none !important;
+	animation: none !important;
 }
 
 .underlineHover:hover {
-    text-decoration: underline;
+	text-decoration: underline;
 }
 
 .underlineHover:active {
-    text-decoration: underline;
+	text-decoration: underline;
 }
 
-
-
 .loader {
-    border: 16px solid var(--subText);
-    /* Light grey */
-    border-top: 16px solid var(--accent);
-    /* Blue */
-    border-radius: 50%;
-    width: 120px;
-    height: 120px;
-    animation: spinFull 2s linear infinite;
-    box-sizing: border-box;
+	border: 16px solid var(--subText);
+	/* Light grey */
+	border-top: 16px solid var(--accent);
+	/* Blue */
+	border-radius: 50%;
+	width: 120px;
+	height: 120px;
+	animation: spinFull 2s linear infinite;
+	box-sizing: border-box;
 }
 
 @keyframes spinFull {
-    0% {
-        transform: rotate(0deg);
-    }
+	0% {
+		transform: rotate(0deg);
+	}
 
-    100% {
-        transform: rotate(360deg);
-    }
+	100% {
+		transform: rotate(360deg);
+	}
 }
 
 @keyframes wobble {
-    0% {
-        transform: rotate(0deg);
-    }
+	0% {
+		transform: rotate(0deg);
+	}
 
-    25% {
-        transform: rotate(5deg);
-    }
+	25% {
+		transform: rotate(5deg);
+	}
 
-    50% {
-        transform: rotate(0deg);
-    }
+	50% {
+		transform: rotate(0deg);
+	}
 
-    75% {
-        transform: rotate(-5deg);
-    }
+	75% {
+		transform: rotate(-5deg);
+	}
 
-    100% {
-        transform: rotate(0deg);
-    }
+	100% {
+		transform: rotate(0deg);
+	}
 }
 
 @keyframes spinLeft {
-    from {
-        transform: rotate(0deg);
-    }
+	from {
+		transform: rotate(0deg);
+	}
 
-    to {
-        transform: rotate(180deg);
-    }
+	to {
+		transform: rotate(180deg);
+	}
 }
 
 @keyframes spinRight {
-    from {
-        transform: rotate(180deg);
-    }
+	from {
+		transform: rotate(180deg);
+	}
 
-    to {
-        transform: rotate(0deg);
-    }
+	to {
+		transform: rotate(0deg);
+	}
 }
 
 @keyframes navbarPullup {
-    0% {
-        opacity: 0;
-        transform: translateY(75px);
-        z-index: -1;
-    }
+	0% {
+		opacity: 0;
+		transform: translateY(75px);
+		z-index: -1;
+	}
 
-    25% {
-        opacity: 0;
-    }
+	25% {
+		opacity: 0;
+	}
 
-    100% {
-        opacity: 1;
-        transform: translateY(0px);
-    }
+	100% {
+		opacity: 1;
+		transform: translateY(0px);
+	}
 }
 
 .fadeIn {
-    animation: fadeIn;
-    animation-duration: 1s;
+	animation: fadeIn;
+	animation-duration: 1s;
 }
 
 .fadeOut {
-    animation: fadeOut;
-    animation-duration: 1s;
+	animation: fadeOut;
+	animation-duration: 1s;
 }
-
-
 
 @keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-    10% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
+	0% {
+		opacity: 0;
+	}
+	10% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
 }
 
-
 @keyframes fadeOut {
-    0% {
-        opacity: 1;
-    }
-    10% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
+	0% {
+		opacity: 1;
+	}
+	10% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
 }
 
 @keyframes slideUp {
-    0% {
-        top: 100vh;
-    }
-    100% {
-        top: 0
-    }
+	0% {
+		top: 100vh;
+	}
+	100% {
+		top: 0;
+	}
 }
 
-
 @keyframes fadeInBackground {
-    0% {
-        background-color: rgba(0,0,0,0%);
-    }
-    100% {
-        background-color: rgba(0,0,0,50%);
-    }
+	0% {
+		background-color: rgba(0, 0, 0, 0%);
+	}
+	100% {
+		background-color: rgba(0, 0, 0, 50%);
+	}
 }
 
 @keyframes slideInContent {
-    0% {
-        margin-top: 100vh;
-        opacity: 0;
-    }
-    10% {
-        opacity: 0;
-    }
-    33% {
-        opacity: 1;
-    }
-    100% {
-        margin-top: 0;
-    }
+	0% {
+		margin-top: 100vh;
+		opacity: 0;
+	}
+	10% {
+		opacity: 0;
+	}
+	33% {
+		opacity: 1;
+	}
+	100% {
+		margin-top: 0;
+	}
 }

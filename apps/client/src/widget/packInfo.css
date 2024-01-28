@@ -1,215 +1,211 @@
 @keyframes pullIn {
-    from {
-        transform: translateX(60%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0%);
-        opacity: 1;
-    }
+	from {
+		transform: translateX(60%);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0%);
+		opacity: 1;
+	}
 }
 @keyframes pullInLeft {
-    from {
-        transform: translateX(-60%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0%);
-        opacity: 1;
-    }
+	from {
+		transform: translateX(-60%);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0%);
+		opacity: 1;
+	}
 }
 
 @keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-    10% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
+	0% {
+		opacity: 0;
+	}
+	10% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
 }
 
 @media screen and (max-width: 480px) {
-    .packImage {
-        display: none;
-    }
+	.packImage {
+		display: none;
+	}
 }
 @media screen and (min-width: 480px) {
-    .packImage {
-        display: inherit;
-    }
+	.packImage {
+		display: inherit;
+	}
 }
 
-
 .packInfoRoot {
-    box-sizing: border-box;
-    width: 100%;
-    justify-content: safe start;
+	box-sizing: border-box;
+	width: 100%;
+	justify-content: safe start;
 }
 
 .packDetailsContainer {
-    display: grid;
-    width: 100%;
+	display: grid;
+	width: 100%;
 
-    grid-template-areas: 
-        "icon name"
-        "icon byLine";
+	grid-template-areas:
+		"icon name"
+		"icon byLine";
 
-    grid-template-columns: auto 1fr;
-    column-gap: 1rem;
+	grid-template-columns: auto 1fr;
+	column-gap: 1rem;
 
-    grid-area: details;
+	grid-area: details;
 }
 
-.packDetailsContainer>img {
-    width: 4rem;
-    height: 4rem;
+.packDetailsContainer > img {
+	width: 4rem;
+	height: 4rem;
 }
 
 .packPageHeader {
-    display: grid;
-    grid-template-areas: 
-        "details download"
-        "userButtons .";
+	display: grid;
+	grid-template-areas:
+		"details download"
+		"userButtons .";
 
-    grid-template-columns: 1fr 1fr;
-    width: 100%;
+	grid-template-columns: 1fr 1fr;
+	width: 100%;
 
-    row-gap: 1rem;
+	row-gap: 1rem;
 }
 
-.userButtonsContainer, .downloadContainer {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    gap: 1rem;
+.userButtonsContainer,
+.downloadContainer {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	gap: 1rem;
 }
 
 .downloadContainer {
-    grid-area: download;
+	grid-area: download;
 
-    justify-content: end;
-    align-items: start;
+	justify-content: end;
+	align-items: start;
 }
 
 .userButtonsContainer {
-    grid-area: userButtons;
+	grid-area: userButtons;
 }
 
 .addToBundlePage {
+	width: 100%;
+	box-sizing: border-box;
+	background-color: var(--bold);
+	border-radius: var(--defaultBorderRadius);
+	/* border: 0.125rem solid var(--border); */
 
-    width: 100%;
-    box-sizing: border-box;
-    background-color: var(--bold);
-    border-radius: var(--defaultBorderRadius);
-    /* border: 0.125rem solid var(--border); */
+	height: 100%;
+	overflow-x: hidden;
+	margin-bottom: -100%;
 
-    height: 100%;
-    overflow-x: hidden;
-    margin-bottom: -100%;
-
-    transition: all 0.25s ease-in-out;
+	transition: all 0.25s ease-in-out;
 }
 
-.addToBundlePage>* {
-    border-radius: var(--defaultBorderRadius);
-    gap: 0.5rem;
-    width: 100%;
-    height: 100%;
-    background-color: var(--bold);
-    padding: 1rem;
-    box-sizing: border-box;
+.addToBundlePage > * {
+	border-radius: var(--defaultBorderRadius);
+	gap: 0.5rem;
+	width: 100%;
+	height: 100%;
+	background-color: var(--bold);
+	padding: 1rem;
+	box-sizing: border-box;
 
-    animation-duration: 0.5s;
-    animation-timing-function: ease-in-out;
-    transition: all 0.25s ease-in-out;
-
+	animation-duration: 0.5s;
+	animation-timing-function: ease-in-out;
+	transition: all 0.25s ease-in-out;
 }
 /* 
 .packDownloadVersions>*:nth-child(n + 5):not(:last-child) {
     display: none;
 } */
 
-
 @media screen and (min-width: 56rem) {
-    .packInfoSmallDownload {
-        display: none !important;
-    }
+	.packInfoSmallDownload {
+		display: none !important;
+	}
 }
 
 @media screen and (max-width: 56rem) {
-    .downloadContainer {
-        display: none;
-    }
-
+	.downloadContainer {
+		display: none;
+	}
 }
 
-@media screen and (max-width: 43rem) {   
-    .packInfoMediaButton:not(:only-child) {
-        border-radius: 0;
-    }
-    .packInfoMediaButton:not(:only-child)>label, .packInfoMediaButton:not(:only-child)>div {
-        display: none;
-    }
+@media screen and (max-width: 43rem) {
+	.packInfoMediaButton:not(:only-child) {
+		border-radius: 0;
+	}
+	.packInfoMediaButton:not(:only-child) > label,
+	.packInfoMediaButton:not(:only-child) > div {
+		display: none;
+	}
 
+	.packInfoMediaButton:last-child:not(:only-child) {
+		border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0;
+	}
+	.packInfoMediaButton:first-child:not(:only-child) {
+		border-radius: var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius);
+	}
 
-    .packInfoMediaButton:last-child:not(:only-child) {
-        border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0;
-    }
-    .packInfoMediaButton:first-child:not(:only-child) {
-        border-radius: var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius);
-    }
+	.userButtonsContainer {
+		width: 100%;
+		gap: 0.25rem;
+		justify-content: center;
+	}
 
-    .userButtonsContainer {
-        width: 100%;
-        gap: 0.25rem;
-        justify-content: center;
-    }
+	.packPageHeader {
+		grid-template-areas:
+			"details"
+			"userButtons";
+		grid-template-columns: 1fr;
 
-    .packPageHeader {
-        grid-template-areas: 
-            "details"
-            "userButtons";
-        grid-template-columns: 1fr;
+		align-items: center;
+	}
 
-        align-items: center;
-    }
+	.packDetailsContainer {
+		grid-template-areas:
+			"icon"
+			"name"
+			"byLine";
+		grid-template-columns: 1fr;
+		place-items: center;
+	}
 
-    .packDetailsContainer {
-        grid-template-areas: 
-            "icon"
-            "name"
-            "byLine";
-        grid-template-columns: 1fr;
-        place-items: center;
-    }
+	.packDetailsContainer > img {
+		margin-bottom: 0.5rem;
+	}
 
-    .packDetailsContainer>img {
-        margin-bottom: 0.5rem;
-    }
-
-    .packDetailsUpdateInfo {
-        display: none;
-    }
+	.packDetailsUpdateInfo {
+		display: none;
+	}
 }
 
 @keyframes slideInleft {
-    0% {
-        margin-right: -200%;
-        opacity: 0;
-    }
-    100% {
-        margin-right: 0;
-    }
+	0% {
+		margin-right: -200%;
+		opacity: 0;
+	}
+	100% {
+		margin-right: 0;
+	}
 }
 @keyframes slideInright {
-    0% {
-        margin-left: -200%;
-        opacity: 0;
-    }
-    100% {
-        margin-left: 0;
-    }
+	0% {
+		margin-left: -200%;
+		opacity: 0;
+	}
+	100% {
+		margin-left: 0;
+	}
 }

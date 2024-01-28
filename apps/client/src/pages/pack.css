@@ -1,21 +1,20 @@
-
 .panelContainer {
-    position: absolute;
-    display: grid !important;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    place-items: start;
-    overflow-y: auto;
+	position: absolute;
+	display: grid !important;
+	top: 0;
+	left: 0;
+	height: 100vh;
+	place-items: start;
+	overflow-y: auto;
 }
 @media screen and (max-width: 768px) {
-    .panelContainer {
-        grid-template-columns: auto;
-        grid-template-rows: auto auto;
-    }
+	.panelContainer {
+		grid-template-columns: auto;
+		grid-template-rows: auto auto;
+	}
 }
 @media screen and (min-width: 768px) {
-    .panelContainer {
-        grid-template-columns:auto minmax(auto, 320px);
-    }
+	.panelContainer {
+		grid-template-columns: auto minmax(auto, 320px);
+	}
 }

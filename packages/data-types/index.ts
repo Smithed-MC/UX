@@ -1,141 +1,154 @@
-import {Static, Type} from '@sinclair/typebox'
-import {Format} from '@sinclair/typebox/format'
-import { coerce } from 'semver'
+import { Static, Type } from "@sinclair/typebox"
+import { Format } from "@sinclair/typebox/format"
+import { coerce } from "semver"
 
 export interface PackEntry {
-    added: number,
-    downloads: { [key: string]: number }
-    updated: number
-    owner: string
+	added: number
+	downloads: { [key: string]: number }
+	updated: number
+	owner: string
 }
 
-Format.Set('semver', (v) => coerce(v) != null)
-console.log(Format.Has('semver'))
+Format.Set("semver", (v) => coerce(v) != null)
+console.log(Format.Has("semver"))
 
 export const supportedMinecraftVersions = [
-    '1.20.5-23w51b',
-    '1.20.4',
-    '1.20.4-rc1',
-    '1.20.3',
-    '1.20.3-rc1',
-    '1.20.3-pre4',
-    '1.20.2',
-    '1.20.1',
-    '1.20',
-    '1.19.4',
-    '1.19',
-    '1.18.2',
-    '1.18.1',
-    '1.18',
-    '1.17.1',
-    '1.17'
+	"1.20.5-23w51b",
+	"1.20.4",
+	"1.20.4-rc1",
+	"1.20.3",
+	"1.20.3-rc1",
+	"1.20.3-pre4",
+	"1.20.2",
+	"1.20.1",
+	"1.20",
+	"1.19.4",
+	"1.19",
+	"1.18.2",
+	"1.18.1",
+	"1.18",
+	"1.17.1",
+	"1.17",
 ]
 
-export const fullMinecraftVersions = supportedMinecraftVersions.filter(v => !v.includes('-'))
+export const fullMinecraftVersions = supportedMinecraftVersions.filter(
+	(v) => !v.includes("-")
+)
 
-export const latestMinecraftVersion = '1.20.4'
+export const latestMinecraftVersion = "1.20.4"
 
-export const MinecraftVersionSchema = Type.Union(supportedMinecraftVersions.map(v => Type.Literal(v)))
+export const MinecraftVersionSchema = Type.Union(
+	supportedMinecraftVersions.map((v) => Type.Literal(v))
+)
 
-export const packCategories = [ 
-    'Extensive' ,
-    'Lightweight' ,
-    'QoL' ,
-    'Vanilla+' ,
-    'Tech' ,
-    'Magic' ,
-    'Library' ,
-    'Exploration' ,
-    'World Overhaul' ,
-    'No Resource Pack'
+export const packCategories = [
+	"Extensive",
+	"Lightweight",
+	"QoL",
+	"Vanilla+",
+	"Tech",
+	"Magic",
+	"Library",
+	"Exploration",
+	"World Overhaul",
+	"No Resource Pack",
 ]
 
 export const PackReferenceSchema = Type.Object({
-    id: Type.String(),
-    version: Type.String()
+	id: Type.String(),
+	version: Type.String(),
 })
 
-export const PackCategorySchema = Type.Union(packCategories.map(c => Type.Literal(c)))
+export const PackCategorySchema = Type.Union(
+	packCategories.map((c) => Type.Literal(c))
+)
 
 export const PackVersionSchema = Type.Object({
-    name: Type.String({minLength: 1}),
-    downloads: Type.Partial(Type.Object({
-        datapack: Type.String(),
-        resourcepack: Type.String()
-    }), {minProperties: 1}),
-    supports: Type.Array(MinecraftVersionSchema, {minItems: 1}),
-    dependencies: Type.Array(PackReferenceSchema)
+	name: Type.String({ minLength: 1 }),
+	downloads: Type.Partial(
+		Type.Object({
+			datapack: Type.String(),
+			resourcepack: Type.String(),
+		}),
+		{ minProperties: 1 }
+	),
+	supports: Type.Array(MinecraftVersionSchema, { minItems: 1 }),
+	dependencies: Type.Array(PackReferenceSchema),
 })
 
 export const PackGalleryImageSchema = Type.Union([
-    Type.Object({
-        type: Type.Literal('bucket'), 
-        uid: Type.String(),
-        content: Type.Optional(Type.String())
-    }),
-    Type.String()
+	Type.Object({
+		type: Type.Literal("bucket"),
+		uid: Type.String(),
+		content: Type.Optional(Type.String()),
+	}),
+	Type.String(),
 ])
 
 export const PackDataSchema = Type.Object({
-    id: Type.String({minLength: 3}),
-    display: Type.Object({
-        name: Type.String({minLength: 3}),
-        description: Type.String({minLength: 3}),
-        icon: Type.String({default: ''}),
-        hidden: Type.Boolean({default: false}),
-        webPage: Type.Optional(Type.String()),
-        urls: Type.Optional(Type.Object({
-            discord: Type.Optional(Type.String()),
-            source: Type.Optional(Type.String()),
-            homepage: Type.Optional(Type.String())
-        })),
-        gallery: Type.Optional(Type.Array(PackGalleryImageSchema))
-    }),
-    versions: Type.Array(PackVersionSchema, {minItems: 1}),
-    categories: Type.Array(PackCategorySchema)
+	id: Type.String({ minLength: 3 }),
+	display: Type.Object({
+		name: Type.String({ minLength: 3 }),
+		description: Type.String({ minLength: 3 }),
+		icon: Type.String({ default: "" }),
+		hidden: Type.Boolean({ default: false }),
+		webPage: Type.Optional(Type.String()),
+		urls: Type.Optional(
+			Type.Object({
+				discord: Type.Optional(Type.String()),
+				source: Type.Optional(Type.String()),
+				homepage: Type.Optional(Type.String()),
+			})
+		),
+		gallery: Type.Optional(Type.Array(PackGalleryImageSchema)),
+	}),
+	versions: Type.Array(PackVersionSchema, { minItems: 1 }),
+	categories: Type.Array(PackCategorySchema),
 })
 
 export const MetaDataSchema = Type.Object({
-    docId: Type.String(),
-    rawId: Type.String(),
-    stats: Type.Object({
-        updated: Type.Optional(Type.Number()),
-        added: Type.Number(),
-        downloads: Type.Object({
-            total: Type.Number(),
-            today: Type.Number()
-        })
-    }),
-    owner: Type.String(),
-    contributors: Type.Array(Type.String(), {default: []})
+	docId: Type.String(),
+	rawId: Type.String(),
+	stats: Type.Object({
+		updated: Type.Optional(Type.Number()),
+		added: Type.Number(),
+		downloads: Type.Object({
+			total: Type.Number(),
+			today: Type.Number(),
+		}),
+	}),
+	owner: Type.String(),
+	contributors: Type.Array(Type.String(), { default: [] }),
 })
 
 export const BundleSchema = Type.Object({
-    owner: Type.String(),
-    name: Type.String(),
-    version: MinecraftVersionSchema,
-    packs: Type.Array(PackReferenceSchema),
-    public: Type.Boolean(),
-    uid: Type.Optional(Type.String())
+	owner: Type.String(),
+	name: Type.String(),
+	version: MinecraftVersionSchema,
+	packs: Type.Array(PackReferenceSchema),
+	public: Type.Boolean(),
+	uid: Type.Optional(Type.String()),
 })
 
 export const UserDataSchema = Type.Object({
-    displayName: Type.String(),
-    cleanName: Type.String(),
-    creationTime: Type.Number(),
-    uid: Type.String(),
-    pfp: Type.Optional(Type.String()),
-    banner: Type.Optional(Type.String()),
-    biography: Type.Optional(Type.String({maxLength: 2000}))
+	displayName: Type.String(),
+	cleanName: Type.String(),
+	creationTime: Type.Number(),
+	uid: Type.String(),
+	pfp: Type.Optional(Type.String()),
+	banner: Type.Optional(Type.String()),
+	biography: Type.Optional(Type.String({ maxLength: 2000 })),
 })
 
 export enum SortOptions {
-    Trending = "trending",
-    Downloads = "downloads",
-    Alphabetically = "alphabetically",
-    Newest = "newest"
+	Trending = "trending",
+	Downloads = "downloads",
+	Alphabetically = "alphabetically",
+	Newest = "newest",
 }
-export const SortSchema = Type.Enum(SortOptions, {default: SortOptions.Downloads})
+export const SortSchema = Type.Enum(SortOptions, {
+	default: SortOptions.Downloads,
+})
 
 export type PackMetaData = Static<typeof MetaDataSchema>
 export type MinecraftVersion = Static<typeof MinecraftVersionSchema>
@@ -149,14 +162,14 @@ export type PackGalleryImage = Static<typeof PackGalleryImageSchema>
 export type UserData = Static<typeof UserDataSchema>
 
 export enum HTTPResponses {
-    OK = 200,
-    CREATED = 201,
-    BAD_REQUEST = 400,
-    UNAUTHORIZED = 401,
-    FORBIDDEN = 403,
-    NOT_FOUND = 404,
-    CONFLICT = 409,
-    SERVER_ERROR = 500   
+	OK = 200,
+	CREATED = 201,
+	BAD_REQUEST = 400,
+	UNAUTHORIZED = 401,
+	FORBIDDEN = 403,
+	NOT_FOUND = 404,
+	CONFLICT = 409,
+	SERVER_ERROR = 500,
 }
 
-export type ReviewState = 'verified'|'pending'|'unsubmitted'|'rejected'
+export type ReviewState = "verified" | "pending" | "unsubmitted" | "rejected"

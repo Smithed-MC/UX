@@ -1,21 +1,21 @@
-import { useState } from "react";
-import { AssociatedProgressEvent, OutputMessageEvent } from "../../types";
-import "./LaunchConsole.css";
-import { svg } from "components";
+import { useState } from "react"
+import { AssociatedProgressEvent, OutputMessageEvent } from "../../types"
+import "./LaunchConsole.css"
+import { svg } from "components"
 
 function LaunchConsole({ messages }: LaunchConsoleProps) {
-	const [expanded, setExpanded] = useState(false);
+	const [expanded, setExpanded] = useState(false)
 
-	let messagesMapped: JSX.Element[] = [];
+	let messagesMapped: JSX.Element[] = []
 	for (let i = 0; i < messages.length; i++) {
-		const isLast = i === messages.length - 1;
+		const isLast = i === messages.length - 1
 		messagesMapped.push(
 			<div className={`consoleMessage ${isLast ? "last" : ""}`}>
 				{messages[i]}
 			</div>
-		);
+		)
 	}
-	const latestMessage = messagesMapped[messagesMapped.length - 1];
+	const latestMessage = messagesMapped[messagesMapped.length - 1]
 
 	return (
 		<div className="launchConsole">
@@ -23,9 +23,9 @@ function LaunchConsole({ messages }: LaunchConsoleProps) {
 				className="container launchConsoleHeader"
 				onClick={() => {
 					if (expanded) {
-						setExpanded(false);
+						setExpanded(false)
 					} else {
-						setExpanded(true);
+						setExpanded(true)
 					}
 				}}
 			>
@@ -44,23 +44,23 @@ function LaunchConsole({ messages }: LaunchConsoleProps) {
 				<div className="launchConsoleExpanded">{messagesMapped}</div>
 			)}
 		</div>
-	);
+	)
 }
 
 export interface LaunchConsoleProps {
-	messages: string[];
+	messages: string[]
 }
 
 export function createDefaultMessage(event: OutputMessageEvent) {
-	return event;
+	return event
 }
 
 export function createProgressBar(event: AssociatedProgressEvent) {
-	return `(${event.current}/${event.total}) ${event.message}`;
+	return `(${event.current}/${event.total}) ${event.message}`
 }
 
 function consoleMessage(msg: string) {
-	return;
+	return
 }
 
-export default LaunchConsole;
+export default LaunchConsole
