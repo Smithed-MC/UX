@@ -40,6 +40,12 @@ npm run web:dev
 
 This will open a local development server with live reload.
 
+> [!TIP]
+> In order to launch a server you must provide `PORT`, `VITE_NIGHTLY` & `VITE_API_SERVER` environment variables.
+> 
+> **Example**:
+> `VITE_NIGHTLY=true VITE_API_SERVER=https://api.smithed.dev/v2 PORT=8000 npm run web:dev`
+
 ### Developing the API
 
 In order to test, you'll need to create your own [firebase database and secret](https://firebase.google.com/docs/admin/setup).
