@@ -147,21 +147,6 @@
 }
 
 @media screen and (max-width: 43rem) {   
-    .packInfoMediaButton:not(:only-child) {
-        border-radius: 0;
-    }
-    .packInfoMediaButton:not(:only-child)>label, .packInfoMediaButton:not(:only-child)>div {
-        display: none;
-    }
-
-
-    .packInfoMediaButton:last-child:not(:only-child) {
-        border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0;
-    }
-    .packInfoMediaButton:first-child:not(:only-child) {
-        border-radius: var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius);
-    }
-
     .userButtonsContainer {
         width: 100%;
         gap: 0.25rem;
@@ -192,6 +177,18 @@
 
     .packDetailsUpdateInfo {
         display: none;
+    }
+}
+
+@media screen and (max-width: 51rem) {
+    .userButtonsContainer {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .packInfoMediaButton {
+        width: 100% !important;
     }
 }
 
