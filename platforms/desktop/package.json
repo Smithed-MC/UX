@@ -1,21 +1,21 @@
 {
-  "name": "desktop",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "vite:dev": "vite",
-    "vite:build": "vite build",
-    "vite:preview": "vite preview",
-    "dev": "tauri dev",
-    "build": "tauri build",
-    "tauri": "tauri"
-  },
-  "dependencies": {
-    "@tauri-apps/api": "^1.1.0",
-    "client": "*"
-  },
-  "devDependencies": {
-    "@tauri-apps/cli": "^1.1.0"
-  }
+	"name": "desktop",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"vite:dev": "vite",
+		"vite:build": "vite build",
+		"vite:preview": "vite preview",
+		"dev": "tauri dev",
+		"build": "tauri build",
+		"tauri": "tauri"
+	},
+	"dependencies": {
+		"@tauri-apps/api": "^1.1.0",
+		"client": "*"
+	},
+	"devDependencies": {
+		"@tauri-apps/cli": "^1.1.0"
+	}
 }

@@ -1,133 +1,174 @@
 import React, { PropsWithChildren, useEffect } from "react"
 import { useRef, useState } from "react"
-import './CategoryBar.css'
+import "./CategoryBar.css"
 
 interface CategoryBarProps {
-    children: React.ReactElement<CategoryChoiceProps>[] | React.ReactElement<CategoryChoiceProps>
-    onChange?: (v: string) => void
-    defaultValue?: string
+	children:
+		| React.ReactElement<CategoryChoiceProps>[]
+		| React.ReactElement<CategoryChoiceProps>
+	onChange?: (v: string) => void
+	defaultValue?: string
 }
 
-export default function CategoryBar({ children, defaultValue, onChange }: CategoryBarProps) {
-    if (!(children instanceof Array))
-        children = [children]
+export default function CategoryBar({
+	children,
+	defaultValue,
+	onChange,
+}: CategoryBarProps) {
+	if (!(children instanceof Array)) children = [children]
 
-    const [value, setValue] = useState<string>('')
+	const [value, setValue] = useState<string>("")
 
-    useEffect(() => {
-        if (!(children instanceof Array))
-            children = [children]
+	useEffect(() => {
+		if (!(children instanceof Array)) children = [children]
 
-        const setDefaultValue = () => {
-            if (!(children instanceof Array))
-                children = [children]
-    
-            defaultValue = children.filter(c => !c.props.disabled)[0].props.value ?? undefined
-        }
-    
-    
-        if (defaultValue) {
-            let child = children.find(c => c.props.value === defaultValue)
-    
-            if (child === undefined || child.props.disabled) {
-                setDefaultValue()
-            }
-        } else {
-            setDefaultValue()
-        }
+		const setDefaultValue = () => {
+			if (!(children instanceof Array)) children = [children]
 
-        setValue(defaultValue ?? '')
-    }, [])
-    
+			defaultValue =
+				children.filter((c) => !c.props.disabled)[0].props.value ??
+				undefined
+		}
 
-    const selectedChoice = useRef<HTMLButtonElement>(null)
-    const backgroundElement = useRef<HTMLDivElement>(null)
+		if (defaultValue) {
+			let child = children.find((c) => c.props.value === defaultValue)
 
-    if (new Set(children.map(c => c.props.value)).size < children.length)
-        throw Error("Category bar has duplicate values")
+			if (child === undefined || child.props.disabled) {
+				setDefaultValue()
+			}
+		} else {
+			setDefaultValue()
+		}
 
-    function updateBackgroundSlide(selected: HTMLElement, shouldTransition: boolean = true) {
-        if (selected == null)
-            return
-        const selectedRect = selected.getBoundingClientRect();
+		setValue(defaultValue ?? "")
+	}, [])
 
-        const backgroundStyle = backgroundElement.current!.style
-        const parentRect = backgroundElement.current!.parentElement!.getBoundingClientRect();
+	const selectedChoice = useRef<HTMLButtonElement>(null)
+	const backgroundElement = useRef<HTMLDivElement>(null)
 
-        let transition = backgroundStyle.transition;
-        if (!shouldTransition)
-            backgroundStyle.setProperty('transition', 'none')
-        else
-            backgroundStyle.removeProperty('transition')
+	if (new Set(children.map((c) => c.props.value)).size < children.length)
+		throw Error("Category bar has duplicate values")
 
-        backgroundStyle.setProperty('width', `${selectedRect.width}px`);
-        backgroundStyle.setProperty('height', `${selectedRect.height}px`);
+	function updateBackgroundSlide(
+		selected: HTMLElement,
+		shouldTransition: boolean = true
+	) {
+		if (selected == null) return
+		const selectedRect = selected.getBoundingClientRect()
 
-        backgroundStyle.setProperty('left', (selectedRect.left - parentRect.left) + 'px')
-        backgroundStyle.setProperty('top', (selectedRect.top - parentRect.top) + 'px')
+		const backgroundStyle = backgroundElement.current!.style
+		const parentRect =
+			backgroundElement.current!.parentElement!.getBoundingClientRect()
 
-        if (!shouldTransition)
-            setTimeout(() => backgroundStyle.setProperty('transition', transition), 1)
-    }
+		let transition = backgroundStyle.transition
+		if (!shouldTransition) backgroundStyle.setProperty("transition", "none")
+		else backgroundStyle.removeProperty("transition")
 
-    useEffect(() => {
-        const onResize =  () => updateBackgroundSlide(selectedChoice.current!, false)
+		backgroundStyle.setProperty("width", `${selectedRect.width}px`)
+		backgroundStyle.setProperty("height", `${selectedRect.height}px`)
 
-        window.addEventListener('resize', onResize)
-        return () => window.removeEventListener('resize', onResize)
-    }, [])
+		backgroundStyle.setProperty(
+			"left",
+			selectedRect.left - parentRect.left + "px"
+		)
+		backgroundStyle.setProperty(
+			"top",
+			selectedRect.top - parentRect.top + "px"
+		)
 
-    useEffect(() => {
-        setValue(defaultValue ?? '')
-        updateBackgroundSlide(selectedChoice.current!, false)
-    }, [defaultValue])
+		if (!shouldTransition)
+			setTimeout(
+				() => backgroundStyle.setProperty("transition", transition),
+				1
+			)
+	}
 
-    function wrapOnClick(c: React.ReactElement<CategoryChoiceProps & React.HTMLProps<HTMLElement>>) {
-        let props = c.props
-        const onClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-            if (value != props.value) {
-                if (onChange)
-                    onChange(props.value)
-                setValue(props.value)
-                updateBackgroundSlide(e.currentTarget)
-            }
+	useEffect(() => {
+		const onResize = () =>
+			updateBackgroundSlide(selectedChoice.current!, false)
 
-            if (props.onClick)
-                props.onClick(e)
-        }
+		window.addEventListener("resize", onResize)
+		return () => window.removeEventListener("resize", onResize)
+	}, [])
 
-        return <CategoryChoice {...props} 
-            key={props.key ?? props.value}
-            onClick={onClick} 
-            selected={value === props.value} 
-            ref={value === props.value ? selectedChoice : undefined}
-        />
-    }
+	useEffect(() => {
+		setValue(defaultValue ?? "")
+		updateBackgroundSlide(selectedChoice.current!, false)
+	}, [defaultValue])
 
-    return <div className="container categoryBar">
-        <div className="psuedoBackground" ref={backgroundElement}/>
-        {children.filter(c => !c.props.hidden).map(wrapOnClick)}
-    </div>
+	function wrapOnClick(
+		c: React.ReactElement<
+			CategoryChoiceProps & React.HTMLProps<HTMLElement>
+		>
+	) {
+		let props = c.props
+		const onClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+			if (value != props.value) {
+				if (onChange) onChange(props.value)
+				setValue(props.value)
+				updateBackgroundSlide(e.currentTarget)
+			}
+
+			if (props.onClick) props.onClick(e)
+		}
+
+		return (
+			<CategoryChoice
+				{...props}
+				key={props.key ?? props.value}
+				onClick={onClick}
+				selected={value === props.value}
+				ref={value === props.value ? selectedChoice : undefined}
+			/>
+		)
+	}
+
+	return (
+		<div className="container categoryBar">
+			<div className="psuedoBackground" ref={backgroundElement} />
+			{children.filter((c) => !c.props.hidden).map(wrapOnClick)}
+		</div>
+	)
 }
 
 interface CategoryChoiceProps {
-    value: string,
-    text: string,
-    icon: JSX.Element
-    selected?: boolean,
-    disabled?: boolean,
-    hidden?: boolean
-    children?: any
-    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void 
+	value: string
+	text: string
+	icon: JSX.Element
+	selected?: boolean
+	disabled?: boolean
+	hidden?: boolean
+	children?: any
+	onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
 }
 
-export const CategoryChoice = React.forwardRef(function ({ selected, onClick, children, icon, text, disabled }: CategoryChoiceProps, forwardRef?: React.ForwardedRef<HTMLButtonElement>) {
-    return <button className={`exclude container categoryChoice ${selected ? 'selected' : ''}`} onClick={onClick} ref={forwardRef} disabled={disabled}>
-        <div className="container content" style={{ gap: '1rem', flexDirection: 'row'}}>
-            {icon}
-            <div style={{ width: '0.125rem', height: '1.25rem', backgroundColor: 'var(--foreground)', opacity: 0.2 }} />
-            <span>{text}</span>
-        </div>
-        {selected && children}
-    </button>
+export const CategoryChoice = React.forwardRef(function (
+	{ selected, onClick, children, icon, text, disabled }: CategoryChoiceProps,
+	forwardRef?: React.ForwardedRef<HTMLButtonElement>
+) {
+	return (
+		<button
+			className={`exclude container categoryChoice ${selected ? "selected" : ""}`}
+			onClick={onClick}
+			ref={forwardRef}
+			disabled={disabled}
+		>
+			<div
+				className="container content"
+				style={{ gap: "1rem", flexDirection: "row" }}
+			>
+				{icon}
+				<div
+					style={{
+						width: "0.125rem",
+						height: "1.25rem",
+						backgroundColor: "var(--foreground)",
+						opacity: 0.2,
+					}}
+				/>
+				<span>{text}</span>
+			</div>
+			{selected && children}
+		</button>
+	)
 })

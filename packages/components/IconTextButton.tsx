@@ -3,14 +3,14 @@ import {
 	CSSProperties,
 	FunctionComponent,
 	SVGProps,
-} from "react";
-import { Link } from "react-router-dom";
+} from "react"
+import { Link } from "react-router-dom"
 
 interface IconTextButtonProps {
-	text: string | JSX.Element;
-	icon?: FunctionComponent<SVGProps<SVGSVGElement>> | string;
-	iconElement?: JSX.Element;
-	reverse?: boolean;
+	text: string | JSX.Element
+	icon?: FunctionComponent<SVGProps<SVGSVGElement>> | string
+	iconElement?: JSX.Element
+	reverse?: boolean
 }
 
 export function IconTextButton({
@@ -26,25 +26,29 @@ export function IconTextButton({
 	onMouseEnter,
 	onMouseLeave,
 	rel,
-	disabled
+	disabled,
 }: IconTextButtonProps & React.HTMLProps<HTMLAnchorElement>) {
 	return (
 		<a
-			className={
-				`buttonLike${disabled ? " disabled" : ""} ` + className
-			}
+			className={`buttonLike${disabled ? " disabled" : ""} ` + className}
 			style={{ flexDirection: reverse ? "row-reverse" : "row", ...style }}
 			href={href}
-			
 			target={target}
 			onClick={onClick}
 			rel={rel}
 			onMouseEnter={onMouseEnter}
 			onMouseLeave={onMouseLeave}
 		>
-			<div className='container' style={{ flexShrink: 0, height: '100%' }}>
-				{IconSvg !== undefined && typeof IconSvg === "string" && IconSvg}
-				{IconSvg !== undefined && typeof IconSvg !== "string" && <IconSvg />}
+			<div
+				className="container"
+				style={{ flexShrink: 0, height: "100%" }}
+			>
+				{IconSvg !== undefined &&
+					typeof IconSvg === "string" &&
+					IconSvg}
+				{IconSvg !== undefined && typeof IconSvg !== "string" && (
+					<IconSvg />
+				)}
 				{iconElement !== undefined && iconElement}
 			</div>
 
@@ -59,7 +63,16 @@ export function IconTextButton({
 				/>
 			)}
 
-			<span style={{ flexGrow: 1, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{text}</span>
+			<span
+				style={{
+					flexGrow: 1,
+					whiteSpace: "nowrap",
+					textOverflow: "ellipsis",
+					overflow: "hidden",
+				}}
+			>
+				{text}
+			</span>
 		</a>
-	);
+	)
 }

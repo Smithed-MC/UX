@@ -1,115 +1,113 @@
 .navButtonClosed {
-    opacity: 0.5;
+	opacity: 0.5;
 }
 
 .navButtonClosed:hover {
-    opacity: 1;
+	opacity: 1;
 }
 
 .navBarBundle {
-    background: color-mix(in srgb, var(--warning) 10%, transparent) !important;
-    color: var(--warning) !important;
-    width: min-content !important;
+	background: color-mix(in srgb, var(--warning) 10%, transparent) !important;
+	color: var(--warning) !important;
+	width: min-content !important;
 }
 
-.navBarBundle>label {
-    overflow: hidden;
-    width: min-content ;
+.navBarBundle > label {
+	overflow: hidden;
+	width: min-content;
 }
 
 .navBarBundle:hover {
-    border: 0.125rem solid var(--warning) !important;
+	border: 0.125rem solid var(--warning) !important;
 }
 
-
 @keyframes navbarSlidedown {
-    0% {
-        opacity: 1;
-        transform: translateY(0px);
-        z-index: -1;
-    }
+	0% {
+		opacity: 1;
+		transform: translateY(0px);
+		z-index: -1;
+	}
 
-    25% {
-        opacity: 0.5;
-    }
+	25% {
+		opacity: 0.5;
+	}
 
-    50% {
-        opacity: 0;
-    }
+	50% {
+		opacity: 0;
+	}
 
-    100% {
-        z-index: -1;
-        opacity: 0;
-        display: none;
-        transform: translateY(75px);
-    }
+	100% {
+		z-index: -1;
+		opacity: 0;
+		display: none;
+		transform: translateY(75px);
+	}
 }
 
 @keyframes navbarTooltipEnter {
-    0% {
-        left: 32;
-        width: 0px;
-        color: var(--accent);
-    }
+	0% {
+		left: 32;
+		width: 0px;
+		color: var(--accent);
+	}
 
-    100% {
-        left: 32;
-        width: calc(100%);
-        color: var(--foreground);
-    }
+	100% {
+		left: 32;
+		width: calc(100%);
+		color: var(--foreground);
+	}
 }
 
-
 .navBarContainer {
-    gap: 2rem;
+	gap: 2rem;
 }
 
 @media screen and (max-width: 64rem) {
-    .navBarBundle>label, .navBarBundle>div {
-        display: none;
-    }
-    .navBarBundle {
-        flex-grow: 0 !important;
-        width: min-content !important;
-    }
+	.navBarBundle > label,
+	.navBarBundle > div {
+		display: none;
+	}
+	.navBarBundle {
+		flex-grow: 0 !important;
+		width: min-content !important;
+	}
 }
 
 @media screen and (max-width: 52rem) {
-    .navBarBundle {
-        display: none !important;
-    }
+	.navBarBundle {
+		display: none !important;
+	}
 }
 
 @media screen and (max-width: 56rem) {
-    .navBarHide {
-        display: none !important;
-    }
+	.navBarHide {
+		display: none !important;
+	}
 }
 
 @media screen and (max-width: 43rem) {
+	.navBarContainer {
+		gap: 0.25rem;
+	}
 
-    .navBarContainer {
-        gap: 0.25rem;
-    }
+	.navBarOption > *:not(:first-child) {
+		display: none;
+	}
 
-    .navBarOption>*:not(:first-child) {
-        display: none;
-    }
+	.navBarOption {
+		height: 3rem !important;
+		flex-grow: 1;
+	}
 
-    .navBarOption {
-        height: 3rem !important;
-        flex-grow: 1;
-    }
+	.navBarOption.start {
+		border-radius: var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius);
+	}
 
-    .navBarOption.start {
-        border-radius: var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius);
-    }
+	.navBarOption.middle {
+		border-radius: 0;
+	}
 
-    .navBarOption.middle {
-        border-radius: 0;
-    }
-
-    .navBarOption.end {
-        border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0;
-    }
+	.navBarOption.end {
+		border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0;
+	}
 }

@@ -1,38 +1,40 @@
-import { ChooseBox, IconInput, IconTextButton, svg } from "components";
-import { useEffect, useState } from "react";
-import { ChooseBoxChoice, LocalBundleConfig } from "../types";
-import { getChooseBoxBundles } from "../util";
-import { invoke } from "@tauri-apps/api";
-import { PackBundle } from 'data-types';
+import { ChooseBox, IconInput, IconTextButton, svg } from "components"
+import { useEffect, useState } from "react"
+import { ChooseBoxChoice, LocalBundleConfig } from "../types"
+import { getChooseBoxBundles } from "../util"
+import { invoke } from "@tauri-apps/api"
+import { PackBundle } from "data-types"
 
 function ImportBundle({ bundleId, onFinish }: ImportBundleProps) {
-	const [bundle, setBundle] = useState<PackBundle | undefined>(undefined);
-	const [name, setName] = useState("");
+	const [bundle, setBundle] = useState<PackBundle | undefined>(undefined)
+	const [name, setName] = useState("")
 
-	let [error, setError] = useState<undefined | "bundle_exists" | "empty_name">(
-		undefined
-	);
+	let [error, setError] = useState<
+		undefined | "bundle_exists" | "empty_name"
+	>(undefined)
 
 	useEffect(() => {
 		async function get() {
 			const remoteBundle: PackBundle = await invoke("get_remote_bundle", {
 				bundleId: bundleId,
-			});
-			setBundle(remoteBundle);
-			setName(remoteBundle.name);
+			})
+			setBundle(remoteBundle)
+			setName(remoteBundle.name)
 		}
 		if (bundle === undefined) {
-			get();
+			get()
 		}
-	});
+	})
 
 	async function checkIfExists() {
 		try {
-			let exists: boolean = await invoke("bundle_exists", { bundleId: name });
-			return exists;
+			let exists: boolean = await invoke("bundle_exists", {
+				bundleId: name,
+			})
+			return exists
 		} catch (e) {
-			console.error("Failed to check if bundle exists: " + e);
-			return true;
+			console.error("Failed to check if bundle exists: " + e)
+			return true
 		}
 	}
 
@@ -50,13 +52,13 @@ function ImportBundle({ bundleId, onFinish }: ImportBundleProps) {
 					error == "bundle_exists"
 						? "Bundle with this name already exists"
 						: error == "empty_name"
-						? "Name cannot be empty"
-						: ""
+							? "Name cannot be empty"
+							: ""
 				}
 				placeholder="Bundle name"
 				icon={svg.Edit}
 				onChange={(e) => {
-					setName(e.currentTarget.value);
+					setName(e.currentTarget.value)
 				}}
 				value={name}
 			/>
@@ -68,7 +70,7 @@ function ImportBundle({ bundleId, onFinish }: ImportBundleProps) {
 					icon={svg.Cross}
 					style={{ width: "fit-content" }}
 					onClick={async () => {
-						onFinish(undefined, undefined);
+						onFinish(undefined, undefined)
 					}}
 				/>
 				<IconTextButton
@@ -79,34 +81,34 @@ function ImportBundle({ bundleId, onFinish }: ImportBundleProps) {
 					style={{ width: "fit-content" }}
 					onClick={async () => {
 						if (name === "") {
-							setError("empty_name");
-							return;
+							setError("empty_name")
+							return
 						}
 						if (await checkIfExists()) {
-							setError("bundle_exists");
-							return;
+							setError("bundle_exists")
+							return
 						}
 						if (bundle === undefined) {
-							return;
+							return
 						}
 						const bundleConfig: LocalBundleConfig = {
 							version: bundle.version,
 							packs: bundle.packs,
-						};
-						onFinish(name, bundleConfig);
+						}
+						onFinish(name, bundleConfig)
 					}}
 				/>
 			</div>
 		</div>
-	);
+	)
 }
 
 export interface ImportBundleProps {
-	bundleId: string;
+	bundleId: string
 	onFinish: (
 		id: string | undefined,
 		bundle: LocalBundleConfig | undefined
-	) => {};
+	) => {}
 }
 
-export default ImportBundle;
+export default ImportBundle

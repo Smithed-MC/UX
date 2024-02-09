@@ -4,35 +4,34 @@
 name: Website CI - Production Branch
 
 on:
-  push:
-    branches: [ "production" ]
+    push:
+        branches: ["production"]
 
-env: 
-  BRANCH: production
-  
+env:
+    BRANCH: production
+
 jobs:
-  build:
+    build:
+        runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [18.x]
+                # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
-    strategy:
-      matrix:
-        node-version: [18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npx turbo run build --filter=api --filter=website
-    - name: Deploy to DevOps
-      uses: peter-evans/repository-dispatch@v2
-      with:
-        token: ${{ secrets.PAT }}
-        repository: Smithed-MC/DevOps
-        event-type: update
-        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "production", "branch": "production"}'
+        steps:
+            - uses: actions/checkout@v3
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "npm"
+            - run: npm ci
+            - run: npx turbo run build --filter=api --filter=website
+            - name: Deploy to DevOps
+              uses: peter-evans/repository-dispatch@v2
+              with:
+                  token: ${{ secrets.PAT }}
+                  repository: Smithed-MC/DevOps
+                  event-type: update
+                  client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "production", "branch": "production"}'

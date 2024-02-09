@@ -1,17 +1,15 @@
-import { DownloadButton, IconTextButton } from "components";
-import { svg } from "components";
-import { Download, Right } from "components/svg";
+import { DownloadButton, IconTextButton } from "components"
+import { svg } from "components"
+import { Download, Right } from "components/svg"
 
 export interface ClientInject {
-	getNavbarTabs: () => JSX.Element[];
-	enableFooter: boolean;
-	logoUrl: string;
-	packDownloadButton: DownloadButton;
-	bundleDownloadButton: DownloadButton;
-	showBackButton: boolean;
+	getNavbarTabs: () => JSX.Element[]
+	enableFooter: boolean
+	logoUrl: string
+	packDownloadButton: DownloadButton
+	bundleDownloadButton: DownloadButton
+	showBackButton: boolean
 }
-
-
 
 export function getDefaultInject(): ClientInject {
 	return {
@@ -36,14 +34,19 @@ export function getDefaultInject(): ClientInject {
 				href="https://smithed.dev/discord"
 				key="discord"
 				icon={svg.Discord}
-			/>
+			/>,
 		],
 		enableFooter: true,
 		logoUrl: "/",
-		packDownloadButton: ({id, ...props}) => (
+		packDownloadButton: ({ id, ...props }) => (
 			<IconTextButton
 				className="accentedButtonLike"
-				iconElement={<Right fill="var(--foreground)" style={{transform: 'rotate(90deg)'}}/>}
+				iconElement={
+					<Right
+						fill="var(--foreground)"
+						style={{ transform: "rotate(90deg)" }}
+					/>
+				}
 				text={"Download"}
 				reverse
 				href={import.meta.env.VITE_API_SERVER + `/download?pack=${id}`}
@@ -52,14 +55,16 @@ export function getDefaultInject(): ClientInject {
 			/>
 		),
 		showBackButton: false,
-		bundleDownloadButton: ({id}) => (
+		bundleDownloadButton: ({ id }) => (
 			<IconTextButton
 				text={"Download"}
 				iconElement={<Download fill="var(--foreground)" />}
 				className="bundleButtonLike bundleControlButton"
 				reverse={true}
-				href={import.meta.env.VITE_API_SERVER + `/bundles/${id}/download`}
+				href={
+					import.meta.env.VITE_API_SERVER + `/bundles/${id}/download`
+				}
 			/>
 		),
-	};
+	}
 }

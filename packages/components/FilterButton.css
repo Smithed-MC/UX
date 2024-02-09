@@ -1,29 +1,29 @@
 .filter-button {
-    border: 0.125rem solid transparent;
-    border-radius: var(--defaultBorderRadius);
-    color: var(--highlight);
-    background-color: var(--section);
-    opacity: 1;
-    padding: 8px 16px;
-    margin: 2px;
-    cursor: pointer;
-    font-size: revert; /* why are "a" links too large?? */
-    user-select: none;
-    transition: all 100ms ease-in-out;
+	border: 0.125rem solid transparent;
+	border-radius: var(--defaultBorderRadius);
+	color: var(--highlight);
+	background-color: var(--section);
+	opacity: 1;
+	padding: 8px 16px;
+	margin: 2px;
+	cursor: pointer;
+	font-size: revert; /* why are "a" links too large?? */
+	user-select: none;
+	transition: all 100ms ease-in-out;
 }
 
 .filter-button:hover {
-    border: 0.125rem solid var(--border);
+	border: 0.125rem solid var(--border);
 }
 
 .filter-button.selected {
-    opacity: 1;
-    background: var(--success);
-    color: var(--foreground);
-    border: 0.125rem solid var(--success);
+	opacity: 1;
+	background: var(--success);
+	color: var(--foreground);
+	border: 0.125rem solid var(--success);
 }
 
 .filter-button.selected:hover {
-    background: var(--section);
-    border: 0.125rem solid var(--border);
+	background: var(--section);
+	border: 0.125rem solid var(--border);
 }

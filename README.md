@@ -14,8 +14,8 @@ The latest stable version of the launcher can be downloaded from the [website](h
 
 ### Prerequisites
 
-- [Node.js - v18+](https://nodejs.org/en)
-- [Rust / Tauri](https://tauri.app/v1/guides/getting-started/prerequisites) (Only required for building the launcher)
+-   [Node.js - v18+](https://nodejs.org/en)
+-   [Rust / Tauri](https://tauri.app/v1/guides/getting-started/prerequisites) (Only required for building the launcher)
 
 ### Setting up the monorepo
 
@@ -42,7 +42,7 @@ This will open a local development server with live reload.
 
 > [!TIP]
 > In order to launch a server you must provide `PORT`, `VITE_NIGHTLY` & `VITE_API_SERVER` environment variables.
-> 
+>
 > **Example**:
 > `VITE_NIGHTLY=true VITE_API_SERVER=https://api.smithed.dev/v2 PORT=8000 npm run web:dev`
 

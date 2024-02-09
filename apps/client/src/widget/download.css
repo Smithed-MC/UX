@@ -1,23 +1,21 @@
 .downloadRoot {
-    background-color: var(--backgroundAccent);
-    width: 100%;
-    height: 100%;
-    border-radius: var(--defaultBorderRadius);
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+	background-color: var(--backgroundAccent);
+	width: 100%;
+	height: 100%;
+	border-radius: var(--defaultBorderRadius);
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
-
-
 @keyframes pullIn {
-    from {
-        transform: translateX(60%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0%);
-        opacity: 1;
-    }
+	from {
+		transform: translateX(60%);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0%);
+		opacity: 1;
+	}
 }

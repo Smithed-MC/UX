@@ -27,3 +27,4 @@ typesense.ts
 **/data-types/index.js
 
 .vscode/
+*.code-workspace
