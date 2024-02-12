@@ -36,14 +36,11 @@ export function sendError(
 	code: HTTPResponses,
 	message: string
 ) {
-	reply
-		.status(code)
-		.header("Access-Control-Allow-Origin", "*")
-		.send({
-			statusCode: code,
-			error: HTTPResponses[code],
-			message: message,
-		})
+	reply.status(code).header("Access-Control-Allow-Origin", "*").send({
+		statusCode: code,
+		error: HTTPResponses[code],
+		message: message,
+	})
 }
 
 export async function importRoutes(dirPath: string) {

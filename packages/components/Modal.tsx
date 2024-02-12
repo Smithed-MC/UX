@@ -53,19 +53,41 @@ export default function Modal({
 					transition: "opacity 0.25s ease-in-out",
 				}}
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="34"
-					height="30"
-					viewBox="0 0 34 30"
-					fill="none"
-					style={{ zIndex: 1, marginBottom: "-0.25rem" }}
-				>
-					<path
-						d="M17 0L33.8875 29.25H0.112505L17 0Z"
-						fill="var(--bold)"
-					/>
-				</svg>
+				<div style={{ marginBottom: "-0.5rem" }}>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="34"
+						height="30"
+						viewBox="0 0 34 30"
+						fill="none"
+						style={{
+							position: "absolute",
+							zIndex: -1,
+							marginTop: -2,
+						}}
+					>
+						<path
+							d="M17 0L33.8875 29.25H0.112505L17 0Z"
+							fill="var(--border)"
+							stroke="var(--border)"
+							strokeWidth="0.125rem"
+							strokeLinecap="inherit"
+						/>
+					</svg>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="34"
+						height="30"
+						viewBox="0 0 34 30"
+						fill="none"
+						style={{ zIndex: 2 }}
+					>
+						<path
+							d="M17 0L33.8875 29.25H0.112505L17 0Z"
+							fill="var(--bold)"
+						/>
+					</svg>
+				</div>
 				<div
 					style={{
 						padding: "0.5rem",
@@ -74,6 +96,8 @@ export default function Modal({
 						boxSizing: "border-box",
 						minWidth: "4rem",
 						width: "max-content",
+						border: "0.125rem solid var(--border)",
+						zIndex: -1,
 					}}
 				>
 					{content &&

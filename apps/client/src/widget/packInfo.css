@@ -130,6 +130,10 @@
     display: none;
 } */
 
+.packDownloadButtonContainer:has(> *:hover) > * > * > #separator {
+	opacity: 0 !important;
+}
+
 @media screen and (min-width: 56rem) {
 	.packInfoSmallDownload {
 		display: none !important;

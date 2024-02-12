@@ -17,6 +17,7 @@ import {
 	Picture,
 	Plus,
 	Right,
+	Star,
 	Warning,
 } from "components/svg"
 import {
@@ -82,19 +83,19 @@ if (
 }
 
 function WidgetOption({
-	isOutdated,
+	isLatest,
 	onClick,
 	children,
 	icon,
 }: {
-	isOutdated: boolean
+	isLatest: boolean
 	onClick?: () => void
 	children?: any
 	icon?: JSX.Element
 }) {
 	return (
 		<div
-			className={`buttonLike container ${isOutdated ? "invalidButtonLike" : "accentedButtonLike"}`}
+			className={`buttonLike container accentedButtonLike`}
 			style={{
 				width: "100%",
 				flexDirection: "row",
@@ -106,7 +107,7 @@ function WidgetOption({
 		>
 			{children}
 			<div style={{ flexGrow: 1 }} />
-			{isOutdated && <Warning style={{ fill: "var(--disturbing)" }} />}
+			{isLatest && <Star style={{ fill: "var(--border)" }} />}
 			<div
 				style={{
 					width: "0.125rem",
@@ -115,11 +116,7 @@ function WidgetOption({
 					opacity: 0.25,
 				}}
 			/>
-			{icon ?? (
-				<Right
-					style={{ fill: isOutdated ? "var(--disturbing)" : "" }}
-				/>
-			)}
+			{icon ?? <Right />}
 		</div>
 	)
 }
@@ -152,16 +149,12 @@ function showSupportedVersions(
 			)
 			const latestVersion = sortedVersions?.at(0)
 
-			const isOutdated = latestVersion !== attachedVersion
+			const isLatest = latestVersion === attachedVersion
 
 			return (
-				<WidgetOption
-					isOutdated={isOutdated}
-					onClick={() => onClick(v)}
-				>
+				<WidgetOption isLatest={isLatest} onClick={() => onClick(v)}>
 					<span
 						style={{
-							color: isOutdated ? "var(--disturbing)" : "",
 							fontWeight: 600,
 							position: "relative",
 						}}
@@ -198,11 +191,9 @@ function showPackVersions(
 			: ""
 
 	return versions.map((v, idx) => {
-		const isOutdated = idx !== 0
-
 		return (
 			<WidgetOption
-				isOutdated={false}
+				isLatest={idx === 0}
 				onClick={() => onClick(v)}
 				icon={download ? <Download /> : undefined}
 			>
@@ -211,8 +202,7 @@ function showPackVersions(
 					<span style={{ position: "absolute", left: 0 }}>
 						{v.name}
 					</span>
-				</span>{" "}
-				<span style={{ opacity: isOutdated ? 0 : 0.25 }}>Latest</span>
+				</span>
 			</WidgetOption>
 		)
 	})
@@ -597,14 +587,26 @@ function DownloadPackModal({
 	packId: string
 }) {
 	const [page, setPage] = useState<"mode" | "gameVersion" | "packVersion">(
-		"mode"
+		"gameVersion"
 	)
-	const [downloadMode, setDownloadMode] = useState<string>()
+
 	const [gameVersion, setMinecraftVersion] = useState<string>()
-	// const [packVersion, setPackVersion] = useState<string>()
+	const [packVersion, setPackVersion] = useState<PackVersion>()
 	const [showAllVersions, setShowAllVersions] = useState<string>()
 
+	const supportedVersions = showSupportedVersions(packData!, (v) => {
+		setMinecraftVersion(v)
+		setPage("packVersion")
+	})
+
 	const navigate = useNavigate()
+
+	function download(packVersion: PackVersion | undefined, mode: string) {
+		window.open(
+			import.meta.env.VITE_API_SERVER +
+				`/download?pack=${packId}@${packVersion?.name}&version=${gameVersion}&mode=${mode}`
+		)
+	}
 
 	function DownloadOption({
 		text,
@@ -629,8 +631,7 @@ function DownloadPackModal({
 					color: color,
 				}}
 				onClick={() => {
-					setDownloadMode(value)
-					setPage("gameVersion")
+					download(packVersion, value)
 				}}
 			>
 				<span style={{ flexGrow: 1 }}>{text}</span>
@@ -651,10 +652,20 @@ function DownloadPackModal({
 		packData!,
 		gameVersion!,
 		(v) => {
-			window.open(
-				import.meta.env.VITE_API_SERVER +
-					`/download?pack=${packId}@${v.name}&version=${gameVersion}&mode=${downloadMode}`
-			)
+			let mode = ""
+
+			// If no resourcepack is set, auto download the datapack
+			if (!v.downloads.resourcepack || v.downloads.resourcepack === "") {
+				mode = "datapack"
+			} else if (!v.downloads.datapack || v.downloads.datapack === "") {
+				// Same for the datapack
+				mode = "resourcepack"
+			} else {
+				// Otherwise open the modal
+				setPage("mode")
+			}
+
+			if (mode !== "") download(v, mode)
 		},
 		true
 	)
@@ -666,10 +677,28 @@ function DownloadPackModal({
 	}) => (
 		<div
 			className="container compactButton"
-			style={{ flexDirection: "row", gap: "0.5rem", marginTop: "0.5rem" }}
+			style={{
+				flexDirection: "row",
+				gap: "0.5rem",
+				margin: "0.5rem 0rem",
+			}}
 			onClick={() => setPage(page)}
 		>
 			<Right style={{ transform: "rotate(180deg)" }} /> Back
+		</div>
+	)
+
+	const CloseButton = ({ close }: { close: MouseEventHandler }) => (
+		<div
+			className="container compactButton"
+			style={{
+				flexDirection: "row",
+				gap: "0.5rem",
+				margin: "0.5rem 0rem",
+			}}
+			onClick={close}
+		>
+			<Cross /> Close
 		</div>
 	)
 
@@ -677,7 +706,11 @@ function DownloadPackModal({
 		<Modal
 			trigger={children}
 			onClose={() => {
-				setPage("mode")
+				setPage(
+					supportedMinecraftVersions.length > 1
+						? "gameVersion"
+						: "packVersion"
+				)
 			}}
 			content={({ close }) => (
 				<>
@@ -701,16 +734,13 @@ function DownloadPackModal({
 							/>
 
 							<div
-								className="container compactButton"
 								style={{
-									flexDirection: "row",
-									gap: "0.5rem",
-									marginTop: "0.5rem",
+									width: "100%",
+									height: "0.125rem",
+									backgroundColor: "var(--border)",
 								}}
-								onClick={close}
-							>
-								<Cross /> Close
-							</div>
+							/>
+							<BackButton page="packVersion" />
 						</>
 					)}
 
@@ -730,6 +760,9 @@ function DownloadPackModal({
 							>
 								Choose Minecraft Version
 							</span>
+
+							{supportedVersions}
+
 							<div
 								style={{
 									width: "100%",
@@ -737,11 +770,7 @@ function DownloadPackModal({
 									backgroundColor: "var(--border)",
 								}}
 							/>
-							{showSupportedVersions(packData!, (v) => {
-								setMinecraftVersion(v)
-								setPage("packVersion")
-							})}
-							<BackButton page={"mode"} />
+							<CloseButton close={close} />
 						</div>
 					)}
 
@@ -769,7 +798,19 @@ function DownloadPackModal({
 								}}
 							/>
 							{packVersions}
-							<BackButton page={"gameVersion"} />
+
+							<div
+								style={{
+									width: "100%",
+									height: "0.125rem",
+									backgroundColor: "var(--border)",
+								}}
+							/>
+							{supportedVersions.length > 1 ? (
+								<BackButton page={"gameVersion"} />
+							) : (
+								<CloseButton close={close} />
+							)}
 						</div>
 					)}
 				</>
@@ -862,6 +903,7 @@ export default function PackInfo({
 								}}
 							/>
 						</DownloadPackModal>
+
 						<label style={{ color: "var(--border)" }}>
 							{(() => {
 								const version = packData?.versions
