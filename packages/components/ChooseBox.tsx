@@ -130,7 +130,7 @@ export function ChooseBox({
 								children[(i + direction) % children.length].focus()
 							}
 
-							if (e.key === " ") {
+							if (e.key === " " || e.key === "Enter") {
 								e.preventDefault()
 								clickOption(e, c.value)
 							}
