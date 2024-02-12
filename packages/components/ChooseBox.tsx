@@ -154,7 +154,7 @@ export function ChooseBox({
 				onMouseDown={clickTrigger}
 				ref={triggerRef}
 			>
-				<label
+				<span
 					style={{
 						lineHeight: "20px",
 						WebkitLineClamp: 1,
@@ -166,10 +166,11 @@ export function ChooseBox({
 						flexGrow: 1,
 						width: "100%",
 						wordBreak: "break-all",
+						
 					}}
 				>
 					<span
-						style={{ opacity: 0.5 }}
+						style={{ opacity: 0.5, cursor: "pointer" }}
 						className="chooseBoxPlaceholder"
 					>
 						{`${placeholder ?? "Choice"}: `}
@@ -186,7 +187,7 @@ export function ChooseBox({
 							</label>
 						</span>
 					)}
-				</label>
+				</span>
 				<div
 					style={{
 						height: "1rem",
