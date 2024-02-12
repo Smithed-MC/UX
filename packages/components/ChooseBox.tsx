@@ -32,7 +32,8 @@ export function ChooseBox({
 	)
 	const [open, setOpen] = useState(false)
 
-	const triggerRef = useRef(null)
+	const triggerRef = useRef<HTMLDivElement>(null)
+	const optionsRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
 		function listener(this: Document, e: MouseEvent) {
@@ -49,13 +50,13 @@ export function ChooseBox({
 		setValue(defaultValue ?? "")
 	}, [defaultValue])
 
-	const clickTrigger: React.MouseEventHandler<HTMLDivElement> = (e) => {
+	const clickTrigger = (e: React.MouseEvent | React.KeyboardEvent) => {
 		e.stopPropagation()
 		beforeOpen && beforeOpen()
 		setOpen(!open)
 	}
 
-	const clickOption = (e: React.MouseEvent, newValue: string) => {
+	const clickOption = (e: React.MouseEvent | React.KeyboardEvent, newValue: string) => {
 		e.stopPropagation()
 
 		if (multiselect && value instanceof Array) {
@@ -102,12 +103,47 @@ export function ChooseBox({
 		>
 			<div
 				className={`chooseBoxOptions ${open ? "open" : ""} ${flip ? "flip" : "noflip"}`}
+				ref={optionsRef}
 			>
-				{choices.map((c) => (
+				{choices.map((c, i) => (
 					<div
 						key={c.value}
 						onMouseDown={(e) => clickOption(e, c.value)}
 						className="chooseBoxOption"
+						tabIndex={i}
+						onKeyDown={(e) => {
+							const direction =
+								e.key === "ArrowDown"
+									? 1
+									: e.key === "ArrowUp"
+										? -1
+										: 0
+							if (direction !== 0) {
+								e.preventDefault()
+
+								const children = [
+									...e.currentTarget.parentElement!.children,
+								] as HTMLElement[]
+
+								if (i + direction < 0)
+									i = children.length
+								children[(i + direction) % children.length].focus()
+							}
+
+							if (e.key === " ") {
+								e.preventDefault()
+								clickOption(e, c.value)
+							}
+
+							if (e.key === "Tab")
+								e.preventDefault()
+
+							if (e.key === "Escape") {
+								e.preventDefault()
+								clickTrigger(e)
+								triggerRef.current!.focus()
+							}
+						}}
 					>
 						{c.content}
 						{(multiselect
@@ -153,6 +189,21 @@ export function ChooseBox({
 				className={`chooseBoxTrigger ${open ? "open" : ""} ${flip ? "flip" : "noflip"}`}
 				onMouseDown={clickTrigger}
 				ref={triggerRef}
+				tabIndex={0}
+				onKeyDown={(e) => {
+					if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " ") {
+						e.preventDefault()
+						if (!open) {
+							clickTrigger(e)
+							return
+						}
+
+						const children = [
+							...optionsRef.current!.children,
+						] as HTMLElement[]
+						children.at(e.key === "ArrowDown" ? 0 : -1)!.focus()
+					}
+				}}
 			>
 				<span
 					style={{
@@ -166,7 +217,6 @@ export function ChooseBox({
 						flexGrow: 1,
 						width: "100%",
 						wordBreak: "break-all",
-						
 					}}
 				>
 					<span
