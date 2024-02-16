@@ -187,7 +187,7 @@ function showPackVersions(
 	const longestVersion =
 		versions.length >= 1
 			? versions.reduce((p, n) => (p.name.length > n.name.length ? p : n))
-					.name
+				.name
 			: ""
 
 	return versions.map((v, idx) => {
@@ -257,10 +257,10 @@ export function AddToBundleModal({
 
 		setPage(
 			pages[idx + directionNumber] as
-				| "mcVersion"
-				| "packVersion"
-				| "bundle"
-				| "createBundle"
+			| "mcVersion"
+			| "packVersion"
+			| "bundle"
+			| "createBundle"
 		)
 		setDirection(direction)
 	}
@@ -362,7 +362,7 @@ export function AddToBundleModal({
 
 								const resp = await fetch(
 									import.meta.env.VITE_API_SERVER +
-										`/bundles/${bundle.uid}?token=${await user?.getIdToken()}`,
+									`/bundles/${bundle.uid}?token=${await user?.getIdToken()}`,
 									{
 										method: "PUT",
 										headers: {
@@ -602,9 +602,10 @@ function DownloadPackModal({
 	const navigate = useNavigate()
 
 	function download(packVersion: PackVersion | undefined, mode: string) {
+		const url = import.meta.env.VITE_API_SERVER +
+			`/download?pack=${packId}${packVersion ? "@" + packVersion.name : ""}&version=${gameVersion}&mode=${mode}`
 		window.open(
-			import.meta.env.VITE_API_SERVER +
-				`/download?pack=${packId}@${packVersion?.name}&version=${gameVersion}&mode=${mode}`
+			url
 		)
 	}
 
@@ -663,6 +664,7 @@ function DownloadPackModal({
 			} else {
 				// Otherwise open the modal
 				setPage("mode")
+				setPackVersion(v)
 			}
 
 			if (mode !== "") download(v, mode)
