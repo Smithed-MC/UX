@@ -1,56 +1,56 @@
-import "./EditLocalBundle.css";
+import "./EditLocalBundle.css"
 
-import { invoke } from "@tauri-apps/api";
-import { useNavigate, useParams } from "react-router-dom";
-import { LocalBundleConfig } from "../types";
-import { IconTextButton, PackCard, svg } from "components";
-import { PackData, PackReference } from 'data-types';
-import { useEffect, useState } from "react";
-import BackButton from "client/src/widget/BackButton";
+import { invoke } from "@tauri-apps/api"
+import { useNavigate, useParams } from "react-router-dom"
+import { LocalBundleConfig } from "../types"
+import { IconTextButton, PackCard, svg } from "components"
+import { PackData, PackReference } from "data-types"
+import { useEffect, useState } from "react"
+import BackButton from "client/src/widget/BackButton"
 
 interface BundleData {
-	bundle: LocalBundleConfig;
-	packs: [PackReference, PackData][];
+	bundle: LocalBundleConfig
+	packs: [PackReference, PackData][]
 }
 
 function EditLocalBundle({}: EditLocalBundleProps) {
-	const params = useParams();
-	const bundleId = params.id as string;
-	const [data, setData] = useState<BundleData | undefined>(undefined);
-	const [reload, setReload] = useState(false);
-	const navigate = useNavigate();
+	const params = useParams()
+	const bundleId = params.id as string
+	const [data, setData] = useState<BundleData | undefined>(undefined)
+	const [reload, setReload] = useState(false)
+	const navigate = useNavigate()
 
 	useEffect(() => {
 		async function get() {
 			try {
 				const bundle: LocalBundleConfig = await invoke("get_bundle", {
 					bundleId: bundleId,
-				});
+				})
 				const packs: [PackReference, PackData][] = await invoke(
 					"get_bundle_packs",
 					{
 						bundleId: bundleId,
 					}
-				);
-				setData({ bundle, packs });
+				)
+				setData({ bundle, packs })
 			} catch (e) {
-				console.error("Failed to get local bundle data: " + e);
+				console.error("Failed to get local bundle data: " + e)
 			}
 		}
 
-		setReload(false);
-		get();
-	}, [reload]);
+		setReload(false)
+		get()
+	}, [reload])
 
 	async function deleteBundle() {
 		if (data === undefined) {
-			return;
+			return
 		}
 		try {
-			await invoke("remove_bundle", { bundleId: bundleId });
-			navigate("/launch");
+			await invoke("remove_bundle", { bundleId: bundleId })
+			navigate("/launch")
 		} catch (e) {
-			console.error("Failed to delete bundle: " + e);
+			console.error("Failed to delete bundle: " + e)
 		}
 	}
 
@@ -59,14 +59,14 @@ function EditLocalBundle({}: EditLocalBundleProps) {
 			await invoke("remove_pack_from_bundle", {
 				bundleId: bundleId,
 				packId: packId,
-			});
-			setReload(true);
+			})
+			setReload(true)
 		} catch (e) {
-			console.error("Failed to delete pack from bundle: " + e);
+			console.error("Failed to delete pack from bundle: " + e)
 		}
 	}
 
-	let packElems: JSX.Element[] = [];
+	let packElems: JSX.Element[] = []
 	if (data !== undefined) {
 		for (let [reference, packData] of data.packs) {
 			packElems.push(
@@ -74,10 +74,10 @@ function EditLocalBundle({}: EditLocalBundleProps) {
 					data={packData}
 					reference={reference}
 					onRemove={() => {
-						removePack(reference.id);
+						removePack(reference.id)
 					}}
 				/>
-			);
+			)
 		}
 	}
 
@@ -92,7 +92,8 @@ function EditLocalBundle({}: EditLocalBundleProps) {
 				<div className="bigText">Editing local bundle '{bundleId}'</div>
 			</div>
 			<div className="container bundleInfoContainer">
-				Version: {data !== undefined ? data.bundle.version : "Loading..."}
+				Version:{" "}
+				{data !== undefined ? data.bundle.version : "Loading..."}
 			</div>
 			<br />
 			{data === undefined ? (
@@ -122,13 +123,13 @@ function EditLocalBundle({}: EditLocalBundleProps) {
 				onClick={deleteBundle}
 			/>
 		</div>
-	);
+	)
 }
 
 export interface EditLocalBundleProps {}
 
 function EditLocalPack({ data, reference, onRemove }: EditLocalPackProps) {
-	const [open, setOpen] = useState(false);
+	const [open, setOpen] = useState(false)
 
 	return (
 		<div className={`container editLocalPackContainer`}>
@@ -138,9 +139,9 @@ function EditLocalPack({ data, reference, onRemove }: EditLocalPackProps) {
 				}`}
 				onClick={() => {
 					if (open) {
-						setOpen(false);
+						setOpen(false)
 					} else {
-						setOpen(true);
+						setOpen(true)
 					}
 				}}
 			>
@@ -151,18 +152,29 @@ function EditLocalPack({ data, reference, onRemove }: EditLocalPackProps) {
 						flexGrow: "1",
 						gap: "1rem",
 						flexDirection: "row",
-						boxSizing: "border-box"
+						boxSizing: "border-box",
 					}}
 				>
-					<img className="editLocalPackIcon" src={data.display.icon} />
+					<img
+						className="editLocalPackIcon"
+						src={data.display.icon}
+					/>
 					<div className="editLocalPackName">{data.display.name}</div>
-					<div className="editLocalPackVersion">v{reference.version}</div>
+					<div className="editLocalPackVersion">
+						v{reference.version}
+					</div>
 				</div>
 				<div
 					className="container"
-					style={{ justifyContent: "end", flexGrow: "1", gap: "1rem" }}
+					style={{
+						justifyContent: "end",
+						flexGrow: "1",
+						gap: "1rem",
+					}}
 				>
-					<svg.Right className={`editLocalPackArrow ${open ? "open" : ""}`} />
+					<svg.Right
+						className={`editLocalPackArrow ${open ? "open" : ""}`}
+					/>
 				</div>
 			</div>
 			{open && (
@@ -195,13 +207,13 @@ function EditLocalPack({ data, reference, onRemove }: EditLocalPackProps) {
 				</div>
 			)}
 		</div>
-	);
+	)
 }
 
 interface EditLocalPackProps {
-	data: PackData;
-	reference: PackReference;
-	onRemove: () => void;
+	data: PackData
+	reference: PackReference
+	onRemove: () => void
 }
 
-export default EditLocalBundle;
+export default EditLocalBundle

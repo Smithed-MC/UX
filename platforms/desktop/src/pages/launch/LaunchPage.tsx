@@ -1,42 +1,42 @@
-import "./LaunchPage.css";
-import { useEffect, useRef, useState } from "react";
-import { invoke } from "@tauri-apps/api/tauri";
-import { Event, UnlistenFn, listen } from "@tauri-apps/api/event";
-import { app, clipboard } from "@tauri-apps/api";
-import { WebviewWindow } from "@tauri-apps/api/window";
-import { ChooseBox, IconTextButton, svg } from "components";
+import "./LaunchPage.css"
+import { useEffect, useRef, useState } from "react"
+import { invoke } from "@tauri-apps/api/tauri"
+import { Event, UnlistenFn, listen } from "@tauri-apps/api/event"
+import { app, clipboard } from "@tauri-apps/api"
+import { WebviewWindow } from "@tauri-apps/api/window"
+import { ChooseBox, IconTextButton, svg } from "components"
 import {
 	AssociatedProgressEvent,
 	ChooseBoxChoice,
 	LocalBundleConfig,
 	OutputMessageEvent,
-} from "../../types";
-import { MinecraftVersion } from "data-types";
-import { Smithed } from "components/svg";
-import { getChooseBoxBundles } from "../../util";
-import BundleList from "./BundleList";
-import CreateBundle from "../../components/CreateBundle";
+} from "../../types"
+import { MinecraftVersion } from "data-types"
+import { Smithed } from "components/svg"
+import { getChooseBoxBundles } from "../../util"
+import BundleList from "./BundleList"
+import CreateBundle from "../../components/CreateBundle"
 import LaunchConsole, {
 	LaunchConsoleProps,
 	createProgressBar,
-} from "./LaunchConsole";
+} from "./LaunchConsole"
 
 function LaunchPage() {
-	const [authDisplay, setAuthDisplay] = useState<AuthDisplayEvent | undefined>(
-		undefined
-	);
-	const [bundle, setBundle] = useState<string | undefined>(undefined);
-	const [appVersion, setAppVersion] = useState<undefined | string>(undefined);
+	const [authDisplay, setAuthDisplay] = useState<
+		AuthDisplayEvent | undefined
+	>(undefined)
+	const [bundle, setBundle] = useState<string | undefined>(undefined)
+	const [appVersion, setAppVersion] = useState<undefined | string>(undefined)
 
 	useEffect(() => {
 		async function getVersion() {
-			const version = await app.getVersion();
-			setAppVersion(version);
+			const version = await app.getVersion()
+			setAppVersion(version)
 		}
 		if (appVersion == undefined) {
-			getVersion();
+			getVersion()
 		}
-	});
+	})
 
 	return (
 		<div className="container launchContainer">
@@ -51,81 +51,84 @@ function LaunchPage() {
 				{authDisplay && <AuthPopup {...authDisplay} />}
 			</div>
 
-			<LaunchFooter onSetAuthDisplay={setAuthDisplay} selectedBundle={bundle} />
+			<LaunchFooter
+				onSetAuthDisplay={setAuthDisplay}
+				selectedBundle={bundle}
+			/>
 		</div>
-	);
+	)
 }
 
 function LaunchFooter({ selectedBundle, onSetAuthDisplay }: LaunchFooterProps) {
-	const [online, setOnline] = useState(true);
+	const [online, setOnline] = useState(true)
 	const [consoleProps, setConsoleProps] = useState<LaunchConsoleProps>({
 		messages: [],
-	});
-	const [showConsole, setShowConsole] = useState(false);
+	})
+	const [showConsole, setShowConsole] = useState(false)
 
-	const [error, setError] = useState<undefined | "no_bundle">(undefined);
-	const [unlistens, setUnlistens] = useState<UnlistenFn[]>([]);
+	const [error, setError] = useState<undefined | "no_bundle">(undefined)
+	const [unlistens, setUnlistens] = useState<UnlistenFn[]>([])
 
 	function updateConsole(msg: string) {
 		setConsoleProps((current) => {
 			return {
 				messages: current.messages.concat(msg),
-			};
-		});
+			}
+		})
 	}
 
 	function clearConsole() {
-		let console: LaunchConsoleProps = { messages: [] };
-		setConsoleProps(console);
+		let console: LaunchConsoleProps = { messages: [] }
+		setConsoleProps(console)
 	}
 
 	async function launchGame() {
-		console.log("3 2 1 blastoff!");
+		console.log("3 2 1 blastoff!")
 		try {
 			for (let unlisten of unlistens) {
-				unlisten();
+				unlisten()
 			}
-			setShowConsole(true);
-			clearConsole();
+			setShowConsole(true)
+			clearConsole()
 			let launchPromise = invoke("launch_game", {
 				bundleId: selectedBundle,
 				offline: !online,
-			});
+			})
 
 			let closeListenerPromise = listen("game_finished", () => {
-				onSetAuthDisplay(undefined);
-				setShowConsole(false);
-			});
+				onSetAuthDisplay(undefined)
+				setShowConsole(false)
+			})
 
 			let auth = listen(
 				"mcvm_display_auth_info",
 				(event: Event<AuthDisplayEvent>) => {
-					let url = event.payload.url;
-					let device_code = event.payload.device_code;
-					onSetAuthDisplay({ url, device_code });
+					let url = event.payload.url
+					let device_code = event.payload.device_code
+					onSetAuthDisplay({ url, device_code })
 				}
-			);
+			)
 
 			let message = listen(
 				"mcvm_output_message",
 				(event: Event<OutputMessageEvent>) => {
-					updateConsole(event.payload);
+					updateConsole(event.payload)
 				}
-			);
+			)
 
 			let header = listen(
 				"mcvm_output_header",
 				(event: Event<OutputMessageEvent>) => {
-					updateConsole(event.payload);
+					updateConsole(event.payload)
 				}
-			);
+			)
 
 			let progress = listen(
 				"mcvm_output_progress",
 				(event: Event<AssociatedProgressEvent>) => {
-					updateConsole(createProgressBar(event.payload));
+					updateConsole(createProgressBar(event.payload))
 				}
-			);
+			)
 
 			let [_, ...eventUnlistens] = await Promise.all([
 				launchPromise,
@@ -134,29 +137,29 @@ function LaunchFooter({ selectedBundle, onSetAuthDisplay }: LaunchFooterProps) {
 				message,
 				header,
 				progress,
-			]);
-			setUnlistens(eventUnlistens);
+			])
+			setUnlistens(eventUnlistens)
 		} catch (e) {
-			console.error("Failed to launch game: " + e);
+			console.error("Failed to launch game: " + e)
 		}
 	}
 
 	async function tryLaunch() {
 		if (selectedBundle === undefined) {
-			setError("no_bundle");
-			return;
+			setError("no_bundle")
+			return
 		}
-		await launchGame();
+		await launchGame()
 	}
 
 	async function stopGame() {
-		console.log("Stopping game...");
-		onSetAuthDisplay(undefined);
-		setShowConsole(false);
+		console.log("Stopping game...")
+		onSetAuthDisplay(undefined)
+		setShowConsole(false)
 		try {
-			await invoke("stop_game");
+			await invoke("stop_game")
 		} catch (e) {
-			console.error("Failed to stop game: " + e);
+			console.error("Failed to stop game: " + e)
 		}
 	}
 
@@ -167,7 +170,9 @@ function LaunchFooter({ selectedBundle, onSetAuthDisplay }: LaunchFooterProps) {
 				<div className="editBundleContainer">
 					<IconTextButton
 						className={
-							selectedBundle ? "secondaryButtonLike" : "highlightButtonLike"
+							selectedBundle
+								? "secondaryButtonLike"
+								: "highlightButtonLike"
 						}
 						text={selectedBundle ? "Edit bundle" : "Select bundle"}
 						icon={svg.Edit}
@@ -201,21 +206,21 @@ function LaunchFooter({ selectedBundle, onSetAuthDisplay }: LaunchFooterProps) {
 					flip={true}
 					onChange={(value) => {
 						if (value == "online") {
-							setOnline(true);
+							setOnline(true)
 						} else if (value == "offline") {
-							setOnline(false);
+							setOnline(false)
 						}
 					}}
 					style={{ width: "75%" }}
 				/>
 			</div>
 		</div>
-	);
+	)
 }
 
 interface LaunchFooterProps {
-	onSetAuthDisplay: (value: AuthDisplayEvent | undefined) => void;
-	selectedBundle: string | undefined;
+	onSetAuthDisplay: (value: AuthDisplayEvent | undefined) => void
+	selectedBundle: string | undefined
 }
 
 function LaunchButton({
@@ -224,29 +229,32 @@ function LaunchButton({
 	onCancel,
 	error,
 }: LaunchButtonProps) {
-	const [state, setState] = useState(LaunchButtonState.SelectBundle);
+	const [state, setState] = useState(LaunchButtonState.SelectBundle)
 
-	if (state == LaunchButtonState.SelectBundle && selectedBundle !== undefined) {
-		setState(LaunchButtonState.ClickToLaunch);
+	if (
+		state == LaunchButtonState.SelectBundle &&
+		selectedBundle !== undefined
+	) {
+		setState(LaunchButtonState.ClickToLaunch)
 	}
 
 	if (
 		state == LaunchButtonState.ClickToLaunch &&
 		selectedBundle === undefined
 	) {
-		setState(LaunchButtonState.SelectBundle);
+		setState(LaunchButtonState.SelectBundle)
 	}
 
 	async function onClick() {
 		if (state == LaunchButtonState.ClickToLaunch) {
-			setState(LaunchButtonState.Running);
-			onLaunch();
+			setState(LaunchButtonState.Running)
+			onLaunch()
 			await listen("game_finished", () => {
-				setState(LaunchButtonState.ClickToLaunch);
-			});
+				setState(LaunchButtonState.ClickToLaunch)
+			})
 		} else if (state == LaunchButtonState.ClickToCancel) {
-			onCancel();
-			setState(LaunchButtonState.ClickToLaunch);
+			onCancel()
+			setState(LaunchButtonState.ClickToLaunch)
 		}
 	}
 	return (
@@ -256,19 +264,19 @@ function LaunchButton({
 					state == LaunchButtonState.ClickToCancel
 						? "invalidButtonLike"
 						: state == LaunchButtonState.SelectBundle
-						? "highlightButtonLike"
-						: "accentedButtonLike"
+							? "highlightButtonLike"
+							: "accentedButtonLike"
 				} ${error ? "invalidInput" : ""}`}
 				text={
 					state == LaunchButtonState.SelectBundle
 						? "Select bundle"
 						: state == LaunchButtonState.ClickToLaunch
-						? `Launch bundle '${selectedBundle}'`
-						: state == LaunchButtonState.Running
-						? "Running"
-						: state == LaunchButtonState.ClickToCancel
-						? "Click to cancel"
-						: "Invalid state"
+							? `Launch bundle '${selectedBundle}'`
+							: state == LaunchButtonState.Running
+								? "Running"
+								: state == LaunchButtonState.ClickToCancel
+									? "Click to cancel"
+									: "Invalid state"
 				}
 				title={
 					state == LaunchButtonState.ClickToCancel
@@ -292,25 +300,25 @@ function LaunchButton({
 				onClick={onClick}
 				onMouseEnter={() => {
 					if (state == LaunchButtonState.Running) {
-						setState(LaunchButtonState.ClickToCancel);
+						setState(LaunchButtonState.ClickToCancel)
 					}
 				}}
 				onMouseLeave={() => {
 					if (state == LaunchButtonState.ClickToCancel) {
-						setState(LaunchButtonState.Running);
+						setState(LaunchButtonState.Running)
 					}
 				}}
 				reverse={state == LaunchButtonState.Running}
 			/>
 		</div>
-	);
+	)
 }
 
 interface LaunchButtonProps {
-	selectedBundle: string | undefined;
-	onLaunch: () => void;
-	onCancel: () => void;
-	error?: string;
+	selectedBundle: string | undefined
+	onLaunch: () => void
+	onCancel: () => void
+	error?: string
 }
 
 enum LaunchButtonState {
@@ -321,21 +329,21 @@ enum LaunchButtonState {
 }
 
 function BundleSelector({ onSetBundle }: BundleSelectorProps) {
-	let [available, setAvailable] = useState<ChooseBoxChoice[]>([]);
-	let [showCreate, setShowCreate] = useState(false);
+	let [available, setAvailable] = useState<ChooseBoxChoice[]>([])
+	let [showCreate, setShowCreate] = useState(false)
 
 	useEffect(() => {
-		updateChoices();
-	});
+		updateChoices()
+	})
 
 	async function updateChoices() {
-		let choices = await getChooseBoxBundles();
-		choices.push({ value: "__createNew", content: "Create new" });
-		setAvailable(choices);
+		let choices = await getChooseBoxBundles()
+		choices.push({ value: "__createNew", content: "Create new" })
+		setAvailable(choices)
 	}
 
 	function createNew() {
-		setShowCreate(true);
+		setShowCreate(true)
 	}
 
 	async function addBundle(
@@ -344,14 +352,14 @@ function BundleSelector({ onSetBundle }: BundleSelectorProps) {
 	) {
 		if (name !== undefined && version !== undefined) {
 			try {
-				let bundle: LocalBundleConfig = { version: version, packs: [] };
-				await invoke("add_bundle", { bundleId: name, bundle: bundle });
+				let bundle: LocalBundleConfig = { version: version, packs: [] }
+				await invoke("add_bundle", { bundleId: name, bundle: bundle })
 			} catch (e) {
-				console.error("Failed to add bundle: " + e);
+				console.error("Failed to add bundle: " + e)
 			}
 		}
 
-		setShowCreate(false);
+		setShowCreate(false)
 	}
 
 	return (
@@ -365,26 +373,26 @@ function BundleSelector({ onSetBundle }: BundleSelectorProps) {
 					beforeOpen={updateChoices}
 					onChange={(value) => {
 						if (value == "__createNew") {
-							createNew();
+							createNew()
 						} else {
 							if (!Array.isArray(value)) {
-								onSetBundle(value);
+								onSetBundle(value)
 							}
 						}
 					}}
 				/>
 			</div>
 		</>
-	);
+	)
 }
 
 interface BundleSelectorProps {
-	onSetBundle: (id: string) => void;
+	onSetBundle: (id: string) => void
 }
 
 interface AuthDisplayEvent {
-	url: string;
-	device_code: string;
+	url: string
+	device_code: string
 }
 
 function AuthPopup({ url, device_code }: AuthDisplayEvent) {
@@ -400,11 +408,11 @@ function AuthPopup({ url, device_code }: AuthDisplayEvent) {
 			<br />
 			<LoginWindowButton url={url} />
 		</div>
-	);
+	)
 }
 
 function CopyCodeButton({ code }: CopyCodeButtonProps) {
-	let [clicked, setClicked] = useState(false);
+	let [clicked, setClicked] = useState(false)
 
 	return (
 		<IconTextButton
@@ -413,22 +421,22 @@ function CopyCodeButton({ code }: CopyCodeButtonProps) {
 			iconElement={clicked ? <svg.Check /> : <svg.Copy fill="white" />}
 			style={{ width: "fit-content" }}
 			onClick={async () => {
-				setClicked(true);
-				await clipboard.writeText(code);
+				setClicked(true)
+				await clipboard.writeText(code)
 				setTimeout(() => {
-					setClicked(false);
-				}, 3000);
+					setClicked(false)
+				}, 3000)
 			}}
 		/>
-	);
+	)
 }
 
 interface CopyCodeButtonProps {
-	code: string;
+	code: string
 }
 
 function LoginWindowButton({ url }: LoginWindowButtonProps) {
-	let [opening, setOpening] = useState(false);
+	let [opening, setOpening] = useState(false)
 
 	return (
 		<IconTextButton
@@ -437,20 +445,20 @@ function LoginWindowButton({ url }: LoginWindowButtonProps) {
 			icon={svg.Globe}
 			style={{ width: "fit-content" }}
 			onClick={() => {
-				setOpening(true);
+				setOpening(true)
 				new WebviewWindow("microsoft_login", {
 					url: url,
-				});
+				})
 				setTimeout(() => {
-					setOpening(false);
-				}, 3000);
+					setOpening(false)
+				}, 3000)
 			}}
 		/>
-	);
+	)
 }
 
 interface LoginWindowButtonProps {
-	url: string;
+	url: string
 }
 
-export default LaunchPage;
+export default LaunchPage

@@ -1,26 +1,25 @@
-
 .titlebar {
-    height: 30px;
-    background: #329ea3;
-    user-select: none;
-    display: flex;
-    justify-content: flex-end;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+	height: 30px;
+	background: #329ea3;
+	user-select: none;
+	display: flex;
+	justify-content: flex-end;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
 }
 
 .titlebar-button {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    width: 30px;
-    height: 30px;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	width: 30px;
+	height: 30px;
 }
 
 .titlebar-button:hover {
-    background: #5bbec3;
+	background: #5bbec3;
 }
 
 .popup {
@@ -32,7 +31,7 @@
 	transform: translate(-50%, -50%);
 	-webkit-transform: translate(-50%, -50%);
 	border-radius: 16px;
-    border: 0.125rem solid var(--border);
+	border: 0.125rem solid var(--border);
 }
 
 .bigText {

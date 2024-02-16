@@ -1,64 +1,66 @@
 .browserRoot,
 .browserRootWidget {
-    display: grid;
+	display: grid;
 
-    height: 100%;
-    width: 100%;
-    box-sizing: border-box;
+	height: 100%;
+	width: 100%;
+	box-sizing: border-box;
 }
 
 .packCardContainer {
-    box-sizing: border-box;
-    width: 100% !important;
-    display: grid;
-    grid-template-columns: auto auto;
-    /* grid-template-rows: aut; */
-    position: relative;
+	box-sizing: border-box;
+	width: 100% !important;
+	display: grid;
+	grid-template-columns: auto auto;
+	/* grid-template-rows: aut; */
+	position: relative;
 
-    transition: all 0.5s;
+	transition:
+		all 0.5s,
+		opacity 0.3s ease-in-out;
 
-    gap: 2rem;
+	gap: 2rem;
 }
 
 .browsePageButton {
-    padding: 0.5rem;
-    border-radius: var(--defaultBorderRadius);
-    color: var(--foreground);
-    text-decoration: none;
-    aspect-ratio: 1 / 1 !important;
-    width: auto;
-    height: 1.25rem;
-    text-align: center;
-    vertical-align: center;
-    opacity: 0.5;
-    transition: all 0.2s ease-in-out;
+	padding: 0.5rem;
+	border-radius: var(--defaultBorderRadius);
+	color: var(--foreground);
+	text-decoration: none;
+	aspect-ratio: 1 / 1 !important;
+	width: auto;
+	height: 1.25rem;
+	text-align: center;
+	vertical-align: center;
+	opacity: 0.5;
+	transition: all 0.2s ease-in-out;
 }
 
-.browsePageButton:hover, .browsePageButton.selected {
-    background-color: var(--section);
-    opacity: 1;
+.browsePageButton:hover,
+.browsePageButton.selected {
+	background-color: var(--section);
+	opacity: 1;
 }
 
 @media screen and (max-width: 1024px) {
-
-    .browserRoot,
-    .browserRootWidget {
-        columns: 1;
-        grid-template-columns: 100%;
-        flex-direction: column !important;
-        place-items: safe center !important;
-        align-items: safe center !important;
-    }
+	.browserRoot,
+	.browserRootWidget {
+		columns: 1;
+		grid-template-columns: 100%;
+		flex-direction: column !important;
+		place-items: safe center !important;
+		align-items: safe center !important;
+	}
 }
 
 @media screen and (min-width: 1024px) {
-    .packCardContainer {
-        width: 100%;
-    }
+	.packCardContainer {
+		width: 100%;
+	}
 }
 
 @media screen and (max-width: 48rem) {
-    .packCardContainer {
-        grid-template-columns: auto;
-    }
+	.packCardContainer {
+		grid-template-columns: auto;
+	}
 }

@@ -1,1 +1,1 @@
-declare module 'pngjs/browser'
+declare module "pngjs/browser"

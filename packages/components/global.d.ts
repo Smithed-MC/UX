@@ -1,1 +1,1 @@
-declare module 'remark-remove-comments'
+declare module "remark-remove-comments"

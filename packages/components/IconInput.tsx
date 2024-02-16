@@ -1,20 +1,69 @@
-import { ButtonHTMLAttributes, FunctionComponent, InputHTMLAttributes, RefObject, SVGProps, useRef, useState } from "react";
-import './IconInput.css'
+import {
+	ButtonHTMLAttributes,
+	FunctionComponent,
+	InputHTMLAttributes,
+	RefObject,
+	SVGProps,
+	useRef,
+	useState,
+} from "react"
+import "./IconInput.css"
 
 interface IconTextButtonProps {
-    icon?: FunctionComponent<SVGProps<SVGSVGElement>> | string,
-    iconElement?: JSX.Element,
-    inputRef?: RefObject<HTMLInputElement>
+	icon?: FunctionComponent<SVGProps<SVGSVGElement>> | string
+	iconElement?: JSX.Element
+	inputRef?: RefObject<HTMLInputElement>
 }
 
-export default function IconInput({ icon: IconSvg, iconElement, className, style, inputRef, ...props }: IconTextButtonProps & React.HTMLProps<HTMLInputElement>) {
-
-    return <div key={props.key} className={'container input ' + className} style={{ flexDirection: 'row', alignItems: 'center', gap: '0.5rem', ...style }}>
-        {(IconSvg || iconElement) && <span className="container" style={{ color: 'var(--border)', height: '100%'}}>
-            {IconSvg !== undefined && typeof (IconSvg) === 'string' && IconSvg}
-            {IconSvg !== undefined && typeof (IconSvg) !== 'string' && <IconSvg />}
-            {iconElement !== undefined && iconElement}
-        </span>}
-        <input id={props.id} {...props} ref={inputRef} className="childInput" style={{ backgroundColor: 'transparent', border: 'none', fontFamily: 'Lexend', width: '100%', height: '100%', fontSize: '1rem', WebkitUserSelect: 'none', color: 'var(--foreground)'}}></input>
-    </div>
+export default function IconInput({
+	icon: IconSvg,
+	iconElement,
+	className,
+	style,
+	inputRef,
+	...props
+}: IconTextButtonProps & React.HTMLProps<HTMLInputElement>) {
+	return (
+		<div
+			key={props.key}
+			className={"container input " + className}
+			style={{
+				flexDirection: "row",
+				alignItems: "center",
+				gap: "0.5rem",
+				...style,
+			}}
+		>
+			{(IconSvg || iconElement) && (
+				<span
+					className="container"
+					style={{ color: "var(--border)", height: "100%" }}
+				>
+					{IconSvg !== undefined &&
+						typeof IconSvg === "string" &&
+						IconSvg}
+					{IconSvg !== undefined && typeof IconSvg !== "string" && (
+						<IconSvg />
+					)}
+					{iconElement !== undefined && iconElement}
+				</span>
+			)}
+			<input
+				id={props.id}
+				{...props}
+				ref={inputRef}
+				className="childInput"
+				style={{
+					backgroundColor: "transparent",
+					border: "none",
+					fontFamily: "Lexend",
+					width: "100%",
+					height: "100%",
+					fontSize: "1rem",
+					WebkitUserSelect: "none",
+					color: "var(--foreground)",
+				}}
+			></input>
+		</div>
+	)
 }

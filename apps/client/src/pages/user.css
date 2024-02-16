@@ -1,199 +1,199 @@
 .statDisplay {
-    display: flex;
-    flex-direction: row;
-    background-color: var(--bold);
-    padding: 0.5rem 1rem;
-    gap: 1rem;
-    border-radius: var(--defaultBorderRadius);
-    align-items: center;
+	display: flex;
+	flex-direction: row;
+	background-color: var(--bold);
+	padding: 0.5rem 1rem;
+	gap: 1rem;
+	border-radius: var(--defaultBorderRadius);
+	align-items: center;
 }
 
 .profileControlContainer {
-    flex-direction: row;
-    gap: 0.5rem;
+	flex-direction: row;
+	gap: 0.5rem;
 }
 
 .bundleControls {
-    flex-direction: row;
-    grid-area: options;
-    gap: 1rem;
+	flex-direction: row;
+	grid-area: options;
+	gap: 1rem;
 }
 
 @media screen and (max-width: 43rem) {
-    .statBoxes {
-        flex-direction: column;
-        align-items: center;
-    }
+	.statBoxes {
+		flex-direction: column;
+		align-items: center;
+	}
 
-    .flexDirection {
-        flex-direction: column;
-        align-items: center;
-    }
+	.flexDirection {
+		flex-direction: column;
+		align-items: center;
+	}
 
-    .statContainer {
-        align-items: center;
-        flex-direction: column;
-    }
+	.statContainer {
+		align-items: center;
+		flex-direction: column;
+	}
 
-    .bundleControls {
-        gap: 0.25rem;
-    }
+	.bundleControls {
+		gap: 0.25rem;
+	}
 
-    .bundleControlButton:not(:only-child) {
-        border-radius: 0 !important;
-    }
+	.bundleControlButton:not(:only-child) {
+		border-radius: 0 !important;
+	}
 
-    .bundleControlButton>label,
-    .bundleControlButton>div {
-        display: none;
-    }
+	.bundleControlButton > label,
+	.bundleControlButton > div {
+		display: none;
+	}
 
-    .bundleControlButton:first-child:not(:only-child) {
-        border-radius: var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius) !important;
-    }
+	.bundleControlButton:first-child:not(:only-child) {
+		border-radius: var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius) !important;
+	}
 
-    .bundleControlButton:last-child:not(:only-child) {
-        border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0 !important;
-    }
+	.bundleControlButton:last-child:not(:only-child) {
+		border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0 !important;
+	}
 }
 
 .newContentButton {
-    border: 0.125rem solid transparent;
-    border-radius: 50%;
-    padding: 0.25rem;
+	border: 0.125rem solid transparent;
+	border-radius: 50%;
+	padding: 0.25rem;
 }
 
 .newContentButton:hover {
-    border: 0.125rem solid var(--border)
+	border: 0.125rem solid var(--border);
 }
 
 .newContentButton:active {
-    border: 0.125rem solid var(--foreground)
+	border: 0.125rem solid var(--foreground);
 }
 
 .statGrid {
-    display: grid;
-    grid-template-rows: auto auto;
-    grid-template-columns: auto min-content auto min-content auto;
-    width: max-content;
-    place-items: center;
-    column-gap: 1rem;
-    row-gap: 0.5rem;
-    background-color: var(--section);
-    border-radius: var(--defaultBorderRadius);
-    box-sizing: border-box;
-    padding: 1rem;
+	display: grid;
+	grid-template-rows: auto auto;
+	grid-template-columns: auto min-content auto min-content auto;
+	width: max-content;
+	place-items: center;
+	column-gap: 1rem;
+	row-gap: 0.5rem;
+	background-color: var(--section);
+	border-radius: var(--defaultBorderRadius);
+	box-sizing: border-box;
+	padding: 1rem;
 }
 
-.statGrid>.divider {
-    height: 100%;
-    width: 0.125rem;
-    background-color: var(--border);
+.statGrid > .divider {
+	height: 100%;
+	width: 0.125rem;
+	background-color: var(--border);
 }
 
-.statGrid>.title {
-    font-weight: 700;
+.statGrid > .title {
+	font-weight: 700;
 }
 
 .userContentGrid {
-    width: 100%;
-    gap: 2rem;
-    grid-template-columns: 1fr 1fr;
+	width: 100%;
+	gap: 2rem;
+	grid-template-columns: 1fr 1fr;
 }
 
 @media screen and (max-width: 36rem) {
+	.profileControlContainer {
+		gap: 0.25rem;
+		flex-direction: column;
+	}
 
-    .profileControlContainer {
-        gap: 0.25rem;
-        flex-direction: column;
-    }
+	.profileControl {
+		padding: 16px 8px !important;
+		border: 0.125rem solid transparent;
+	}
 
-    .profileControl {
-        padding: 16px 8px !important;
-        border: 0.125rem solid transparent;
-    }
+	.profileControl.first {
+		border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0px
+			0px !important;
+	}
 
-    .profileControl.first {
-        border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0px 0px !important;
-    }
+	.profileControl.last {
+		border-radius: 0px 0px var(--defaultBorderRadius)
+			var(--defaultBorderRadius) !important;
+	}
 
-    .profileControl.last {
-        border-radius: 0px 0px var(--defaultBorderRadius) var(--defaultBorderRadius) !important;
-    }
+	.profileControl > div,
+	.profileControl > label {
+		display: none;
+	}
 
-    .profileControl>div,
-    .profileControl>label {
-        display: none;
-    }
+	.bundleControls {
+		gap: 0.25rem;
+		flex-direction: column;
+	}
 
-    .bundleControls {
-        gap: 0.25rem;
-        flex-direction: column;
-    }
+	.bundleControlButton:first-child:not(:only-child) {
+		border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0 !important;
+	}
 
-    .bundleControlButton:first-child:not(:only-child) {
-        border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0 !important;
-    }
+	.bundleControlButton:last-child:not(:only-child) {
+		border-radius: 0 0 var(--defaultBorderRadius) var(--defaultBorderRadius) !important;
+	}
 
-    .bundleControlButton:last-child:not(:only-child) {
-        border-radius: 0 0 var(--defaultBorderRadius) var(--defaultBorderRadius) !important;
-    }
-    
-    .userContentGrid {
-        grid-template-columns: 1fr;
-    }
+	.userContentGrid {
+		grid-template-columns: 1fr;
+	}
 }
 
 @media screen and (min-width: 868px) {
-
-    .statBoxes {
-        flex-flow: row;
-        flex-direction: row;
-        width: 100%;
-        justify-content: space-between;
-    }
+	.statBoxes {
+		flex-flow: row;
+		flex-direction: row;
+		width: 100%;
+		justify-content: space-between;
+	}
 }
 
 .statBoxes {
-    padding-top: 16px;
-    width: 100%;
-    gap: 1rem;
-    height: min-content;
+	padding-top: 16px;
+	width: 100%;
+	gap: 1rem;
+	height: min-content;
 }
 
 .userIconAndName {
-    display: grid;
-    grid-template-areas:
-        "image username"
-        "image join";
-    column-gap: 1rem;
+	display: grid;
+	grid-template-areas:
+		"image username"
+		"image join";
+	column-gap: 1rem;
 }
 
 .userName,
 .userJoinTime {
-    height: 100%;
-    display: flex;
+	height: 100%;
+	display: flex;
 }
 
 .userName {
-    align-items: end;
-    grid-area: "username";
-    font-size: 1.5rem;
-    font-weight: 600;
+	align-items: end;
+	grid-area: "username";
+	font-size: 1.5rem;
+	font-weight: 600;
 }
 
 .userJoinTime {
-    grid-area: "join";
+	grid-area: "join";
 }
 
 .userFallbackPFP {
-    width: 64px;
-    height: 64px;
-    font-size: 3rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--section);
-    border-radius: var(--defaultBorderRadius);
-    grid-area: image;
+	width: 64px;
+	height: 64px;
+	font-size: 3rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: var(--section);
+	border-radius: var(--defaultBorderRadius);
+	grid-area: image;
 }

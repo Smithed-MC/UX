@@ -1,56 +1,57 @@
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap");
 :root {
-    font-family: Lexend;
-    position: absolute;
-    font-weight: 300;
-    min-height: 100%;
-    min-width: 100%;
-    background: var(--background);
+	font-family: Lexend;
+	position: absolute;
+	font-weight: 300;
+	min-height: 100%;
+	min-width: 100%;
+	background: var(--background);
 
-    --bold: #000000;
-    --background: #121213;
-    --section: #1D1F21;
-    --highlight: #2E2E31;
-    --border: #4B4B4B;
-    --foreground: #FFF8F0;
-    --accent: #1b48c4;
-    --accent2: #23A3FF;
-    
-    --warning: #E8AA03;
-    --disturbing: #C41B48;
-    --success: #1BC443;
-    --secondary: #C41B9C;
+	--bold: #000000;
+	--background: #121213;
+	--section: #1d1f21;
+	--highlight: #2e2e31;
+	--border: #4b4b4b;
+	--foreground: #fff8f0;
+	--accent: #1b48c4;
+	--accent2: #23a3ff;
 
-    --bundle: #971BC4;
+	--warning: #e8aa03;
+	--disturbing: #c41b48;
+	--success: #1bc443;
+	--secondary: #c41b9c;
 
-    --backgroundDark: #1b1924;
+	--bundle: #971bc4;
 
-    --badAccent: rgb(255, 72, 72);
-    --goodAccent: rgb(144, 255, 71);
-    --foreground: #fff;
-    --text: #fff;
-    --codeText: rgb(255, 247, 136);
-    --subText: #aaa;
-    --smallScreenSize: 640px;
+	--backgroundDark: #1b1924;
 
-    --defaultBorderRadius: 1rem;
+	--badAccent: rgb(255, 72, 72);
+	--goodAccent: rgb(144, 255, 71);
+	--foreground: #fff;
+	--text: #fff;
+	--codeText: rgb(255, 247, 136);
+	--subText: #aaa;
+	--smallScreenSize: 640px;
 
-    --mobileCutoff: 43rem;
+	--defaultBorderRadius: 1rem;
 
-    overflow: hidden;
+	--mobileCutoff: 43rem;
+
+	overflow: hidden;
 }
 
 @font-face {
-    font-family: 'Inconsolata';
-    src: local('Inconsolata'),
-        url('./fonts/Inconsolata.otf') format('opentype')
+	font-family: "Inconsolata";
+	src:
+		local("Inconsolata"),
+		url("./fonts/Inconsolata.otf") format("opentype");
 }
 
-
 @font-face {
-    font-family: 'DoppioOne';
-    src: local('DoppioOne'),
-        url('./fonts/DoppioOne-Regular.ttf') format('truetype')
+	font-family: "DoppioOne";
+	src:
+		local("DoppioOne"),
+		url("./fonts/DoppioOne-Regular.ttf") format("truetype");
 }
 
 /* @font-face {
@@ -59,377 +60,380 @@
         url('./fonts/Lexend-VariableFont_wght.ttf') format('truetype variations');
 } */
 
-
 div {
-    font-family: Lexend;
-    color: var(--foreground)
+	font-family: Lexend;
+	color: var(--foreground);
 }
 
 h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
+	font-size: 1.5rem;
+	font-weight: 600;
 }
 
 h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
+	font-size: 1.25rem;
+	font-weight: 600;
 }
 h3 {
-    font-size: 1.125rem;
-    font-weight: 600;
+	font-size: 1.125rem;
+	font-weight: 600;
 }
-
 
 code {
-    background-color: var(--highlight);
-    font-family: Inconsolata;
-    color:rgba(255, 255, 255, 0.7);
-    padding: 0.125rem;
-    box-sizing: border-box;
-    line-height: 1.5rem;
-    border-radius: 0.125rem;
+	background-color: var(--highlight);
+	font-family: Inconsolata;
+	color: rgba(255, 255, 255, 0.7);
+	padding: 0.125rem;
+	box-sizing: border-box;
+	line-height: 1.5rem;
+	border-radius: 0.125rem;
 }
-
 
 pre {
-    color: var(--codeText);
-    background-color: var(--highlight);
-    padding: 16px;
-    border-radius: var(--defaultBorderRadius);
+	color: var(--codeText);
+	background-color: var(--highlight);
+	padding: 16px;
+	border-radius: var(--defaultBorderRadius);
 }
 
-pre>code {
-    background-color: transparent !important;
-    white-space: break-spaces;
-    line-height: normal;
+pre > code {
+	background-color: transparent !important;
+	white-space: break-spaces;
+	line-height: normal;
 }
 
 details {
-    background-color: var(--section);
-    padding: 16px;
-    border-radius: var(--defaultBorderRadius);
-    margin-bottom: 4px;
+	background-color: var(--section);
+	padding: 16px;
+	border-radius: var(--defaultBorderRadius);
+	margin-bottom: 4px;
 }
 
 summary:hover {
-    filter: brightness(80%);
+	filter: brightness(80%);
 }
 
 summary:active {
-    filter: brightness(60%);
+	filter: brightness(60%);
 }
 
 ::-webkit-scrollbar {
-    width: 8px;
-    /* width of the entire scrollbar */
-
+	width: 8px;
+	/* width of the entire scrollbar */
 }
 
-
 ::-webkit-scrollbar-thumb {
-    width: 4px;
-    background-color: var(--subText);
-    /* color of the scroll thumb */
-    border-radius: var(--defaultBorderRadius);
-    /* roundness of the scroll thumb */
-    /* creates padding around scroll thumb */
-    border: 0.125rem solid var(--section);
+	width: 4px;
+	background-color: var(--subText);
+	/* color of the scroll thumb */
+	border-radius: var(--defaultBorderRadius);
+	/* roundness of the scroll thumb */
+	/* creates padding around scroll thumb */
+	border: 0.125rem solid var(--section);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--accent2);
+	background-color: var(--accent2);
 }
 
-
-.input, select {
-    border: none;
-    border-radius: var(--defaultBorderRadius);
-    font-family: Lexend;
-    font-size: 1rem;
-    border: 0.125rem solid transparent;
-    box-sizing: border-box;
+.input,
+select {
+	border: none;
+	border-radius: var(--defaultBorderRadius);
+	font-family: Lexend;
+	font-size: 1rem;
+	border: 0.125rem solid transparent;
+	box-sizing: border-box;
 }
 
 select {
-    padding: 0px 8px;
+	padding: 0px 8px;
 }
 
 .input {
-    padding: 8px 16px;
+	padding: 8px 16px;
 }
 
-.input:focus, select:focus {
-    outline: none;
-    border: 0.125rem solid var(--accent);
+.input:focus,
+select:focus {
+	outline: none;
+	border: 0.125rem solid var(--accent);
 }
 
 .input:hover {
-    border: 0.125rem solid var(--border);
+	border: 0.125rem solid var(--border);
 }
 
 select select {
-    background-color: red;
+	background-color: red;
 }
 
 .input:disabled {
-    color: var(--subText) !important;
-    font-style: italic;
+	color: var(--subText) !important;
+	font-style: italic;
 }
 
-.input, select {
-    background-color: var(--bold);
-    border: 0.125rem solid var(--border);
-    color: var(--foreground);
-    width: 19.25rem;
-    height: 2.25rem;
+.input,
+select {
+	background-color: var(--bold);
+	border: 0.125rem solid var(--border);
+	color: var(--foreground);
+	width: 19.25rem;
+	height: 2.25rem;
 }
-.input>svg>path {
-    fill: var(--border)
-}
-
-.input:focus, select:focus {
-    border: 0.125rem solid var(--foreground);
+.input > svg > path {
+	fill: var(--border);
 }
 
-.input:focus>svg>path {
-    fill: var(--foreground);
+.input:focus,
+select:focus {
+	border: 0.125rem solid var(--foreground);
+}
+
+.input:focus > svg > path {
+	fill: var(--foreground);
 }
 
 input::placeholder {
-    color: var(--border);
-    font-weight: 500;
+	color: var(--border);
+	font-weight: 500;
 }
 
 .invalidInput {
-    border: 0.125rem solid var(--disturbing) !important;
-    color: var(--disturbing) !important;
-    animation: invalidShake 0.33s ease-in-out;
+	border: 0.125rem solid var(--disturbing) !important;
+	color: var(--disturbing) !important;
+	animation: invalidShake 0.33s ease-in-out;
 }
 
-
-.invalidInput>svg>path {
-    fill: var(--disturbing);
+.invalidInput > svg > path {
+	fill: var(--disturbing);
 }
-
 
 @keyframes invalidShake {
-    25% {
-        transform: translateX(0.25rem);
-    }
-    50% {
-        transform: translateX(0rem);
-    }
-    75% {
-        transform: translateX(-0.25rem);
-    }
-    100% {
-        transform: translateX(0rem);
-    }
+	25% {
+		transform: translateX(0.25rem);
+	}
+	50% {
+		transform: translateX(0rem);
+	}
+	75% {
+		transform: translateX(-0.25rem);
+	}
+	100% {
+		transform: translateX(0rem);
+	}
 }
 
 input[type="button"] {
-    background-color: var(--accent);
-    width: 128px;
-    color: var(--foreground);
+	background-color: var(--accent);
+	width: 128px;
+	color: var(--foreground);
 }
 
 input[type="button"]:hover,
 select:hover {
-    filter: brightness(85%);
+	filter: brightness(85%);
 }
 
 input[type="button"]:active,
 select:active {
-    filter: brightness(60%);
+	filter: brightness(60%);
 }
 
 input[type="button"]:active {
-    transform: scale(105%);
+	transform: scale(105%);
 }
-
 
 select {
-    background-image: url(./assets/green_down-arrow.png) !important;
-    background-position: 95% !important;
-    background-repeat: no-repeat !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    cursor: pointer !important;
-    overflow: visible;
+	background-image: url(./assets/green_down-arrow.png) !important;
+	background-position: 95% !important;
+	background-repeat: no-repeat !important;
+	-webkit-appearance: none !important;
+	-moz-appearance: none !important;
+	cursor: pointer !important;
+	overflow: visible;
 }
 
-button:not(.exclude), .buttonLike {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 0.5rem 1rem;
-    gap: 1rem;
+button:not(.exclude),
+.buttonLike {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	padding: 0.5rem 1rem;
+	gap: 1rem;
 
-    font-weight: 400;
-    
-    height: 36px;
-    
-    text-decoration: none;
-    /* Section */
+	font-weight: 400;
 
-    white-space: nowrap;
-    
-    box-sizing: border-box;
-    background: var(--section);
-    border-radius: var(--defaultBorderRadius);
-    border: 0.125rem solid transparent;
+	height: 36px;
 
-    
-    font-family: 'Lexend';
-    font-size: 1rem;
-    
-    color: var(--foreground);
+	text-decoration: none;
+	/* Section */
 
-    transition: background-color, border 0.1s;
-    cursor: pointer;
+	white-space: nowrap;
 
-    width: min-content;
+	box-sizing: border-box;
+	background: var(--section);
+	border-radius: var(--defaultBorderRadius);
+	border: 0.125rem solid transparent;
+
+	font-family: "Lexend";
+	font-size: 1rem;
+
+	color: var(--foreground);
+
+	transition:
+		background-color,
+		border 0.1s;
+	cursor: pointer;
+
+	width: min-content;
 }
-.buttonLike>label {
-    cursor: pointer;
+.buttonLike > label {
+	cursor: pointer;
 }
 
-button:hover:not(:disabled):not(.exclude), .buttonLike:hover:not(:disabled) {
-    /* Highlight */
+button:hover:not(:disabled):not(.exclude),
+.buttonLike:hover:not(:disabled) {
+	/* Highlight */
 
-    background: var(--section);
-    /* Border */
+	background: var(--section);
+	/* Border */
 
-    border: 0.125rem solid var(--border);
+	border: 0.125rem solid var(--border);
 }
 
 .invalidButtonLike:hover {
-    border-color: var(--disturbing) !important;
-    background: color-mix(
-        in srgb,
-        var(--disturbing) 25%,
-        transparent
-    ) !important;
+	border-color: var(--disturbing) !important;
+	background: color-mix(
+		in srgb,
+		var(--disturbing) 25%,
+		transparent
+	) !important;
 }
 
 .highlightButtonLike:hover {
-    background-color: var(--highlight) !important;
+	background-color: var(--highlight) !important;
 }
 
-
-button:focus:not(:disabled):not(.exclude), .buttonLike:focus:not(:disabled) {
-    outline: none;
-    border: 0.125rem solid var(--foreground);
+button:focus:not(:disabled):not(.exclude),
+.buttonLike:focus:not(:disabled) {
+	outline: none;
+	border: 0.125rem solid var(--foreground);
 }
 
-
-button:active:not(:disabled):not(.exclude), .buttonLike:active:not(:disabled) {
-    filter: brightness(90%);
+button:active:not(:disabled):not(.exclude),
+.buttonLike:active:not(:disabled) {
+	filter: brightness(90%);
 }
 
-button:disabled:not(.exclude), .buttonLike:disabled {
-    opacity: 0.5 !important;
-    cursor: default;
+button:disabled:not(.exclude),
+.buttonLike:disabled {
+	opacity: 0.5 !important;
+	cursor: default;
 }
 
 .accentedButtonLike {
-    background-color: var(--accent);
+	background-color: var(--accent);
 }
 .secondaryAccentButtonLike {
-    background-color: var(--accent2);
+	background-color: var(--accent2);
 }
 .disturbingButtonLike {
-    background-color: var(--disturbing);
+	background-color: var(--disturbing);
 }
 
 .invalidButtonLike {
-    background: color-mix(
-        in srgb,
-        var(--disturbing) 25%,
-        transparent
-    )
+	background: color-mix(in srgb, var(--disturbing) 25%, transparent);
 }
 
 .highlightButtonLike {
-    background-color: var(--highlight);
+	background-color: var(--highlight);
 }
 
 .successButtonLike {
-    background-color: var(--success);
+	background-color: var(--success);
 }
 
 .secondaryButtonLike {
-    background-color: var(--secondary);
+	background-color: var(--secondary);
 }
 
 .bundleButtonLike {
-    background-color: var(--bundle);
+	background-color: var(--bundle);
 }
 
 .footerContainer {
-    display: grid;
-    grid-template: auto / 66% 16% 16%;
-    padding: 64px 0px;
-    box-sizing: border-box;
+	display: grid;
+	grid-template: auto / 66% 16% 16%;
+	padding: 64px 0px;
+	box-sizing: border-box;
 }
 
 .footerLargeGroup,
 .footerSmallGroup {
-    justify-content: start;
+	justify-content: start;
 }
 
 .footerSmallGroup {
-    width: 100%;
-    gap: 1rem;
+	width: 100%;
+	gap: 1rem;
 }
 
 .footerLargeGroup {
-    width: 100%;
-    align-items: start;
+	width: 100%;
+	align-items: start;
 }
 
 a {
-    color: var(--accent2)
+	color: var(--accent2);
 }
 
 a:hover[href] {
-    opacity: 0.85;
+	opacity: 0.85;
 }
 
-@media screen and (max-width: 70rem) { 
-    .outlet {
-        padding: 16px 16px !important;
-    }
+@media screen and (max-width: 70rem) {
+	.outlet {
+		padding: 16px 16px !important;
+	}
 }
 
 @media screen and (max-width: 50rem) {
-    .footerContainer {
-        padding: 64px 16px !important;
-        grid-template: auto auto auto / auto;
-        align-items: center;
-        gap: 64px;
-    }
+	.footerContainer {
+		padding: 64px 16px !important;
+		grid-template: auto auto auto / auto;
+		align-items: center;
+		gap: 64px;
+	}
 
-    .footerLargeGroup {
-        align-items: center;
-        text-align: center;
-        grid-row: 3;
-    }
+	.footerLargeGroup {
+		align-items: center;
+		text-align: center;
+		grid-row: 3;
+	}
 }
 
-.compactButton { 
-    color: var(--foreground);
-    cursor: pointer;
-    text-decoration: none;
+.compactButton {
+	color: var(--foreground);
+	cursor: pointer;
+	text-decoration: none;
 }
 
 .compactButton:hover:where(a[href], a[onClick], :not(a)) {
-    text-decoration: underline;
+	text-decoration: underline;
 }
 
-
-.compactButton:active:where(a[href], a[onClick], :not(a))  {
-    opacity: 0.9;
+.compactButton:active:where(a[href], a[onClick], :not(a)) {
+	opacity: 0.9;
 }
 
+blockquote {
+	border-left: 0.25rem solid var(--accent);
+	margin: 0;
+	padding: 0.5rem 1rem;
+	height: fit-content;
+}
+blockquote > p {
+	margin: 0;
+}

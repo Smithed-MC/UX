@@ -1,23 +1,25 @@
-import { ChooseBox, IconInput, IconTextButton, svg } from "components";
-import { MinecraftVersion } from 'data-types';
-import { availableMinecraftVersionsChooseBox } from "../types";
-import { invoke } from "@tauri-apps/api";
-import { useState } from "react";
+import { ChooseBox, IconInput, IconTextButton, svg } from "components"
+import { MinecraftVersion } from "data-types"
+import { availableMinecraftVersionsChooseBox } from "../types"
+import { invoke } from "@tauri-apps/api"
+import { useState } from "react"
 
 function CreateBundle({ onFinish }: CreateBundleProps) {
-	const [name, setName] = useState("");
-	const [version, setVersion] = useState<MinecraftVersion>("1.20.1");
+	const [name, setName] = useState("")
+	const [version, setVersion] = useState<MinecraftVersion>("1.20.1")
 	const [error, setError] = useState<
 		undefined | "bundle_exists" | "empty_name" | "name_too_long"
-	>(undefined);
+	>(undefined)
 
 	async function checkIfExists() {
 		try {
-			let exists: boolean = await invoke("bundle_exists", { bundleId: name });
-			return exists;
+			let exists: boolean = await invoke("bundle_exists", {
+				bundleId: name,
+			})
+			return exists
 		} catch (e) {
-			console.error("Failed to check if bundle exists: " + e);
-			return true;
+			console.error("Failed to check if bundle exists: " + e)
+			return true
 		}
 	}
 
@@ -37,15 +39,15 @@ function CreateBundle({ onFinish }: CreateBundleProps) {
 					error == "bundle_exists"
 						? "Bundle with this name already exists"
 						: error == "empty_name"
-						? "Name cannot be empty"
-						: error == "name_too_long"
-						? "Name must be less than 17 characters"
-						: ""
+							? "Name cannot be empty"
+							: error == "name_too_long"
+								? "Name must be less than 17 characters"
+								: ""
 				}
 				placeholder="Bundle name"
 				icon={svg.Edit}
 				onChange={(e) => {
-					setName(e.currentTarget.value);
+					setName(e.currentTarget.value)
 				}}
 				value={name}
 			/>
@@ -56,7 +58,7 @@ function CreateBundle({ onFinish }: CreateBundleProps) {
 				defaultValue={"1.20.1"}
 				onChange={(value) => {
 					if (!Array.isArray(value)) {
-						setVersion(value);
+						setVersion(value)
 					}
 				}}
 				style={{ width: "100%" }}
@@ -70,7 +72,7 @@ function CreateBundle({ onFinish }: CreateBundleProps) {
 					icon={svg.Cross}
 					style={{ width: "fit-content" }}
 					onClick={async () => {
-						onFinish(undefined, undefined);
+						onFinish(undefined, undefined)
 					}}
 				/>
 				<IconTextButton
@@ -79,26 +81,26 @@ function CreateBundle({ onFinish }: CreateBundleProps) {
 					style={{ width: "fit-content" }}
 					onClick={async () => {
 						if (name === "") {
-							setError("empty_name");
+							setError("empty_name")
 						} else if (await checkIfExists()) {
-							setError("bundle_exists");
+							setError("bundle_exists")
 						} else if (name.length > 16) {
-							setError("name_too_long");
+							setError("name_too_long")
 						} else {
-							onFinish(name, version);
+							onFinish(name, version)
 						}
 					}}
 				/>
 			</div>
 		</div>
-	);
+	)
 }
 
 interface CreateBundleProps {
 	onFinish: (
 		name: string | undefined,
 		version: MinecraftVersion | undefined
-	) => void;
+	) => void
 }
 
-export default CreateBundle;
+export default CreateBundle
