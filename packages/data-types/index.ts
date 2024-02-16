@@ -13,22 +13,22 @@ Format.Set("semver", (v) => coerce(v) != null)
 console.log(Format.Has("semver"))
 
 export const supportedMinecraftVersions = [
-	"1.20.5-23w51b",
-	"1.20.4",
-	"1.20.4-rc1",
-	"1.20.3",
-	"1.20.3-rc1",
-	"1.20.3-pre4",
-	"1.20.2",
-	"1.20.1",
-	"1.20",
-	"1.19.4",
-	"1.19",
-	"1.18.2",
-	"1.18.1",
-	"1.18",
-	"1.17.1",
-	"1.17",
+    '1.20.5-23w51b',
+    '1.20.4',
+    '1.20.4-rc1',
+    '1.20.3',
+    '1.20.3-rc1',
+    '1.20.3-pre4',
+    '1.20.2',
+    '1.20.1',
+    '1.20',
+    '1.19.4',
+    '1.19',
+    '1.18.2',
+    '1.18.1',
+    '1.18',
+    '1.17.1',
+    '1.17'
 ]
 
 export const fullMinecraftVersions = supportedMinecraftVersions.filter(
