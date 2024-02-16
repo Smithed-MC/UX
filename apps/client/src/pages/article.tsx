@@ -13,6 +13,7 @@ import {
 import { At, Check, Cross, Edit, Picture, Save, Upload } from "components/svg"
 
 import "./article.css"
+import { Helmet } from "react-helmet"
 
 export default function Article() {
 	const { new: isNew } = useQueryParams()
@@ -88,6 +89,11 @@ export default function Article() {
 				gap: "1rem",
 			}}
 		>
+			<Helmet>
+				<meta name="og:site_name" content="Smithed" />
+				<title>{article?.title ?? "Article"}</title>
+				<meta name="description" content="" />
+			</Helmet>
 			{userData?.role === "admin" && (
 				<CategoryBar
 					defaultValue={isNew ? "edit" : "preview"}
