@@ -138,6 +138,9 @@ export const UserDataSchema = Type.Object({
 	pfp: Type.Optional(Type.String()),
 	banner: Type.Optional(Type.String()),
 	biography: Type.Optional(Type.String({ maxLength: 2000 })),
+	role: Type.Readonly(
+		Type.Union([Type.Literal("member"), Type.Literal("admin")])
+	),
 })
 
 export enum SortOptions {
@@ -150,6 +153,25 @@ export const SortSchema = Type.Enum(SortOptions, {
 	default: SortOptions.Downloads,
 })
 
+export const ArticleSchema = Type.Object({
+	title: Type.String(),
+	category: Type.Union([
+		Type.Literal("general"),
+		Type.Literal("council"),
+		Type.Literal("showcase"),
+	]),
+	banner: Type.String(),
+	content: Type.String(),
+	publisher: Type.String(),
+	datePublished: Type.Number(),
+	state: Type.Union([
+		Type.Literal("not-created"),
+		Type.Literal("unpublished"),
+		Type.Literal("published"),
+	]),
+})
+
+export type Article = Static<typeof ArticleSchema>
 export type PackMetaData = Static<typeof MetaDataSchema>
 export type MinecraftVersion = Static<typeof MinecraftVersionSchema>
 export type PackDependency = Static<typeof PackReferenceSchema>

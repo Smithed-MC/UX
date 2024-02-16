@@ -23,7 +23,7 @@ export function useFirebaseUser() {
 	return user
 }
 
-export function useSmithedUser() {
+export function useSmithedUser(): UserData | undefined {
 	const user = import.meta.env.SSR
 		? (useRouteLoaderData("root") as any).user
 		: useAppSelector(selectUserData)

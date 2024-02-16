@@ -1,7 +1,8 @@
-import { LoaderFunctionArgs } from "react-router-dom"
+import { LoaderFunctionArgs, redirect } from "react-router-dom"
 import * as querystring from "query-string"
 import { getAuth } from "firebase/auth"
 import {
+	Article,
 	PackBundle,
 	PackData,
 	PackMetaData,
@@ -284,4 +285,71 @@ export async function loadRootData({ request }: { request: Request }) {
 	}
 
 	return { user: undefined }
+}
+
+export interface ArticleLoaderData {
+	article: Article
+	publisher?: UserData
+}
+
+export async function loadArticleData({
+	request,
+	params,
+}: {
+	request: Request
+	params: any
+}): Promise<ArticleLoaderData | null> {
+	const { new: isNew, ...parsedParams } = querystring.parse(
+		request.url.split("?")[1]
+	)
+
+	if (!isNew && params.article === undefined) {
+		return null
+	}
+
+	const articleSlug = params.article
+
+	const cookie = Cookie.parse(request.headers.get("cookie") ?? "")
+	const user: UserData | null = cookie["smithedUser"]
+		? JSON.parse(cookie["smithedUser"])
+		: null
+
+	if (isNew && user != null && user?.role === "admin") {
+		return {
+			article: {
+				title: "[None]",
+				category: "general",
+				content: "",
+				banner: "",
+				publisher: "",
+				datePublished: Date.now(),
+				state: "not-created",
+			},
+			publisher: undefined,
+		}
+	} else {
+		const articleDataResp = await fetch(
+			import.meta.env.VITE_API_SERVER + "/articles/" + articleSlug
+		)
+		if (!articleDataResp.ok) {
+			return null
+		}
+
+		const articleData: Article = await articleDataResp.json()
+
+		if (articleData.state === "unpublished" && user?.role !== "admin") {
+			return null
+		}
+
+		const publisherResp = await fetch(
+			import.meta.env.VITE_API_SERVER + "/users/" + articleData.publisher
+		)
+
+		return {
+			article: articleData,
+			publisher: publisherResp.ok
+				? await publisherResp.json()
+				: undefined,
+		}
+	}
 }

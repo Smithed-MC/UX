@@ -56,7 +56,10 @@ export function ChooseBox({
 		setOpen(!open)
 	}
 
-	const clickOption = (e: React.MouseEvent | React.KeyboardEvent, newValue: string) => {
+	const clickOption = (
+		e: React.MouseEvent | React.KeyboardEvent,
+		newValue: string
+	) => {
 		e.stopPropagation()
 
 		if (multiselect && value instanceof Array) {
@@ -125,9 +128,10 @@ export function ChooseBox({
 									...e.currentTarget.parentElement!.children,
 								] as HTMLElement[]
 
-								if (i + direction < 0)
-									i = children.length
-								children[(i + direction) % children.length].focus()
+								if (i + direction < 0) i = children.length
+								children[
+									(i + direction) % children.length
+								].focus()
 							}
 
 							if (e.key === " " || e.key === "Enter") {
@@ -135,8 +139,7 @@ export function ChooseBox({
 								clickOption(e, c.value)
 							}
 
-							if (e.key === "Tab")
-								e.preventDefault()
+							if (e.key === "Tab") e.preventDefault()
 
 							if (e.key === "Escape") {
 								e.preventDefault()
@@ -191,7 +194,11 @@ export function ChooseBox({
 				ref={triggerRef}
 				tabIndex={0}
 				onKeyDown={(e) => {
-					if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " ") {
+					if (
+						e.key === "ArrowDown" ||
+						e.key === "ArrowUp" ||
+						e.key === " "
+					) {
 						e.preventDefault()
 						if (!open) {
 							clickTrigger(e)

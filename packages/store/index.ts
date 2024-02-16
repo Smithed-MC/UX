@@ -54,6 +54,7 @@ const userSlice = createSlice({
 					JSON.stringify({
 						uid: action.payload.uid,
 						displayName: action.payload.displayName,
+						role: action.payload.role ?? "member",
 					})
 				)
 			} else Cookies.remove("smithedUser")

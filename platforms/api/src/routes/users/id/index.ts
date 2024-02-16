@@ -1,4 +1,4 @@
-import { Type } from "@sinclair/typebox"
+import { Static, Type } from "@sinclair/typebox"
 import { API_APP, get, sendError, set } from "../../../app.js"
 import { getFirestore } from "firebase-admin/firestore"
 import { sanitize } from "../../sanitize.js"
@@ -138,16 +138,15 @@ API_APP.route({
 	},
 })
 
+const PartialUserSchema = Type.Partial(UserDataSchema)
+type PartialUserData = Static<typeof PartialUserSchema>
+
 async function setUserData(request: any, reply: any) {
 	const { id: userId } = request.params
 	const { token } = request.query
 	const { data: rawUserData } = request.body
 
-	const userData: {
-		displayName?: string
-		pfp?: string
-		[key: string]: any
-	} = rawUserData
+	const userData = rawUserData as PartialUserData
 
 	const tokenUserId = await getUIDFromToken(token)
 	if (userId === undefined)
@@ -183,7 +182,11 @@ async function setUserData(request: any, reply: any) {
 			"Supplied PFP exceeds 1MB"
 		)
 
-	await doc.ref.set(userData, { merge: true })
+	let newData: any = {}
+	for (const k of Object.keys(userData))
+		if (k !== "role") newData[k] = (userData as any)[k]
+
+	await doc.ref.set(newData, { merge: true })
 	return reply.status(HTTPResponses.OK).send("Updated data")
 }
 

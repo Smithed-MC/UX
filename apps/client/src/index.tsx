@@ -28,6 +28,7 @@ import Settings from "./pages/settings.js"
 
 import { Provider } from "react-redux"
 import {
+	loadArticleData,
 	loadBrowseData,
 	loadHomePageData,
 	loadRootData,
@@ -52,6 +53,7 @@ import { Cross, Logo } from "components/svg.js"
 export type { ClientInject } from "./inject.js"
 
 import Cookies from "js-cookie"
+import Article from "./pages/article.js"
 
 interface ClientProps {
 	platform: "desktop" | "website"
@@ -127,6 +129,7 @@ export function ClientApplet(props: ClientProps) {
 		const cookieUser = {
 			uid: userData.uid,
 			displayName: userData.displayName,
+			role: userData.role,
 		}
 
 		dispatch(setUserData(userData))
@@ -373,6 +376,16 @@ export const subRoutes: any[] = [
 				buttonDownloadFn={getDefaultInject().bundleDownloadButton}
 			/>
 		),
+	},
+	{
+		path: "articles/:article",
+		element: <Article />,
+		loader: loadArticleData,
+	},
+	{
+		path: "articles",
+		element: <Article />,
+		loader: loadArticleData,
 	},
 ]
 
