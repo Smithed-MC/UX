@@ -16,24 +16,10 @@ export function getDefaultInject(): ClientInject {
 		getNavbarTabs: () => [
 			<IconTextButton
 				className="navBarOption start"
-				text="Home"
-				href="/"
-				key="home"
-				icon={svg.Home}
-			/>,
-			<IconTextButton
-				className="navBarOption middle"
-				text="Browse"
+				text="Packs"
 				href="/browse"
 				key="browse"
 				icon={svg.Browse}
-			/>,
-			<IconTextButton
-				className="navBarOption middle"
-				text="Discord"
-				href="https://smithed.dev/discord"
-				key="discord"
-				icon={svg.Discord}
 			/>,
 		],
 		enableFooter: true,

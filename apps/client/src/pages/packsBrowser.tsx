@@ -9,7 +9,7 @@ import {
 } from "data-types"
 import { AddToBundleModal } from "../widget/packInfo.js"
 import { Link, useLoaderData, useNavigate } from "react-router-dom"
-import "./browse.css"
+import "./packsBrowser.css"
 import {
 	useAppDispatch,
 	useAppSelector,
@@ -77,7 +77,7 @@ function RenderPages({
 	)
 }
 
-export default function Browse(props: any) {
+export default function PacksBrowser(props: any) {
 	const params = useQueryParams()
 	const { search, category, sort, version, page } = params
 

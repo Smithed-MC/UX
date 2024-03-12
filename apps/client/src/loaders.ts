@@ -244,7 +244,7 @@ export function createBrowseSearchParams(parsedParams: any) {
 	return params
 }
 
-export async function loadBrowseData({
+export async function loadPackBrowseData({
 	request,
 }: {
 	request: Request

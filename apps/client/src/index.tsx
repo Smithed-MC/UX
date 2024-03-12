@@ -3,6 +3,7 @@ import { StrictMode, useEffect, useState, useTransition } from "react"
 import {
 	createBrowserRouter,
 	Outlet,
+	redirect,
 	RouterProvider,
 	ScrollRestoration,
 	useLocation,
@@ -15,7 +16,7 @@ import {
 	setPersistence,
 } from "firebase/auth"
 
-import Browse from "./pages/browse.js"
+import PacksBrowser from "./pages/packsBrowser.js"
 import Home from "./pages/home.js"
 import Packs, { loadPackData } from "./pages/pack.js"
 import "./style.css"
@@ -29,7 +30,7 @@ import Settings from "./pages/settings.js"
 import { Provider } from "react-redux"
 import {
 	loadArticleData,
-	loadBrowseData,
+	loadPackBrowseData,
 	loadHomePageData,
 	loadRootData,
 	loadUserPageData,
@@ -338,8 +339,8 @@ export const subRoutes: any[] = [
 	},
 	{
 		path: "browse",
-		element: <Browse />,
-		loader: loadBrowseData,
+		element: <div></div>,
+		loader: async () => { return redirect("/packs") },
 	},
 	{
 		path: "account",
@@ -387,6 +388,11 @@ export const subRoutes: any[] = [
 		element: <Article />,
 		loader: loadArticleData,
 	},
+	{
+		path: "packs",
+		element: <PacksBrowser/>,
+		loader: loadPackBrowseData
+	}
 ]
 
 export const routes = [
