@@ -2,8 +2,16 @@ import { Type } from "@sinclair/typebox"
 import { API_APP, sendError } from "../../app.js"
 import { getFirestore } from "firebase-admin/firestore"
 import { sanitize } from "../sanitize.js"
-import { BundleSchema, HTTPResponses, PackBundle } from "data-types"
+import {
+	BundleSchema,
+	BundleSchema_v1,
+	BundleSchema_v2,
+	BundleUpdater,
+	HTTPResponses,
+	PackBundle,
+} from "data-types"
 import { getUIDFromToken } from "database"
+import { compare } from "semver"
 
 export async function getBundleDoc(id: string) {
 	const firestore = getFirestore()
@@ -96,10 +104,11 @@ API_APP.route({
 		if (bundleDoc === undefined)
 			return sendError(reply, HTTPResponses.NOT_FOUND, "Bundle not found")
 
-		const bundleData = bundleDoc.data() as PackBundle
+		const bundleData = BundleUpdater(bundleDoc.data() as PackBundle)
+		bundleData.versions.sort((a, b) => -compare(a.name, b.name))
 
 		const resp = await API_APP.inject(
-			`/download?${bundleData.packs.map((p) => `pack=${p.id}@${p.version}`).join("&")}&version=${bundleData.version}&mode=${mode}`
+			`/download?${bundleData.versions[0].packs.map((p) => `pack=${p.id}@${p.version}`).join("&")}&version=${bundleData.versions[0].supports[0]}&mode=${mode}`
 		)
 
 		if (resp.statusCode !== HTTPResponses.OK)
@@ -112,7 +121,7 @@ API_APP.route({
 		reply
 			.header(
 				"Content-Disposition",
-				`attachment; filename="${bundleData.name.replace(" ", "-")}.zip"`
+				`attachment; filename="${bundleData.display.name.replace(" ", "-")}.zip"`
 			)
 			.type("application/octet-stream")
 		return reply.status(HTTPResponses.OK).send(resp.rawPayload)
@@ -221,13 +230,16 @@ API_APP.route({
 			token: Type.String(),
 		}),
 		body: Type.Object({
-			data: Type.Omit(BundleSchema, ["owner"]),
+			data: Type.Union([
+				Type.Omit(BundleSchema_v1, ["owner"]),
+				Type.Omit(BundleSchema_v2, ["owner"]),
+			]),
 		}),
 	},
 	handler: async (request, reply) => {
 		const { id } = request.params
 		const { token } = request.query
-		const { data } = request.body
+		const data = request.body.data as PackBundle
 		const bundleDoc = await getBundleDoc(id)
 
 		if (bundleDoc === undefined)
@@ -248,7 +260,7 @@ API_APP.route({
 
 		if (data.uid) delete data.uid
 
-		await bundleDoc.ref.set(data, { merge: true })
+		await bundleDoc.ref.set(BundleUpdater(data), { merge: true })
 		reply.status(HTTPResponses.OK).send("Bundle updated successfully")
 	},
 })
@@ -285,7 +297,10 @@ API_APP.route({
 			token: Type.String(),
 		}),
 		body: Type.Object({
-			data: Type.Omit(BundleSchema, ["owner"]),
+			data: Type.Union([
+				Type.Omit(BundleSchema_v1, ["owner"]),
+				Type.Omit(BundleSchema_v2, ["owner"]),
+			]),
 		}),
 	},
 	handler: async (request, reply) => {
@@ -302,7 +317,7 @@ API_APP.route({
 
 		const createdDoc = await getFirestore()
 			.collection("bundles")
-			.add(bundleData)
+			.add(BundleUpdater(bundleData))
 		reply.status(HTTPResponses.CREATED).send({ uid: createdDoc.id })
 	},
 })
