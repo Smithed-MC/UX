@@ -21,9 +21,11 @@ import {
 	Warning,
 } from "components/svg"
 import {
+	BundleUpdater,
 	fullMinecraftVersions,
 	MinecraftVersion,
 	PackBundle,
+	PackBundle_v2,
 	PackData,
 	PackEntry,
 	PackMetaData,
@@ -36,6 +38,7 @@ import React, {
 	MouseEventHandler,
 	useRef,
 	useState,
+	version,
 } from "react"
 import { useLoaderData, useNavigate } from "react-router-dom"
 import "./packInfo.css"
@@ -187,7 +190,7 @@ function showPackVersions(
 	const longestVersion =
 		versions.length >= 1
 			? versions.reduce((p, n) => (p.name.length > n.name.length ? p : n))
-				.name
+					.name
 			: ""
 
 	return versions.map((v, idx) => {
@@ -221,8 +224,16 @@ export function AddToBundleModal({
 	packData?: PackData
 	id: string
 }) {
-	const selectedBundle = useAppSelector(selectSelectedBundle)
+	const selectedBundleUid = useAppSelector(selectSelectedBundle)
 	const bundles = useAppSelector(selectUsersBundles)
+
+	let selectedBundle: PackBundle_v2 | undefined = undefined
+	let foundBundle
+	if ((foundBundle = bundles.find((b) => b.uid === selectedBundleUid))) {
+		selectedBundle = BundleUpdater(foundBundle)
+
+		selectedBundle.versions.sort((a, b) => -compare(a.name, b.name))
+	}
 
 	const dispatch = useAppDispatch()
 
@@ -230,20 +241,18 @@ export function AddToBundleModal({
 
 	const [page, setPage] = useState<
 		"mcVersion" | "packVersion" | "bundle" | "createBundle"
-	>(selectedBundle === "" ? "mcVersion" : "packVersion")
+	>(selectedBundleUid === "" ? "mcVersion" : "packVersion")
 	const [direction, setDirection] = useState<"left" | "right">("right")
 
 	const [minecraftVersion, setMinecraftVersion] = useState<
 		MinecraftVersion | undefined
 	>(
-		selectedBundle !== ""
-			? bundles.find((b) => b.uid === selectedBundle)?.version
+		selectedBundleUid !== ""
+			? selectedBundle?.versions[0].supports[0]
 			: undefined
 	)
-	const [bundle, setBundle] = useState<PackBundle | undefined>(
-		selectedBundle !== ""
-			? bundles.find((b) => b.uid === selectedBundle)
-			: undefined
+	const [bundle, setBundle] = useState<PackBundle_v2 | undefined>(
+		selectedBundleUid !== "" ? selectedBundle : undefined
 	)
 
 	const changePage = (direction: "left" | "right") => {
@@ -257,10 +266,10 @@ export function AddToBundleModal({
 
 		setPage(
 			pages[idx + directionNumber] as
-			| "mcVersion"
-			| "packVersion"
-			| "bundle"
-			| "createBundle"
+				| "mcVersion"
+				| "packVersion"
+				| "bundle"
+				| "createBundle"
 		)
 		setDirection(direction)
 	}
@@ -334,15 +343,19 @@ export function AddToBundleModal({
 						style={{ gap: "1rem", width: "100%" }}
 					>
 						<label style={{ fontWeight: 600, textAlign: "center" }}>
-							Choose Datapack version for "{bundle?.name}"
+							Choose Datapack version for "{bundle?.display.name}"
 						</label>
 						{showPackVersions(
 							packData!,
-							bundle?.version ?? "",
+							bundle?.versions[0].supports[0] ?? "",
 							async (v) => {
 								if (bundle === undefined) return
 
-								const packs = [...bundle.packs]
+								const versions = [...bundle.versions]
+
+								const latestVersion = versions.splice(0)[0]
+								const packs = [...latestVersion.packs]
+
 								const containedPack = packs.findIndex(
 									(p) => p.id === id
 								)
@@ -354,15 +367,22 @@ export function AddToBundleModal({
 									version: v.name,
 								})
 
-								const newData = {
+								const newData: PackBundle_v2 = {
 									...bundle,
-									packs: packs,
+									versions: [
+										{
+											...latestVersion,
+											packs: packs,
+										},
+										...versions,
+									],
 								}
+								newData.versions[0].packs = packs
 								// console.log(newData)
 
 								const resp = await fetch(
 									import.meta.env.VITE_API_SERVER +
-									`/bundles/${bundle.uid}?token=${await user?.getIdToken()}`,
+										`/bundles/${bundle.uid}?token=${await user?.getIdToken()}`,
 									{
 										method: "PUT",
 										headers: {
@@ -460,17 +480,28 @@ export function AddToBundleModal({
 						</label>
 
 						{bundles
-							.filter((b) => b.version === minecraftVersion)
+							.map((b) => {
+								b = BundleUpdater(b)
+								b.versions.sort(
+									(a, b) => -compare(a.name, b.name)
+								)
+								return b
+							})
+							.filter(
+								(b) =>
+									b.versions[0].supports[0] ===
+									minecraftVersion
+							)
 							.map((b) => {
 								return (
 									<WidgetOption
-										isOutdated={false}
+										isLatest={true}
 										onClick={() => {
 											setBundle(b)
 											changePage("right")
 										}}
 									>
-										{b.name}
+										{b.display.name}
 									</WidgetOption>
 								)
 							})}
@@ -602,11 +633,10 @@ function DownloadPackModal({
 	const navigate = useNavigate()
 
 	function download(packVersion: PackVersion | undefined, mode: string) {
-		const url = import.meta.env.VITE_API_SERVER +
+		const url =
+			import.meta.env.VITE_API_SERVER +
 			`/download?pack=${packId}${packVersion ? "@" + packVersion.name : ""}&version=${gameVersion}&mode=${mode}`
-		window.open(
-			url
-		)
+		window.open(url)
 	}
 
 	function DownloadOption({

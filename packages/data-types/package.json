@@ -1,12 +1,13 @@
 {
 	"name": "data-types",
-	"version": "0.2.0",
+	"version": "0.3.1",
 	"description": "",
 	"main": "index.ts",
 	"types": "index.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"lint": "tsc"
+		"lint": "tsc",
+		"pubBuild": "tsc --noEmit false --declaration true"
 	},
 	"dependencies": {
 		"@sinclair/typebox": "^0.25.20",

@@ -1,9 +1,16 @@
-import { PackBundle, PackData, PackDependency } from "data-types"
+import {
+	BundleUpdater,
+	PackBundle,
+	PackBundle_v2,
+	PackData,
+	PackDependency,
+} from "data-types"
 import { useEffect, useRef, useState } from "react"
 import { DownloadButton, IconTextButton } from "components"
 import { useAppDispatch, useFirebaseUser } from "hooks"
 import { Check, Cross, Folder, Gear, NewFolder, Trash } from "components/svg"
 import { setSelectedBundle } from "store"
+import { compare } from "semver"
 
 export function BundleCard({
 	id,
@@ -16,7 +23,9 @@ export function BundleCard({
 	showOwner?: boolean
 	bundleDownloadButton: DownloadButton
 }) {
-	const [rawBundleData, setRawBundleData] = useState<PackBundle | undefined>()
+	const [rawBundleData, setRawBundleData] = useState<
+		PackBundle_v2 | undefined
+	>()
 	const [containedPacks, setContainedPacks] =
 		useState<[string, string, string][]>()
 	const [ownerName, setOwnerName] = useState("")
@@ -57,9 +66,11 @@ export function BundleCard({
 
 		if (!resp.ok) return
 
-		const data: PackBundle = await resp.json()
+		const data: PackBundle_v2 = BundleUpdater(await resp.json())
 
-		const promises = data.packs.map((p) => getPackName(p))
+		data.versions.sort((a, b) => -compare(a.name, b.name))
+
+		const promises = data.versions[0].packs.map((p) => getPackName(p))
 		const results = await Promise.all(promises)
 
 		await getOwnerName(data.owner)
@@ -116,7 +127,7 @@ export function BundleCard({
 						}}
 					>
 						<Folder style={{ width: "1.5rem", height: "1.5rem" }} />
-						{rawBundleData.name}
+						{rawBundleData.display.name}
 					</span>
 
 					<div
@@ -131,7 +142,7 @@ export function BundleCard({
 						}}
 					>
 						<Gear />
-						{rawBundleData.version}
+						{rawBundleData.versions[0].supports[0]}
 					</div>
 				</div>
 				<div
@@ -254,7 +265,7 @@ export function BundleCard({
 					>
 						<h3 style={{ margin: 4 }}>
 							Are you sure you want to remove "
-							{rawBundleData.name}"?
+							{rawBundleData.display.name}"?
 						</h3>
 						<div
 							className="container"

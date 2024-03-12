@@ -4,8 +4,11 @@ import {
 	HTTPResponses,
 	MinecraftVersion,
 	PackBundle,
+	PackBundle_v2,
+	latestMinecraftVersion,
 	supportedMinecraftVersions,
 } from "data-types"
+import { sanitize } from "formatters"
 import { useAppDispatch, useAppSelector, useFirebaseUser } from "hooks"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -13,7 +16,7 @@ import { selectUsersBundles, setSelectedBundle, setUsersBundles } from "store"
 
 interface CreateBundleProps {
 	close?: () => void
-	finish?: (bundle: PackBundle) => void
+	finish?: (bundle: PackBundle_v2) => void
 	showCloseButton?: boolean
 	showEditButton?: boolean
 	minecraftVersion?: MinecraftVersion
@@ -40,12 +43,26 @@ export function CreateBundle({
 		if (version === undefined && minecraftVersion === undefined)
 			return undefined
 
-		const bundleData: PackBundle = {
+		const bundleData: PackBundle_v2 = {
+			schemaVersion: "v2",
 			owner: user?.uid ?? "",
-			version: minecraftVersion ?? version ?? "",
-			name: name,
-			packs: [],
-			public: false,
+			id: sanitize(name),
+			display: {
+				name: name,
+				description: "stes",
+				icon: "",
+			},
+			versions: [
+				{
+					name: "0.0.1",
+					packs: [],
+					supports: [
+						minecraftVersion ?? version ?? latestMinecraftVersion,
+					],
+					patches: [],
+				},
+			],
+			visibility: "private",
 		}
 
 		const resp = await fetch(
@@ -67,7 +84,7 @@ export function CreateBundle({
 		const { uid } = await resp.json()
 		bundleData.uid = uid
 
-		dispatch(setUsersBundles([bundleData].concat(bundles)))
+		dispatch(setUsersBundles([bundleData, ...bundles]))
 		if (finishCallback) finishCallback(bundleData)
 		return uid
 	}
