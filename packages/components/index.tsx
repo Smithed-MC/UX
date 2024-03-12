@@ -1,4 +1,5 @@
-import { NavButton, NavBar } from "./NavBar"
+import { NavBar } from "./NavBar"
+import { NavButton } from "./NavButton"
 import PackCard from "./PackCard"
 import Spinner from "./Spinner"
 import * as svg from "./svg"

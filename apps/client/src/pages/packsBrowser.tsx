@@ -155,7 +155,7 @@ export default function PacksBrowser(props: any) {
 			}}
 		>
 			<Helmet>
-				<title>Browse</title>
+				<title>Browse Packs</title>
 				<meta name="description" content="Search for datapacks" />
 			</Helmet>
 			<div

@@ -1,4 +1,4 @@
-import { DownloadButton, IconTextButton } from "components"
+import { DownloadButton, IconTextButton, NavButton } from "components"
 import { svg } from "components"
 import { Download, Right } from "components/svg"
 
@@ -14,12 +14,13 @@ export interface ClientInject {
 export function getDefaultInject(): ClientInject {
 	return {
 		getNavbarTabs: () => [
-			<IconTextButton
+			<NavButton
 				className="navBarOption start"
 				text="Packs"
-				href="/browse"
+				href="/packs"
 				key="browse"
 				icon={svg.Browse}
+				selectedClass="accentedButtonLike"
 			/>,
 		],
 		enableFooter: true,

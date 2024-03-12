@@ -6,12 +6,12 @@ import {
 } from "react"
 import { Link } from "react-router-dom"
 
-interface IconTextButtonProps {
+export type IconTextButtonProps  = {
 	text: string | JSX.Element
 	icon?: FunctionComponent<SVGProps<SVGSVGElement>> | string
 	iconElement?: JSX.Element
 	reverse?: boolean
-}
+} & React.HTMLProps<HTMLAnchorElement>
 
 export function IconTextButton({
 	text,
@@ -27,7 +27,7 @@ export function IconTextButton({
 	onMouseLeave,
 	rel,
 	disabled,
-}: IconTextButtonProps & React.HTMLProps<HTMLAnchorElement>) {
+}: IconTextButtonProps) {
 	return (
 		<a
 			className={`buttonLike${disabled ? " disabled" : ""} ` + className}
