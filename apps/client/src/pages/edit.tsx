@@ -46,7 +46,7 @@ import React, {
 	useRef,
 	useState,
 } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { coerce, compare, satisfies, inc, valid } from "semver"
 import { gzip } from "pako"
 import "./edit.css"
@@ -402,7 +402,10 @@ let initialContributors: string[] = []
 
 export default function Edit() {
 	const user = useFirebaseUser()
-	const { pack: packIdParam, new: isNew, tab: currentTab } = useQueryParams()
+	const { id: packIdParam } = useParams()
+	const isNew = packIdParam === 'new'
+
+	const { tab: currentTab } = useQueryParams()
 
 	const navigate = useNavigate()
 

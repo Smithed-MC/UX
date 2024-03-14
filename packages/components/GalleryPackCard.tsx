@@ -284,7 +284,7 @@ export default function GalleryPackCard({
 							{state === "editable" && (
 								<a
 									className="buttonLike accentedButtonLike"
-									href={"/edit?pack=" + id}
+									href={"/packs/" + id + "/edit"}
 								>
 									<Edit />
 								</a>

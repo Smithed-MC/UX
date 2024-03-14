@@ -347,7 +347,7 @@ export const subRoutes: any[] = [
 		element: <Account />,
 	},
 	{
-		path: "edit",
+		path: "packs/:id/edit",
 		element: <Edit />,
 	},
 	{
