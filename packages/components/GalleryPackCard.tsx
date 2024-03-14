@@ -110,15 +110,13 @@ export default function GalleryPackCard({
 	ref,
 	...props
 }: PackCardProps) {
+
 	const [data, setData] = useState<PackData | undefined>(packData)
 	const [metaData, setMetaData] = useState<PackMetaData | undefined>(packMeta)
-	const [gallery, setGallery] = useState<PackGalleryImage[] | undefined>(
-		undefined
-	)
-	const [fallback, setFallback] = useState<boolean>(false)
+	
 	const [author, setAuthor] = useState(packAuthor)
 
-	const [badges, setBadges] = useState<JSX.Element[]>([])
+	const [badges, setBadges] = useState<JSX.Element[]>(getBadges())
 
 	const [displayGallery, setDisplayGallery] = useState(false)
 	const [currentImage, setCurrentImage] = useState(0)
@@ -127,7 +125,7 @@ export default function GalleryPackCard({
 
 	const card = useRef<HTMLDivElement>(null)
 
-	async function onLoad() {
+	function getBadges() {
 		let badges: JSX.Element[] = []
 		if (author === "Smithed") {
 			badges.push(
@@ -145,31 +143,11 @@ export default function GalleryPackCard({
 				<Badge title="No Resourcepack" key="no-rp" svg={FlagCrossed} />
 			)
 
-		setBadges(badges)
-		setData(packData)
-		setMetaData(packMeta)
-		setAuthor(packAuthor)
-
-		if (!packData.display.icon) {
-			setFallback(true)
-		}
+		return badges
 	}
 
-	async function populateGallery() {
-		const resp = await fetch(
-			import.meta.env.VITE_API_SERVER + "/packs/" + id + "/gallery"
-		)
+	const gallery = packData.display.gallery 
 
-		if (!resp.ok) return
-
-		setGallery(await resp.json())
-	}
-	useEffect(() => {
-		populateGallery()
-	}, [data])
-	useMemo(() => {
-		onLoad()
-	}, [id])
 
 	return (
 		<div
@@ -200,28 +178,17 @@ export default function GalleryPackCard({
 				>
 					<div
 						className="galleryImage"
-						style={{ position: "relative" }}
+						style={{ position: "relative", backgroundColor: 'var(--accent)' }}
 					>
-						{fallback && (
-							<div
-								style={{
-									backgroundColor: "var(--accent)",
-									width: "100%",
-									height: "100%",
-									flexGrow: 1,
-								}}
-							/>
-						)}
-						{(!gallery || gallery.length == 0) && !fallback && (
-							<img
+						{(!gallery || gallery.length == 0) && (
+							<object
 								style={{
 									width: "100%",
 									filter: "saturate(50%) brightness(50%)",
+									backgroundColor: "var(--accent)",
 								}}
-								src={data?.display.icon}
-								onError={(e) => {
-									setFallback(true)
-								}}
+								data={data?.display.icon}
+								type="image/png"
 							/>
 						)}
 						{gallery && gallery.length > 0 && (

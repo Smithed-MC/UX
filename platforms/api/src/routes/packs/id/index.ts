@@ -636,14 +636,15 @@ API_APP.route({
 	handler: async (request, reply) => {
 		const { id, index } = request.params
 
-		// const requestIdentifier = 'GET-PACK-GALLERY-' + index + '::' + id
-		// const tryCachedResult = await get(requestIdentifier)
-		// if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
-		//     request.log.info('served cached /packs/', id, '/gallery/', index)
-		//     reply.header('Content-Type', 'image/png');
-		//     return tryCachedResult.item
-		// }
+		const requestIdentifier = 'GET-PACK-GALLERY-' + id + '::' + index
+		const tryCachedResult = await get(requestIdentifier)
+		if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
+		    request.log.info('served cached /packs/', id, '/gallery/', index)
+		    reply.header('Content-Type', 'image/png');
+		    return tryCachedResult.item
+		}
 
+		console.time("Find pack doc")
 		const doc = await getPackDoc(id)
 		if (doc === undefined)
 			return sendError(
@@ -651,7 +652,7 @@ API_APP.route({
 				HTTPResponses.NOT_FOUND,
 				`Pack with ID ${id} was not found`
 			)
-
+		console.timeEnd("Find pack doc")
 		const gallery = await doc.get("data.display.gallery")
 
 		if (!gallery)
@@ -672,13 +673,14 @@ API_APP.route({
 		reply.header("Content-Type", "image/png")
 
 		let content: Buffer
+
+		console.time("Get image")
 		if (typeof img === "object") {
-			let buffer = (
-				await getStorage()
+			const buffer = (await getStorage()
 					.bucket()
 					.file(`gallery_images/${img.uid}`)
-					.download()
-			)[0]
+					.download())[0]
+			
 
 			content = Buffer.from(
 				buffer.toString("utf8").split(",")[1],
@@ -687,8 +689,9 @@ API_APP.route({
 		} else {
 			content = Buffer.from(img.split(",")[1], "base64")
 		}
+		console.timeEnd("Get image")
 
-		// await set(requestIdentifier, data, 5 * 60 * 1000)
+		await set(requestIdentifier, content, 5 * 60 * 1000)
 		return content
 	},
 })

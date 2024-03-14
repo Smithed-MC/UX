@@ -6,6 +6,8 @@ import { createServer as createViteServer } from "vite"
 import fetch from "node-fetch"
 import dotenv from "dotenv"
 import { generateSitemap } from "./generate-sitemap.js"
+import compression from 'compression'
+
 dotenv.config()
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -29,6 +31,7 @@ async function createServer() {
 		: undefined
 
 	const app = express()
+	app.use(compression())
 
 	let vite
 	if (!isProd) {
@@ -83,7 +86,10 @@ async function createServer() {
 			// // 4. render the app HTML. This assumes entry-server.js's exported
 			// //     `render` function calls appropriate framework SSR APIs,
 			// //    e.g. ReactDOMServer.renderToString()
-			const { html: appHtml, helmet } = await render(req, res, {})
+			const result = await render(req, res, {})
+			if (result == undefined)
+				return next()
+			const { html: appHtml, helmet } = result
 			// console.timeEnd('Render content')
 			// console.time('Replace w/ helmet and ssr')
 			// // 5. Inject the app-rendered HTML into the template.

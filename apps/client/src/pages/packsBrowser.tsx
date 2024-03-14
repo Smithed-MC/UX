@@ -46,7 +46,7 @@ function RenderPages({
 			<Link
 				key={"pageButton" + p}
 				className={`browsePageButton ${currentPage === p ? "selected" : ""}`}
-				to={`/browse?page=${p}&` + params}
+				to={`/packs?page=${p}&` + params}
 				onClick={() => {
 					if (currentPage === p) return
 
@@ -55,6 +55,7 @@ function RenderPages({
 					)! as HTMLDivElement
 					cards.style.setProperty("opacity", "0.2")
 				}}
+				unstable_viewTransition
 			>
 				{p}
 			</Link>
@@ -124,7 +125,7 @@ export default function PacksBrowser(props: any) {
 			sort: packSort,
 		})
 		if (page) params.set("page", page as string)
-		navigate("/browse?" + params)
+		navigate("/packs?" + params)
 	}
 
 	function onClick(p: string) {
