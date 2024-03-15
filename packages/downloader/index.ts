@@ -3,7 +3,7 @@ import { PythonShell } from "python-shell"
 import fetch from "node-fetch"
 import semver from "semver"
 
-import { MinecraftVersion, PackData, PackVersion } from "data-types"
+import { MinecraftVersion, PackData, PackDownloadOptions, PackReference, PackVersion } from "data-types"
 import { getFirestore } from "firebase-admin/firestore"
 import { getPackDoc } from "database"
 import { RUNNER } from "./runner.js"
@@ -46,14 +46,15 @@ export async function incrementPackDownloadCount(
 	}
 }
 
-export type CollectedPack = [string, PackVersion, boolean]
+export type CollectedPack = { id: string, version: PackVersion, isDependency: boolean }
 
 export async function collectPacks(
-	pack: string,
+	pack: string|PackReference,
 	gameVersion: MinecraftVersion,
 	dependency: boolean = false
 ): Promise<CollectedPack[]> {
-	const [packId, packVersion] = pack.split("@")
+	const [packId, packVersion] = typeof pack === 'string' ? pack.split("@") : [pack.id, pack.version]
+	
 	const packDoc = await getPackDoc(packId)
 
 	if (packDoc === undefined) {
@@ -87,21 +88,14 @@ export async function collectPacks(
 				return []
 			}
 
-			console.log(
-				"Using version",
-				packVersion,
-				"for",
-				packId,
-				"but it does not explicitly support",
-				gameVersion
-			)
+			console.log(`Using version ${packVersion} for ${packId} but it does not explicitly support ${gameVersion}`)
 		} else {
 			console.log("No version supports", gameVersion, "for pack", packId)
 			return []
 		}
 	}
 
-	let packs: CollectedPack[] = [[packDoc.id, version, dependency]]
+	let packs: CollectedPack[] = [{id: packDoc.id, version, isDependency: dependency}]
 
 	for (const d of version.dependencies ?? []) {
 		packs = packs.concat(
@@ -146,53 +140,50 @@ export class DownloadRunner {
 		})
 	}
 
-	private async downloadPack(pack: CollectedPack) {
+	private async downloadDataAndResources(name: string, downloads: PackDownloadOptions): Promise<boolean> {
 		// console.log(pack)
-		const [packId, version, dependency] = pack
+
 		let successfullyDownloaded = false
 
 		if (
-			version.downloads.datapack !== undefined &&
-			version.downloads.datapack !== ""
+			downloads.datapack !== undefined &&
+			downloads.datapack !== ""
 		) {
 			successfullyDownloaded = await this.tryToDownload(
-				packId + version.name + "-dp",
-				version.downloads.datapack
+				name + "-dp",
+				downloads.datapack
 			)
 		}
 		if (
-			version.downloads.resourcepack !== undefined &&
-			version.downloads.resourcepack !== ""
+			downloads.resourcepack !== undefined &&
+			downloads.resourcepack !== ""
 		) {
 			let rpSuccess = await this.tryToDownload(
-				packId + version.name + "-rp",
-				version.downloads.resourcepack
+				name + "-rp",
+				downloads.resourcepack
 			)
 			successfullyDownloaded ||= rpSuccess
 		}
 
-		if (successfullyDownloaded)
-			await incrementPackDownloadCount(
-				this.userHash,
-				dependency ? 1 : 3,
-				packId
-			)
+		
+		return successfullyDownloaded	
 	}
 
-	private async downloadPacks(packs: string[], version: MinecraftVersion) {
+	private async downloadPacks(packs: (string|PackReference)[], version: MinecraftVersion) {
 		if (packs.length === 1) {
 			console.log("Single pack, finding game version")
+
+			const [id, packVersion] = typeof packs[0] === 'string' ? packs[0].split("@") : [packs[0].id, packs[0].version]
 			console.log(
-				`https://api.smithed.dev/v2/packs/${packs[0].split("@")[0]}`
+				`https://api.smithed.dev/v2/packs/${id}`
 			)
 			const resp = await fetch(
-				`https://api.smithed.dev/v2/packs/${packs[0].split("@")[0]}`
+				`https://api.smithed.dev/v2/packs/${id}`
 			)
 			if (!resp.ok) return version
 
 			const data: PackData = (await resp.json()) as any
 
-			const packVersion = packs[0].split("@")[1]
 			var versionData = data.versions
 				.filter(
 					(
@@ -213,17 +204,18 @@ export class DownloadRunner {
 
 		let foundPacks: CollectedPack[] = []
 		for (let pack of packs) {
-			foundPacks = foundPacks.concat(
-				await collectPacks(pack, version, false)
-			)
+			foundPacks = [
+				...foundPacks,
+				...await collectPacks(pack, version, false)
+			]
 		}
 
 		foundPacks = foundPacks.filter(
-			(pack, idx, arr) =>
+			(pack, idx) =>
 				foundPacks.findIndex((curPack) => {
 					return (
-						curPack[0] === pack[0] &&
-						curPack[1].name === pack[1].name
+						curPack.id === pack.id &&
+						curPack.version.name === pack.version.name
 					)
 				}) === idx
 		)
@@ -231,8 +223,17 @@ export class DownloadRunner {
 		if (foundPacks.length == 0)
 			throw new Error("No packs found meeting all specified criteria!")
 
-		for (let pack of foundPacks) await this.downloadPack(pack)
-
+		await Promise.allSettled(foundPacks.map(pack => (async () => {
+			const success = await this.downloadDataAndResources(pack.id + pack.version.name, pack.version.downloads)
+			if (success) {
+				await incrementPackDownloadCount(
+					this.userHash,
+					pack.isDependency ? 1 : 3,
+					pack.id
+				)
+			}
+		})()))
+		
 		return version
 	}
 
@@ -252,39 +253,78 @@ export class DownloadRunner {
 		return true
 	}
 
-	async run(
-		packs: string[],
+	async mergePacks(
+		packs: (string|PackReference)[],
 		version: MinecraftVersion,
-		mode: "datapack" | "resourcepack" | "both",
-		userHash?: string
+		mode: "datapack" | "resourcepack" | "both"
 	): Promise<fs.ReadStream | undefined> {
-		const path = "temp/" + this.id
-		fs.mkdirSync(path)
-		console.log("Downloading packs...")
-		console.log("Packs", packs, "\nVersion", version, "\nMode", mode)
-		let activeVersion = await this.downloadPacks(packs, version)
+		const path = this.setupTemporaryFolder()
+		
+		let activeVersion = await this.collectAndDownloadPacks(packs, version, mode)
+
 		console.log("Done downloading packs!\nRunning weld...")
 		await this.runWeld(mode, activeVersion)
 		console.log("Done running weld!")
 
-		var output = undefined
+		return this.collectResultZip(mode, path)
+	}
+
+	private async collectAndDownloadPacks(packs: (string|PackReference)[], version: string, mode: string) {
+		console.log("Downloading packs...")
+		console.log("Packs", packs, "\nVersion", version, "\nMode", mode)
+		let activeVersion = await this.downloadPacks(packs, version)
+		return activeVersion
+	}
+
+	async mergePacksAndPatches(
+		packs: (string|PackReference)[],
+		patches: PackDownloadOptions[],
+		version: MinecraftVersion,
+		mode: "datapack" | "resourcepack" | "both"
+	): Promise<fs.ReadStream | undefined> {
+		const path = this.setupTemporaryFolder()
+
+		let activeVersion = await this.collectAndDownloadPacks(packs, version, mode)
+
+		console.log("Done download packs!\nDownloading patches...")
+		await this.downloadPatches(patches)
+		console.log("Done downloading patches!\nRunning weld...")
+
+		await this.runWeld(mode, activeVersion)
+		console.log("Done running weld!")
+
+		return this.collectResultZip(mode, path)
+	}
+
+	private async downloadPatches(patches: PackDownloadOptions[]) {
+		for (let i = 0; i < patches.length; i++) {
+			await this.downloadDataAndResources("patch-" + i, patches[i])
+		}
+	}
+
+	
+
+	private setupTemporaryFolder() {
+		const path = "temp/" + this.id
+		fs.mkdirSync(path)
+		return path
+	}
+
+	private collectResultZip(mode: string, path: string) {
 
 		if (mode === "datapack" && fs.existsSync(path + "/welded-dp.zip")) {
-			output = fs.createReadStream(path + "/welded-dp.zip")
+			return fs.createReadStream(path + "/welded-dp.zip")
 			// console.log('Size of datapack:', output.byteLength / 1000 / 1000, 'mB')
-		} else if (
-			mode === "resourcepack" &&
-			fs.existsSync(path + "/welded-rp.zip")
-		) {
-			output = fs.createReadStream(path + "/welded-rp.zip")
+		} else if (mode === "resourcepack" &&
+			fs.existsSync(path + "/welded-rp.zip")) {
+			return fs.createReadStream(path + "/welded-rp.zip")
 			// console.log('Size of resourcepack:', output.byteLength / 1000 / 1000, 'mB')
-		} else if (
-			mode === "both" &&
-			fs.existsSync(path + "/welded-both.zip")
-		) {
-			output = fs.createReadStream(path + "/welded-both.zip")
+		} else if (mode === "both" &&
+			fs.existsSync(path + "/welded-both.zip")) {
+			return fs.createReadStream(path + "/welded-both.zip")
 			// console.log('Size of b:', output.byteLength / 1000 / 1000, 'mB')
 		}
-		return output
+
+		return undefined
 	}
 }

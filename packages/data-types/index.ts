@@ -238,6 +238,7 @@ export type PackMetaData = Static<typeof MetaDataSchema>
 export type MinecraftVersion = Static<typeof MinecraftVersionSchema>
 export type PackDependency = Static<typeof PackReferenceSchema>
 export type PackVersion = Static<typeof PackVersionSchema>
+export type PackDownloadOptions = Static<typeof PackDownloadOptionsSchema>
 export type PackData = Static<typeof PackDataSchema>
 
 export type PackBundle_v1 = Static<typeof BundleSchema_v1>

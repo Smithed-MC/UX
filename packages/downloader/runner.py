@@ -19,17 +19,18 @@ zips = []
 for file in os.listdir(path):
     zips.append(ZipFile(path / file))
 
-with run_weld(zips) as context:
-    context.assets.name = 'welded-rp'
-    context.data.name = 'welded-dp'
-    context.meta.setdefault('minecraft', version)
+if len(zips) >= 1:
+    with run_weld(zips) as context:
+        context.assets.name = 'welded-rp'
+        context.data.name = 'welded-dp'
+        context.meta.setdefault('minecraft', version)
 
-    if mode == "resourcepack" or mode == "both":
-        context.assets.save(path, zipped=True, overwrite=True)
-    if mode == "datapack" or mode == "both":
-        context.data.save(path, zipped=True, overwrite=True)
+        if mode == "resourcepack" or mode == "both":
+            context.assets.save(path, zipped=True, overwrite=True)
+        if mode == "datapack" or mode == "both":
+            context.data.save(path, zipped=True, overwrite=True)
 
-    if mode == "both": 
-        with ZipFile(path / 'welded-both.zip', 'w') as zip:
-            zip.write(path / 'welded-dp.zip', arcname='datapacks.zip')
-            zip.write(path / 'welded-rp.zip', arcname='resourcepacks.zip')
+        if mode == "both": 
+            with ZipFile(path / 'welded-both.zip', 'w') as zip:
+                zip.write(path / 'welded-dp.zip', arcname='datapacks.zip')
+                zip.write(path / 'welded-rp.zip', arcname='resourcepacks.zip')

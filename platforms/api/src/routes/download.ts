@@ -9,6 +9,7 @@ import {
 import {
 	HTTPResponses,
 	MinecraftVersionSchema,
+	PackReference,
 	latestMinecraftVersion,
 } from "data-types"
 import hash from "hash.js"
@@ -78,10 +79,7 @@ API_APP.route({
 	handler: async (request, reply) => {
 		const { pack: packs, version, mode } = request.query
 
-		const userHash = hash
-			.sha1()
-			.update(request.headers["user-agent"] + request.ip)
-			.digest("hex")
+		const userHash = getUserHash(request)
 
 		const requestIdentifier =
 			"DOWNLOAD::" +
@@ -103,18 +101,7 @@ API_APP.route({
 				)
 				.type("application/octet-stream")
 
-			let foundPacks: CollectedPack[] = []
-			for (let p of packs)
-				foundPacks = foundPacks.concat(
-					await collectPacks(
-						p,
-						version ?? latestMinecraftVersion,
-						false
-					)
-				)
-
-			for (let f of foundPacks)
-				await incrementPackDownloadCount(userHash, f[2] ? 1 : 3, f[0])
+			await incrementPacksFromCachedResult(packs, version, userHash)
 
 			// console.log(filePath)
 
@@ -122,7 +109,7 @@ API_APP.route({
 		}
 
 		const runner = new DownloadRunner(userHash)
-		const result = await runner.run(
+		const result = await runner.mergePacks(
 			packs,
 			version ?? latestMinecraftVersion,
 			mode
@@ -149,3 +136,26 @@ API_APP.route({
 		)
 	},
 })
+
+export function getUserHash(request: any) {
+	return hash
+		.sha1()
+		.update(request.headers["user-agent"] + request.ip)
+		.digest("hex")
+}
+
+export async function incrementPacksFromCachedResult(packs: (string|PackReference)[], version: string | undefined, userHash: string) {
+	let foundPacks: CollectedPack[] = []
+	for (let p of packs)
+		foundPacks = foundPacks.concat(
+			await collectPacks(
+				p,
+				version ?? latestMinecraftVersion,
+				false
+			)
+		)
+
+	for (let f of foundPacks)
+		await incrementPackDownloadCount(userHash, f.isDependency ? 1 : 3, f.id)
+}
+
