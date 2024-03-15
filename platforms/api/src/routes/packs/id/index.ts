@@ -636,12 +636,15 @@ API_APP.route({
 	handler: async (request, reply) => {
 		const { id, index } = request.params
 
-		const requestIdentifier = 'GET-PACK-GALLERY-' + id + '::' + index
+		const requestIdentifier = "GET-PACK-GALLERY-" + id + "::" + index
 		const tryCachedResult = await get(requestIdentifier)
-		if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
-		    request.log.info('served cached /packs/', id, '/gallery/', index)
-		    reply.header('Content-Type', 'image/png');
-		    return tryCachedResult.item
+		if (
+			tryCachedResult &&
+			request.headers["cache-control"] !== "max-age=0"
+		) {
+			request.log.info("served cached /packs/", id, "/gallery/", index)
+			reply.header("Content-Type", "image/png")
+			return tryCachedResult.item
 		}
 
 		console.time("Find pack doc")
@@ -676,11 +679,12 @@ API_APP.route({
 
 		console.time("Get image")
 		if (typeof img === "object") {
-			const buffer = (await getStorage()
+			const buffer = (
+				await getStorage()
 					.bucket()
 					.file(`gallery_images/${img.uid}`)
-					.download())[0]
-			
+					.download()
+			)[0]
 
 			content = Buffer.from(
 				buffer.toString("utf8").split(",")[1],

@@ -9,18 +9,9 @@ import {
 
 import "./style.css"
 import "./NavBar.css"
-import {
-	Check,
-	Cross,
-	Download,
-	Jigsaw,
-	Logo,
-	Trash,
-} from "./svg.js"
+import { Check, Cross, Download, Jigsaw, Logo, Trash } from "./svg.js"
 import { IconTextButton } from "./IconTextButton"
-import {
-	Account as AccountSvg,
-} from "components/svg.js"
+import { Account as AccountSvg } from "components/svg.js"
 import {
 	selectSelectedBundle,
 	selectUsersBundles,
@@ -62,7 +53,9 @@ export function EditBundle({ close }: EditBundleProps) {
 		if (curBundle === undefined) return
 		setPacks(
 			await Promise.all(
-				BundleUpdater(curBundle).versions[0].packs.map((p) => fetchPackData(p.id, p.version))
+				BundleUpdater(curBundle).versions[0].packs.map((p) =>
+					fetchPackData(p.id, p.version)
+				)
 			)
 		)
 	}

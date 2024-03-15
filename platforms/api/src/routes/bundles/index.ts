@@ -135,7 +135,11 @@ API_APP.route({
 				)
 				.type("application/octet-stream")
 
-			await incrementPacksFromCachedResult(latestBundleVersion.packs, latestBundleVersion.supports[0], userHash)
+			await incrementPacksFromCachedResult(
+				latestBundleVersion.packs,
+				latestBundleVersion.supports[0],
+				userHash
+			)
 
 			// console.log(filePath)
 
@@ -169,7 +173,6 @@ API_APP.route({
 			HTTPResponses.SERVER_ERROR,
 			"An error occured while downloading"
 		)
-	
 	},
 })
 

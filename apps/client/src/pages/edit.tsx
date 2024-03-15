@@ -403,7 +403,7 @@ let initialContributors: string[] = []
 export default function Edit() {
 	const user = useFirebaseUser()
 	const { id: packIdParam } = useParams()
-	const isNew = packIdParam === 'new'
+	const isNew = packIdParam === "new"
 
 	const { tab: currentTab } = useQueryParams()
 

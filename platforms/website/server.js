@@ -6,7 +6,7 @@ import { createServer as createViteServer } from "vite"
 import fetch from "node-fetch"
 import dotenv from "dotenv"
 import { generateSitemap } from "./generate-sitemap.js"
-import compression from 'compression'
+import compression from "compression"
 
 dotenv.config()
 
@@ -87,8 +87,7 @@ async function createServer() {
 			// //     `render` function calls appropriate framework SSR APIs,
 			// //    e.g. ReactDOMServer.renderToString()
 			const result = await render(req, res, {})
-			if (result == undefined)
-				return next()
+			if (result == undefined) return next()
 			const { html: appHtml, helmet } = result
 			// console.timeEnd('Render content')
 			// console.time('Replace w/ helmet and ssr')

@@ -59,12 +59,9 @@ export default async function render(
 	if (
 		context instanceof Response &&
 		[301, 302, 303, 307, 308].includes(context.status)
-	  ) {
-		return res.redirect(
-		  context.status,
-		  context.headers.get("Location")!
-		);
-	  }
+	) {
+		return res.redirect(context.status, context.headers.get("Location")!)
+	}
 
 	let router = createStaticRouter(handler.dataRoutes, context)
 	let html = ReactDOMServer.renderToString(

@@ -144,18 +144,17 @@ export function getUserHash(request: any) {
 		.digest("hex")
 }
 
-export async function incrementPacksFromCachedResult(packs: (string|PackReference)[], version: string | undefined, userHash: string) {
+export async function incrementPacksFromCachedResult(
+	packs: (string | PackReference)[],
+	version: string | undefined,
+	userHash: string
+) {
 	let foundPacks: CollectedPack[] = []
 	for (let p of packs)
 		foundPacks = foundPacks.concat(
-			await collectPacks(
-				p,
-				version ?? latestMinecraftVersion,
-				false
-			)
+			await collectPacks(p, version ?? latestMinecraftVersion, false)
 		)
 
 	for (let f of foundPacks)
 		await incrementPackDownloadCount(userHash, f.isDependency ? 1 : 3, f.id)
 }
-

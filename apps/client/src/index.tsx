@@ -340,7 +340,9 @@ export const subRoutes: any[] = [
 	{
 		path: "browse",
 		element: <div></div>,
-		loader: async () => { return redirect("/packs") },
+		loader: async () => {
+			return redirect("/packs")
+		},
 	},
 	{
 		path: "account",
@@ -390,9 +392,9 @@ export const subRoutes: any[] = [
 	},
 	{
 		path: "packs",
-		element: <PacksBrowser/>,
-		loader: loadPackBrowseData
-	}
+		element: <PacksBrowser />,
+		loader: loadPackBrowseData,
+	},
 ]
 
 export const routes = [

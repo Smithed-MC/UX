@@ -110,10 +110,9 @@ export default function GalleryPackCard({
 	ref,
 	...props
 }: PackCardProps) {
-
 	const [data, setData] = useState<PackData | undefined>(packData)
 	const [metaData, setMetaData] = useState<PackMetaData | undefined>(packMeta)
-	
+
 	const [author, setAuthor] = useState(packAuthor)
 
 	const [badges, setBadges] = useState<JSX.Element[]>(getBadges())
@@ -146,8 +145,7 @@ export default function GalleryPackCard({
 		return badges
 	}
 
-	const gallery = packData.display.gallery 
-
+	const gallery = packData.display.gallery
 
 	return (
 		<div
@@ -178,7 +176,10 @@ export default function GalleryPackCard({
 				>
 					<div
 						className="galleryImage"
-						style={{ position: "relative", backgroundColor: 'var(--accent)' }}
+						style={{
+							position: "relative",
+							backgroundColor: "var(--accent)",
+						}}
 					>
 						{(!gallery || gallery.length == 0) && (
 							<object

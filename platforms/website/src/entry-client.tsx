@@ -8,7 +8,7 @@ let router = createBrowserRouter(routes)
 
 const app = document.getElementById("app")
 if (app != null) {
-	console.log('Hydrate')
+	console.log("Hydrate")
 	ReactDOM.hydrateRoot(
 		app,
 		<StrictMode>

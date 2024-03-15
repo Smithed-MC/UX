@@ -6,7 +6,7 @@ import {
 } from "react"
 import { Link } from "react-router-dom"
 
-export type IconTextButtonProps  = {
+export type IconTextButtonProps = {
 	text: string | JSX.Element
 	icon?: FunctionComponent<SVGProps<SVGSVGElement>> | string
 	iconElement?: JSX.Element
