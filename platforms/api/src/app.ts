@@ -1,4 +1,4 @@
-import { initialize } from "database"
+import { getUIDFromToken, initializeAdmin } from "database"
 
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox"
 import fastify, { FastifyReply } from "fastify"
@@ -97,7 +97,8 @@ async function registerCacheMemory() {
 }
 
 export async function setupApp() {
-	await initialize()
+	await initializeAdmin()
+
 	TYPESENSE_APP = new Client({
 		apiKey: process.env.TYPESENSE_API_KEY ?? "",
 		nodes: [

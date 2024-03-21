@@ -60,7 +60,35 @@ API_APP.route({
 		if (bundleDoc === undefined)
 			return sendError(reply, HTTPResponses.NOT_FOUND, "Bundle not found")
 
-		return { uid: bundleDoc.id, ...bundleDoc.data() }
+		const data = BundleUpdater({
+			uid: bundleDoc.id,
+			...bundleDoc.data(),
+		} as PackBundle)
+
+		if (data.visibility === "private") {
+			if (token === undefined)
+				return sendError(
+					reply,
+					HTTPResponses.UNAUTHORIZED,
+					"No token specified"
+				)
+
+			const uid = await getUIDFromToken(token)
+			if (uid === undefined)
+				return sendError(
+					reply,
+					HTTPResponses.UNAUTHORIZED,
+					"Invalid token"
+				)
+
+			if (data.owner !== uid)
+				return sendError(
+					reply,
+					HTTPResponses.FORBIDDEN,
+					"You do not own this bundle"
+				)
+		}
+		return data
 	},
 })
 
@@ -112,6 +140,30 @@ API_APP.route({
 
 		const bundleData = BundleUpdater(bundleDoc.data() as PackBundle)
 
+		if (bundleData.visibility === "private") {
+			if (token === undefined) {
+				return sendError(
+					reply,
+					HTTPResponses.UNAUTHORIZED,
+					"No token specified"
+				)
+			}
+			const uid = await getUIDFromToken(token)
+			if (uid === undefined) {
+				return sendError(
+					reply,
+					HTTPResponses.UNAUTHORIZED,
+					"Invalid token"
+				)
+			}
+			if (uid !== bundleData.owner) {
+				return sendError(
+					reply,
+					HTTPResponses.FORBIDDEN,
+					"You do not own this bundle"
+				)
+			}
+		}
 		const latestBundleVersion = bundleData.versions
 			.filter((v) =>
 				satisfies(v.name, version ?? "*", { includePrerelease: true })
