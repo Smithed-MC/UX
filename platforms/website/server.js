@@ -23,6 +23,7 @@ console.log("Running on port:", process.env.PORT)
 globalThis.fetch = fetch
 
 async function createServer() {
+
 	const TEMPLATE = isProd
 		? fs.readFileSync(path.resolve(distFolder, "index.html"), "utf-8")
 		: ""

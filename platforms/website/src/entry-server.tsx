@@ -53,6 +53,7 @@ export default async function render(
 	res: ExpressResponse,
 	options: ReactDOMServer.RenderToPipeableStreamOptions
 ) {
+
 	let fetchRequest = createFetchRequest(req)
 	let context: any = await handler.query(fetchRequest as any)
 
@@ -66,7 +67,6 @@ export default async function render(
 	let router = createStaticRouter(handler.dataRoutes, context)
 	let html = ReactDOMServer.renderToString(
 		<StaticRouterProvider router={router} context={context} />
-		// options
 	)
 	const helmet = Helmet.renderStatic()
 
