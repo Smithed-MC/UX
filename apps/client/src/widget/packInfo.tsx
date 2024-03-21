@@ -908,7 +908,7 @@ export default function PackInfo({
 					</label>
 				</div>
 				<div className="downloadContainer">
-					<AddToBundleModal
+					{/* <AddToBundleModal
 						trigger={
 							<div
 								className="buttonLike"
@@ -922,7 +922,7 @@ export default function PackInfo({
 						isOpen={showBundleSelection}
 						close={() => setShowBundleSelection(false)}
 						id={id}
-					/>
+					/> */}
 					<div className="container" style={{ gap: "0.5rem" }}>
 						<DownloadPackModal packData={packData!} packId={id}>
 							<DownloadButton

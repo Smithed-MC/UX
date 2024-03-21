@@ -1,4 +1,4 @@
-import { DownloadButton, IconTextButton } from "components"
+import { DownloadButton, IconTextButton, NavButton } from "components"
 import { svg } from "components"
 import { Download, Right } from "components/svg"
 
@@ -14,26 +14,13 @@ export interface ClientInject {
 export function getDefaultInject(): ClientInject {
 	return {
 		getNavbarTabs: () => [
-			<IconTextButton
+			<NavButton
 				className="navBarOption start"
-				text="Home"
-				href="/"
-				key="home"
-				icon={svg.Home}
-			/>,
-			<IconTextButton
-				className="navBarOption middle"
-				text="Browse"
-				href="/browse"
+				text="Packs"
+				href="/packs"
 				key="browse"
 				icon={svg.Browse}
-			/>,
-			<IconTextButton
-				className="navBarOption middle"
-				text="Discord"
-				href="https://smithed.dev/discord"
-				key="discord"
-				icon={svg.Discord}
+				selectedClass="accentedButtonLike"
 			/>,
 		],
 		enableFooter: true,

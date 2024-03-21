@@ -49,17 +49,28 @@ export const VisibilitySchema = Type.Union([
 	Type.Literal("private"),
 ])
 
-export const packCategories = [
+const sharedCategories = [
 	"Extensive",
 	"Lightweight",
 	"QoL",
 	"Vanilla+",
 	"Tech",
 	"Magic",
-	"Library",
 	"Exploration",
 	"World Overhaul",
-	"No Resource Pack",
+
+]
+
+export const packCategories = [
+	...sharedCategories,
+	"Library",
+	"No Resource Pack"
+]
+
+export const bundleCategories = [
+	...sharedCategories,
+	"Quest Driven",
+	"Multiplayer Focus"	
 ]
 
 export const PackReferenceSchema = Type.Object({
@@ -69,6 +80,11 @@ export const PackReferenceSchema = Type.Object({
 
 export const PackCategorySchema = Type.Union(
 	packCategories.map((c) => Type.Literal(c))
+)
+
+
+export const BundleCategorySchema = Type.Union(
+	bundleCategories.map((c) => Type.Literal(c))
 )
 
 export const PackDownloadOptionsSchema = Type.Partial(
@@ -158,6 +174,7 @@ export const BundleSchema_v2 = Type.Object({
 	display: Type.Omit(DisplaySchema, ["gallery", "hidden"]),
 	visibility: VisibilitySchema,
 	versions: Type.Array(BundleVersionSchema, { minItems: 1 }),
+	categories: Type.Array(BundleCategorySchema),
 })
 export const BundleSchema = Type.Union([BundleSchema_v1, BundleSchema_v2])
 
@@ -177,7 +194,7 @@ export function BundleUpdater(bundle: PackBundle): PackBundle_v2 {
 		uid: bundle.uid,
 		display: {
 			name: bundle.name,
-			description: "",
+			description: "A new bundle",
 			icon: "",
 		},
 		visibility: bundle.public ? "public" : "private",
@@ -189,6 +206,7 @@ export function BundleUpdater(bundle: PackBundle): PackBundle_v2 {
 				packs: bundle.packs,
 			},
 		],
+		categories: []
 	}
 }
 
@@ -238,11 +256,14 @@ export type PackMetaData = Static<typeof MetaDataSchema>
 export type MinecraftVersion = Static<typeof MinecraftVersionSchema>
 export type PackDependency = Static<typeof PackReferenceSchema>
 export type PackVersion = Static<typeof PackVersionSchema>
+export type PackDownloadOptions = Static<typeof PackDownloadOptionsSchema>
 export type PackData = Static<typeof PackDataSchema>
 
 export type PackBundle_v1 = Static<typeof BundleSchema_v1>
 export type PackBundle_v2 = Static<typeof BundleSchema_v2>
 export type PackBundle = PackBundle_v1 | PackBundle_v2
+
+export type BundleVersion = Static<typeof BundleVersionSchema>
 
 export type PackReference = Static<typeof PackReferenceSchema>
 export type PackGalleryImage = Static<typeof PackGalleryImageSchema>

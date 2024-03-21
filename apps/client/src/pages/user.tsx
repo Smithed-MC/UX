@@ -200,7 +200,7 @@ function UserPacks({
 						icon={Plus}
 						text={"Make one here"}
 						className="accentedButtonLike"
-						href="/edit?new=true"
+						href="/packs/new/edit"
 					/>
 				</div>
 			)}
@@ -774,7 +774,7 @@ export default function User({
 							>
 								<a
 									className="container newContentButton"
-									href="/edit?new=true"
+									href="/packs/new/edit"
 								>
 									<Plus />
 								</a>

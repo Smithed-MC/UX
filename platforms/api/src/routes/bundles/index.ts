@@ -1,7 +1,8 @@
 import { Type } from "@sinclair/typebox"
-import { API_APP, sendError } from "../../app.js"
+import { API_APP, get, sendError, set } from "../../app.js"
 import { getFirestore } from "firebase-admin/firestore"
 import { sanitize } from "../sanitize.js"
+import * as fs from "fs"
 import {
 	BundleSchema,
 	BundleSchema_v1,
@@ -11,7 +12,9 @@ import {
 	PackBundle,
 } from "data-types"
 import { getUIDFromToken } from "database"
-import { compare } from "semver"
+import { compare, satisfies } from "semver"
+import { getUserHash, incrementPacksFromCachedResult } from "../download.js"
+import { DownloadRunner } from "downloader"
 
 export async function getBundleDoc(id: string) {
 	const firestore = getFirestore()
@@ -57,7 +60,35 @@ API_APP.route({
 		if (bundleDoc === undefined)
 			return sendError(reply, HTTPResponses.NOT_FOUND, "Bundle not found")
 
-		return { uid: bundleDoc.id, ...bundleDoc.data() }
+		const data = BundleUpdater({
+			uid: bundleDoc.id,
+			...bundleDoc.data(),
+		} as PackBundle)
+
+		if (data.visibility === "private") {
+			if (token === undefined)
+				return sendError(
+					reply,
+					HTTPResponses.UNAUTHORIZED,
+					"No token specified"
+				)
+
+			const uid = await getUIDFromToken(token)
+			if (uid === undefined)
+				return sendError(
+					reply,
+					HTTPResponses.UNAUTHORIZED,
+					"Invalid token"
+				)
+
+			if (data.owner !== uid)
+				return sendError(
+					reply,
+					HTTPResponses.FORBIDDEN,
+					"You do not own this bundle"
+				)
+		}
+		return data
 	},
 })
 
@@ -70,6 +101,8 @@ API_APP.route({
  *
  * @query mode: 'datapack' | 'resourcepack' | 'both' = 'both'
  * Which files should be downloaded from the API.
+ * @query version: string? = '*'
+ * Which version of the bundle to download
  *
  * @return OK: ArrayBuffer
  * @return NOT_FOUND: ApiError
@@ -94,42 +127,103 @@ API_APP.route({
 				],
 				{ default: "both" }
 			),
+			version: Type.Optional(Type.String()),
 		}),
 	},
 	handler: async (request, reply) => {
 		const { id } = request.params
-		const { token, mode } = request.query
+		const { token, mode, version } = request.query
 
 		const bundleDoc = await getBundleDoc(id)
 		if (bundleDoc === undefined)
 			return sendError(reply, HTTPResponses.NOT_FOUND, "Bundle not found")
 
 		const bundleData = BundleUpdater(bundleDoc.data() as PackBundle)
-		bundleData.versions.sort((a, b) => -compare(a.name, b.name))
 
-		const resp = await API_APP.inject(
-			`/download?${bundleData.versions[0].packs.map((p) => `pack=${p.id}@${p.version}`).join("&")}&version=${bundleData.versions[0].supports[0]}&mode=${mode}`
+		if (bundleData.visibility === "private") {
+			if (token === undefined) {
+				return sendError(
+					reply,
+					HTTPResponses.UNAUTHORIZED,
+					"No token specified"
+				)
+			}
+			const uid = await getUIDFromToken(token)
+			if (uid === undefined) {
+				return sendError(
+					reply,
+					HTTPResponses.UNAUTHORIZED,
+					"Invalid token"
+				)
+			}
+			if (uid !== bundleData.owner) {
+				return sendError(
+					reply,
+					HTTPResponses.FORBIDDEN,
+					"You do not own this bundle"
+				)
+			}
+		}
+		const latestBundleVersion = bundleData.versions
+			.filter((v) =>
+				satisfies(v.name, version ?? "*", { includePrerelease: true })
+			)
+			.sort((a, b) => -compare(a.name, b.name))[0]
+
+		const userHash = getUserHash(request)
+
+		const requestIdentifier =
+			"DOWNLOAD::" + id + "," + latestBundleVersion.name + "," + mode
+		const tryCachedResult = await get(requestIdentifier)
+
+		if (tryCachedResult) {
+			const filePath: string = tryCachedResult.item
+
+			reply
+				.header("Access-Control-Expose-Headers", "Content-Disposition")
+				.header(
+					"Content-Disposition",
+					`attachment; filename="${bundleData.display.name}-${mode}.zip"`
+				)
+				.type("application/octet-stream")
+
+			await incrementPacksFromCachedResult(
+				latestBundleVersion.packs,
+				latestBundleVersion.supports[0],
+				userHash
+			)
+
+			// console.log(filePath)
+
+			return fs.createReadStream(filePath)
+		}
+
+		const runner = new DownloadRunner(userHash)
+		const result = await runner.mergePacksAndPatches(
+			latestBundleVersion.packs,
+			latestBundleVersion.patches,
+			latestBundleVersion.supports[0],
+			mode
 		)
 
-		if (resp.statusCode !== HTTPResponses.OK)
-			return sendError(
-				reply,
-				resp.statusCode,
-				"Error while downloading bundle, " + resp.statusMessage
-			)
+		if (result) {
+			await set(requestIdentifier, result.path, 3600 * 1000)
 
-		reply
-			.header(
-				"Content-Disposition",
-				`attachment; filename="${bundleData.display.name.replace(" ", "-")}.zip"`
-			)
-			.type("application/octet-stream")
-		return reply.status(HTTPResponses.OK).send(resp.rawPayload)
+			request.log.info("sending")
 
+			reply
+				.header("Access-Control-Expose-Headers", "Content-Disposition")
+				.header(
+					"Content-Disposition",
+					`attachment; filename="${bundleData.display.name}-${mode}.zip"`
+				)
+				.type("application/octet-stream")
+			return result
+		}
 		return sendError(
 			reply,
-			HTTPResponses.FORBIDDEN,
-			"Bundle is not visible to your token"
+			HTTPResponses.SERVER_ERROR,
+			"An error occured while downloading"
 		)
 	},
 })

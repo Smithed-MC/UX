@@ -9,7 +9,7 @@ import {
 } from "data-types"
 import { AddToBundleModal } from "../widget/packInfo.js"
 import { Link, useLoaderData, useNavigate } from "react-router-dom"
-import "./browse.css"
+import "./packsBrowser.css"
 import {
 	useAppDispatch,
 	useAppSelector,
@@ -46,7 +46,7 @@ function RenderPages({
 			<Link
 				key={"pageButton" + p}
 				className={`browsePageButton ${currentPage === p ? "selected" : ""}`}
-				to={`/browse?page=${p}&` + params}
+				to={`/packs?page=${p}&` + params}
 				onClick={() => {
 					if (currentPage === p) return
 
@@ -55,6 +55,7 @@ function RenderPages({
 					)! as HTMLDivElement
 					cards.style.setProperty("opacity", "0.2")
 				}}
+				unstable_viewTransition
 			>
 				{p}
 			</Link>
@@ -77,7 +78,7 @@ function RenderPages({
 	)
 }
 
-export default function Browse(props: any) {
+export default function PacksBrowser(props: any) {
 	const params = useQueryParams()
 	const { search, category, sort, version, page } = params
 
@@ -124,7 +125,7 @@ export default function Browse(props: any) {
 			sort: packSort,
 		})
 		if (page) params.set("page", page as string)
-		navigate("/browse?" + params)
+		navigate("/packs?" + params)
 	}
 
 	function onClick(p: string) {
@@ -155,7 +156,7 @@ export default function Browse(props: any) {
 			}}
 		>
 			<Helmet>
-				<title>Browse</title>
+				<title>Browse Packs</title>
 				<meta name="description" content="Search for datapacks" />
 			</Helmet>
 			<div

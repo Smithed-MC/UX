@@ -187,6 +187,7 @@ export const PACKS_PER_PAGE = 20
 const BROWSE_SCOPES = [
 	"data.display.name",
 	"data.display.description",
+	"data.display.gallery",
 	"data.display.icon",
 	"data.versions",
 	"data.categories",
@@ -244,7 +245,7 @@ export function createBrowseSearchParams(parsedParams: any) {
 	return params
 }
 
-export async function loadBrowseData({
+export async function loadPackBrowseData({
 	request,
 }: {
 	request: Request

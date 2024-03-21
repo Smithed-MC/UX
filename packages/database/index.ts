@@ -3,13 +3,15 @@ import { cert, initializeApp } from "firebase-admin/app"
 import { getAuth } from "firebase-admin/auth"
 import { getFirestore } from "firebase-admin/firestore"
 
-import { ServiceAccount } from "firebase-admin/lib/app/credential"
 import * as jose from "jose"
 
 export let privateKey: jose.KeyLike
 export let serviceAccount: any
 
-export async function initialize() {
+export async function initializeAdmin() {
+	if (serviceAccount !== undefined)
+		return
+
 	serviceAccount =
 		typeof process.env.ADMIN_CERT === "string"
 			? JSON.parse(
@@ -51,13 +53,13 @@ export async function getUIDFromToken(token: string) {
 		return result.uid
 	} catch {
 		try {
-			const result = await jose.jwtVerify(token, privateKey)
+			const result = await jose.jwtVerify(token.replaceAll('\n', ''), privateKey)
 
 			// Manually check the expiration date against the current system time
 			// This allows for tokens of lifetime greater than one hour.
 			if (Date.now() / 1000 < (result.payload.exp ?? 0))
 				return result.protectedHeader.uid as string
-		} catch {
+		} catch (e) {
 			return undefined
 		}
 	}
