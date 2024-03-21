@@ -327,7 +327,7 @@ export function NavBar(props: NavBarProps) {
 					overflow: "hidden",
 				}}
 			>
-				{selectedBundle !== "" && !import.meta.env.SSR && (
+				{/* {selectedBundle !== "" && !import.meta.env.SSR && (
 					<IconTextButton
 						style={{
 							flexGrow: 1,
@@ -366,7 +366,7 @@ export function NavBar(props: NavBarProps) {
 						reverse
 						onClick={() => setEditBundleOpen(!editBundleOpen)}
 					/>
-				)}
+				)} */}
 				<IconTextButton
 					className="navBarOption end"
 					text={user?.displayName ?? "Login"}
@@ -375,9 +375,9 @@ export function NavBar(props: NavBarProps) {
 					reverse={true}
 				/>
 			</div>
-			{editBundleOpen && (
+			{/* {editBundleOpen && (
 				<EditBundle close={() => setEditBundleOpen(false)} />
-			)}
+			)} */}
 		</div>
 	)
 }

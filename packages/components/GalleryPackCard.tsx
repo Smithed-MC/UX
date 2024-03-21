@@ -95,6 +95,27 @@ function Badge({
 	)
 }
 
+export function getBadges(packData?: PackData, author?: string) {
+	let badges: JSX.Element[] = []
+	if (author === "Smithed") {
+		badges.push(
+			<Badge title="Official Pack" key="official" svg={Logo} />
+		)
+	}
+	if (
+		packData?.versions?.every(
+			(v) =>
+				v.downloads.resourcepack === undefined ||
+				v.downloads.resourcepack === ""
+		)
+	)
+		badges.push(
+			<Badge title="No Resourcepack" key="no-rp" svg={FlagCrossed} />
+		)
+
+	return badges
+}
+
 export default function GalleryPackCard({
 	id,
 	packData,
@@ -115,7 +136,7 @@ export default function GalleryPackCard({
 
 	const [author, setAuthor] = useState(packAuthor)
 
-	const [badges, setBadges] = useState<JSX.Element[]>(getBadges())
+	const [badges, setBadges] = useState<JSX.Element[]>(getBadges(packData, author))
 
 	const [displayGallery, setDisplayGallery] = useState(false)
 	const [currentImage, setCurrentImage] = useState(0)
@@ -124,26 +145,7 @@ export default function GalleryPackCard({
 
 	const card = useRef<HTMLDivElement>(null)
 
-	function getBadges() {
-		let badges: JSX.Element[] = []
-		if (author === "Smithed") {
-			badges.push(
-				<Badge title="Official Pack" key="official" svg={Logo} />
-			)
-		}
-		if (
-			packData?.versions?.every(
-				(v) =>
-					v.downloads.resourcepack === undefined ||
-					v.downloads.resourcepack === ""
-			)
-		)
-			badges.push(
-				<Badge title="No Resourcepack" key="no-rp" svg={FlagCrossed} />
-			)
-
-		return badges
-	}
+	
 
 	const gallery = packData.display.gallery
 
@@ -281,7 +283,7 @@ export default function GalleryPackCard({
 								gridArea: "open",
 							}}
 						>
-							{addWidget}
+							{/* {addWidget} */}
 							{state === "editable" && (
 								<a
 									className="buttonLike accentedButtonLike"
