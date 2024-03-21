@@ -1,10 +1,10 @@
 import { useLoaderData, useParams } from "react-router-dom"
 import React, { useEffect, useState } from "react"
 import { PackData, PackMetaData, UserData } from "data-types"
-import PackInfo from "../widget/packInfo"
-import Download from "../widget/download"
+import PackInfo from "../../../widget/packInfo"
+import Download from "../../../widget/download"
 import { DownloadButton, Spinner } from "components"
-import "./pack.css"
+import "./index.css"
 import { Helmet } from "react-helmet"
 import { correctGithubLinks } from "formatters"
 

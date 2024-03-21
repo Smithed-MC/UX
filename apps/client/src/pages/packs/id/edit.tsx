@@ -6,7 +6,6 @@ import {
 	IconTextButton,
 	MarkdownRenderer,
 	Modal,
-	PackCard,
 	Spinner,
 } from "components"
 import {
@@ -31,7 +30,6 @@ import {
 import {
 	PackData,
 	PackDependency,
-	PackGalleryImage,
 	PackMetaData,
 	PackVersion,
 	UserData,
@@ -39,66 +37,23 @@ import {
 	supportedMinecraftVersions,
 } from "data-types"
 import { useFirebaseUser, useQueryParams } from "hooks"
-import React, {
-	CSSProperties,
+import {
 	useEffect,
 	useMemo,
 	useRef,
 	useState,
 } from "react"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { coerce, compare, satisfies, inc, valid } from "semver"
 import { gzip } from "pako"
 import "./edit.css"
-import { Buffer } from "buffer"
 import { sanitize } from "formatters"
+import { TextInput, setPropertyByPath, LargeTextInput } from "../../../components/editor/inputs"
+import GalleryManager from "../../../components/editor/galleryManager"
 
-function EditorDiv({
-	children,
-	style,
-	...props
-}: {
-	children: any
-	style?: CSSProperties
-	[key: string]: any
-}) {
-	return (
-		<div
-			className="container"
-			style={{ alignItems: "start", gap: 8, width: "100%", ...style }}
-			{...props}
-		>
-			{children}
-		</div>
-	)
-}
-
-const prettyString = (s: string) =>
-	(s[0].toUpperCase() + s.substring(1)).match(/[A-Z][a-z]+/g)?.join(" ") ?? s
 
 const validUrlRegex =
 	/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/g
-
-interface EditorInputProps {
-	reference: { [key: string]: any }
-	attr: string
-	placeholder?: string
-	description: string
-	header?: string
-	disabled?: boolean
-	svg?:
-		| React.FunctionComponent<
-				React.SVGProps<SVGSVGElement> & {
-					title?: string | undefined
-				}
-		  >
-		| string
-}
-
-interface ImageURLInputProps extends EditorInputProps {
-	width: number | string
-	height: number | string
-}
 
 interface SavingState {
 	mode: "off" | "saving" | "saved" | "error"
@@ -251,156 +206,10 @@ function SavingModal({
 	)
 }
 
-export function GalleryManager({
-	display,
-}: {
-	display: { gallery?: PackGalleryImage[] }
-}) {
-	const [selectedImage, setSelectedImage] = useState(0)
-	const [images, setImages] = useState<PackGalleryImage[]>([])
-
-	useEffect(() => {
-		setImages(display.gallery ?? [])
-	}, [...(display.gallery ?? [])])
-
-	const fileUploadRef = useRef<HTMLInputElement>(null)
-
-	async function OnFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-		const file = e.currentTarget.files?.item(0)
-
-		// console.log(file);
-		if (file === undefined || file == null) return
-
-		if (file.size > 1024 * 1024) return alert("Selected image exceeds 1MB")
-
-		const result = await new Promise<string>((resolve) => {
-			const fileReader = new FileReader()
-			fileReader.readAsDataURL(file)
-			fileReader.onloadend = () => {
-				resolve(fileReader.result as string)
-			}
-		})
-
-		if (display.gallery === undefined) display.gallery = []
-
-		display.gallery.push(result)
-		setImages([...display.gallery])
-		setSelectedImage(display.gallery.length - 1)
-	}
-
-	return (
-		<>
-			<input
-				ref={fileUploadRef}
-				type="file"
-				accept="image/png, image/jpeg"
-				hidden
-				onChange={OnFileUpload}
-			/>
-			{display.gallery && display.gallery.length >= 1 && (
-				<div style={{ width: "100%", position: "relative" }}>
-					<img
-						style={{
-							width: "100%",
-							borderRadius: "var(--defaultBorderRadius)",
-						}}
-						src={((g: PackGalleryImage) =>
-							typeof g === "object" ? g.content : g)(
-							images[selectedImage]
-						)}
-					/>
-					<button
-						className="buttonLike"
-						style={{
-							position: "absolute",
-							top: "0.5rem",
-							right: "0.5rem",
-							padding: "0.5rem",
-						}}
-						onClick={() => {
-							display.gallery?.splice(selectedImage, 1)
-							setImages([...(display.gallery ?? [])])
-							setSelectedImage(
-								selectedImage > 0 ? selectedImage - 1 : 0
-							)
-						}}
-					>
-						<Trash
-							style={{
-								width: "1rem",
-								height: "1rem",
-								fill: "var(--text)",
-							}}
-						/>
-					</button>
-				</div>
-			)}
-			<div
-				className="uploaded"
-				style={{ gridColumn: images.length == 0 ? "1/3" : undefined }}
-			>
-				{images.map((g, idx) => (
-					<img
-						key={`gImg${idx}`}
-						src={typeof g === "object" ? g.content : g}
-						className="galleryImageButton"
-						onClick={() => setSelectedImage(idx)}
-					/>
-				))}
-				<span
-					className="buttonLike galleryUploadImage"
-					style={{
-						background: images.length > 0 ? "none" : undefined,
-						width: images.length == 0 ? "100%" : undefined,
-					}}
-					onClick={() => {
-						fileUploadRef.current?.click()
-					}}
-				>
-					<Plus />
-					{images.length === 0 ? "Upload gallery image" : ""}
-				</span>
-			</div>
-		</>
-	)
-}
-function getPropertyByPath(obj: any, path: string) {
-	const properties = path.split("/") // Split the path string into an array of property names
-
-	let currentObj = obj
-	for (let prop of properties) {
-		if (currentObj && currentObj.hasOwnProperty(prop)) {
-			currentObj = currentObj[prop] // Access the property in the object
-		} else {
-			return undefined // Property not found
-		}
-	}
-	return currentObj // Return the final property value
-}
-
-function setPropertyByPath(obj: any, path: string, data: any) {
-	const properties = path.split("/") // Split the path string into an array of property names
-	const target = properties.pop()
-
-	if (!target) return
-
-	let currentObj = obj
-	for (let prop of properties) {
-		if (currentObj && currentObj.hasOwnProperty(prop)) {
-			currentObj = currentObj[prop] // Access the property in the object
-		} else if (!currentObj.hasOwnProperty(prop)) {
-			currentObj[prop] = {}
-			currentObj = currentObj[prop]
-		}
-	}
-
-	if (typeof currentObj === "object") currentObj[target] = data
-}
-
 let depUidToRaw: Record<string, string> = {}
 let initialContributors: string[] = []
 
-export default function Edit() {
+export default function PackEdit() {
 	const user = useFirebaseUser()
 	const { id: packIdParam } = useParams()
 	const isNew = packIdParam === "new"
@@ -418,6 +227,9 @@ export default function Edit() {
 	const [versions, setVersions] = useState<PackVersion[]>([])
 	const [selectedVersion, setSelectedVersion] = useState<PackVersion>()
 
+	const [savingState, setSavingState] = useState<SavingState>({ mode: "off" })
+	const [readme, setReadme] = useState("")
+
 	const updateVersions = () => {
 		let versions = [...(packData?.versions ?? [])].sort((a, b) =>
 			compare(a.name, b.name)
@@ -425,26 +237,8 @@ export default function Edit() {
 
 		setVersions(versions)
 	}
-	// const selectedVersion = useSignal('')
-	// const selectedVersion = { value: '' }
 
-	// const [selectedVersion, setSelectedVersion] = useState('')
 
-	const [savingState, setSavingState] = useState<SavingState>({ mode: "off" })
-	const [readme, setReadme] = useState("")
-
-	// useEffect(() => {
-	//     if (!packData)
-	//         return;
-	//     let v = packData.versions.find(v => v.name === selectedVersion.value)
-
-	//     if (v) {
-	//         v.dependencies ??= []
-	//     }
-	//     if (!packData.display.urls)
-	//         packData.display.urls = {}
-
-	// }, [packData])
 
 	useEffect(() => {
 		loadReadme()
@@ -657,115 +451,6 @@ export default function Edit() {
 				<Spinner />
 			</div>
 		)
-
-	function TextInput({
-		area,
-		path,
-		icon,
-		placeholder,
-		onChange,
-		dataRef,
-		validate,
-	}: {
-		area: string
-		path: string
-		icon: any
-		placeholder: string
-		dataRef?: any
-		validate?: (v: string) => string | undefined
-		onChange?: (e: React.FormEvent<HTMLInputElement>) => void
-	}) {
-		const [error, setError] = useState<string>()
-
-		return (
-			<div
-				className="inputField"
-				style={{
-					gridArea: area,
-					position: "relative",
-				}}
-			>
-				<IconInput
-					className={error ? "invalidInput" : ""}
-					style={{ width: "100%", zIndex: error ? 2 : undefined }}
-					id={path}
-					icon={icon}
-					placeholder={placeholder}
-					defaultValue={getPropertyByPath(dataRef ?? packData, path)}
-					onChange={(e) => {
-						const value = e.currentTarget.value
-
-						const error =
-							validate && value !== "" && value !== undefined
-								? validate(value)
-								: undefined
-						if (error !== undefined) {
-							setError(error)
-							return
-						} else {
-							setError(undefined)
-						}
-
-						setPropertyByPath(dataRef ?? packData, path, value)
-						if (onChange) onChange(e)
-					}}
-				/>
-
-				<div
-					className="container"
-					style={{
-						position: "absolute",
-						right: error ? 0 : undefined,
-						left: error
-							? "calc(100% - var(--defaultBorderRadius)"
-							: 0,
-						width: "max-content",
-						height: "100%",
-						backgroundColor: "var(--disturbing)",
-						paddingLeft: "calc(var(--defaultBorderRadius) + 1rem)",
-						paddingRight: "1rem",
-						borderRadius:
-							"0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0",
-						zIndex: error ? 1 : -1,
-						transition: ["right", "left", "opacity"]
-							.map((v) => `${v} 0.3s ease-in-out`)
-							.join(", "),
-						transitionDelay: error ? undefined : "0.1s",
-						overflow: "hidden",
-						opacity: error ? 1 : 0,
-					}}
-				>
-					<span style={{ zIndex: 2 }}>{error}</span>
-				</div>
-			</div>
-		)
-	}
-
-	const LargeTextInput = ({
-		area,
-		path,
-		placeholder,
-	}: {
-		area: string
-		path: string
-		placeholder: string
-	}) => (
-		<textarea
-			id={path}
-			placeholder={placeholder}
-			className="input inputField"
-			style={{
-				gridArea: area,
-				height: "100%",
-				resize: "none",
-			}}
-			defaultValue={getPropertyByPath(packData, path)}
-			onChange={(e) => {
-				e.currentTarget.value = e.currentTarget.value.replace("\n", "")
-				setPropertyByPath(packData, path, e.currentTarget.value)
-			}}
-		/>
-	)
 
 	function Dependencies({ version }: { version: PackVersion }) {
 		const [dependencies, setDependencies] = useState<PackDependency[]>(
@@ -1040,6 +725,7 @@ export default function Edit() {
 					path="id"
 					icon={At}
 					placeholder="Project id"
+					dataRef={packData}
 				/>
 				<div className="iconGrid">
 					<Modal
@@ -1079,6 +765,7 @@ export default function Edit() {
 						content={() => (
 							<>
 								<TextInput
+									dataRef={packData}
 									area=""
 									path="display/icon"
 									icon={Picture}
@@ -1102,12 +789,14 @@ export default function Edit() {
 						)}
 					/>
 					<TextInput
+						dataRef={packData}
 						area="name"
 						path="display/name"
 						icon={Jigsaw}
 						placeholder="Project name"
 					/>
 					<LargeTextInput
+						dataRef={packData}
 						area="description"
 						path="display/description"
 						placeholder="Short project description"
@@ -1307,24 +996,28 @@ export default function Edit() {
 					defaultValue={packData.display.hidden ? "true" : "false"}
 				/>
 				<TextInput
+					dataRef={packData}
 					area="website"
 					path="display/urls/homepage"
 					icon={Globe}
 					placeholder="Project website"
 				/>
 				<TextInput
+					dataRef={packData}
 					area="sourceCode"
 					path="display/urls/source"
 					icon={Github}
 					placeholder="Source code"
 				/>
 				<TextInput
+					dataRef={packData}
 					area="video"
 					path="display/urls/video"
 					icon={YouTube}
 					placeholder="YouTube showcase"
 				/>
 				<TextInput
+					dataRef={packData}
 					area="discord"
 					path="display/urls/discord"
 					icon={Discord}
@@ -1378,6 +1071,7 @@ export default function Edit() {
 					}}
 				>
 					<TextInput
+						dataRef={packData}
 						area=""
 						placeholder="Link to README.md"
 						icon={Globe}

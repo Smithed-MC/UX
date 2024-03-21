@@ -6,10 +6,11 @@ import React, {
 } from "react"
 
 interface ModalContext {
-	close: MouseEventHandler
+	close: MouseEventHandler,
+	openState: boolean
 }
 
-const ModalContext = createContext<ModalContext>({ close: () => {} })
+const ModalContext = createContext<ModalContext>({ close: () => {}, openState: false })
 
 export default function Modal({
 	trigger,
@@ -107,6 +108,7 @@ export default function Modal({
 								setOpen(false)
 								if (onClose) onClose()
 							},
+							openState: open
 						})}
 				</div>
 			</div>

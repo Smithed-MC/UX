@@ -4,6 +4,7 @@ import {
 	createBrowserRouter,
 	Outlet,
 	redirect,
+	RouteObject,
 	RouterProvider,
 	ScrollRestoration,
 	useLocation,
@@ -12,18 +13,18 @@ import { initializeApp } from "firebase/app"
 import {
 	User as FirebaseUser,
 	browserSessionPersistence,
-	indexedDBLocalPersistence,
+	browserLocalPersistence,
 	setPersistence,
 } from "firebase/auth"
 
-import PacksBrowser from "./pages/packsBrowser.js"
+import PacksBrowser from "./pages/packs/index.js"
 import Home from "./pages/home.js"
-import Packs, { loadPackData } from "./pages/pack.js"
+import Packs, { loadPackData } from "./pages/packs/id/index.js"
 import "./style.css"
 
 import Account from "./pages/account.js"
 import { getAuth } from "firebase/auth"
-import Edit from "./pages/edit.js"
+import PackEdit from "./pages/packs/id/edit.js"
 import Bundles from "./pages/bundle.js"
 import Settings from "./pages/settings.js"
 
@@ -55,6 +56,8 @@ export type { ClientInject } from "./inject.js"
 
 import Cookies from "js-cookie"
 import Article from "./pages/article.js"
+import BundleEdit, { BundleEditError } from "./pages/bundles/id/edit.js"
+import { loadBundleEdit } from "./pages/bundles/id/loader.js"
 
 interface ClientProps {
 	platform: "desktop" | "website"
@@ -147,12 +150,19 @@ export function ClientApplet(props: ClientProps) {
 			await setPersistence(
 				getAuth(),
 				persistence
-					? indexedDBLocalPersistence
+					? browserLocalPersistence
 					: browserSessionPersistence
 			)
 
 			loadBundles(user)
 			loadUserData(user)
+
+			if (user)
+				Cookies.set("smithedToken", await user?.getIdToken(), {
+					sameSite: 'strict'
+				})
+			else
+				Cookies.remove("smithedToken")
 		})
 
 		return () => {
@@ -327,7 +337,7 @@ function Footer() {
 }
 
 // Don't reorder these please
-export const subRoutes: any[] = [
+export const subRoutes: RouteObject[] = [
 	{
 		path: "",
 		element: <Home />,
@@ -350,7 +360,7 @@ export const subRoutes: any[] = [
 	},
 	{
 		path: "packs/:id/edit",
-		element: <Edit />,
+		element: <PackEdit />,
 	},
 	{
 		path: ":owner",
@@ -379,6 +389,14 @@ export const subRoutes: any[] = [
 				buttonDownloadFn={getDefaultInject().bundleDownloadButton}
 			/>
 		),
+	},
+	{
+		path: "bundles/:id/edit",
+		element: (
+			<BundleEdit/>
+		),
+		errorElement: <BundleEditError />,
+		loader: loadBundleEdit
 	},
 	{
 		path: "articles/:article",

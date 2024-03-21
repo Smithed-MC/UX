@@ -1,15 +1,13 @@
-import { PackCard, IconInput, ChooseBox, GalleryPackCard } from "components"
-import React, { useEffect, useRef, useState } from "react"
+import { IconInput, ChooseBox, GalleryPackCard } from "components"
+import { useEffect, useRef, useState } from "react"
 import {
-	PackData,
 	SortOptions,
 	fullMinecraftVersions,
 	packCategories,
-	supportedMinecraftVersions,
 } from "data-types"
-import { AddToBundleModal } from "../widget/packInfo.js"
+import { AddToBundleModal } from "../../widget/packInfo.js"
 import { Link, useLoaderData, useNavigate } from "react-router-dom"
-import "./packsBrowser.css"
+import "./index.css"
 import {
 	useAppDispatch,
 	useAppSelector,
@@ -23,7 +21,7 @@ import {
 	BrowsePageData,
 	PACKS_PER_PAGE,
 	createBrowseSearchParams,
-} from "../loaders.js"
+} from "../../loaders.js"
 
 function RenderPages({
 	totalPacks,
