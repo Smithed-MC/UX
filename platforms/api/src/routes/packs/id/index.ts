@@ -644,7 +644,7 @@ API_APP.route({
 		) {
 			request.log.info("served cached /packs/", id, "/gallery/", index)
 			reply.header("Content-Type", "image/png")
-			return tryCachedResult.item
+			return Buffer.from(tryCachedResult.item, "base64")
 		}
 
 		console.time("Find pack doc")
@@ -695,7 +695,7 @@ API_APP.route({
 		}
 		console.timeEnd("Get image")
 
-		await set(requestIdentifier, content, 5 * 60 * 1000)
+		await set(requestIdentifier, content.toString("base64"), 5 * 60 * 1000)
 		return content
 	},
 })
