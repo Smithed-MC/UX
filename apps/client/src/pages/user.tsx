@@ -799,10 +799,7 @@ export default function User({
 							>
 								<a
 									className="container newContentButton"
-									onClick={(e) => {
-										e.preventDefault()
-										setShowBundleCreationModal(true)
-									}}
+									href="/bundles/new/edit"
 								>
 									<Plus />
 								</a>

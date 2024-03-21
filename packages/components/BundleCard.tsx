@@ -61,7 +61,7 @@ export function BundleCard({
 
 	async function loadBundleData() {
 		const resp = await fetch(
-			import.meta.env.VITE_API_SERVER + `/bundles/${id}`
+			import.meta.env.VITE_API_SERVER + `/bundles/${id}?token=${await firebaseUser?.getIdToken()}`
 		)
 
 		if (!resp.ok) return
@@ -81,7 +81,7 @@ export function BundleCard({
 
 	useEffect(() => {
 		loadBundleData()
-	}, [])
+	}, [firebaseUser])
 
 	if (rawBundleData === undefined) return <div style={{ display: "none" }} />
 
@@ -212,12 +212,7 @@ export function BundleCard({
 						{editable && (
 							<a
 								className="buttonLike highlightButtonLike bundleControlButton"
-								href={`/browse`}
-								onClick={(e) => {
-									dispatch(
-										setSelectedBundle(rawBundleData.uid)
-									)
-								}}
+								href={`/bundles/${rawBundleData.uid}/edit`}
 							>
 								<NewFolder />
 							</a>
