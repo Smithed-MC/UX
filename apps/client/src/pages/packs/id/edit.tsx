@@ -311,6 +311,8 @@ export default function PackEdit() {
 			v.dependencies ??= []
 		})
 
+		data.categories ??= []
+
 		const metaData: PackMetaData = await (
 			await fetch(
 				import.meta.env.VITE_API_SERVER + `/packs/${packIdParam}/meta`,

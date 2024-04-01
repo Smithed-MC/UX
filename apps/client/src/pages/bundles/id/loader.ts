@@ -35,7 +35,10 @@ export async function loadBundleEdit({
 
 	if (bundleId !== "new") {
 		const bundleResp = await fetch(
-			import.meta.env.VITE_API_SERVER + `/bundles/${bundleId}?token=${token}`
+			import.meta.env.VITE_API_SERVER + `/bundles/${bundleId}?token=${token}`,
+			{
+				cache: 'no-cache'
+			}
 		)
 
 		if (!bundleResp.ok) {

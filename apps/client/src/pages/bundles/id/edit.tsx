@@ -305,7 +305,10 @@ export default function BundleEdit() {
 			: `/bundles/${bundleData.uid}?token=${token}`
 
 		console.log(uri)
-
+		console.log(bundleData)
+		if (bundleData.id === '')
+			bundleData.id = Date.now().toString()
+		
 		const mainSaveResp = await fetch(
 			import.meta.env.VITE_API_SERVER + uri,
 			{
