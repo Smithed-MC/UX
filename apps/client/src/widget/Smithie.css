@@ -1,0 +1,32 @@
+
+@keyframes smithieBounce {
+    0% {
+        transform: translateY(0rem);
+    }
+    25% {
+        transform: translateY(-0.2rem);
+    }
+    75% {
+        transform: translateY(0.2rem);
+    }
+    100% {
+        transform: translateY(0rem);
+    }
+}
+
+
+
+@keyframes smithieZoomies {
+    0% {
+        transform: translateX(0rem);
+    }
+    50% {
+        transform: translateX(calc(-100vw - 8rem));
+    }
+    90% {
+        transform: translateX(8rem);
+    }
+    100% {
+        transform: translateX(0rem);
+    }
+}

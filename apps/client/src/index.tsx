@@ -58,6 +58,7 @@ import Cookies from "js-cookie"
 import Article from "./pages/article.js"
 import BundleEdit, { BundleEditError } from "./pages/bundles/id/edit.js"
 import { loadBundleEdit } from "./pages/bundles/id/loader.js"
+import Smithie from "./widget/Smithie.js"
 
 interface ClientProps {
 	platform: "desktop" | "website"
@@ -268,6 +269,7 @@ export function ClientApplet(props: ClientProps) {
 					logoUrl={props.inject.logoUrl}
 				/>
 				<Outlet />
+				<Smithie />
 			</div>
 			{props.inject.enableFooter ? <Footer /> : <br />}
 		</div>
