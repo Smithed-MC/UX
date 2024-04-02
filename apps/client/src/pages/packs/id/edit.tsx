@@ -232,7 +232,7 @@ export default function PackEdit() {
 
 	const updateVersions = () => {
 		let versions = [...(packData?.versions ?? [])].sort((a, b) =>
-			compare(a.name, b.name)
+			compare(coerce(a.name) ?? '', coerce(b.name) ?? '')
 		)
 
 		setVersions(versions)
@@ -1123,7 +1123,7 @@ export default function PackEdit() {
 		return (
 			<>
 				{[...versions]
-					.sort((a, b) => compare(a.name, b.name))
+					.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
 					.map((v, i) => (
 						<span
 							className={`versionChoice ${v === selectedVersion ? "selected" : ""}`}
@@ -1197,7 +1197,7 @@ export default function PackEdit() {
 							const nextVersion =
 								inc(
 									[...versions]
-										.sort((a, b) => compare(a.name, b.name))
+										.sort((a, b) => compare(coerce(a.name) ?? '', coerce(b.name) ?? ''))
 										.at(-1)?.name ?? "0.0.0",
 									"patch"
 								) ?? ""
