@@ -15,6 +15,7 @@ import { getUIDFromToken } from "database"
 import { coerce } from "semver"
 import { SearchResponseHit } from "typesense/lib/Typesense/Documents.js"
 import hash from "hash.js"
+import { updateGalleryData } from "./id/index.js"
 
 type ReceivedPackResult = {
 	docId: string
@@ -235,6 +236,8 @@ API_APP.route({
 					`Version ${v} is not valid semver`
 				)
 		}
+
+		await updateGalleryData(data, reply)
 
 		const documentData = {
 			id: id,

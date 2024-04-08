@@ -3,6 +3,7 @@ import { API_APP, setupApp } from "./app.js"
 import dotenv from "dotenv"
 import { calculateDownloads } from "./tasks/createMetrics.js"
 import { deleteTempFiles } from "./tasks/deleteTempFiles.js"
+import { updateGalleries } from "./tasks/updateGalleries.js"
 
 export type Queryable =
 	| FirebaseFirestore.Query

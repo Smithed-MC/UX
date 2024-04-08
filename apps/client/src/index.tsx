@@ -269,7 +269,6 @@ export function ClientApplet(props: ClientProps) {
 					logoUrl={props.inject.logoUrl}
 				/>
 				<Outlet />
-				<Smithie />
 			</div>
 			{props.inject.enableFooter ? <Footer /> : <br />}
 		</div>

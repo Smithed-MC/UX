@@ -83,7 +83,7 @@ export function BundleCard({
 		loadBundleData()
 	}, [firebaseUser])
 
-	if (rawBundleData === undefined) return <div style={{ display: "none" }} />
+	if (rawBundleData === undefined) return <></>
 
 	return (
 		<div

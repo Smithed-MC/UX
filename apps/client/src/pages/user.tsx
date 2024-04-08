@@ -37,6 +37,7 @@ import {
 	Jigsaw,
 	Line,
 	Plus,
+	Smithed,
 	Trash,
 	Upload,
 } from "components/svg"
@@ -48,6 +49,7 @@ import { CreateBundle } from "../widget/bundle"
 import { BundleCard } from "components/BundleCard"
 import { UserStats } from "../loaders"
 import { selectUserData } from "store"
+import Smithie from "../widget/Smithie"
 
 interface UserTabComponent {
 	editable: boolean
@@ -842,6 +844,11 @@ export default function User({
 					user={firebaseUser}
 				/>
 			)}
+
+			{[
+				"6HLRqeMx3zZQO4iWQcEfQMBMK8m2",
+				"ACICebloi6dIVDTcmo3pieZkadc2",
+			].includes(user.uid) && <Smithie />}
 		</div>
 	)
 }
