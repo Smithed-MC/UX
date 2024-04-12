@@ -44,6 +44,7 @@
 }
 
 .launchFooter {
+	display: flex;
 	background-color: var(--section);
 	width: min(100%);
 	padding: 1.5rem;
@@ -58,6 +59,8 @@
 }
 
 .launchFooterLeft {
+	display: flex;
+	flex-direction: column;
 	justify-content: flex-start;
 	flex: 1 1;
 

@@ -5,6 +5,7 @@ import {
 	ErrorPage,
 	IconInput,
 	IconTextButton,
+	Link,
 	MarkdownRenderer,
 	Modal,
 	Spinner,
@@ -238,16 +239,16 @@ export function BundleEditError() {
 				className="container"
 				style={{ flexDirection: "row", gap: "1rem" }}
 			>
-				<a className="buttonLike accentedButtonLike" href="/">
+				<Link className="buttonLike accentedButtonLike" to="/">
 					Go Home
-				</a>
+				</Link>
 				{error.status === HTTPResponses.UNAUTHORIZED && (
-					<a
+					<Link
 						className="buttonLike accentedButtonLike"
-						href="/account"
+						to="/account"
 					>
 						Go to sign-in
-					</a>
+					</Link>
 				)}
 			</div>
 		</div>
@@ -573,8 +574,8 @@ export default function BundleEdit() {
 						width: "100%",
 					}}
 				>
-					<a
-						href={"/packs/" + packRef.id}
+					<Link
+						to={"/packs/" + packRef.id}
 						style={{
 							fontWeight: 600,
 							fontSize: "1.5rem",
@@ -591,7 +592,7 @@ export default function BundleEdit() {
 						}}
 					>
 						{packData.display.name}
-					</a>
+					</Link>
 					{packVersion && (
 						<div
 							style={{
@@ -655,12 +656,12 @@ export default function BundleEdit() {
 				>
 					<span style={{ opacity: 0.5 }}>
 						by{" "}
-						<a
+						<Link
 							style={{ color: "var(--foreground)" }}
-							href={"/" + packData.author}
+							to={"/" + packData.author}
 						>
 							{packData.author}
-						</a>
+						</Link>
 					</span>
 					<div style={{ flexGrow: 1 }} />
 					{packVersion && (
@@ -1399,7 +1400,7 @@ export default function BundleEdit() {
 	// 								icon={At}
 	// 								placeholder="Project id"
 	// 							/>
-	// 							<a
+	// 							<Link
 	// 								className="buttonLike invalidButtonLike"
 	// 								onClick={async () => {
 	// 									const input = document.getElementById(
@@ -1426,7 +1427,7 @@ export default function BundleEdit() {
 	// 								}}
 	// 							>
 	// 								<Trash />
-	// 							</a>
+	// 							</Link>
 	// 						</div>
 	// 					)}
 	// 				</>

@@ -151,13 +151,13 @@ export default function SignUp({ clickLogin }: { clickLogin: () => void }) {
 				className="container"
 				style={{ flexDirection: "row", gap: "1.25rem" }}
 			>
-				<a
+				<Link
 					className="compactButton"
 					style={{ color: "var(--border)" }}
-					href="https://smithed.dev/discord"
+					to="https://smithed.dev/discord"
 				>
 					Need help
-				</a>
+				</Link>
 				<div
 					style={{
 						width: "0.25rem",
@@ -167,13 +167,13 @@ export default function SignUp({ clickLogin }: { clickLogin: () => void }) {
 						margin: "0rem -0.75rem",
 					}}
 				/>
-				<a
+				<Link
 					className="compactButton"
 					style={{ color: "var(--border)" }}
 					onClick={clickLogin}
 				>
 					Login
-				</a>
+				</Link>
 				<IconTextButton
 					className="accentedButtonLike"
 					text="Sign Up"

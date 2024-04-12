@@ -1,7 +1,7 @@
 import { open } from "@tauri-apps/api/shell"
 import {
-	DownloadButton,
 	IconTextButton,
+	Link,
 	markdownOptions,
 	MarkdownRenderer,
 	Modal,
@@ -24,21 +24,17 @@ import {
 	BundleUpdater,
 	fullMinecraftVersions,
 	MinecraftVersion,
-	PackBundle,
 	PackBundle_v2,
 	PackData,
-	PackEntry,
 	PackMetaData,
 	PackVersion,
 	supportedMinecraftVersions,
 	UserData,
 } from "data-types"
 import React, {
-	createContext,
 	MouseEventHandler,
-	useRef,
+	useContext,
 	useState,
-	version,
 } from "react"
 import { useLoaderData, useNavigate } from "react-router-dom"
 import "./packInfo.css"
@@ -53,17 +49,13 @@ import {
 } from "store"
 import { CreateBundle } from "./bundle"
 import BackButton from "./BackButton"
+import { ClientContext } from "../context"
 
 interface PackInfoProps {
-	yOffset: number
-	packEntry?: PackEntry
-	packData?: PackData
 	id: string
 	fixed: boolean
 	onClose: () => void
 	style?: React.CSSProperties
-	downloadButton: DownloadButton
-	showBackButton: boolean
 }
 
 if (
@@ -72,16 +64,17 @@ if (
 	markdownOptions !== undefined
 ) {
 	markdownOptions.a = ({ children, ...props }) => (
-		<a
+		<Link
 			{...props}
 			target="_blank"
-			href={undefined}
+			to={""}
 			onClick={(e) => {
+				e.preventDefault()
 				open(props.href ?? "")
 			}}
 		>
 			{children}
-		</a>
+		</Link>
 	)
 }
 
@@ -852,30 +845,23 @@ function DownloadPackModal({
 }
 
 export default function PackInfo({
-	yOffset,
-	packEntry,
 	id,
-	fixed,
-	onClose,
 	style,
-	downloadButton: DownloadButton,
-	showBackButton,
 }: PackInfoProps) {
 	const loaderData = useLoaderData() as any
 	// console.log(loaderData)
+	const clientContext = useContext(ClientContext)
+
+	const DownloadButton = clientContext.packDownloadButton
 
 	const packData: PackData | undefined = loaderData.packData
 	const metaData: PackMetaData | undefined = loaderData.metaData
 	const owner: UserData | undefined = loaderData.owner
 	const fullview: string = loaderData.fullview
 	// console.log(fullview)
-	const [showBundleSelection, setShowBundleSelection] = useState(false)
 	const [injectPopup, setInjectPopup] = useState<undefined | JSX.Element>(
 		undefined
 	)
-
-	const parentDiv = useRef<HTMLDivElement>(null)
-	const spinnerDiv = useRef<HTMLDivElement>(null)
 
 	return (
 		<div
@@ -901,7 +887,7 @@ export default function PackInfo({
 						{packData?.display.name}
 					</label>
 					<label style={{ gridArea: "byLine" }}>
-						by <a href={`/${owner?.uid}`}>{owner?.displayName}</a>
+						by <Link to={`/${owner?.uid}`}>{owner?.displayName}</Link>
 						<label className="packDetailsUpdateInfo">
 							{` ∙ ${metaData?.stats.updated ? "Updated" : "Uploaded"} ${prettyTimeDifference(metaData?.stats.updated ?? metaData?.stats.added ?? 0)} ago`}
 						</label>
@@ -959,14 +945,14 @@ export default function PackInfo({
 					</div>
 				</div>
 				<div className="userButtonsContainer">
-					{showBackButton && <BackButton />}
+					{clientContext.showBackButton && <BackButton />}
 					{packData?.display.urls?.discord &&
 						packData?.display.urls?.discord.length > 0 && (
 							<IconTextButton
 								className={"packInfoMediaButton"}
 								icon={Discord}
 								text={"Join Discord"}
-								href={packData?.display.urls?.discord}
+								to={packData?.display.urls?.discord}
 							/>
 						)}
 					{packData?.display.urls?.homepage &&
@@ -975,7 +961,7 @@ export default function PackInfo({
 								className={"packInfoMediaButton"}
 								iconElement={<Globe fill="var(--foreground)" />}
 								text={"Official website"}
-								href={packData?.display.urls?.homepage}
+								to={packData?.display.urls?.homepage}
 							/>
 						)}
 					{packData?.display.urls?.source &&
@@ -984,14 +970,14 @@ export default function PackInfo({
 								className={"packInfoMediaButton"}
 								icon={Github}
 								text={"Source code"}
-								href={packData?.display.urls?.source}
+								to={packData?.display.urls?.source}
 							/>
 						)}
 					<IconTextButton
 						className="accentedButtonLike packInfoSmallDownload packInfoMediaButton"
 						iconElement={<Download fill="var(--foreground)" />}
 						text={"Download"}
-						href={
+						to={
 							import.meta.env.VITE_API_SERVER +
 							`/download?pack=${id}`
 						}

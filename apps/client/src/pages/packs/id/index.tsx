@@ -66,10 +66,7 @@ export async function loadPackData({ params }: any) {
 	return { packData, metaData, fullview, owner }
 }
 
-export default function Packs({
-	packDownloadButton,
-	showBackButton,
-}: PacksProps) {
+export default function Packs() {
 	const { id: id } = useParams()
 	const data = useLoaderData() as any
 
@@ -79,7 +76,7 @@ export default function Packs({
 	// if (packData === undefined) return <div className="container" style={{ width: '100%', height: '100%', gap: 8, boxSizing: 'border-box' }}>
 	//     <h1 style={{ color: 'var(--disturbing)', marginBottom: 0 }}>Error 404</h1>
 	//     <label style={{ fontSize: '1.5rem', marginBottom: 16 }}>That pack could not be found!</label>
-	//     <a className="button" href="/browse" style={{ padding: 12, borderRadius: 'var(--defaultBorderRadius)' }}>Back to Browse</a>
+	//     <Link className="button" to="/browse" style={{ padding: 12, borderRadius: 'var(--defaultBorderRadius)' }}>Back to Browse</Link>
 	// </div>
 
 	// if (data === undefined) return <div className="container" style={{ width: '100%', height: '95vh' }}>
@@ -109,12 +106,9 @@ export default function Packs({
 				}}
 			>
 				<PackInfo
-					yOffset={/*window.scrollY*/ 0}
 					id={id ?? ""}
 					fixed={false}
 					onClose={() => {}}
-					downloadButton={packDownloadButton}
-					showBackButton={showBackButton}
 				/>
 			</div>
 		</div>

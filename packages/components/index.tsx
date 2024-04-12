@@ -16,6 +16,7 @@ import GalleryPackCard from "./GalleryPackCard"
 import CategoryBar, { CategoryChoice } from "./CategoryBar"
 import { DownloadButton } from "./DownloadButton"
 import Modal from "./Modal"
+import Link from "./Link"
 
 export {
 	NavButton,
@@ -37,4 +38,5 @@ export {
 	CategoryChoice,
 	type DownloadButton,
 	Modal,
+	Link
 }

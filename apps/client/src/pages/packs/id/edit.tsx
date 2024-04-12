@@ -435,10 +435,10 @@ export default function PackEdit() {
 					<IconTextButton
 						icon={Account}
 						text={"Login"}
-						href="/account"
+						to="/account"
 						className="accentedButtonLike"
 					/>
-					<IconTextButton icon={Home} text={"Go Home"} href="/" />
+					<IconTextButton icon={Home} text={"Go Home"} to="/" />
 				</div>
 			</div>
 		)
@@ -1404,7 +1404,7 @@ export default function PackEdit() {
 									icon={At}
 									placeholder="Project id"
 								/>
-								<a
+								<Link
 									className="buttonLike invalidButtonLike"
 									onClick={async () => {
 										const input = document.getElementById(
@@ -1430,7 +1430,7 @@ export default function PackEdit() {
 									}}
 								>
 									<Trash />
-								</a>
+								</Link>
 							</div>
 						)}
 					</>

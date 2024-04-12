@@ -17,7 +17,7 @@ export default function EditButton({
 			style={{ width: 48, height: 48, flexShrink: 0, ...props.style }}
 			{...props}
 		>
-			<a
+			<Link
 				className="button wobbleHover container"
 				style={{
 					maxWidth: 48,
@@ -25,11 +25,11 @@ export default function EditButton({
 					borderRadius: 24,
 					padding: 12,
 				}}
-				href={link}
+				to={link}
 				onClick={onClick}
 			>
 				<Edit style={{ fill: "var(--buttonText)" }} />
-			</a>
+			</Link>
 		</div>
 	)
 }

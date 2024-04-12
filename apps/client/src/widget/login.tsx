@@ -129,13 +129,13 @@ export default function Login({
 				className="container"
 				style={{ flexDirection: "row", gap: "1.25rem" }}
 			>
-				<a
+				<Link
 					className="compactButton"
 					style={{ opacity: 0.3 }}
 					onClick={clickHelp}
 				>
 					Need help?
-				</a>
+				</Link>
 				<div
 					style={{
 						width: "0.25rem",
@@ -145,13 +145,13 @@ export default function Login({
 						margin: "0rem -0.75rem",
 					}}
 				/>
-				<a
+				<Link
 					className="compactButton"
 					style={{ opacity: 0.3 }}
 					onClick={clickSignUp}
 				>
 					Sign up
-				</a>
+				</Link>
 				<IconTextButton
 					className="accentedButtonLike"
 					text="Login"

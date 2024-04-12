@@ -18,6 +18,7 @@ import {
 	setUsersBundles,
 } from "store"
 import { BundleUpdater, PackBundle, PackData } from "data-types"
+import Link from "./Link"
 
 interface NavButtonProps {
 	onOpen: () => void
@@ -169,19 +170,19 @@ export function EditBundle({ close }: EditBundleProps) {
 						onClick={close}
 					/>
 					{packs.length > 0 && (
-						<a
+						<Link
 							className="buttonLike"
 							style={{
 								fill: "var(--foreground)",
 								padding: "0.5rem",
 							}}
-							href={
+							to={
 								import.meta.env.VITE_API_SERVER +
 								`/bundles/${curBundle.uid}/download`
 							}
 						>
 							<Download />
-						</a>
+						</Link>
 					)}
 					{packs.length > 0 && (
 						<IconTextButton
@@ -237,7 +238,7 @@ export function EditBundle({ close }: EditBundleProps) {
 	)
 }
 
-export function NavBar(props: NavBarProps) {
+export function NavBar({ tabs, logoUrl }: NavBarProps) {
 	const [open, setOpen] = useState(previousState)
 
 	const [editBundleOpen, setEditBundleOpen] = useState(false)
@@ -293,7 +294,7 @@ export function NavBar(props: NavBarProps) {
 				className="navBarHide"
 				style={{ width: "1.5rem", height: "1.5rem" }}
 			/>
-			<a
+			<Link
 				className="navBarHide"
 				style={{
 					fontSize: "24px",
@@ -303,10 +304,10 @@ export function NavBar(props: NavBarProps) {
 					color: "var(--foreground)",
 					textDecoration: "none",
 				}}
-				href={props.logoUrl}
+				to={logoUrl}
 			>
 				Smithed
-			</a>
+			</Link>
 			<div
 				className="navBarHide"
 				style={{
@@ -316,7 +317,7 @@ export function NavBar(props: NavBarProps) {
 				}}
 			/>
 
-			{props.getTabs && props.getTabs()}
+			{tabs}
 			<div
 				style={{
 					display: "flex",
@@ -370,7 +371,7 @@ export function NavBar(props: NavBarProps) {
 				<IconTextButton
 					className="navBarOption end"
 					text={user?.displayName ?? "Login"}
-					href={"/" + (user?.displayName ?? "account")}
+					to={"/" + (user?.displayName ?? "account")}
 					icon={AccountSvg}
 					reverse={true}
 				/>
@@ -383,6 +384,6 @@ export function NavBar(props: NavBarProps) {
 }
 
 export interface NavBarProps {
-	getTabs: (() => JSX.Element[]) | undefined
+	tabs: readonly JSX.Element[]
 	logoUrl: string
 }

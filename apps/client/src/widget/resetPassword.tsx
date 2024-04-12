@@ -48,13 +48,13 @@ export default function ResetPassword({
 				className="container"
 				style={{ flexDirection: "row", gap: "1.25rem" }}
 			>
-				<a
+				<Link
 					className="compactButton"
 					style={{ color: "var(--border)" }}
 					onClick={clickBack}
 				>
 					Back
-				</a>
+				</Link>
 				<IconTextButton
 					className="accentedButtonLike"
 					text="Reset Password"

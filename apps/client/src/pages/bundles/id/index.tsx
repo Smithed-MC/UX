@@ -1,14 +1,12 @@
 import { useParams } from "react-router-dom"
 import { BundleCard } from "components/BundleCard"
 import { DownloadButton } from "components"
+import { useContext } from "react"
+import { ClientContext } from "../../../context"
 
-export default function Bundles({
-	buttonDownloadFn,
-}: {
-	buttonDownloadFn: DownloadButton
-}) {
+export default function Bundles() {
 	const { bundleId } = useParams()
-
+	const { bundleDownloadButton } = useContext(ClientContext);
 	if (!bundleId) return <div></div>
 
 	return (
@@ -29,7 +27,7 @@ export default function Bundles({
 					id={bundleId}
 					editable={false}
 					showOwner
-					bundleDownloadButton={buttonDownloadFn}
+					bundleDownloadButton={bundleDownloadButton}
 				/>
 			</div>
 		</div>

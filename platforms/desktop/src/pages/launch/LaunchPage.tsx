@@ -164,8 +164,8 @@ function LaunchFooter({ selectedBundle, onSetAuthDisplay }: LaunchFooterProps) {
 	}
 
 	return (
-		<div className="launchFooter container">
-			<div className="launchFooterLeft container">
+		<div className="launchFooter">
+			<div className="launchFooterLeft">
 				{showConsole && <LaunchConsole {...consoleProps} />}
 				<div className="editBundleContainer">
 					<IconTextButton
@@ -177,10 +177,10 @@ function LaunchFooter({ selectedBundle, onSetAuthDisplay }: LaunchFooterProps) {
 						text={selectedBundle ? "Edit bundle" : "Select bundle"}
 						icon={svg.Edit}
 						style={{ width: "fit-content" }}
-						href={
+						to={
 							selectedBundle !== undefined
 								? `/editLocalBundle/${selectedBundle}`
-								: null
+								: undefined
 						}
 					/>
 				</div>
@@ -289,11 +289,11 @@ function LaunchButton({
 					) : state == LaunchButtonState.ClickToLaunch ? (
 						<svg.Play fill="white" />
 					) : state == LaunchButtonState.Running ? (
-						"..."
+						<>...</>
 					) : state == LaunchButtonState.ClickToCancel ? (
 						<svg.Cross />
 					) : (
-						""
+						<></>
 					)
 				}
 				style={{ width: "fit-content" }}

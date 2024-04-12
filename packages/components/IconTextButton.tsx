@@ -4,13 +4,14 @@ import {
 	FunctionComponent,
 	SVGProps,
 } from "react"
-import { Link } from "react-router-dom"
+import Link from "./Link"
 
 export type IconTextButtonProps = {
 	text: string | JSX.Element
 	icon?: FunctionComponent<SVGProps<SVGSVGElement>> | string
 	iconElement?: JSX.Element
 	reverse?: boolean
+	to?: string
 } & React.HTMLProps<HTMLAnchorElement>
 
 export function IconTextButton({
@@ -19,6 +20,7 @@ export function IconTextButton({
 	iconElement,
 	reverse,
 	href,
+	to,
 	style,
 	target,
 	className,
@@ -29,10 +31,10 @@ export function IconTextButton({
 	disabled,
 }: IconTextButtonProps) {
 	return (
-		<a
+		<Link
 			className={`buttonLike${disabled ? " disabled" : ""} ` + className}
 			style={{ flexDirection: reverse ? "row-reverse" : "row", ...style }}
-			href={href}
+			to={href ?? to ?? ""}
 			target={target}
 			onClick={onClick}
 			rel={rel}
@@ -73,6 +75,6 @@ export function IconTextButton({
 			>
 				{text}
 			</span>
-		</a>
+		</Link>
 	)
 }

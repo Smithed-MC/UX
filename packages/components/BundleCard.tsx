@@ -6,7 +6,7 @@ import {
 	PackDependency,
 } from "data-types"
 import { useEffect, useRef, useState } from "react"
-import { DownloadButton, IconTextButton } from "components"
+import { DownloadButton, IconTextButton, Link } from "components"
 import { useAppDispatch, useFirebaseUser } from "hooks"
 import { Check, Cross, Folder, Gear, NewFolder, Trash } from "components/svg"
 import { setSelectedBundle } from "store"
@@ -165,12 +165,12 @@ export function BundleCard({
 								borderRadius: "var(--defaultBorderRadius)",
 							}}
 						>
-							<a
+							<Link
 								className="compactButton"
-								href={`/packs/${p[0]}`}
+								to={`/packs/${p[0]}`}
 							>
 								{p[1]}
-							</a>
+							</Link>
 							<div
 								style={{
 									width: 2,
@@ -210,12 +210,12 @@ export function BundleCard({
 							</div>
 						)}
 						{editable && (
-							<a
+							<Link
 								className="buttonLike highlightButtonLike bundleControlButton"
-								href={`/bundles/${rawBundleData.uid}/edit`}
+								to={`/bundles/${rawBundleData.uid}/edit`}
 							>
 								<NewFolder />
-							</a>
+							</Link>
 						)}
 						{rawBundleData.uid !== undefined && (
 							<DownloadButton
@@ -228,7 +228,7 @@ export function BundleCard({
 								}}
 							/>
 						)}
-						{/* <IconTextButton text={"Download"} iconElement={<Download fill="var(--foreground)" />} className="accentedButtonLike bundleControlButton" reverse={true} href={import.meta.env.VITE_API_SERVER + `/bundles/${rawBundleData.uid}/download`} /> */}
+						{/* <IconTextButton text={"Download"} iconElement={<Download fill="var(--foreground)" />} className="accentedButtonLike bundleControlButton" reverse={true} to={import.meta.env.VITE_API_SERVER + `/bundles/${rawBundleData.uid}/download`} /> */}
 					</div>
 				</div>
 			</div>

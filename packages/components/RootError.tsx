@@ -23,16 +23,16 @@ export function RootError() {
 				Sorry, we've encountered an error on our end!
 				<br />
 				Report it to the{" "}
-				<a href="https://github.com/Smithed-MC/UX">github</a>.
+				<Link to="https://github.com/Smithed-MC/UX">github</Link>.
 			</p>
-			<a
+			<Link
 				className="button"
 				onClick={() => {
 					navigate(-1)
 				}}
 			>
 				Go back
-			</a>
+			</Link>
 			<label
 				style={{
 					backgroundColor: "var(--backgroundAccent)",

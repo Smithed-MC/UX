@@ -46,14 +46,14 @@ export default function AddRemovePackButton({
 				</button>
 			)}
 			{link !== undefined && (
-				<a
+				<Link
 					className="button wobbleHover container"
 					style={sharedStyle}
 					onClick={onClick}
-					href={link}
+					to={link}
 				>
 					<ButtonIcon />
-				</a>
+				</Link>
 			)}
 		</div>
 	)

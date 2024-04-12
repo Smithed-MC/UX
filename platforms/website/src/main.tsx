@@ -1,4 +1,4 @@
-import Client from "client"
+import ClientParent from "client"
 import React from "react"
 import "./index.css"
 

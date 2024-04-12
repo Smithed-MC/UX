@@ -11,7 +11,7 @@ export default function FilterButton({ onClick, ...props }: FilterButtonProps) {
 	let [selected, setSelected] = React.useState(false)
 
 	return (
-		<a
+		<Link
 			style={{
 				display: "flex",
 				alignItems: "baseline",
@@ -24,6 +24,6 @@ export default function FilterButton({ onClick, ...props }: FilterButtonProps) {
 			}}
 		>
 			{props.children}
-		</a>
+		</Link>
 	)
 }

@@ -5,7 +5,7 @@ import {
 	PackMetaData,
 	UserData,
 } from "data-types"
-import { useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { useLoaderData, useNavigate, useParams } from "react-router-dom"
 import { formatDownloads } from "formatters"
 import "./user.css"
@@ -15,6 +15,7 @@ import {
 	DownloadButton,
 	GalleryPackCard,
 	IconTextButton,
+	Link,
 	MarkdownRenderer,
 } from "components"
 import {
@@ -50,6 +51,7 @@ import { BundleCard } from "components/BundleCard"
 import { UserStats } from "../loaders"
 import { selectUserData } from "store"
 import Smithie from "../widget/Smithie"
+import { ClientContext } from "../context"
 
 interface UserTabComponent {
 	editable: boolean
@@ -213,12 +215,11 @@ function UserPacks({
 function UserBundles({
 	bundles,
 	editable,
-	bundleDownloadButton,
 	visible,
 }: {
 	bundles: string[]
-	bundleDownloadButton: DownloadButton
 } & UserTabComponent) {
+	const clientContext = useContext(ClientContext)
 	return (
 		<div
 			key="bundles"
@@ -230,7 +231,7 @@ function UserBundles({
 					key={b}
 					id={b}
 					editable={editable}
-					bundleDownloadButton={bundleDownloadButton}
+					bundleDownloadButton={clientContext.bundleDownloadButton}
 				/>
 			))}
 		</div>
@@ -341,13 +342,12 @@ function UserAbout({
 	)
 }
 
-export default function User({
-	showBackButton,
-	bundleDownloadButton,
-}: UserProps) {
+export default function User() {
 	const { owner: userId } = useParams()
 	const { tab: defaultTab } = useQueryParams()
 	const firebaseUser = useFirebaseUser()
+
+	const clientContext = useContext(ClientContext)
 
 	const navigate = useNavigate()
 	const {
@@ -656,8 +656,8 @@ export default function User({
 						</div>
 						{editable && (
 							<div className="container profileControlContainer">
-								<a
-									href="../account"
+								<Link
+									to="../account"
 									className="buttonLike profileControl first"
 									title="Sign Out"
 									onClick={() => {
@@ -677,7 +677,7 @@ export default function User({
 										<BackArrow />
 										<Line fill="var(--foreground)" />
 									</div>
-								</a>
+								</Link>
 								{!editingUserData && (
 									<IconTextButton
 										className="accentedButtonLike profileControl last"
@@ -774,12 +774,12 @@ export default function User({
 									zIndex: 1,
 								}}
 							>
-								<a
+								<Link
 									className="container newContentButton"
-									href="/packs/new/edit"
+									to="/packs/new/edit"
 								>
 									<Plus />
-								</a>
+								</Link>
 							</div>
 						)}
 					</CategoryChoice>
@@ -799,12 +799,12 @@ export default function User({
 									zIndex: 1,
 								}}
 							>
-								<a
+								<Link
 									className="container newContentButton"
-									href="/bundles/new/edit"
+									to="/bundles/new/edit"
 								>
 									<Plus />
-								</a>
+								</Link>
 							</div>
 						)}
 					</CategoryChoice>
@@ -823,7 +823,6 @@ export default function User({
 					visible={tab === "userBundles"}
 					bundles={userStats.bundles}
 					editable={editable}
-					bundleDownloadButton={bundleDownloadButton}
 				/>
 				<UserAbout
 					isEditing={editingUserData}

@@ -1,6 +1,7 @@
 import {
 	GalleryPackCard,
 	IconTextButton,
+	Link,
 	NavBar,
 	NavButton,
 	PackCard,
@@ -62,12 +63,12 @@ function CategoryHeader({
 				style={{ width: "1rem", color: `var(--${color})` }}
 				fill={`var(--${color})`}
 			/>
-			<a
-				href={`/browse?sort=${sort}`}
+			<Link
+				to={`/packs?sort=${sort}`}
 				style={{ color: `var(--${color})` }}
 			>
 				{text}
-			</a>
+			</Link>
 		</div>
 	)
 }

@@ -235,13 +235,13 @@ export default function PackCard({
 							<QuestionMark />
 						</div>
 					)}
-					<a
+					<Link
 						className="compactButton packCardName"
 						style={{ fontWeight: 600 }}
-						href={`/packs/${id}`}
+						to={`/packs/${id}`}
 					>
 						{data.display.name}
-					</a>
+					</Link>
 					<p className="packCardDescription">
 						{data.display.description}
 					</p>
@@ -260,12 +260,12 @@ export default function PackCard({
 					<div className="packCardInfo">
 						<span>
 							by{" "}
-							<a
+							<Link
 								className="compactButton"
-								href={`/${metaData?.owner}`}
+								to={`/${metaData?.owner}`}
 							>
 								{author}
-							</a>
+							</Link>
 						</span>
 						<span className="packCardInfoSeperator">
 							<svg
@@ -303,12 +303,12 @@ export default function PackCard({
 					</div>
 					<div style={{ flexGrow: 1 }} />
 					{state === "editable" && (
-						<a
+						<Link
 							className="buttonLike accentedButtonLike"
-							href={`/edit?pack=${id}`}
+							to={`/edit?pack=${id}`}
 						>
 							<Edit />
-						</a>
+						</Link>
 					)}
 					{state === "add" && addWidget}
 					<IconTextButton
@@ -316,7 +316,7 @@ export default function PackCard({
 						text={"Open"}
 						icon={Right}
 						reverse={true}
-						href={`/packs/${id}`}
+						to={`/packs/${id}`}
 					/>
 				</div>
 			</div>

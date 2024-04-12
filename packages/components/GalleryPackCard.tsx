@@ -21,6 +21,7 @@ import { User } from "firebase/auth"
 import { IconTextButton } from "./IconTextButton.js"
 import { Download, Edit, FlagCrossed, Logo, Refresh, Right } from "./svg.js"
 import { useNavigate } from "react-router-dom"
+import Link from "./Link"
 
 interface PackCardProps {
 	id: string
@@ -264,12 +265,12 @@ export default function GalleryPackCard({
 							}}
 						>
 							{`by `}
-							<a
+							<Link
 								style={{ color: "var(--text)" }}
-								href={`/${author}`}
+								to={`/${author}`}
 							>
 								{author}
-							</a>
+							</Link>
 							{data?.categories && data.categories.length > 0
 								? " • " + data?.categories[0]
 								: ""}
@@ -285,12 +286,12 @@ export default function GalleryPackCard({
 						>
 							{/* {addWidget} */}
 							{state === "editable" && (
-								<a
+								<Link
 									className="buttonLike accentedButtonLike"
-									href={"/packs/" + id + "/edit"}
+									to={"/packs/" + id + "/edit"}
 								>
 									<Edit />
-								</a>
+								</Link>
 							)}
 							<IconTextButton
 								className="accentedButtonLike"

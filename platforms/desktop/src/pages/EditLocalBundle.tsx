@@ -109,7 +109,7 @@ function EditLocalBundle({}: EditLocalBundleProps) {
 						text="Browse packs"
 						icon={svg.Plus}
 						style={{ width: "fit-content" }}
-						href="/browse"
+						to="/browse"
 					/>
 				</>
 			)}
@@ -193,7 +193,7 @@ function EditLocalPack({ data, reference, onRemove }: EditLocalPackProps) {
 							text="Go to page"
 							icon={svg.Right}
 							style={{ width: "fit-content" }}
-							href={`/packs/${data.id}`}
+							to={`/packs/${data.id}`}
 							reverse={true}
 						/>
 						<IconTextButton

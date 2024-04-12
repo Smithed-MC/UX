@@ -17,7 +17,8 @@ export default ({ mode }) => {
 			strictPort: true,
 		},
 		define: {
-			"import.meta.env.VITE_API_SERVER": '"https://api.smithed.dev/v2"'
+			"import.meta.env.VITE_API_SERVER": '"https://api.smithed.dev/v2"',
+			"import.meta.env.TAURI": true
 		},
 		envPrefix: ["VITE_", "TAURI_"],
 		build: {
