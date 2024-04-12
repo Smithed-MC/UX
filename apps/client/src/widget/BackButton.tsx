@@ -6,15 +6,13 @@ import { useNavigate } from "react-router-dom"
 function BackButton() {
 	const nav = useNavigate()
 	return (
-		<div className="backButton">
 			<IconTextButton
 				text="Back"
 				onClick={() => {
 					nav(-1)
 				}}
-				icon={Right}
+				iconElement={<Right style={{transform: 'rotate(180deg)'}}/>}
 			/>
-		</div>
 	)
 }
 
