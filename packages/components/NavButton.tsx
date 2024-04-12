@@ -10,7 +10,7 @@ export function NavButton({
 	className,
 	...props
 }: NavButtonProps) {
-	const match = useMatch(props.href ?? "")
+	const match = useMatch(props.href ?? props.to ?? "")
 
 	return (
 		<IconTextButton

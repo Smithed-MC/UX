@@ -1,6 +1,9 @@
+import { useEffect } from "react";
 import * as reactRouter from "react-router-dom";
 
 
 export default function Link(props: reactRouter.LinkProps) {
-    return <reactRouter.Link {...props} reloadDocument={props.reloadDocument ?? !import.meta.env.TAURI}/>
+    const reloadDocument = props.reloadDocument ?? !import.meta.env.TAURI;
+
+    return <reactRouter.Link {...props} reloadDocument={reloadDocument}/>
 }

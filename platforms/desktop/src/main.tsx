@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client"
 import "./style.css"
 import LaunchPage from "./pages/launch/LaunchPage"
 import ClientParent, { subRoutes } from "client"
-import { IconTextButton, svg } from "components"
+import { IconTextButton, NavButton, svg } from "components"
 import AddToBundle from "./components/AddToBundle"
 import { invoke } from "@tauri-apps/api"
 import { PackReference } from "data-types"
@@ -32,8 +32,9 @@ if (!subRoutes.includes(editLocalBundleRoute)) {
 
 const context: IClientContext = {
 	navbarTabs: [
-			<IconTextButton
+			<NavButton
 				className="navBarOption start"
+				selectedClass="successButtonLike"
 				text="Launch"
 				to="/launch"
 				iconElement={<svg.Play fill="white" />}
