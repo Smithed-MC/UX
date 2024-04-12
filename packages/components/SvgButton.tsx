@@ -1,4 +1,5 @@
 import React from "react"
+import Link from "./Link"
 
 interface EditButtonProps {
 	link?: string
@@ -40,7 +41,7 @@ export default function SvgButton({
 					boxSizing: "border-box",
 					...buttonStyle,
 				}}
-				to={link}
+				to={link ?? ""}
 				target="_blank"
 				onClick={onClick}
 			>

@@ -1,5 +1,6 @@
 import React from "react"
 import { Edit } from "./svg"
+import Link from "./Link"
 
 interface EditButtonProps {
 	link?: string
@@ -25,7 +26,7 @@ export default function EditButton({
 					borderRadius: 24,
 					padding: 12,
 				}}
-				to={link}
+				to={link ?? ''}
 				onClick={onClick}
 			>
 				<Edit style={{ fill: "var(--buttonText)" }} />

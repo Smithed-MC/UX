@@ -6,7 +6,7 @@ import {
 import React, { useState } from "react"
 import "./login.css"
 import { FirebaseError } from "firebase/app"
-import { IconInput, IconTextButton } from "components"
+import { IconInput, IconTextButton, Link } from "components"
 import { Right, Key, At } from "components/svg"
 
 export default function ResetPassword({
@@ -48,13 +48,13 @@ export default function ResetPassword({
 				className="container"
 				style={{ flexDirection: "row", gap: "1.25rem" }}
 			>
-				<Link
+				<a
 					className="compactButton"
 					style={{ color: "var(--border)" }}
 					onClick={clickBack}
 				>
 					Back
-				</Link>
+				</a>
 				<IconTextButton
 					className="accentedButtonLike"
 					text="Reset Password"

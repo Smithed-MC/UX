@@ -8,6 +8,7 @@ import { compare, coerce } from "semver"
 import { User } from "firebase/auth"
 import { IconTextButton } from "./IconTextButton.js"
 import { Edit, Right } from "./svg.js"
+import Link from "./Link"
 
 interface PackCardProps {
 	id: string

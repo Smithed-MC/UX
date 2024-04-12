@@ -4,6 +4,7 @@ import {
 	ChooseBox,
 	IconInput,
 	IconTextButton,
+	Link,
 	MarkdownRenderer,
 	Modal,
 	Spinner,
@@ -1404,7 +1405,7 @@ export default function PackEdit() {
 									icon={At}
 									placeholder="Project id"
 								/>
-								<Link
+								<a
 									className="buttonLike invalidButtonLike"
 									onClick={async () => {
 										const input = document.getElementById(
@@ -1430,7 +1431,7 @@ export default function PackEdit() {
 									}}
 								>
 									<Trash />
-								</Link>
+								</a>
 							</div>
 						)}
 					</>

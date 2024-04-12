@@ -1,5 +1,6 @@
 import React, { CSSProperties } from "react"
 import { AddToBundle, Edit, RemoveFromBundle } from "./svg"
+import Link from "./Link"
 
 interface AddButtonProps {
 	add: boolean

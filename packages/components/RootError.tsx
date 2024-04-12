@@ -1,4 +1,5 @@
 import { useRouteError, useNavigate } from "react-router-dom"
+import Link from "./Link"
 
 export function RootError() {
 	const error: any = useRouteError()
@@ -25,14 +26,14 @@ export function RootError() {
 				Report it to the{" "}
 				<Link to="https://github.com/Smithed-MC/UX">github</Link>.
 			</p>
-			<Link
-				className="button"
+			<a
+				className="buttonLike"
 				onClick={() => {
 					navigate(-1)
 				}}
 			>
 				Go back
-			</Link>
+			</a>
 			<label
 				style={{
 					backgroundColor: "var(--backgroundAccent)",
