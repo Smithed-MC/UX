@@ -787,7 +787,7 @@ export default function User() {
 						value="userBundles"
 						text="Bundles"
 						icon={<Folder />}
-						disabled={userStats.bundles.length === 0}
+						disabled={userStats.bundles.length === 0 && !editable}
 					>
 						{editable && (
 							<div

@@ -6,7 +6,7 @@ import {
 import React, { useState } from "react"
 import "./login.css"
 import { FirebaseError } from "firebase/app"
-import { IconInput, IconTextButton } from "components"
+import { IconInput, IconTextButton, Link } from "components"
 import { Account, At, Key, Right } from "components/svg"
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
@@ -154,7 +154,7 @@ export default function SignUp({ clickLogin }: { clickLogin: () => void }) {
 				<Link
 					className="compactButton"
 					style={{ color: "var(--border)" }}
-					to="https://smithed.dev/discord"
+					to="/discord"
 				>
 					Need help
 				</Link>
@@ -167,13 +167,13 @@ export default function SignUp({ clickLogin }: { clickLogin: () => void }) {
 						margin: "0rem -0.75rem",
 					}}
 				/>
-				<Link
+				<a
 					className="compactButton"
 					style={{ color: "var(--border)" }}
 					onClick={clickLogin}
 				>
 					Login
-				</Link>
+				</a>
 				<IconTextButton
 					className="accentedButtonLike"
 					text="Sign Up"

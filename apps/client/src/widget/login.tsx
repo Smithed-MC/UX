@@ -9,7 +9,7 @@ import {
 import React, { useState } from "react"
 import "./login.css"
 import { FirebaseError } from "firebase/app"
-import { IconInput, IconTextButton, Spinner } from "components"
+import { IconInput, IconTextButton, Link, Spinner } from "components"
 import { Right, Key, At } from "components/svg"
 import { useNavigate } from "react-router-dom"
 import Cookies from "js-cookie"
@@ -130,6 +130,7 @@ export default function Login({
 				style={{ flexDirection: "row", gap: "1.25rem" }}
 			>
 				<Link
+					to="/discord"
 					className="compactButton"
 					style={{ opacity: 0.3 }}
 					onClick={clickHelp}
@@ -145,13 +146,13 @@ export default function Login({
 						margin: "0rem -0.75rem",
 					}}
 				/>
-				<Link
+				<a
 					className="compactButton"
 					style={{ opacity: 0.3 }}
 					onClick={clickSignUp}
 				>
 					Sign up
-				</Link>
+				</a>
 				<IconTextButton
 					className="accentedButtonLike"
 					text="Login"

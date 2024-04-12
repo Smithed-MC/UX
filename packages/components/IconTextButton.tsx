@@ -30,8 +30,10 @@ export function IconTextButton({
 	rel,
 	disabled,
 }: IconTextButtonProps) {
+	const Element = (href || to) ? Link : (props: any) => <a {...props}/> 
+
 	return (
-		<Link
+		<Element
 			className={`buttonLike${disabled ? " disabled" : ""} ` + className}
 			style={{ flexDirection: reverse ? "row-reverse" : "row", ...style }}
 			to={href ?? to ?? ""}
@@ -75,6 +77,6 @@ export function IconTextButton({
 			>
 				{text}
 			</span>
-		</Link>
+		</Element>
 	)
 }
