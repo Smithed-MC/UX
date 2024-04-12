@@ -16,20 +16,6 @@ import hash from "hash.js"
 import { request } from "express"
 import { IncomingMessage, ServerResponse } from "http"
 
-async function populateContent(gallery: PackGalleryImage[]) {
-	for (let i = 0; i < gallery.length; i++) {
-		const g = gallery[i]
-
-		if (typeof g === "object") {
-			const contents = await getStorage()
-				.bucket()
-				.file(`gallery_images/${g.uid}`)
-				.download()
-
-			g.content = contents[0].toString("utf-8")
-		}
-	}
-}
 
 export async function updateGalleryData(packData: any, reply: FastifyReply|undefined) {
 	if (packData.display.gallery === undefined)
@@ -116,10 +102,6 @@ API_APP.route({
 			)
 
 		const data: PackData = await doc.get("data")
-
-		if (data.display.gallery) {
-			await populateContent(data.display.gallery)
-		}
 
 		await set(requestIdentifier, data, 60 * 60 * 1000)
 		return data
@@ -580,54 +562,6 @@ API_APP.route({
 		return data
 	},
 })
-
-API_APP.route({
-	method: "GET",
-	url: "/packs/:id/gallery",
-	schema: {
-		params: Type.Object({
-			id: Type.String(),
-		}),
-	},
-	handler: async (request, reply) => {
-		const { id } = request.params
-
-		// const requestIdentifier = 'GET-PACK-GALLERY::' + id
-		// const tryCachedResult = await get(requestIdentifier)
-		// if (tryCachedResult && request.headers["cache-control"] !== 'max-age=0') {
-		//     request.log.info('served cached /packs/', id, '/gallery')
-		//     return tryCachedResult.item
-		// }
-		const gallery = await getGallery(id, reply)
-		if (reply.sent) return
-
-		// await set(requestIdentifier, gallery ?? [], 5 * 60 * 1000);
-		return gallery ?? []
-	},
-})
-
-async function getGallery(
-	id: string,
-	reply: FastifyReply
-): Promise<PackGalleryImage[] | undefined | void> {
-	const doc = await getPackDoc(id)
-	if (doc === undefined)
-		return sendError(
-			reply,
-			HTTPResponses.NOT_FOUND,
-			`Pack with ID ${id} was not found`
-		)
-
-	const gallery: PackGalleryImage[] | undefined = await doc.get(
-		"data.display.gallery"
-	)
-
-	if (gallery) {
-		await populateContent(gallery)
-	}
-
-	return gallery ?? []
-}
 
 API_APP.route({
 	method: "GET",
