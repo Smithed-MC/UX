@@ -2,9 +2,12 @@ use std::sync::Mutex;
 
 use anyhow::anyhow;
 use directories::ProjectDirs;
-use mcvm::data::user::UserManager;
+use mcvm::core::user::UserManager;
+use oauth2::ClientId;
 use reqwest::Client;
 use tauri::async_runtime;
+
+use crate::minecraft::auth::CLIENT_ID;
 
 pub mod commands;
 
@@ -23,7 +26,7 @@ impl SmithedState {
             project_dirs: ProjectDirs::from("dev.smithed", "Smithed", "smithed_launcher")
                 .ok_or(anyhow!("Failed to create project directories"))?,
             client: Client::new(),
-            user_manager: Mutex::new(UserManager::new()),
+            user_manager: Mutex::new(UserManager::new(ClientId::new(CLIENT_ID.to_string()))),
         })
     }
 }

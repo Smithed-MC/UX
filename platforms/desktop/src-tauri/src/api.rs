@@ -1,10 +1,8 @@
-use std::{
-    fs::File,
-    io::{BufWriter, Cursor},
-    path::Path,
-};
+use std::fs::File;
+use std::io::{BufWriter, Cursor};
+use std::path::Path;
 
-use mcvm::net::download;
+use mcvm::core::net::download;
 use reqwest::Client;
 use zip::ZipArchive;
 
