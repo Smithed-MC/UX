@@ -58,6 +58,7 @@ import Article from "./pages/article.js"
 import BundleEdit, { BundleEditError } from "./pages/bundles/id/edit.js"
 import { loadBundleEdit } from "./pages/bundles/id/loader.js"
 import Smithie from "./widget/Smithie.js"
+import { loadPackEdit } from "./pages/packs/id/loader.js"
 
 initializeApp({
 	databaseURL: "https://mc-smithed-default-rtdb.firebaseio.com",
@@ -141,24 +142,18 @@ export function ClientApplet() {
 		setHideWarning(!!sessionStorage.getItem("hereBeDragons"))
 
 		const unsub = getAuth().onAuthStateChanged(async (user) => {
-			const persistence = Cookies.get("smithedPersistence") === "true"
-
-			await setPersistence(
-				getAuth(),
-				persistence
-					? browserLocalPersistence
-					: browserSessionPersistence
-			)
-
-			loadBundles(user)
-			loadUserData(user)
-
-			if (user)
-				Cookies.set("smithedToken", await user?.getIdToken(), {
+			if (user) {
+				Cookies.set("smithedToken", await user?.getIdToken(true), {
 					sameSite: 'strict'
 				})
-			else
+				loadBundles(user)
+				loadUserData(user)
+			}
+			else {
 				Cookies.remove("smithedToken")
+				resetBundleData()
+				resetUserData()
+			}
 		})
 
 		return () => {
@@ -357,6 +352,10 @@ export const subRoutes: RouteObject[] = [
 	{
 		path: "packs/:id/edit",
 		element: <PackEdit />,
+		loader: loadPackEdit,
+		shouldRevalidate: ({currentParams, nextParams}) => {
+			return currentParams !== nextParams
+		}
 	},
 	{
 		path: ":owner",

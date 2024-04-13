@@ -36,6 +36,10 @@
 	height: 100%;
 }
 
+.editTab:not(.selected) {
+	display: none;
+}
+
 .editProjectDetails,
 .editVersions {
 	display: grid;
@@ -167,6 +171,8 @@
 	box-sizing: border-box;
 	display: flex;
 }
+
+
 
 .editProjectDetails > .categories > .categoryChoice {
 	padding: 0.5rem 1rem;

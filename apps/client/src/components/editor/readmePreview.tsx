@@ -1,7 +1,7 @@
 import { IconTextButton, MarkdownRenderer } from "components"
 import { Globe, Refresh } from "components/svg"
 import { useState, useEffect } from "react"
-import { TextInput } from "./inputs"
+import { TextInput, validUrlRegex } from "./inputs"
 
 export default function ReadmePreview({ dataRef }: { dataRef: {display: {webPage?: string }} }) {
 	const [readme, setReadme] = useState<string>()
@@ -40,6 +40,8 @@ export default function ReadmePreview({ dataRef }: { dataRef: {display: {webPage
 					placeholder="Link to README.md"
 					icon={Globe}
 					path="display/webPage"
+					validate={(v) => !validUrlRegex.test(v) ? "Invalid url" : undefined}
+					insetError
 				/>
 				<IconTextButton
 					reverse

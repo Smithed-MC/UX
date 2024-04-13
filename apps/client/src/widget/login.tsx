@@ -42,7 +42,7 @@ export default function Login({
 			await setPersistence(
 				getAuth(),
 				staySignedIn
-					? indexedDBLocalPersistence
+					? browserLocalPersistence
 					: browserSessionPersistence
 			)
 			const cred = await signInWithEmailAndPassword(

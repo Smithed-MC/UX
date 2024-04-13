@@ -6,11 +6,14 @@ import React, {
 } from "react"
 
 interface ModalContext {
-	close: MouseEventHandler,
+	close: MouseEventHandler
 	openState: boolean
 }
 
-const ModalContext = createContext<ModalContext>({ close: () => {}, openState: false })
+const ModalContext = createContext<ModalContext>({
+	close: () => {},
+	openState: false,
+})
 
 export default function Modal({
 	trigger,
@@ -18,8 +21,12 @@ export default function Modal({
 	onClose,
 	style,
 	offset,
+	fragment,
+	className
 }: {
-	trigger: React.ReactElement
+	trigger: React.ReactElement,
+	fragment?: boolean
+	className?: string
 	style?: CSSProperties
 	offset?: string | number
 	content?: (ctx: ModalContext) => React.ReactElement
@@ -36,12 +43,8 @@ export default function Modal({
 		},
 	})
 
-	return (
-		<div
-			className="container"
-			style={{ position: "relative", ...style }}
-			onMouseLeave={() => setOpen(false)}
-		>
+	const frag = (
+		<>
 			{trigger}
 			<div
 				className="container"
@@ -51,6 +54,7 @@ export default function Modal({
 					padding: "1rem 1rem 1rem 1rem",
 					zIndex: open ? 10 : -100,
 					opacity: open ? 1 : 0,
+					pointerEvents: open ? 'all' : 'none',
 					transition: "opacity 0.25s ease-in-out",
 				}}
 			>
@@ -108,10 +112,23 @@ export default function Modal({
 								setOpen(false)
 								if (onClose) onClose()
 							},
-							openState: open
+							openState: open,
 						})}
 				</div>
 			</div>
+		</>
+	)
+
+	if (fragment)
+		return frag
+
+	return (
+		<div
+			className={["container", className].join(" ")}
+			style={{ position: "relative", ...style }}
+			onMouseLeave={() => setOpen(false)}
+		>
+			{frag}
 		</div>
 	)
 }

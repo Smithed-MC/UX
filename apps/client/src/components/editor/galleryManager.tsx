@@ -3,14 +3,23 @@ import { PackGalleryImage } from "data-types"
 import { useState, useEffect, useRef } from "react"
 
 export default function GalleryManager({
+	packId,
 	display,
 }: {
+	packId: string
 	display: { gallery?: PackGalleryImage[] }
 }) {
 	const [selectedImage, setSelectedImage] = useState(0)
 	const [images, setImages] = useState<PackGalleryImage[]>([])
 
+	
 	useEffect(() => {
+		display.gallery ??= []
+		display.gallery.forEach((g, i) => {
+			if (typeof g === "string") return
+			g.content = import.meta.env.VITE_API_SERVER + `/packs/${packId}/gallery/${i}`
+		})
+
 		setImages(display.gallery ?? [])
 	}, [...(display.gallery ?? [])])
 
@@ -48,17 +57,18 @@ export default function GalleryManager({
 				hidden
 				onChange={OnFileUpload}
 			/>
-			{display.gallery && display.gallery.length >= 1 && (
+			{images && images.length >= 1 && (
 				<div style={{ width: "100%", position: "relative" }}>
 					<img
 						style={{
 							width: "100%",
 							borderRadius: "var(--defaultBorderRadius)",
 						}}
-						src={((g: PackGalleryImage) =>
-							typeof g === "object" ? g.content : g)(
-							images[selectedImage]
-						)}
+						src={
+							typeof images[selectedImage] === "string"
+								? images[selectedImage]
+								: images[selectedImage].content
+						}
 					/>
 					<button
 						className="buttonLike"
@@ -93,7 +103,7 @@ export default function GalleryManager({
 				{images.map((g, idx) => (
 					<img
 						key={`gImg${idx}`}
-						src={typeof g === "object" ? g.content : g}
+						src={typeof g === "string" ? g : g.content}
 						className="galleryImageButton"
 						onClick={() => setSelectedImage(idx)}
 					/>

@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useEffect } from "react"
+import React, { PropsWithChildren, useEffect, useId } from "react"
 import { useRef, useState } from "react"
 import "./CategoryBar.css"
 
@@ -139,19 +139,37 @@ interface CategoryChoiceProps {
 	disabled?: boolean
 	hidden?: boolean
 	children?: any
+	id?: string
 	onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
 }
 
 export const CategoryChoice = React.forwardRef(function (
-	{ selected, onClick, children, icon, text, disabled }: CategoryChoiceProps,
+	{ selected, onClick, children, icon, text, disabled, id}: CategoryChoiceProps,
 	forwardRef?: React.ForwardedRef<HTMLButtonElement>
 ) {
+	const [hasError, setHasError] = useState(false)
+	const name = useId()
+
+	function setError(this: HTMLButtonElement, e: Event) {
+		setHasError((e as CustomEvent).detail)
+	}
+
+	useEffect(() => {
+		const button = document.getElementsByName(name)[0]
+
+		button?.addEventListener('setError', setError)
+		return () => button?.removeEventListener('setError', setError)
+	}, [])
+
+
 	return (
 		<button
-			className={`exclude container categoryChoice ${selected ? "selected" : ""}`}
+			className={`exclude container categoryChoice ${selected ? "selected" : ""} ${hasError ? "hasError" : ""}`}
 			onClick={onClick}
 			ref={forwardRef}
 			disabled={disabled}
+			id={id}
+			name={name}
 		>
 			<div
 				className="container content"

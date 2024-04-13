@@ -123,6 +123,9 @@ export default function PacksBrowser(props: any) {
 			sort: packSort,
 		})
 		if (page) params.set("page", page as string)
+		document
+			.getElementById("packCardContainer")
+			?.style.setProperty("opacity", "0.2")
 		navigate("/packs?" + params)
 	}
 
@@ -140,7 +143,7 @@ export default function PacksBrowser(props: any) {
 		document
 			.getElementById("packCardContainer")
 			?.style.setProperty("opacity", "1")
-	}, [page])
+	}, [page, packs])
 
 	return (
 		<div

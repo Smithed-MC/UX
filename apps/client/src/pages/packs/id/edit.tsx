@@ -1,3 +1,4 @@
+import { Value, ValueError, ValueErrorType } from "@sinclair/typebox/value"
 import {
 	CategoryBar,
 	CategoryChoice,
@@ -30,6 +31,7 @@ import {
 } from "components/svg"
 import {
 	PackData,
+	PackDataSchema,
 	PackDependency,
 	PackMetaData,
 	PackVersion,
@@ -37,9 +39,17 @@ import {
 	packCategories,
 	supportedMinecraftVersions,
 } from "data-types"
-import { useFirebaseUser, useQueryParams } from "hooks"
+import { useFirebaseUser, useQueryParams, useSmithedUser } from "hooks"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import {
+	createSearchParams,
+	useLoaderData,
+	useLocation,
+	useNavigate,
+	useNavigation,
+	useParams,
+	useSearchParams,
+} from "react-router-dom"
 import { coerce, compare, satisfies, inc, valid } from "semver"
 import { gzip } from "pako"
 import "./edit.css"
@@ -48,11 +58,12 @@ import {
 	TextInput,
 	setPropertyByPath,
 	LargeTextInput,
+	validUrlRegex,
 } from "../../../components/editor/inputs"
 import GalleryManager from "../../../components/editor/galleryManager"
-
-const validUrlRegex =
-	/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/g
+import { PackEditLoaderData } from "./loader"
+import qs from "query-string"
+import ReadmePreview from "../../../components/editor/readmePreview"
 
 interface SavingState {
 	mode: "off" | "saving" | "saved" | "error"
@@ -209,136 +220,89 @@ let depUidToRaw: Record<string, string> = {}
 let initialContributors: string[] = []
 
 export default function PackEdit() {
-	const user = useFirebaseUser()
+	const user = useSmithedUser()
+	const firebaseUser = useFirebaseUser()
+
 	const { id: packIdParam } = useParams()
+
 	const isNew = packIdParam === "new"
 
-	const { tab: currentTab } = useQueryParams()
+	const location = useLocation()
 
+	const { tab: currentTab } = qs.parse(
+		import.meta.env.SSR ? location.search : window.location.search
+	)
+	const defaultTab = currentTab ?? "editProjectDetails"
 	const navigate = useNavigate()
 
-	const [tab, setTab] = useState<string>(
-		(currentTab ?? "project-details") as string
-	)
-	const [packData, setPackData] = useState<PackData>()
-	const [packMetaData, setPackMetaData] = useState<PackMetaData>()
-
-	const [versions, setVersions] = useState<PackVersion[]>([])
-	const [selectedVersion, setSelectedVersion] = useState<PackVersion>()
+	const { packData, packMetaData } = useLoaderData() as PackEditLoaderData
 
 	const [savingState, setSavingState] = useState<SavingState>({ mode: "off" })
-	const [readme, setReadme] = useState("")
-
-	const updateVersions = () => {
-		let versions = [...(packData?.versions ?? [])].sort((a, b) =>
-			compare(
-				valid(a.name) ? a.name : coerce(a.name) ?? "0.0.1",
-				valid(b.name) ? b.name : coerce(b.name) ?? "0.0.1"
-			)
-		)
-
-		setVersions(versions)
-	}
-
-	useEffect(() => {
-		loadReadme()
-	}, [packData])
-
-	useEffect(() => {
-		updateVersions()
-		setSelectedVersion(packData?.versions[0])
-	}, [packData])
-
-	async function loadReadme() {
-		if (!packData?.display.webPage) return
-
-		const response = await fetch(packData.display.webPage)
-
-		if (!response.ok) {
-			setReadme('<span style="color: red;">Failed to load readme!</span>')
-			return
-		}
-		const newReadme = await response.text()
-		setReadme(newReadme)
-	}
 
 	async function onLoad() {
 		if (user == null) return
 
-		if (isNew) {
-			setPackData({
-				id: "",
-				display: {
-					name: "",
-					description: "",
-					webPage: "",
-					icon: "",
-					hidden: false,
-				},
-				versions: [],
-				categories: [],
-			})
-			setPackMetaData({
-				contributors: [user.uid],
-				owner: user.uid,
-				stats: {
-					downloads: {
-						today: 0,
-						total: 0,
-					},
-					added: 0,
-				},
-				docId: "",
-				rawId: "",
-			})
-			return
-		}
-
-		const data: PackData = await (
-			await fetch(
-				import.meta.env.VITE_API_SERVER + `/packs/${packIdParam}`,
-				{ cache: "no-cache" }
-			)
-		).json()
-		data.versions.sort((a, b) =>
+		packData.versions.sort((a, b) =>
 			compare(
 				valid(a.name) ? a.name : coerce(a.name) ?? "0.0.1",
 				valid(b.name) ? b.name : coerce(b.name) ?? "0.0.1"
 			)
 		)
 
-		data.versions.forEach((v) => {
+		packData.versions.forEach((v) => {
 			v.name = valid(v.name)
 				? v.name
 				: ((coerce(v.name)?.format() ?? "0.0.0") as string)
 			v.dependencies ??= []
 		})
 
-		data.categories ??= []
+		packData.categories ??= []
 
-		const metaData: PackMetaData = await (
-			await fetch(
-				import.meta.env.VITE_API_SERVER + `/packs/${packIdParam}/meta`,
-				{ cache: "no-cache" }
-			)
-		).json()
+		packData.id = packMetaData.rawId
 
-		data.id = metaData.rawId
-
-		setPackData(data)
-		initialContributors = [...metaData.contributors]
-		setPackMetaData(metaData)
+		initialContributors = [...packMetaData.contributors]
 	}
+
 	useEffect(() => {
 		onLoad()
-	}, [packIdParam, user])
+	}, [packData, packMetaData, user])
+
+	function sendError(path: string, e: ValueError) {
+		console.log(path)
+		const elem = document.getElementById(path)
+
+		elem?.dispatchEvent(
+			new ErrorEvent("error", {
+				error: e,
+				bubbles: true,
+			})
+		)
+	}
 
 	async function savePack() {
 		if (packData === undefined) return
 
+		const errors = [...Value.Errors(PackDataSchema, packData)]
+		if (errors.length >= 1) {
+			for (const e of errors) {
+				const path = e.path.slice(1)
+
+				if (path.endsWith("/downloads")) {
+					if (e.type === ValueErrorType.ObjectMinProperties) {
+						e.message = "At least one is required"
+					}
+					sendError(path + "/datapack", e)
+					sendError(path + "/resourcepack", e)
+				} else {
+					sendError(path, e)
+				}
+			}
+			return
+		}
+
 		setSavingState({ mode: "saving" })
 
-		const token = await user?.getIdToken()
+		const token = await firebaseUser!.getIdToken(true)
 
 		const packId = isNew ? packData.id : packIdParam
 
@@ -425,37 +389,26 @@ export default function PackEdit() {
 		setSavingState({ mode: "saved" })
 	}
 
-	if (user == null)
-		return (
-			<div className="container" style={{ height: "100%" }}>
-				<h1>You must be signed in to create/edit a pack</h1>
-				<div
-					className="container"
-					style={{ gap: "1rem", flexDirection: "row" }}
-				>
-					<IconTextButton
-						icon={Account}
-						text={"Login"}
-						to="/account"
-						className="accentedButtonLike"
-					/>
-					<IconTextButton icon={Home} text={"Go Home"} to="/" />
-				</div>
-			</div>
-		)
-	if (packData === undefined)
-		return (
-			<div
-				className="container"
-				style={{
-					width: "100%",
-					height: "100vh",
-					boxSizing: "border-box",
-				}}
-			>
-				<Spinner />
-			</div>
-		)
+	function createErrorHandlers(
+		id: string,
+		ref: React.RefObject<HTMLElement | null>
+	) {
+		function onError() {
+			const button = document.getElementById(id)
+			button?.dispatchEvent(new CustomEvent("setError", { detail: true }))
+		}
+
+		function onErrorCleared() {
+			if (ref?.current?.querySelector(".hasError")) return
+
+			const button = document.getElementById(id)
+			button?.dispatchEvent(
+				new CustomEvent("setError", { detail: false })
+			)
+		}
+
+		return [onError, onErrorCleared]
+	}
 
 	function Dependencies({ version }: { version: PackVersion }) {
 		const [dependencies, setDependencies] = useState<PackDependency[]>(
@@ -627,7 +580,13 @@ export default function PackEdit() {
 		)
 	}
 
-	function VersionInfo({ version }: { version?: PackVersion }) {
+	function VersionInfo({
+		version,
+		index,
+	}: {
+		version?: PackVersion
+		index: number
+	}) {
 		if (version === undefined)
 			return (
 				<div className="container" style={{ gridColumn: "1/3" }}>
@@ -640,6 +599,7 @@ export default function PackEdit() {
 				<TextInput
 					dataRef={version}
 					area="name"
+					pathPrefix={`versions/${index}/`}
 					path="name"
 					icon={At}
 					placeholder="Version x.y.z"
@@ -673,8 +633,10 @@ export default function PackEdit() {
 				<TextInput
 					dataRef={version}
 					area="datapack"
+					pathPrefix={`versions/${index}/`}
 					path="downloads/datapack"
 					icon={Globe}
+					insetError
 					placeholder="Datapack URL"
 					validate={(url) =>
 						!validUrlRegex.test(url) ? "Invalid url" : undefined
@@ -683,8 +645,10 @@ export default function PackEdit() {
 				<TextInput
 					dataRef={version}
 					area="resourcepack"
+					pathPrefix={`versions/${index}/`}
 					path="downloads/resourcepack"
 					icon={Globe}
+					insetError
 					placeholder="Resourcepack URL (Optional)"
 					validate={(url) =>
 						!validUrlRegex.test(url) ? "Invalid url" : undefined
@@ -720,529 +684,634 @@ export default function PackEdit() {
 		setPropertyByPath(packData, path, content)
 	}
 
-	const ProjectDetails = () => (
-		<div className="editProjectDetails">
-			<div className="main">
-				{/* <StringInput reference={packData} attr={'id'} disabled={!isNew} svg={Star}
-                description='Unique ID that others can reference your pack by' /> */}
-				<TextInput
-					area="id"
-					path="id"
-					icon={At}
-					placeholder="Project id"
-					dataRef={packData}
-				/>
-				<div className="iconGrid">
-					<Modal
-						style={{ gridArea: "icon", cursor: "pointer" }}
-						offset="1rem"
-						trigger={
-							<div
-								style={{
-									gridArea: "icon",
-									width: "8rem",
-									height: "8rem",
-									borderRadius: "var(--defaultBorderRadius)",
-									backgroundColor: "var(--bold)",
-									border: "0.125rem solid var(--border)",
-									overflow: "hidden",
-								}}
-							>
-								<img
-									id="display/icon/img"
-									src={packData.display.icon}
-									style={{
-										width: "100%",
-										height: "100%",
-										display: packData.display.icon
-											? "initial"
-											: "none",
-									}}
-									onError={(e) => {
-										e.currentTarget.style.setProperty(
-											"display",
-											"none"
-										)
-									}}
-								/>
-							</div>
-						}
-						content={() => (
-							<>
-								<TextInput
-									dataRef={packData}
-									area=""
-									path="display/icon"
-									icon={Picture}
-									placeholder="Project icon"
-									onChange={(v) => {
-										const img = document.getElementById(
-											"display/icon/img"
-										)! as HTMLImageElement
+	function ProjectDetails() {
+		const ref = useRef<HTMLDivElement>(null)
+		const [onError, onErrorCleared] = createErrorHandlers(
+			"editProjectDetailsChoice",
+			ref
+		)
 
-										img.setAttribute(
-											"src",
-											v.currentTarget.value
-										)
-										img.style.setProperty(
-											"display",
-											"initial"
-										)
-									}}
-								/>
-							</>
-						)}
-					/>
+		useEffect(() => {
+			ref.current?.addEventListener("error", onError)
+			ref.current?.addEventListener("errorCleared", onErrorCleared)
+
+			return () => {
+				ref.current?.removeEventListener("error", onError)
+				ref.current?.removeEventListener("errorCleared", onErrorCleared)
+			}
+		}, [])
+
+		return (
+			<div
+				className={`editTab editProjectDetails ${defaultTab === "editProjectDetails" ? "selected" : "none"}`}
+				ref={ref}
+			>
+				<div className="main">
+					{/* <StringInput reference={packData} attr={'id'} disabled={!isNew} svg={Star}
+                description='Unique ID that others can reference your pack by' /> */}
 					<TextInput
+						area="id"
+						path="id"
+						icon={At}
+						placeholder="Project id"
 						dataRef={packData}
-						area="name"
-						path="display/name"
-						icon={Jigsaw}
-						placeholder="Project name"
 					/>
-					<LargeTextInput
-						dataRef={packData}
-						area="description"
-						path="display/description"
-						placeholder="Short project description"
+					<div className="iconGrid">
+						<Modal
+							style={{ gridArea: "icon", cursor: "pointer" }}
+							offset="1rem"
+							trigger={
+								<div
+									style={{
+										gridArea: "icon",
+										width: "8rem",
+										height: "8rem",
+										borderRadius:
+											"var(--defaultBorderRadius)",
+										backgroundColor: "var(--bold)",
+										border: "0.125rem solid var(--border)",
+										overflow: "hidden",
+									}}
+								>
+									<img
+										id="display/icon/img"
+										src={packData.display.icon}
+										style={{
+											width: "100%",
+											height: "100%",
+											display: packData.display.icon
+												? "initial"
+												: "none",
+										}}
+										onError={(e) => {
+											e.currentTarget.style.setProperty(
+												"display",
+												"none"
+											)
+										}}
+									/>
+								</div>
+							}
+							content={() => (
+								<>
+									<TextInput
+										dataRef={packData}
+										area=""
+										path="display/icon"
+										icon={Picture}
+										placeholder="Project icon"
+										onChange={(v) => {
+											const img = document.getElementById(
+												"display/icon/img"
+											)! as HTMLImageElement
+
+											img.setAttribute(
+												"src",
+												v.currentTarget.value
+											)
+											img.style.setProperty(
+												"display",
+												"initial"
+											)
+										}}
+									/>
+								</>
+							)}
+						/>
+						<TextInput
+							dataRef={packData}
+							area="name"
+							path="display/name"
+							icon={Jigsaw}
+							placeholder="Project name"
+						/>
+						<LargeTextInput
+							dataRef={packData}
+							area="description"
+							path="display/description"
+							placeholder="Short project description"
+						/>
+					</div>
+					<IconTextButton
+						icon={Github}
+						className="inputField"
+						style={{ gridArea: "import" }}
+						text="Import from github"
+						reverse
+						onClick={() =>
+							document
+								.getElementById("githubImportModal")
+								?.style.setProperty("display", "flex")
+						}
 					/>
-				</div>
-				<IconTextButton
-					icon={Github}
-					className="inputField"
-					style={{ gridArea: "import" }}
-					text="Import from github"
-					reverse
-					onClick={() =>
-						document
-							.getElementById("githubImportModal")
-							?.style.setProperty("display", "flex")
-					}
-				/>
-				<div
-					id="githubImportModal"
-					className="container"
-					style={{
-						display: "none",
-						position: "fixed",
-						top: 0,
-						left: 0,
-						backgroundColor: "rgba(0,0,0,0.25)",
-						width: "100%",
-						height: "100%",
-						zIndex: 10,
-					}}
-				>
-					<div style={{ width: "min-content" }}>
-						<div
-							className="container"
-							style={{
-								gap: "1rem",
-								backgroundColor: "var(--section)",
-								padding: "1rem",
-								borderRadius:
-									"calc(var(--defaultBorderRadius) * 1.5)",
-								border: "0.125rem solid var(--border)",
-							}}
-						>
-							<IconInput
-								id="githubUrl"
-								type="url"
-								icon={Globe}
-								placeholder="Github URL"
-							/>
+					<div
+						id="githubImportModal"
+						className="container"
+						style={{
+							display: "none",
+							position: "fixed",
+							top: 0,
+							left: 0,
+							backgroundColor: "rgba(0,0,0,0.25)",
+							width: "100%",
+							height: "100%",
+							zIndex: 10,
+						}}
+					>
+						<div style={{ width: "min-content" }}>
 							<div
 								className="container"
-								style={{ flexDirection: "row", gap: "1rem" }}
+								style={{
+									gap: "1rem",
+									backgroundColor: "var(--section)",
+									padding: "1rem",
+									borderRadius:
+										"calc(var(--defaultBorderRadius) * 1.5)",
+									border: "0.125rem solid var(--border)",
+								}}
 							>
-								<IconTextButton
-									className="invalidButtonLike"
-									icon={Cross}
-									text={"Cancel"}
-									onClick={closeGithubModal}
+								<IconInput
+									id="githubUrl"
+									type="url"
+									icon={Globe}
+									placeholder="Github URL"
 								/>
-								<IconTextButton
-									className="successButtonLike"
-									icon={Check}
-									text={"Confirm"}
-									onClick={async () => {
-										const url = (
-											document.getElementById(
-												"githubUrl"
-											) as HTMLInputElement
-										).value
-										const match =
-											/https:\/\/(?:www.)?github.com\/([^\/]+)\/([^\/]+)/g.exec(
-												url
-											)
-
-										if (match == null) {
-											alert("Invalid github url!")
-											return
-										}
-
-										const [_, owner, repo] = match
-
-										let resp = await fetch(
-											`https://api.github.com/repos/${owner}/${repo}/contents`
-										)
-
-										if (!resp.ok) {
-											return alert(
-												"Failed to fetch files in github repo!\nUrl may be invalid or the repo is private"
-											)
-										}
-
-										let files: {
-											name: string
-											path: string
-											download_url: string
-											type: string
-										}[] = await resp.json()
-										let rootReadme = files.find(
-											(f) =>
-												f.name.toLowerCase() ===
-												"readme.md"
-										)?.download_url
-
-										for (let file of files) {
-											if (
-												file.name === "pack.png" ||
-												file.name === "icon.png"
-											) {
-												updateValue(
-													"display/icon",
-													file.download_url
-												)
-
-												const img =
-													document.getElementById(
-														"display/icon/img"
-													)! as HTMLInputElement
-
-												img.src = file.download_url
-												img.style.setProperty(
-													"display",
-													null
-												)
-
-												break
-											}
-
-											if (file.type === "dir") {
-												files.push(
-													...(await (
-														await fetch(
-															`https://api.github.com/repos/${owner}/${repo}/contents/${file.path}`
-														)
-													).json())
-												)
-											}
-										}
-
-										if (rootReadme)
-											updateValue(
-												"display/webPage",
-												rootReadme
-											)
-
-										resp = await fetch(
-											`https://api.github.com/repos/${owner}/${repo}`
-										)
-
-										if (!resp.ok) {
-											return alert(
-												"Failed to fetch info about github repo!\nUrl may be invalid or the repo is private"
-											)
-										}
-
-										const repoInfo: {
-											name: string
-											description: string
-											homepage: string
-										} = await resp.json()
-										const name = repoInfo.name.replace(
-											/([a-z])([A-Z])/g,
-											"$1 $2"
-										)
-
-										updateValue("id", sanitize(name))
-										updateValue("display/name", name)
-										updateValue(
-											"display/description",
-											repoInfo.description
-										)
-										updateValue(
-											"display/urls/source",
-											`https://github.com/${owner}/${repo}`
-										)
-										updateValue(
-											"display/urls/homepage",
-											repoInfo.homepage
-										)
-
-										closeGithubModal()
+								<div
+									className="container"
+									style={{
+										flexDirection: "row",
+										gap: "1rem",
 									}}
-								/>
+								>
+									<IconTextButton
+										className="invalidButtonLike"
+										icon={Cross}
+										text={"Cancel"}
+										onClick={closeGithubModal}
+									/>
+									<IconTextButton
+										className="successButtonLike"
+										icon={Check}
+										text={"Confirm"}
+										onClick={async () => {
+											const url = (
+												document.getElementById(
+													"githubUrl"
+												) as HTMLInputElement
+											).value
+											const match =
+												/https:\/\/(?:www.)?github.com\/([^\/]+)\/([^\/]+)/g.exec(
+													url
+												)
+
+											if (match == null) {
+												alert("Invalid github url!")
+												return
+											}
+
+											const [_, owner, repo] = match
+
+											let resp = await fetch(
+												`https://api.github.com/repos/${owner}/${repo}/contents`
+											)
+
+											if (!resp.ok) {
+												return alert(
+													"Failed to fetch files in github repo!\nUrl may be invalid or the repo is private"
+												)
+											}
+
+											let files: {
+												name: string
+												path: string
+												download_url: string
+												type: string
+											}[] = await resp.json()
+											let rootReadme = files.find(
+												(f) =>
+													f.name.toLowerCase() ===
+													"readme.md"
+											)?.download_url
+
+											for (let file of files) {
+												if (
+													file.name === "pack.png" ||
+													file.name === "icon.png"
+												) {
+													updateValue(
+														"display/icon",
+														file.download_url
+													)
+
+													const img =
+														document.getElementById(
+															"display/icon/img"
+														)! as HTMLInputElement
+
+													img.src = file.download_url
+													img.style.setProperty(
+														"display",
+														null
+													)
+
+													break
+												}
+
+												if (file.type === "dir") {
+													files.push(
+														...(await (
+															await fetch(
+																`https://api.github.com/repos/${owner}/${repo}/contents/${file.path}`
+															)
+														).json())
+													)
+												}
+											}
+
+											if (rootReadme)
+												updateValue(
+													"display/webPage",
+													rootReadme
+												)
+
+											resp = await fetch(
+												`https://api.github.com/repos/${owner}/${repo}`
+											)
+
+											if (!resp.ok) {
+												return alert(
+													"Failed to fetch info about github repo!\nUrl may be invalid or the repo is private"
+												)
+											}
+
+											const repoInfo: {
+												name: string
+												description: string
+												homepage: string
+											} = await resp.json()
+											const name = repoInfo.name.replace(
+												/([a-z])([A-Z])/g,
+												"$1 $2"
+											)
+
+											updateValue("id", sanitize(name))
+											updateValue("display/name", name)
+											updateValue(
+												"display/description",
+												repoInfo.description
+											)
+											updateValue(
+												"display/urls/source",
+												`https://github.com/${owner}/${repo}`
+											)
+											updateValue(
+												"display/urls/homepage",
+												repoInfo.homepage
+											)
+
+											closeGithubModal()
+										}}
+									/>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-				<ChooseBox
-					style={{ gridArea: "visibility" }}
-					placeholder="Visibility"
-					choices={[
-						{ content: "Public", value: "false" },
-						{ content: "Unlisted", value: "true" },
-					]}
-					onChange={(v) =>
-						(packData.display.hidden = v === "true" ? true : false)
-					}
-					defaultValue={packData.display.hidden ? "true" : "false"}
-				/>
-				<TextInput
-					dataRef={packData}
-					area="website"
-					path="display/urls/homepage"
-					icon={Globe}
-					placeholder="Project website"
-				/>
-				<TextInput
-					dataRef={packData}
-					area="sourceCode"
-					path="display/urls/source"
-					icon={Github}
-					placeholder="Source code"
-				/>
-				<TextInput
-					dataRef={packData}
-					area="video"
-					path="display/urls/video"
-					icon={YouTube}
-					placeholder="YouTube showcase"
-				/>
-				<TextInput
-					dataRef={packData}
-					area="discord"
-					path="display/urls/discord"
-					icon={Discord}
-					placeholder="Discord server"
-				/>
-			</div>
-			<div className="categories">
-				<span
-					style={{
-						gridColumn: "1/3",
-						width: "100%",
-						textAlign: "center",
-						fontWeight: 500,
-					}}
-				>
-					Categories
-				</span>
-				{packCategories.map((c) => (
-					<span
-						className={`categoryChoice ${packData.categories.includes(c) ? "selected" : ""}`}
-						key={"categoryChoice" + c.replace(" ", "")}
-						onClick={(e) => {
-							if (packData.categories.includes(c)) {
-								e.currentTarget.classList.remove("selected")
-								packData.categories =
-									packData.categories.filter(
-										(cat) => cat != c
-									)
-							} else {
-								e.currentTarget.classList.add("selected")
-								packData.categories.push(c)
-							}
-						}}
-					>
-						{c}
-						<Check />
-					</span>
-				))}
-			</div>
-			<div className="gallery">
-				<GalleryManager display={packData.display} />
-			</div>
-			<div className="readme">
-				<div
-					className="container"
-					style={{
-						flexDirection: "row",
-						backgroundColor: "var(--section)",
-						padding: "1rem",
-						gap: "1rem",
-					}}
-				>
+					<ChooseBox
+						style={{ gridArea: "visibility" }}
+						placeholder="Visibility"
+						choices={[
+							{ content: "Public", value: "false" },
+							{ content: "Unlisted", value: "true" },
+						]}
+						onChange={(v) =>
+							(packData.display.hidden =
+								v === "true" ? true : false)
+						}
+						defaultValue={
+							packData.display.hidden ? "true" : "false"
+						}
+					/>
 					<TextInput
 						dataRef={packData}
-						area=""
-						placeholder="Link to README.md"
+						area="website"
+						path="display/urls/homepage"
 						icon={Globe}
-						path="display/webPage"
+						placeholder="Project website"
 					/>
-					<IconTextButton
-						reverse
-						className="accentedButtonLike"
-						icon={Refresh}
-						text="Update preview"
-						onClick={loadReadme}
+					<TextInput
+						dataRef={packData}
+						area="sourceCode"
+						path="display/urls/source"
+						icon={Github}
+						placeholder="Source code"
+					/>
+					<TextInput
+						dataRef={packData}
+						area="video"
+						path="display/urls/video"
+						icon={YouTube}
+						placeholder="YouTube showcase"
+					/>
+					<TextInput
+						dataRef={packData}
+						area="discord"
+						path="display/urls/discord"
+						icon={Discord}
+						placeholder="Discord server"
 					/>
 				</div>
-				<div
-					style={{
-						backgroundColor: "var(--bold)",
-						padding: "0rem 1rem 1rem 1rem",
-						height: "100%",
-						margin: 0,
-						overflow: "hidden",
-					}}
-				>
-					<MarkdownRenderer>{readme}</MarkdownRenderer>
-				</div>
-			</div>
-		</div>
-	)
-
-	function VersionSelect({ packData }: { packData: PackData }) {
-		const select = (version: PackVersion) => {
-			const matches = packData.versions.filter(
-				(v) => v.name === selectedVersion?.name
-			)
-
-			if (matches.length > 1)
-				return alert("Resolve version name conflict!")
-
-			if (
-				selectedVersion !== undefined &&
-				valid(selectedVersion?.name) == null
-			)
-				return alert("Selected version name is not valid SemVer")
-
-			setSelectedVersion(version)
-		}
-
-		return (
-			<>
-				{[...versions]
-					.sort((a, b) =>
-						compare(
-							valid(a.name) ? a.name : coerce(a.name) ?? "0.0.1",
-							valid(b.name) ? b.name : coerce(b.name) ?? "0.0.1"
-						)
-					)
-					.map((v, i) => (
+				<div className="categories">
+					<span
+						style={{
+							gridColumn: "1/3",
+							width: "100%",
+							textAlign: "center",
+							fontWeight: 500,
+						}}
+					>
+						Categories
+					</span>
+					{packCategories.map((c) => (
 						<span
-							className={`versionChoice ${v === selectedVersion ? "selected" : ""}`}
-							key={v.name}
+							className={`categoryChoice ${packData.categories.includes(c) ? "selected" : ""}`}
+							key={"categoryChoice" + c.replace(" ", "")}
 							onClick={(e) => {
-								if (!(e.target instanceof HTMLSpanElement))
-									return
-								select(v)
+								if (packData.categories.includes(c)) {
+									e.currentTarget.classList.remove("selected")
+									packData.categories =
+										packData.categories.filter(
+											(cat) => cat != c
+										)
+								} else {
+									e.currentTarget.classList.add("selected")
+									packData.categories.push(c)
+								}
 							}}
 						>
-							<span id={`packVersionOption${v.name}`}>
-								{v.name}
-							</span>
-							{versions.length > 1 && (
-								<div
-									id="trashButton"
-									className="container"
-									style={{
-										position: "absolute",
-										right: "0.75rem",
-										top: 0,
-										height: "100%",
-										transition: "all 0.2s ease-in-out",
-									}}
-								>
-									<button
-										style={{
-											backgroundColor: "transparent",
-											width: "2rem",
-											height: "2rem",
-											padding: 0,
-										}}
-										onClick={(e) => {
-											e.preventDefault()
-											const idx =
-												packData.versions.findIndex(
-													(version) => version === v
-												)
-											packData.versions.splice(idx, 1)
-
-											if (selectedVersion === v) {
-												setSelectedVersion(
-													packData.versions[
-														packData.versions
-															.length === idx
-															? idx - 1
-															: idx
-													]
-												)
-											}
-
-											updateVersions()
-										}}
-									>
-										<Trash />
-									</button>
-								</div>
-							)}
+							{c}
+							<Check />
 						</span>
 					))}
-
-				{versions.length > 0 && <div style={{ flexGrow: 1 }} />}
-
-				<div className="container" style={{ width: "100%" }}>
-					<IconTextButton
-						icon={Plus}
-						text="Add"
-						reverse
-						style={{ backgroundColor: "transparent" }}
-						onClick={() => {
-							const nextVersion =
-								inc(
-									[...versions]
-										.sort((a, b) =>
-											compare(
-												valid(a.name)
-													? a.name
-													: coerce(a.name) ?? "0.0.1",
-												valid(b.name)
-													? b.name
-													: coerce(b.name) ?? "0.0.1"
-											)
-										)
-										.at(-1)?.name ?? "0.0.0",
-									"patch"
-								) ?? ""
-							packData.versions.push({
-								name: nextVersion,
-								downloads: {},
-								dependencies: [],
-								supports: [],
-							})
-							updateVersions()
-							// setVersions(packData.versions.map(v => v.name))
-						}}
+				</div>
+				<div className="gallery">
+					<GalleryManager
+						display={packData.display}
+						packId={packIdParam!}
 					/>
 				</div>
-			</>
+				<div className="readme">
+					<ReadmePreview dataRef={packData} />
+				</div>
+			</div>
 		)
 	}
 
-	const Versions = () => (
-		<div className="editVersions">
-			<div className="versionSelect">
-				<VersionSelect packData={packData} />
+	function Versions() {
+		const ref = useRef<HTMLDivElement>(null)
+
+		const [versions, setVersions] = useState<PackVersion[]>([])
+		const [selectedVersion, setSelectedVersion] = useState<PackVersion>()
+		
+		const [onError, onErrorCleared] = createErrorHandlers(
+			"editVersionsChoice",
+			ref
+		)
+
+		const updateVersions = () => {
+			let versions = [...(packData?.versions ?? [])].sort((a, b) =>
+				compare(
+					valid(a.name) ? a.name : coerce(a.name) ?? "0.0.1",
+					valid(b.name) ? b.name : coerce(b.name) ?? "0.0.1"
+				)
+			)
+
+			setVersions(versions)
+		}
+		useEffect(() => {
+			updateVersions()
+			setSelectedVersion(packData?.versions[0])
+		}, [packData])
+
+		useEffect(() => {
+			console.log("add listeners")
+			ref.current?.addEventListener("error", onError)
+			ref.current?.addEventListener("errorCleared", onErrorCleared)
+
+			return () => {
+				ref.current?.removeEventListener("error", onError)
+				ref.current?.removeEventListener("errorCleared", onErrorCleared)
+			}
+		}, [ref])
+
+		function VersionSelectOption({
+			version,
+			index,
+		}: {
+			version: PackVersion
+			index: number
+		}) {
+			const select = (version: PackVersion) => {
+				const matches = packData.versions.filter(
+					(v) => v.name === selectedVersion?.name
+				)
+
+				if (matches.length > 1)
+					return alert("Resolve version name conflict!")
+
+				if (
+					selectedVersion !== undefined &&
+					valid(selectedVersion?.name) == null
+				)
+					return alert("Selected version name is not valid SemVer")
+
+				setSelectedVersion(version)
+			}
+
+			function onError() {
+				const option = document.getElementById(
+					`versions/${index}_select`
+				)
+				option?.style.setProperty("color", "var(--disturbing)")
+				option?.classList.add("hasError")
+			}
+			function onErrorCleared(this: HTMLElement, e: Event) {
+				console.log(e.target)
+				console.log(matchingVersion?.querySelector(".hasError"))
+				if (matchingVersion?.querySelector(".hasError")) return
+
+				const option = document.getElementById(
+					`versions/${index}_select`
+				)
+
+				option?.style.setProperty("color", null)
+				option?.classList.remove("hasError")
+			}
+			let matchingVersion: HTMLElement | null = null
+
+			useEffect(() => {
+				matchingVersion = document.getElementById(`versions/${index}`)
+				matchingVersion?.addEventListener("error", onError)
+				matchingVersion?.addEventListener(
+					"errorCleared",
+					onErrorCleared
+				)
+
+				return () => {
+					matchingVersion?.removeEventListener("error", onError)
+					matchingVersion?.removeEventListener(
+						"errorCleared",
+						onErrorCleared
+					)
+				}
+			}, [])
+
+			return (
+				<span
+					className={`versionChoice ${version === selectedVersion ? "selected" : ""}`}
+					id={`versions/${index}_select`}
+					key={version.name}
+					onClick={(e) => {
+						if (!(e.target instanceof HTMLSpanElement)) return
+						select(version)
+					}}
+				>
+					<span id={`packVersionOption${version.name}`}>
+						{version.name}
+					</span>
+					{versions.length > 1 && (
+						<div
+							id="trashButton"
+							className="container"
+							style={{
+								position: "absolute",
+								right: "0.75rem",
+								top: 0,
+								height: "100%",
+								transition: "all 0.2s ease-in-out",
+							}}
+						>
+							<button
+								style={{
+									backgroundColor: "transparent",
+									width: "2rem",
+									height: "2rem",
+									padding: 0,
+								}}
+								onClick={(e) => {
+									e.preventDefault()
+									const idx = packData.versions.findIndex(
+										(version) => version === version
+									)
+									packData.versions.splice(idx, 1)
+
+									if (selectedVersion === version) {
+										setSelectedVersion(
+											packData.versions[
+												packData.versions.length === idx
+													? idx - 1
+													: idx
+											]
+										)
+									}
+
+									updateVersions()
+								}}
+							>
+								<Trash />
+							</button>
+						</div>
+					)}
+				</span>
+			)
+		}
+
+		function VersionSelect({ packData }: { packData: PackData }) {
+			return (
+				<>
+					{[...versions]
+						.sort((a, b) =>
+							compare(
+								valid(a.name)
+									? a.name
+									: coerce(a.name) ?? "0.0.1",
+								valid(b.name)
+									? b.name
+									: coerce(b.name) ?? "0.0.1"
+							)
+						)
+						.map((v, i) => (
+							<VersionSelectOption
+								key={`version_option_${i}`}
+								version={v}
+								index={i}
+							/>
+						))}
+
+					{versions.length > 0 && <div style={{ flexGrow: 1 }} />}
+
+					<div className="container" style={{ width: "100%" }}>
+						<IconTextButton
+							icon={Plus}
+							text="Add"
+							reverse
+							style={{ backgroundColor: "transparent" }}
+							onClick={() => {
+								const nextVersion =
+									inc(
+										[...versions]
+											.sort((a, b) =>
+												compare(
+													valid(a.name)
+														? a.name
+														: coerce(a.name) ??
+																"0.0.1",
+													valid(b.name)
+														? b.name
+														: coerce(b.name) ??
+																"0.0.1"
+												)
+											)
+											.at(-1)?.name ?? "0.0.0",
+										"patch"
+									) ?? ""
+								packData.versions.push({
+									name: nextVersion,
+									downloads: {},
+									dependencies: [],
+									supports: [],
+								})
+								updateVersions()
+								// setVersions(packData.versions.map(v => v.name))
+							}}
+						/>
+					</div>
+				</>
+			)
+		}
+		return (
+			<div
+				className={`editTab editVersions ${defaultTab === "editVersions" ? "selected" : "none"}`}
+				ref={ref}
+			>
+				<div className="versionSelect">
+					<VersionSelect packData={packData} />
+				</div>
+				{versions.map((v, i) => (
+					<div
+						key={`version_info_${i}`}
+						id={`versions/${i}`}
+						className="versionInfo"
+						style={{
+							gridArea: v !== selectedVersion ? "" : undefined,
+							display: v !== selectedVersion ? "none" : undefined,
+						}}
+					>
+						<VersionInfo version={v} index={i} />
+					</div>
+				))}
 			</div>
-			<div className="versionInfo">
-				<VersionInfo version={selectedVersion} />
-			</div>
-		</div>
-	)
+		)
+	}
 
 	function Management() {
 		const [contributors, setContributors] =
@@ -1272,7 +1341,9 @@ export default function PackEdit() {
 		}, [packMetaData?.contributors])
 
 		return (
-			<div className="editManagement">
+			<div
+				className={`editTab editManagement ${defaultTab === "editManagement" ? "selected" : "none"}`}
+			>
 				<div
 					className="container"
 					style={{
@@ -1416,7 +1487,7 @@ export default function PackEdit() {
 
 										const deleteResp = await fetch(
 											import.meta.env.VITE_API_SERVER +
-												`/packs/${packIdParam}?token=${await user?.getIdToken()}`,
+												`/packs/${packIdParam}?token=${await firebaseUser?.getIdToken(true)}`,
 											{
 												method: "DELETE",
 											}
@@ -1454,33 +1525,38 @@ export default function PackEdit() {
 			}}
 		>
 			<CategoryBar
-				defaultValue={(currentTab ?? "project-details") as string}
+				defaultValue={(defaultTab ?? "project-details") as string}
 				onChange={(v) => {
-					setTab(v)
-					// navigate(`?tab=${v}${pack != null ? '&pack=' + pack : ''}${isNew != null ? '&new=' + isNew : ''}`)
+					document.querySelectorAll(".editTab").forEach((element) => {
+						element.classList.remove("selected")
+					})
+					document.querySelector("." + v)?.classList.add("selected")
+					window.history.pushState(null, "", "?tab=" + v)
 				}}
 			>
 				<CategoryChoice
 					text="Details"
 					icon={<TextSvg />}
-					value="project-details"
+					value="editProjectDetails"
+					id={"editProjectDetailsChoice"}
 				/>
 				<CategoryChoice
 					text="Versions"
 					icon={<File />}
-					value="versions"
+					value="editVersions"
+					id={"editVersionsChoice"}
 				/>
 				<CategoryChoice
 					text="Management"
 					icon={<Account />}
-					value="management"
-					hidden={user.uid !== packMetaData?.owner}
+					value="editManagement"
+					hidden={user?.uid !== packMetaData?.owner}
 				/>
 			</CategoryBar>
 			<div className="editorOrganizer">
-				{tab === "project-details" && <ProjectDetails />}
-				{tab === "versions" && <Versions />}
-				{tab === "management" && <Management />}
+				<ProjectDetails />
+				<Versions />
+				<Management />
 			</div>
 			<div
 				className="container"

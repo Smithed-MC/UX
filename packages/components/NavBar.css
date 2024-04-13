@@ -94,7 +94,7 @@
 		display: none;
 	}
 
-	.navBarOption {
+	.navBarOption, .navBarModal {
 		height: 3rem !important;
 		flex-grow: 1;
 	}
@@ -107,7 +107,7 @@
 		border-radius: 0;
 	}
 
-	.navBarOption:last-child {
-		border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0;
+	.navBarOption:last-child, .navBarOption.end {
+		border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0 !important;
 	}
 }

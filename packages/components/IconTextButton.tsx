@@ -45,7 +45,7 @@ export function IconTextButton({
 		>
 			<div
 				className="container"
-				style={{ flexShrink: 0, height: "100%" }}
+				style={{ flexShrink: 0, height: "100%", width: "1rem" }}
 			>
 				{IconSvg !== undefined &&
 					typeof IconSvg === "string" &&
@@ -62,7 +62,7 @@ export function IconTextButton({
 						width: 2,
 						height: 20,
 						opacity: 0.15,
-						backgroundColor: "white",
+						backgroundColor: style?.color ?? "white"
 					}}
 				/>
 			)}
