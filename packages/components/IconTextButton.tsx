@@ -14,7 +14,7 @@ export type IconTextButtonProps = {
 	to?: string
 } & React.HTMLProps<HTMLAnchorElement>
 
-export function IconTextButton({
+export default function IconTextButton({
 	text,
 	icon: IconSvg,
 	iconElement,

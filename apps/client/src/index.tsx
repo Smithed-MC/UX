@@ -1,5 +1,5 @@
 import { Link, NavBar, RootError } from "components"
-import { createContext, StrictMode, useContext, useEffect, useState, useTransition } from "react"
+import { useContext, useEffect, useState } from "react"
 import {
 	createBrowserRouter,
 	Outlet,
@@ -10,23 +10,11 @@ import {
 	useLocation,
 } from "react-router-dom"
 import { initializeApp } from "firebase/app"
-import {
-	User as FirebaseUser,
-	browserSessionPersistence,
-	browserLocalPersistence,
-	setPersistence,
-} from "firebase/auth"
+import { User as FirebaseUser } from "firebase/auth"
 
-import PacksBrowser from "./pages/packs/index.js"
-import Home from "./pages/home.js"
-import Packs, { loadPackData } from "./pages/packs/id/index.js"
 import "./style.css"
 
-import Account from "./pages/account.js"
 import { getAuth } from "firebase/auth"
-import PackEdit from "./pages/packs/id/edit.js"
-import Bundles from "./pages/bundles/id/index.js"
-import Settings from "./pages/settings.js"
 
 import { Provider } from "react-redux"
 import {
@@ -36,10 +24,9 @@ import {
 	loadRootData,
 	loadUserPageData,
 } from "./loaders.js"
-import User from "./pages/user.js"
+
 import {
 	selectSelectedBundle,
-	selectUsersBundles,
 	setSelectedBundle,
 	setUserData,
 	setUsersBundles,
@@ -50,16 +37,15 @@ import { PackBundle, UserData } from "data-types"
 import { Helmet } from "react-helmet"
 import { ClientContext, defaultContext, IClientContext } from "./context.js"
 
-import { Cross, Edit, Logo } from "components/svg.js"
-
+import { Cross, Logo } from "components/svg.js"
 
 import Cookies from "js-cookie"
-import Article from "./pages/article.js"
-import BundleEdit from "./pages/bundles/id/edit.js"
 import { loadBundleEdit } from "./pages/bundles/id/edit.loader.js"
-import Smithie from "./widget/Smithie.js"
 import { loadPackEdit } from "./pages/packs/id/edit.loader.js"
 import EditorError from "./pages/editors/error.js"
+import React from "react"
+import loadable from "@loadable/component"
+import loadPackData from "./pages/packs/id/index.loader.js"
 
 initializeApp({
 	databaseURL: "https://mc-smithed-default-rtdb.firebaseio.com",
@@ -78,7 +64,7 @@ export function ClientApplet() {
 	const [hideWarning, setHideWarning] = useState(false)
 	const location = useLocation()
 	const context = useContext(ClientContext)
-	
+
 	function resetBundleData() {
 		dispatch(setUsersBundles([]))
 		dispatch(setSelectedBundle(""))
@@ -145,12 +131,11 @@ export function ClientApplet() {
 		const unsub = getAuth().onAuthStateChanged(async (user) => {
 			if (user) {
 				Cookies.set("smithedToken", await user?.getIdToken(true), {
-					sameSite: 'strict'
+					sameSite: "strict",
 				})
 				loadBundles(user)
 				loadUserData(user)
-			}
-			else {
+			} else {
 				Cookies.remove("smithedToken")
 				resetBundleData()
 				resetUserData()
@@ -255,10 +240,7 @@ export function ClientApplet() {
 					paddingBottom: "1rem",
 				}}
 			>
-				<NavBar
-					tabs={context.navbarTabs}
-					logoUrl={context.logoUrl}
-				/>
+				<NavBar tabs={context.navbarTabs} logoUrl={context.logoUrl} />
 				<Outlet />
 			</div>
 			{context.enableFooter ? <Footer /> : <br />}
@@ -328,6 +310,22 @@ function Footer() {
 	)
 }
 
+const config = { ssr: import.meta.env.SSR }
+
+const Home = loadable(() => import("./pages/home.js"), config)
+const Settings = loadable(() => import("./pages/settings.js"), config)
+const Account = loadable(() => import("./pages/account.js"), config)
+const PackEditor = loadable(() => import("./pages/packs/id/edit.js"), config)
+const User = loadable(() => import("./pages/user.js"), config)
+const PackPage = loadable(() => import("./pages/packs/id/index.js"), config)
+const PackBrowsePage = loadable(() => import("./pages/packs/index.js"), config)
+const BundlePage = loadable(() => import("./pages/bundles/id/index.js"), config)
+const BundleEditor = loadable(
+	() => import("./pages/bundles/id/edit.js"),
+	config
+)
+const ArticlePage = loadable(() => import("./pages/article.js"), config)
+
 // Don't reorder these please
 export const subRoutes: RouteObject[] = [
 	{
@@ -352,52 +350,43 @@ export const subRoutes: RouteObject[] = [
 	},
 	{
 		path: "packs/:id/edit",
-		element: <PackEdit />,
+		element: <PackEditor />,
 		loader: loadPackEdit,
-		errorElement: <EditorError/>
-
+		errorElement: <EditorError />,
 	},
 	{
 		path: ":owner",
-		element: (
-			<User/>
-		),
+		element: <User />,
 		loader: loadUserPageData,
 	},
 	{
 		path: "packs/:id",
-		element: (
-			<Packs/>
-		),
+		element: <PackPage />,
 		loader: loadPackData,
 	},
 	{
 		path: "bundles/:bundleId",
-		element: (
-			<Bundles/>
-		),
+		element: <BundlePage />,
 	},
 	{
 		path: "bundles/:id/edit",
-		element: (
-			<BundleEdit/>
-		),
+		element: <BundleEditor />,
 		errorElement: <EditorError />,
-		loader: loadBundleEdit
+		loader: loadBundleEdit,
 	},
 	{
 		path: "articles/:article",
-		element: <Article />,
+		element: <ArticlePage />,
 		loader: loadArticleData,
 	},
 	{
 		path: "articles",
-		element: <Article />,
+		element: <ArticlePage />,
 		loader: loadArticleData,
 	},
 	{
 		path: "packs",
-		element: <PacksBrowser />,
+		element: <PackBrowsePage />,
 		loader: loadPackBrowseData,
 	},
 ]
@@ -417,10 +406,11 @@ export const routes = [
 	},
 ]
 
-
-export default function ClientParent({ context }: {context: IClientContext}) {
+export default function ClientParent({ context }: { context: IClientContext }) {
 	const router = createBrowserRouter(routes)
-	return <ClientContext.Provider value={context ?? defaultContext}>
-		<RouterProvider router={router} />
-	</ClientContext.Provider>
+	return (
+		<ClientContext.Provider value={context ?? defaultContext}>
+			<RouterProvider router={router} />
+		</ClientContext.Provider>
+	)
 }

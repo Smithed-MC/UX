@@ -5,7 +5,7 @@ interface NavButtonProps extends IconTextButtonProps {
 	selectedClass?: string
 }
 
-export function NavButton({
+export default function NavButton({
 	selectedClass,
 	className,
 	...props

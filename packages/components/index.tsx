@@ -1,6 +1,3 @@
-import { NavBar } from "./NavBar"
-import { NavButton } from "./NavButton"
-import PackCard from "./PackCard"
 import Spinner from "./Spinner"
 import * as svg from "./svg"
 import "./style.css"
@@ -9,19 +6,23 @@ import MarkdownRenderer, { markdownComponents } from "./MarkdownRenderer"
 import { RootError } from "./RootError"
 import FilterButton from "./FilterButton"
 import SvgButton from "./SvgButton"
-import { IconTextButton } from "./IconTextButton"
-import IconInput from "./IconInput"
-import { ChooseBox } from "./ChooseBox"
-import GalleryPackCard from "./GalleryPackCard"
 import CategoryBar, { CategoryChoice } from "./CategoryBar"
 import { DownloadButton } from "./DownloadButton"
 import Modal from "./Modal"
 import Link from "./Link"
+import loadable from "@loadable/component"
+
+const config = {ssr: import.meta.env.SSR }
+
+export const NavButton = loadable(() => import('./NavButton'), config)
+export const NavBar = loadable(() => import('./NavBar'), config)
+export const PackCard = loadable(() => import('./PackCard'), config)
+export const IconTextButton = loadable(() => import('./IconTextButton'), config)
+export const IconInput = loadable(() => import('./IconInput'), config)
+export const GalleryPackCard = loadable(() => import('./GalleryPackCard'), config)
+export const ChooseBox = loadable(() => import('./ChooseBox'), config)
 
 export {
-	NavButton,
-	NavBar,
-	PackCard,
 	Spinner,
 	svg,
 	ErrorPage,
@@ -30,10 +31,6 @@ export {
 	RootError,
 	FilterButton,
 	SvgButton,
-	IconTextButton,
-	IconInput,
-	ChooseBox,
-	GalleryPackCard,
 	CategoryBar,
 	CategoryChoice,
 	type DownloadButton,

@@ -15,7 +15,7 @@ interface ChooseBoxProps {
 	title?: string
 }
 
-export function ChooseBox({
+export default function ChooseBox({
 	placeholder,
 	defaultValue,
 	multiselect,

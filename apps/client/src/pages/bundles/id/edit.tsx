@@ -2,14 +2,12 @@ import {
 	CategoryBar,
 	CategoryChoice,
 	ChooseBox,
-	ErrorPage,
 	IconInput,
 	IconTextButton,
-	Link,
-	MarkdownRenderer,
 	Modal,
 	Spinner,
 } from "components"
+
 import {
 	Trash,
 	Globe,
@@ -19,59 +17,37 @@ import {
 	Jigsaw,
 	Text as TextSvg,
 	At,
-	Refresh,
 	File,
-	Account,
-	Home,
-	Github,
 	YouTube,
 	Discord,
-	ColorPicker,
 	Cross,
-	Edit,
 	Right,
-	Pin,
-	List,
 	NewFolder,
 	Folder,
-	Download,
 } from "components/svg"
 import {
 	BundleSchema_v2,
 	BundleVersion,
-	HTTPResponses,
 	PackBundle_v2,
 	PackData,
-	PackDependency,
 	PackDownloadOptions,
-	PackMetaData,
-	PackReference,
-	PackVersion,
-	UserData,
 	bundleCategories,
-	packCategories,
 	supportedMinecraftVersions,
 } from "data-types"
-import { useFirebaseUser, useQueryParams } from "hooks"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useFirebaseUser } from "hooks"
+import { useEffect, useRef, useState } from "react"
 import {
 	useLoaderData,
 	useLocation,
 	useNavigate,
 	useParams,
-	useRouteError,
 } from "react-router-dom"
-import { coerce, compare, satisfies, inc, valid } from "semver"
-import { gzip } from "pako"
-import { sanitize } from "formatters"
+import { compare, inc, valid } from "semver"
 import {
 	TextInput,
-	setPropertyByPath,
 	LargeTextInput,
 } from "../../editors/inputs"
-import GalleryManager from "../../editors/galleryManager"
 import ReadmePreview from "../../editors/readmePreview"
-import { getBadges } from "components/GalleryPackCard"
 import { Value } from "@sinclair/typebox/value"
 import {
 	sendErrorEvent,
@@ -80,9 +56,12 @@ import {
 import qs from "query-string"
 import "./edit.css"
 import "../../editors/common.css"
-import { Pack } from "./edit/Pack"
+import { Pack } from "./edit/pack.js"
 import SearchPacks from "./edit/searchPacks"
 import VersionSelectOption from "../../editors/versionSelectOption"
+
+import Error from '../../editors/error'
+import { loadBundleEdit } from "./edit.loader"
 
 interface SavingState {
 	mode: "off" | "saving" | "saved" | "error"
@@ -608,7 +587,7 @@ export default function BundleEdit() {
 
 	function Versions() {
 		const ref = useRef<HTMLDivElement>(null)
-		
+
 		useErrorEventHandlers(ref, (hasError) => {
 			const button = document.getElementById("editBundleVersionsChoice")
 			button?.dispatchEvent(

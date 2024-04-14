@@ -252,7 +252,7 @@ export function EditBundle({ close }: EditBundleProps) {
 	)
 }
 
-export function NavBar({ tabs, logoUrl }: NavBarProps) {
+export default function NavBar({ tabs, logoUrl }: NavBarProps) {
 	const [open, setOpen] = useState(previousState)
 
 	const [editBundleOpen, setEditBundleOpen] = useState(false)

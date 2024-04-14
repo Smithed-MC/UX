@@ -61,7 +61,7 @@ import {
 	validUrlRegex,
 } from "../../editors/inputs"
 import GalleryManager from "../../editors/galleryManager"
-import { PackEditLoaderData } from "./edit.loader"
+import { loadPackEdit, PackEditLoaderData } from "./edit.loader"
 import qs from "query-string"
 import ReadmePreview from "../../editors/readmePreview"
 import {
@@ -70,6 +70,7 @@ import {
 } from "../../editors/errorEvents"
 import "../../editors/common.css"
 import VersionSelectOption from "../../editors/versionSelectOption"
+import Error from "../../editors/error"
 
 interface SavingState {
 	mode: "off" | "saving" | "saved" | "error"
@@ -1046,7 +1047,6 @@ export default function PackEdit() {
 		})
 
 		const updateVersions = () => {
-			console.log(packData.versions)
 			let versions = [...(packData?.versions ?? [])].sort((a, b) =>
 				compare(
 					valid(a.name) ? a.name : coerce(a.name) ?? "0.0.1",

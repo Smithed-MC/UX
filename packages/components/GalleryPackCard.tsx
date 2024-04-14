@@ -18,10 +18,10 @@ import { formatDownloads, prettyTimeDifference } from "formatters"
 import "./GalleryPackCard.css"
 import { compare, coerce } from "semver"
 import { User } from "firebase/auth"
-import { IconTextButton } from "./IconTextButton.js"
 import { Download, Edit, FlagCrossed, Logo, Refresh, Right } from "./svg.js"
 import { useNavigate } from "react-router-dom"
 import Link from "./Link"
+import { IconTextButton } from "."
 
 interface PackCardProps {
 	id: string
