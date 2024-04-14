@@ -2,7 +2,7 @@ import { IconInput } from "components"
 import { Globe } from "components/svg"
 import { BundleVersion, PackData } from "data-types"
 import { useState, useEffect } from "react"
-import { Pack } from "./Pack"
+import { Pack } from "./pack"
 
 let pendingTimeout: NodeJS.Timeout | undefined = undefined
 

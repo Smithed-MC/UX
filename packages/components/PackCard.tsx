@@ -6,7 +6,7 @@ import { useMatch, useNavigate } from "react-router-dom"
 import "./PackCard.css"
 import { compare, coerce } from "semver"
 import { User } from "firebase/auth"
-import { IconTextButton } from "./IconTextButton.js"
+import IconTextButton from "./IconTextButton.js"
 import { Edit, Right } from "./svg.js"
 import Link from "./Link"
 

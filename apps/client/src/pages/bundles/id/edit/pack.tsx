@@ -4,7 +4,7 @@ import { Trash, Right } from "components/svg"
 import { BundleVersion, PackData, PackReference } from "data-types"
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import RenderPackVersionOptions from "./RenderPackVersionOptions"
+import RenderPackVersionOptions from "./renderPackVersionOptions"
 
 export function Pack({
 	packData,

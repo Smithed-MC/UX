@@ -1,4 +1,4 @@
-import { IconTextButton } from "components/IconTextButton"
+import IconTextButton from "components/IconTextButton"
 import { Right } from "components/svg"
 import "./BackButton.css"
 import { useNavigate } from "react-router-dom"

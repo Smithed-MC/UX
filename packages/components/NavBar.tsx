@@ -22,7 +22,7 @@ import {
 	Settings,
 	Trash,
 } from "./svg.js"
-import { IconTextButton, IconTextButtonProps } from "./IconTextButton"
+import IconTextButton, { IconTextButtonProps } from "./IconTextButton"
 import { Account as AccountSvg } from "components/svg.js"
 import {
 	selectSelectedBundle,

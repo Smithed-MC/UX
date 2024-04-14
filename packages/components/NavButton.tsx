@@ -1,5 +1,5 @@
 import { useMatch } from "react-router-dom"
-import { IconTextButton, IconTextButtonProps } from "./IconTextButton.js"
+import IconTextButton, { IconTextButtonProps } from "./IconTextButton.js"
 
 interface NavButtonProps extends IconTextButtonProps {
 	selectedClass?: string
