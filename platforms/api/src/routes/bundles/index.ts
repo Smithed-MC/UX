@@ -10,22 +10,28 @@ import {
 	BundleUpdater,
 	HTTPResponses,
 	PackBundle,
+	PermissionScope,
 } from "data-types"
-import { getUIDFromToken } from "database"
+import { parseToken, validateToken } from "database"
 import { compare, satisfies } from "semver"
 import { getUserHash, incrementPacksFromCachedResult } from "../download.js"
 import { DownloadRunner } from "downloader"
 
 export async function getBundleDoc(id: string) {
 	const firestore = getFirestore()
-	const packs = firestore.collection("bundles")
+	const bundles = firestore.collection("bundles")
 
 	API_APP.log.info("Querying for bundle", id)
-	const doc = await packs.doc(id).get()
+	const doc = await bundles.doc(id).get()
 	if (doc.exists) {
 		return doc
 	}
-	return undefined
+
+	const query = await bundles.where("id", "==", id).limit(1).get()
+
+	if (query.docs.length == 0) return undefined
+
+	return query.docs[0]
 }
 
 /*
@@ -73,20 +79,12 @@ API_APP.route({
 					"No token specified"
 				)
 
-			const uid = await getUIDFromToken(token)
-			if (uid === undefined)
-				return sendError(
-					reply,
-					HTTPResponses.UNAUTHORIZED,
-					"Invalid token"
-				)
+			const tokenData = await validateToken(reply, token, {
+				requiredUid: [data.owner],
+				requiredScopes: [PermissionScope.READ_BUNDLES],
+			})
 
-			if (data.owner !== uid)
-				return sendError(
-					reply,
-					HTTPResponses.FORBIDDEN,
-					"You do not own this bundle"
-				)
+			if (tokenData) return data
 		}
 		return data
 	},
@@ -148,21 +146,13 @@ API_APP.route({
 					"No token specified"
 				)
 			}
-			const uid = await getUIDFromToken(token)
-			if (uid === undefined) {
-				return sendError(
-					reply,
-					HTTPResponses.UNAUTHORIZED,
-					"Invalid token"
-				)
-			}
-			if (uid !== bundleData.owner) {
-				return sendError(
-					reply,
-					HTTPResponses.FORBIDDEN,
-					"You do not own this bundle"
-				)
-			}
+			const tokenData = await validateToken(reply, token, {
+				requiredUid: [bundleData.owner],
+				requiredScopes: [PermissionScope.READ_BUNDLES]
+			})
+			
+			if (tokenData === undefined)
+				return
 		}
 		const latestBundleVersion = bundleData.versions
 			.filter((v) =>
@@ -266,18 +256,15 @@ API_APP.route({
 		if (bundleDoc === undefined)
 			return sendError(reply, HTTPResponses.NOT_FOUND, "Bundle not found")
 
-		const uid = await getUIDFromToken(token)
-		if (uid === undefined)
-			return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
-
 		const bundleData = bundleDoc.data() as PackBundle
 
-		if (bundleData.owner !== uid)
-			return sendError(
-				reply,
-				HTTPResponses.FORBIDDEN,
-				"Bundle is not owned by your token"
-			)
+		const tokenData = await validateToken(reply, token, {
+			requiredUid: [bundleData.owner],
+			requiredScopes: [PermissionScope.DELETE_BUNDLES]
+		})
+		
+		if (tokenData === undefined)
+			return
 
 		await bundleDoc.ref.delete()
 		reply.status(HTTPResponses.OK).send("Bundle deleted successfully")
@@ -338,19 +325,16 @@ API_APP.route({
 
 		if (bundleDoc === undefined)
 			return sendError(reply, HTTPResponses.NOT_FOUND, "Bundle not found")
-
-		const uid = await getUIDFromToken(token)
-		if (uid === undefined)
-			return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
-
+		
 		const bundleData = bundleDoc.data() as PackBundle
+		
+		const tokenData = await validateToken(reply, token, {
+			requiredUid: [bundleData.owner],
+			requiredScopes: [PermissionScope.WRITE_BUNDLES]
+		})
 
-		if (bundleData.owner !== uid)
-			return sendError(
-				reply,
-				HTTPResponses.FORBIDDEN,
-				"Bundle is not owned by your token"
-			)
+		if (tokenData === undefined)
+			return
 
 		if (data.uid) delete data.uid
 
@@ -401,13 +385,29 @@ API_APP.route({
 		const { data } = request.body
 		const { token } = request.query
 
-		const uid = await getUIDFromToken(token)
+		const tokenData = await validateToken(reply, token, {
+			requiredScopes: [PermissionScope.CREATE_BUNDLES]
+		})
 
-		if (uid === undefined)
-			return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
+		if (tokenData === undefined)
+			return
 
-		const bundleData = data as PackBundle
-		bundleData.owner = uid
+		const bundleData = BundleUpdater(data as PackBundle)
+		bundleData.id ??= tokenData.uid.slice(0, 4) + Date.now()
+		bundleData.owner = tokenData.uid
+
+		const existingCount = getFirestore()
+			.collection("bundles")
+			.where("id", "==", bundleData.id)
+			.count()
+
+		if ((await existingCount.get()).data().count != 0)
+			return sendError(
+				reply,
+				HTTPResponses.CONFLICT,
+				`Pack with ID ${bundleData.id} already exists in the database`
+			)
+
 
 		const createdDoc = await getFirestore()
 			.collection("bundles")

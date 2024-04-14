@@ -8,10 +8,12 @@ import {
 	MinecraftVersionSchema,
 	PackData,
 	PackDataSchema,
+	PackMetaData,
+	PermissionScope,
 	SortOptions,
 	SortSchema,
 } from "data-types"
-import { getUIDFromToken } from "database"
+import { parseToken, validateToken } from "database"
 import { coerce } from "semver"
 import { SearchResponseHit } from "typesense/lib/Typesense/Documents.js"
 import hash from "hash.js"
@@ -210,9 +212,11 @@ API_APP.route({
 		const { token, id } = request.query
 		const { data } = request.body
 
-		const userId = await getUIDFromToken(token)
-		if (userId === undefined)
-			return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
+		const tokenData = await validateToken(reply, token, {
+			requiredScopes: [PermissionScope.CREATE_PACKS],
+		})
+
+		if (tokenData === undefined) return
 
 		const firestore = getFirestore()
 
@@ -238,19 +242,24 @@ API_APP.route({
 		}
 
 		await updateGalleryData(data, reply)
-
-		const documentData = {
+		
+		const documentData: Omit<Omit<PackMetaData, 'docId'>, 'rawId'> & {
+			data: PackData
+			id: string
+			state: string
+			hidden: boolean
+		} = {
 			id: id,
-			contributors: [userId],
+			contributors: [tokenData.uid],
 			state: "unsubmitted",
-			owner: userId,
+			owner: tokenData.uid,
 			hidden: false,
 			stats: {
 				added: Date.now(),
 				updated: Date.now(),
 				downloads: {
 					total: 0,
-					daily: 0,
+					today: 0,
 				},
 			},
 			data: data,

@@ -9,7 +9,7 @@ import {
 	UserData,
 	UserDataSchema,
 } from "data-types"
-import { getUIDFromToken } from "database"
+import { parseToken, validateToken } from "database"
 import { getAuth } from "firebase-admin/auth"
 
 import { useId } from "react"
@@ -58,7 +58,7 @@ API_APP.route({
 			let allowedToViewContents = false
 
 			if (token) {
-				const userUID = await getUIDFromToken(token)
+				const userUID = (await parseToken(token))?.uid
 
 				if (userUID) {
 					const userDoc = await getUserDoc(userUID)
@@ -100,9 +100,10 @@ API_APP.route({
 		const { token } = request.query
 		const { data: article } = request.body
 
-		const userUID = await getUIDFromToken(token)
-		if (!userUID)
-			return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
+		const userUID = (await validateToken(reply, token))?.uid
+
+		if (userUID === undefined)
+			return
 
 		const userDoc = await getUserDoc(userUID)
 		if (!userDoc)
@@ -150,9 +151,9 @@ API_APP.route({
 		const { id } = request.params
 		const { token } = request.query
 
-		const userUID = await getUIDFromToken(token)
-		if (!userUID)
-			return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
+		const userUID = (await validateToken(reply, token))?.uid
+		if (userUID === undefined)
+			return 
 
 		const userDoc = await getUserDoc(userUID)
 		if (!userDoc)
