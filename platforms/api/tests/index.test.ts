@@ -1,7 +1,7 @@
 import { setupApp } from "../src/app.js"
 import { test } from "tap"
 import dotenv from "dotenv"
-import { HTTPResponses, PackData, PackVersion } from "data-types"
+import { HTTPResponses, latestMinecraftVersion, PackBundle, PackData, PackVersion, PermissionScope } from "data-types"
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth"
 import { initializeApp } from "firebase/app"
 
@@ -67,6 +67,27 @@ const TEST_BAD_VERSION_DATA: PackVersion = {
 	supports: ["1.19"],
 }
 
+let scopedToken = ""
+let scopedTokenDocId = ""
+test("POST /tokens", async (t) => {
+	const r = await API.inject({
+		method: "POST",
+		path: "/tokens",
+		query: {
+			token: TOKEN,
+			expires: "15m",
+			name: "API Testing Token",
+			scopes: []	
+		}
+	})
+
+	if (t.equal(r.statusCode, HTTPResponses.OK, ": Failed to create scoped pat")) {
+		const data = (await r.json())
+		scopedToken = data.token
+		scopedTokenDocId = data.tokenDocId
+	}
+})
+
 test("GET /packs", async (t) => {
 	const r = await API.inject({
 		method: "GET",
@@ -107,20 +128,6 @@ test("GET /packs/ssISzemBUMUEFJWYuB1V (Pack w/o friendly ID)", async (t) => {
 	t.equal(r.statusCode, 200, "OK")
 })
 
-test("POST /packs (w/o token)", async (t) => {
-	const r = await API.inject({
-		method: "POST",
-		path: "/packs",
-		query: {
-			id: "smithed_testing",
-		},
-		payload: {
-			data: TEST_PACK_DATA,
-		},
-	})
-	console.log(r.json())
-	t.equal(r.statusCode, HTTPResponses.BAD_REQUEST, "Bad request, no token")
-})
 
 test("POST /packs (w/ invalid token)", async (t) => {
 	const r = await API.inject({
@@ -140,6 +147,25 @@ test("POST /packs (w/ invalid token)", async (t) => {
 		HTTPResponses[r.statusCode] + ", Unauthorized, invalid token"
 	)
 })
+
+test("POST /packs (w/ underscoped token)", async (t) => {
+	const r = await API.inject({
+		method: "POST",
+		path: "/packs",
+		query: {
+			id: "smithed_testing",
+			token: scopedToken,
+		},
+		payload: {
+			data: TEST_PACK_DATA,
+		},
+	})
+	t.equal(
+		r.statusCode,
+		HTTPResponses.FORBIDDEN,
+		HTTPResponses[r.statusCode] + ": Failed while posting pack with underscoped token"
+	)
+}) 
 
 test("POST /packs (w/ valid token) + invalid semver", async (t) => {
 	TEST_PACK_DATA.versions.push(TEST_BAD_VERSION_DATA)
@@ -291,6 +317,32 @@ test("POST /packs/:pack/versions (w/ valid token)", async (t) => {
 	t.equal(r.statusCode, HTTPResponses.CREATED, "Created, new version")
 })
 
+test("POST /packs/:pack/versions (w/ underscoped token)", async (t) => {
+	const r = await API.inject({
+		method: "POST",
+		path: "/packs/smithed_testing/versions",
+		query: {
+			token: scopedToken,
+			version: TEST_VERSION_DATA.name,
+		},
+		payload: {
+			data: TEST_VERSION_DATA,
+		},
+	})
+
+	t.equal(r.statusCode, HTTPResponses.FORBIDDEN, "Failed while uploading version w/ underscoped token")
+})
+
+test("DELETE /packs/:pack (w/ underscoped token)", async (t) => {
+	const r = await API.inject({
+		method: "DELETE",
+		path: "/packs/smithed_testing",
+		query: {
+			token: scopedToken,
+		},
+	})
+	t.equal(r.statusCode, HTTPResponses.FORBIDDEN, r.statusCode + ", Failed while deleting pack w/ undescoped token")
+})
 test("DELETE /packs/:pack", async (t) => {
 	const r = await API.inject({
 		method: "DELETE",
@@ -300,4 +352,78 @@ test("DELETE /packs/:pack", async (t) => {
 		},
 	})
 	t.equal(r.statusCode, HTTPResponses.OK, r.statusCode + ", Deleted pack")
+})
+
+const bundleData: PackBundle = {
+	schemaVersion: "v2",
+	id: "smithed_testing",
+	owner: user.user.uid,
+	versions: [
+		{
+			name: "0.0.1",
+			supports: [latestMinecraftVersion],
+			packs: [],
+			patches: []
+		}
+	],
+	display: {
+		name: "Testing",
+		description: "Testing",
+		icon: "",
+	},
+	categories: [],
+	visibility: "private"
+}
+test("POST /bundles", async (t) => {
+	const r = await API.inject({
+		method: "POST",
+		path: "/bundles",
+		query: {
+			token: TOKEN
+		},
+		payload: {
+			data: bundleData
+		}
+	})
+
+	t.equal(r.statusCode, HTTPResponses.CREATED, r.statusCode + ": Failed to upload a new bundle")
+})
+
+test("POST /bundles (w/ conflict)", async (t) => {
+	const r = await API.inject({
+		method: "POST",
+		path: "/bundles",
+		query: {
+			token: TOKEN
+		},
+		payload: {
+			data: bundleData
+		}
+	})
+
+	t.equal(r.statusCode, HTTPResponses.CONFLICT, r.statusCode + ": Failed while uploading a conflicting bundle")
+})
+
+test("DELETE /bundles/" + bundleData.id, async (t) => {
+	const r = await API.inject({
+		method: "DELETE",
+		path: "/bundles/" + bundleData.id,
+		query: {
+			token: TOKEN
+		}
+	})
+
+	t.equal(r.statusCode, HTTPResponses.OK, r.statusCode + ": Failed to delete the new bundle")
+})
+
+test("DELETE /tokens/" + scopedTokenDocId, async (t) => {
+	const r = await API.inject({
+		method: "DELETE",
+		path: "/tokens/" + scopedTokenDocId,
+		query: {
+			token: TOKEN
+		}
+	})
+
+	t.equal(r.statusCode, HTTPResponses.OK, r.statusCode + ": Failed to delete scoped token")
 })

@@ -8,13 +8,13 @@ import {
 	PackDataSchema,
 	PackGalleryImage,
 	PackMetaData,
+	PermissionScope,
 } from "data-types"
-import { getPackDoc, getUIDFromToken } from "database"
+import { getPackDoc, validateToken } from "database"
 import { FastifyRequest, FastifyReply } from "fastify"
 import { coerce, valid } from "semver"
 import hash from "hash.js"
 import { request } from "express"
-
 
 /*
  * @route GET /packs/:id
@@ -79,10 +79,6 @@ const setPack = async (response: any, reply: any) => {
 
 	const { data: packData }: { data: PartialPackData } = response.body
 
-	const userId = await getUIDFromToken(token)
-	if (userId === undefined)
-		return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
-
 	const doc = await getPackDoc(packId)
 	if (doc === undefined)
 		return sendError(
@@ -91,12 +87,16 @@ const setPack = async (response: any, reply: any) => {
 			`Pack with ID ${packId} was not found`
 		)
 
-	if (!(await doc.get("contributors")).includes(userId))
-		return sendError(
-			reply,
-			HTTPResponses.FORBIDDEN,
-			`You are not a contributor for ${packId}`
-		)
+	const contributors: string[] = await doc.get("contributors")
+
+	const userId = (
+		await validateToken(reply, token, {
+			requiredUid: contributors,
+			requiredScopes: [PermissionScope.WRITE_PACKS],
+		})
+	)?.uid
+
+	if (userId === undefined) return
 
 	if (packData.versions)
 		for (let v of packData.versions) {
@@ -197,7 +197,8 @@ const setPack = async (response: any, reply: any) => {
 /*
  * @route PATCH/PUT /packs/:id
  * Update a pack's data
- *
+ 
+owner*
  * @param id
  * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
  *
@@ -269,7 +270,8 @@ API_APP.route({
 
 /*
  * @route DELETE /packs/:id
- * Delete a specific pack
+ * Delete a specific pac
+ownerk
  *
  * @param id
  * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
@@ -302,10 +304,6 @@ API_APP.route({
 		const { id: packId } = response.params
 		const { token } = response.query
 
-		const userId = await getUIDFromToken(token)
-		if (userId === undefined)
-			return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
-
 		const doc = await getPackDoc(packId)
 		if (doc === undefined)
 			return sendError(
@@ -314,12 +312,15 @@ API_APP.route({
 				`Pack with ID ${packId} was not found`
 			)
 
-		if ((await doc.get("owner")) !== userId)
-			return sendError(
-				reply,
-				HTTPResponses.FORBIDDEN,
-				`You are not the owner of ${packId}`
-			)
+		const owner: string = doc.get("owner")
+		console.log(owner)
+
+		const tokenData = await validateToken(reply, token, {
+			requiredUid: [owner],
+			requiredScopes: [PermissionScope.DELETE_PACKS],
+		})
+
+		if (tokenData === undefined) return
 
 		await doc.ref.delete()
 		return reply.status(HTTPResponses.OK).send("Deleted data")
@@ -401,10 +402,6 @@ API_APP.route({
 		const { id: packId } = response.params
 		const { token, contributors } = response.query
 
-		const userId = await getUIDFromToken(token)
-		if (userId === undefined)
-			return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
-
 		const doc = await getPackDoc(packId)
 		if (doc === undefined)
 			return sendError(
@@ -412,13 +409,15 @@ API_APP.route({
 				HTTPResponses.NOT_FOUND,
 				`Pack with ID ${packId} was not found`
 			)
+		const owner: string = await doc.get("owner")
 
-		if ((await doc.get("owner")) !== userId)
-			return sendError(
-				reply,
-				HTTPResponses.FORBIDDEN,
-				`You are not the owner of ${packId}`
-			)
+		const tokenData = await validateToken(reply, token, {
+			requiredUid: [owner],
+			requiredScopes: [PermissionScope.WRITE_PACKS],
+		})
+
+		owner
+		if (tokenData === undefined) return
 
 		const existingContributors: string[] = await doc.get("contributors")
 
@@ -470,10 +469,6 @@ API_APP.route({
 		const { id: packId } = response.params
 		const { token, contributors } = response.query
 
-		const userId = await getUIDFromToken(token)
-		if (userId === undefined)
-			return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
-
 		const doc = await getPackDoc(packId)
 		if (doc === undefined)
 			return sendError(
@@ -481,20 +476,21 @@ API_APP.route({
 				HTTPResponses.NOT_FOUND,
 				`Pack with ID ${packId} was not found`
 			)
+		const owner: string = await doc.get("owner")
 
-		if ((await doc.get("owner")) !== userId)
-			return sendError(
-				reply,
-				HTTPResponses.FORBIDDEN,
-				`You are not the owner of ${packId}`
-			)
+		const tokenData = await validateToken(reply, token, {
+			requiredUid: [owner],
+			requiredScopes: [PermissionScope.WRITE_PACKS],
+		})
+
+		if (tokenData === undefined) return
 
 		const existingContributors: string[] = await doc.get("contributors")
 
 		await doc.ref.set(
 			{
 				contributors: existingContributors.filter(
-					(v) => v === userId || !contributors.includes(v)
+					(v) => v === owner || !contributors.includes(v)
 				),
 			},
 			{ merge: true }

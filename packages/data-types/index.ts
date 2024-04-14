@@ -62,19 +62,18 @@ const sharedCategories = [
 	"Magic",
 	"Exploration",
 	"World Overhaul",
-
 ]
 
 export const packCategories = [
 	...sharedCategories,
 	"Library",
-	"No Resource Pack"
+	"No Resource Pack",
 ]
 
 export const bundleCategories = [
 	...sharedCategories,
 	"Quest Driven",
-	"Multiplayer Focus"	
+	"Multiplayer Focus",
 ]
 
 export const PackReferenceSchema = Type.Object({
@@ -85,7 +84,6 @@ export const PackReferenceSchema = Type.Object({
 export const PackCategorySchema = Type.Union(
 	packCategories.map((c) => Type.Literal(c))
 )
-
 
 export const BundleCategorySchema = Type.Union(
 	bundleCategories.map((c) => Type.Literal(c))
@@ -210,7 +208,7 @@ export function BundleUpdater(bundle: PackBundle): PackBundle_v2 {
 				packs: bundle.packs,
 			},
 		],
-		categories: []
+		categories: [],
 	}
 }
 
@@ -255,6 +253,33 @@ export const ArticleSchema = Type.Object({
 	]),
 })
 
+
+export enum PermissionScope {
+	READ_PACKS,
+	WRITE_PACKS,
+	CREATE_PACKS,
+	DELETE_PACKS,
+	READ_BUNDLES,
+	WRITE_BUNDLES,
+	CREATE_BUNDLES,
+	DELETE_BUNDLES,
+	READ_USER,
+	WRITE_USER
+}
+
+export const PermissionScopeSchema = Type.Enum(
+	PermissionScope
+)
+
+export const PATokenSchema = Type.Object({
+	owner: Type.String(),
+	createdAt: Type.Number(),
+	expiration: Type.Number(),
+	scopes: Type.Array(PermissionScopeSchema, { default: [], uniqueItems: true}),
+	tokenUid: Type.String(),
+	name: Type.String(),
+})
+
 export type Article = Static<typeof ArticleSchema>
 export type PackMetaData = Static<typeof MetaDataSchema>
 export type MinecraftVersion = Static<typeof MinecraftVersionSchema>
@@ -273,6 +298,8 @@ export type PackReference = Static<typeof PackReferenceSchema>
 export type PackGalleryImage = Static<typeof PackGalleryImageSchema>
 
 export type UserData = Static<typeof UserDataSchema>
+
+export type PAToken = Static<typeof PATokenSchema>
 
 export enum HTTPResponses {
 	OK = 200,

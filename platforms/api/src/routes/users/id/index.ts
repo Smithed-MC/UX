@@ -2,8 +2,8 @@ import { Static, Type } from "@sinclair/typebox"
 import { API_APP, get, sendError, set } from "../../../app.js"
 import { getFirestore } from "firebase-admin/firestore"
 import { sanitize } from "../../sanitize.js"
-import { HTTPResponses, UserData, UserDataSchema } from "data-types"
-import { getUIDFromToken } from "database"
+import { HTTPResponses, PermissionScope, UserData, UserDataSchema } from "data-types"
+import { validateToken } from "database"
 import { getAuth } from "firebase-admin/auth"
 
 import { useId } from "react"
@@ -148,16 +148,13 @@ async function setUserData(request: any, reply: any) {
 
 	const userData = rawUserData as PartialUserData
 
-	const tokenUserId = await getUIDFromToken(token)
-	if (userId === undefined)
-		return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
+	const tokenData = await validateToken(reply, token, {
+		requiredUid: [userId],
+		requiredScopes: [PermissionScope.WRITE_USER]
+	})
 
-	if (tokenUserId !== userId)
-		return sendError(
-			reply,
-			HTTPResponses.FORBIDDEN,
-			`You do not own this account!`
-		)
+	if (tokenData === undefined)
+		return
 
 	request.log.info("Querying Firebase for User w/ ID " + userId)
 	const doc = await getUserDoc(userId)
@@ -279,7 +276,13 @@ API_APP.route({
 		request.log.info("Querying Firebase for User w/ ID " + id)
 		const userDoc = await getUserDoc(id)
 
-		const uidFromToken = await getUIDFromToken(token)
+		const tokenData = await validateToken(reply, token, {
+			requiredUid: [id],
+			requiredScopes: [PermissionScope.WRITE_USER]
+		})
+
+		if (tokenData === undefined)
+			return
 
 		if (userDoc !== undefined)
 			return sendError(
@@ -287,14 +290,7 @@ API_APP.route({
 				HTTPResponses.NOT_FOUND,
 				"User has been setup previously"
 			)
-		else if (uidFromToken === undefined)
-			return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
-		else if (id !== uidFromToken)
-			return sendError(
-				reply,
-				HTTPResponses.FORBIDDEN,
-				"Specified user does not belong to token"
-			)
+
 		else if ((await getUserDoc(displayName)) !== undefined)
 			return sendError(
 				reply,
@@ -304,7 +300,7 @@ API_APP.route({
 
 		await getFirestore()
 			.collection("users")
-			.doc(uidFromToken)
+			.doc(tokenData.uid)
 			.set({
 				displayName: displayName,
 				cleanName: sanitize(displayName),

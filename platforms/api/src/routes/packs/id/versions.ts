@@ -5,9 +5,10 @@ import {
 	MinecraftVersionSchema,
 	PackVersion,
 	PackVersionSchema,
+	PermissionScope,
 } from "data-types"
 import { coerce, compare } from "semver"
-import { getPackDoc, getUIDFromToken } from "database"
+import { getPackDoc, validateToken } from "database"
 
 /*
  * @route GET /packs/:id/versions
@@ -111,10 +112,6 @@ API_APP.route({
 				"Version ID is not valid semver. Reference: https://semver.org"
 			)
 
-		const userId = await getUIDFromToken(token)
-		if (userId === undefined)
-			return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
-
 		const doc = await getPackDoc(packId)
 		if (doc === undefined)
 			return sendError(
@@ -122,13 +119,14 @@ API_APP.route({
 				HTTPResponses.NOT_FOUND,
 				`Pack with ID ${packId} was not found`
 			)
+		const contributors: string[] = await doc.get("contributors")
 
-		if (!(await doc.get("contributors")).includes(userId))
-			return sendError(
-				reply,
-				HTTPResponses.FORBIDDEN,
-				`You are not a contributor for ${packId}`
-			)
+		const tokenData = await validateToken(reply, token, {
+			requiredUid: contributors,
+			requiredScopes: [PermissionScope.WRITE_PACKS],
+		})
+
+		if (tokenData === undefined) return
 
 		const versions: PackVersion[] = await doc.get("data.versions")
 
@@ -214,10 +212,6 @@ API_APP.route({
 				"Version ID is not valid semver. Reference: https://semver.org"
 			)
 
-		const userId = await getUIDFromToken(token)
-		if (userId === undefined)
-			return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
-
 		const doc = await getPackDoc(packId)
 		if (doc === undefined)
 			return sendError(
@@ -225,13 +219,14 @@ API_APP.route({
 				HTTPResponses.NOT_FOUND,
 				`Pack with ID ${packId} was not found`
 			)
+		const contributors: string[] = await doc.get("contributors")
 
-		if (!(await doc.get("contributors")).includes(userId))
-			return sendError(
-				reply,
-				HTTPResponses.FORBIDDEN,
-				`You are not a contributor for ${packId}`
-			)
+		const tokenData = await validateToken(reply, token, {
+			requiredUid: contributors,
+			requiredScopes: [PermissionScope.WRITE_PACKS],
+		})
+
+		if (tokenData === undefined) return
 
 		const versions: PackVersion[] = await doc.get("data.versions")
 
@@ -312,10 +307,6 @@ API_APP.route({
 				"Version ID is not valid semver. Reference: https://semver.org"
 			)
 
-		const userId = await getUIDFromToken(token)
-		if (userId === undefined)
-			return sendError(reply, HTTPResponses.UNAUTHORIZED, "Invalid token")
-
 		const doc = await getPackDoc(packId)
 		if (doc === undefined)
 			return sendError(
@@ -323,13 +314,15 @@ API_APP.route({
 				HTTPResponses.NOT_FOUND,
 				`Pack with ID ${packId} was not found`
 			)
+		const contributors: string[] = await doc.get("contributors")
 
-		if (!(await doc.get("contributors")).includes(userId))
-			return sendError(
-				reply,
-				HTTPResponses.FORBIDDEN,
-				`You are not a contributor for ${packId}`
-			)
+		const tokenData = await validateToken(reply, token, {
+			requiredUid: contributors,
+			requiredScopes: [PermissionScope.WRITE_PACKS],
+		})
+		
+		if (tokenData === undefined)
+			return
 
 		const versions: PackVersion[] = await doc.get("data.versions")
 

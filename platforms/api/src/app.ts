@@ -1,4 +1,4 @@
-import { getUIDFromToken, initializeAdmin } from "database"
+import { parseToken, initializeAdmin } from "database"
 
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox"
 import fastify, { FastifyReply } from "fastify"

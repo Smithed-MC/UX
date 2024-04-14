@@ -4,13 +4,14 @@ import { getAuth } from "firebase-admin/auth"
 import { getFirestore } from "firebase-admin/firestore"
 
 import * as jose from "jose"
+import { HTTPResponses, PAToken, PermissionScope } from "data-types"
+import { FastifyReply } from "fastify"
 
 export let privateKey: jose.KeyLike
 export let serviceAccount: any
 
 export async function initializeAdmin() {
-	if (serviceAccount !== undefined)
-		return
+	if (serviceAccount !== undefined) return
 
 	serviceAccount =
 		typeof process.env.ADMIN_CERT === "string"
@@ -43,26 +44,118 @@ export async function initializeAdmin() {
 	getAuth()
 }
 
-export async function getUIDFromToken(token: string) {
-	const auth = getAuth()
+type ExtractedTokenData = {
+	type: "id" | "pat"
+	uid: string
+	scopes: PermissionScope[]
+}
 
-	// Since tokens are passed as strings, we need to try to resolve
-	// Firebase ID tokens and then check for custom JWT's if that fails
+async function getFromJWT(
+	token: string
+): Promise<ExtractedTokenData | undefined> {
+	try {
+		const result = await jose.jwtVerify(
+			token.replaceAll("\n", ""),
+			privateKey
+		)
+
+		// Manually check the expiration date against the current system time
+		// This allows for tokens of lifetime greater than one hour.
+		if (Date.now() / 1000 >= (result.payload.exp ?? 0)) return undefined
+
+		const { tokenUid, docId }: { tokenUid?: string; docId?: string } =
+			result.protectedHeader as any
+
+		if (tokenUid === undefined || docId === undefined) return undefined
+
+		const tokenEntry = (
+			await getFirestore().collection("tokens").doc(docId).get()
+		).data() as PAToken | undefined
+
+		if (tokenEntry === undefined) return undefined
+
+		if (tokenUid !== tokenEntry.tokenUid) return undefined
+
+		return { type: "pat", uid: tokenEntry.owner, scopes: tokenEntry.scopes }
+	} catch (e) {
+		return undefined
+	}
+}
+
+const ALL_SCOPES = Object.values(PermissionScope).filter(
+	(v) => typeof v !== "string"
+) as PermissionScope[]
+
+async function getFromIdToken(
+	token: string
+): Promise<ExtractedTokenData | undefined> {
+	const auth = getAuth()
 	try {
 		const result = await auth.verifyIdToken(token)
-		return result.uid
-	} catch {
-		try {
-			const result = await jose.jwtVerify(token.replaceAll('\n', ''), privateKey)
-
-			// Manually check the expiration date against the current system time
-			// This allows for tokens of lifetime greater than one hour.
-			if (Date.now() / 1000 < (result.payload.exp ?? 0))
-				return result.protectedHeader.uid as string
-		} catch (e) {
-			return undefined
+		return {
+			type: "id",
+			uid: result.uid,
+			scopes: ALL_SCOPES,
 		}
+	} catch {}
+	return undefined
+}
+
+export async function parseToken(
+	token: string
+): Promise<ExtractedTokenData | undefined> {
+	// Since tokens are passed as strings, we need to try to resolve
+	// Firebase ID tokens and then check for custom JWT's if that fails
+
+	if (token.startsWith("smithed-")) return getFromJWT(token.slice(8))
+	else return getFromIdToken(token)
+}
+
+
+
+export async function validateToken(
+	reply: FastifyReply,
+	token: string,
+	options?: {
+		requiredUid?: string[]
+		requiredScopes?: PermissionScope[]
 	}
+): Promise<ExtractedTokenData | undefined> {
+	const tokenData = await parseToken(token)
+	if (tokenData === undefined) {
+		reply.status(HTTPResponses.UNAUTHORIZED).send({
+			statusCode: HTTPResponses.UNAUTHORIZED,
+			error: HTTPResponses[HTTPResponses.UNAUTHORIZED],
+			message: "Invalid token"
+		})
+		return undefined
+	} 
+
+	if (!options) return tokenData
+
+	if (options.requiredUid && !options.requiredUid.includes(tokenData.uid)) {
+		reply.status(HTTPResponses.FORBIDDEN).send({
+			statusCode: HTTPResponses.FORBIDDEN,
+			error: HTTPResponses[HTTPResponses.FORBIDDEN],
+			message: "You do not have ownership of this content"
+		})
+		return undefined
+	}
+
+	if (
+		options.requiredScopes &&
+		!options.requiredScopes.every((v) => tokenData.scopes.includes(v))
+	) {
+		reply.status(HTTPResponses.FORBIDDEN).send({
+			statusCode: HTTPResponses.FORBIDDEN,
+			error: HTTPResponses[HTTPResponses.FORBIDDEN],
+			message: "Your token does not have the required scopes for this operation"
+		})
+		
+		return undefined
+	}
+
+	return tokenData
 }
 
 export async function getPackDoc(id: string) {
