@@ -310,21 +310,16 @@ function Footer() {
 	)
 }
 
-const config = { ssr: import.meta.env.SSR }
-
-const Home = loadable(() => import("./pages/home.js"), config)
-const Settings = loadable(() => import("./pages/settings.js"), config)
-const Account = loadable(() => import("./pages/account.js"), config)
-const PackEditor = loadable(() => import("./pages/packs/id/edit.js"), config)
-const User = loadable(() => import("./pages/user.js"), config)
-const PackPage = loadable(() => import("./pages/packs/id/index.js"), config)
-const PackBrowsePage = loadable(() => import("./pages/packs/index.js"), config)
-const BundlePage = loadable(() => import("./pages/bundles/id/index.js"), config)
-const BundleEditor = loadable(
-	() => import("./pages/bundles/id/edit.js"),
-	config
-)
-const ArticlePage = loadable(() => import("./pages/article.js"), config)
+import Home from "./pages/home.js"
+import Settings from "./pages/settings.js"
+import Account from "./pages/account.js"
+import PackEditor from "./pages/packs/id/edit.js"
+import User from "./pages/user.js"
+import PackPage from "./pages/packs/id/index.js"
+import PackBrowsePage from "./pages/packs/index.js"
+import BundlePage from "./pages/bundles/id/index.js"
+import BundleEditor from "./pages/bundles/id/edit.js"
+import ArticlePage from "./pages/article.js"
 
 // Don't reorder these please
 export const subRoutes: RouteObject[] = [

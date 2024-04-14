@@ -10,19 +10,22 @@ import CategoryBar, { CategoryChoice } from "./CategoryBar"
 import { DownloadButton } from "./DownloadButton"
 import Modal from "./Modal"
 import Link from "./Link"
-import loadable from "@loadable/component"
-
-const config = {ssr: import.meta.env.SSR }
-
-export const NavButton = loadable(() => import('./NavButton'), config)
-export const NavBar = loadable(() => import('./NavBar'), config)
-export const PackCard = loadable(() => import('./PackCard'), config)
-export const IconTextButton = loadable(() => import('./IconTextButton'), config)
-export const IconInput = loadable(() => import('./IconInput'), config)
-export const GalleryPackCard = loadable(() => import('./GalleryPackCard'), config)
-export const ChooseBox = loadable(() => import('./ChooseBox'), config)
+import NavButton from './NavButton'
+import NavBar from './NavBar'
+import PackCard from './PackCard'
+import IconTextButton from './IconTextButton'
+import IconInput from './IconInput'
+import GalleryPackCard from './GalleryPackCard'
+import ChooseBox from './ChooseBox'
 
 export {
+	NavButton,
+	NavBar,
+	PackCard,
+	IconTextButton,
+	IconInput,
+	GalleryPackCard,
+	ChooseBox,
 	Spinner,
 	svg,
 	ErrorPage,
