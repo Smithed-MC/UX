@@ -10,12 +10,55 @@ import {
 	PackMetaData,
 	PermissionScope,
 } from "data-types"
-import { getPackDoc, validateToken } from "database"
 import { FastifyRequest, FastifyReply, FastifySchema, FastifyTypeProviderDefault, RawServerDefault, RouteGenericInterface } from "fastify"
+import { getPackDoc, validateToken } from "database"
 import { coerce, valid } from "semver"
 import hash from "hash.js"
 import { request } from "express"
+import { IncomingMessage, ServerResponse } from "http"
 
+
+export async function updateGalleryData(packData: any, reply: FastifyReply|undefined) {
+	if (packData.display.gallery === undefined)
+		return
+
+	for (let i = 0; i < packData.display.gallery.length; i++) {
+		const g = packData.display.gallery[i]
+
+		if (typeof g === "string") {
+			if (!g.startsWith("http")) {
+				const buffer = Buffer.from(g.split(",")[1])
+				if (buffer.byteLength > 1324 * 1024)
+					return reply ? sendError(
+						reply,
+						HTTPResponses.BAD_REQUEST,
+						`Gallery image ${i} exceeds 1MB`
+					) : undefined
+
+				let uid = hash.sha1().update(g).digest("hex")
+
+				getStorage().bucket().file(`gallery_images/${uid}`).save(g)
+
+				packData.display.gallery[i] = {
+					type: "bucket",
+					uid: uid,
+				}
+			}
+		} else if (g.content) {
+			let uid = hash.sha1().update(g.content).digest("hex")
+
+			if (g.uid !== uid) {
+				getStorage().bucket().file(`gallery_images/${g.uid}`).delete()
+				getStorage()
+					.bucket()
+					.file(`gallery_images/${uid}`)
+					.save(g.content)
+			}
+
+			delete g.content
+		}
+	}
+}
 
 /*
  * @route GET /packs/:id
