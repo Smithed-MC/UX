@@ -62,8 +62,7 @@ export default function CategoryBar({
 
 		let transition = backgroundStyle.transition
 		if (!shouldTransition) backgroundStyle.setProperty("transition", "none")
-		else backgroundStyle.removeProperty("transition")
-
+		
 		backgroundStyle.setProperty("width", `${selectedRect.width}px`)
 		backgroundStyle.setProperty("height", `${selectedRect.height}px`)
 
@@ -92,9 +91,8 @@ export default function CategoryBar({
 	}, [])
 
 	useEffect(() => {
-		setValue(defaultValue ?? "")
-		updateBackgroundSlide(selectedChoice.current!, false)
-	}, [defaultValue])
+		updateBackgroundSlide(selectedChoice.current!, true)
+	}, [value])
 
 	function wrapOnClick(
 		c: React.ReactElement<

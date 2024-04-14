@@ -1,6 +1,7 @@
 import { DownloadButton, IconTextButton, NavButton } from "components"
 import { svg } from "components"
 import { Download, Right } from "components/svg"
+import { getAuth } from "firebase/auth"
 import { createContext } from "react"
 
 export interface IClientContext {
@@ -49,6 +50,14 @@ export const defaultContext: IClientContext = {
 			className="bundleButtonLike bundleControlButton"
 			reverse={true}
 			to={import.meta.env.VITE_API_SERVER + `/bundles/${id}/download`}
+			onClick={async (e) => {
+				e.preventDefault()
+				window.open(
+					import.meta.env.VITE_API_SERVER +
+						`/bundles/${id}/download?token=` +
+						(await getAuth().currentUser?.getIdToken())
+				)
+			}}
 		/>
 	),
 }

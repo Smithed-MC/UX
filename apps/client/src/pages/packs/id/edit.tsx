@@ -59,11 +59,17 @@ import {
 	setPropertyByPath,
 	LargeTextInput,
 	validUrlRegex,
-} from "../../../components/editor/inputs"
-import GalleryManager from "../../../components/editor/galleryManager"
-import { PackEditLoaderData } from "./loader"
+} from "../../editors/inputs"
+import GalleryManager from "../../editors/galleryManager"
+import { PackEditLoaderData } from "./edit.loader"
 import qs from "query-string"
-import ReadmePreview from "../../../components/editor/readmePreview"
+import ReadmePreview from "../../editors/readmePreview"
+import {
+	useErrorEventHandlers,
+	sendErrorEvent,
+} from "../../editors/errorEvents"
+import "../../editors/common.css"
+import VersionSelectOption from "../../editors/versionSelectOption"
 
 interface SavingState {
 	mode: "off" | "saving" | "saved" | "error"
@@ -267,18 +273,6 @@ export default function PackEdit() {
 		onLoad()
 	}, [packData, packMetaData, user])
 
-	function sendError(path: string, e: ValueError) {
-		console.log(path)
-		const elem = document.getElementById(path)
-
-		elem?.dispatchEvent(
-			new ErrorEvent("error", {
-				error: e,
-				bubbles: true,
-			})
-		)
-	}
-
 	async function savePack() {
 		if (packData === undefined) return
 
@@ -291,10 +285,10 @@ export default function PackEdit() {
 					if (e.type === ValueErrorType.ObjectMinProperties) {
 						e.message = "At least one is required"
 					}
-					sendError(path + "/datapack", e)
-					sendError(path + "/resourcepack", e)
+					sendErrorEvent(path + "/datapack", e)
+					sendErrorEvent(path + "/resourcepack", e)
 				} else {
-					sendError(path, e)
+					sendErrorEvent(path, e)
 				}
 			}
 			return
@@ -387,27 +381,6 @@ export default function PackEdit() {
 		}
 
 		setSavingState({ mode: "saved" })
-	}
-
-	function createErrorHandlers(
-		id: string,
-		ref: React.RefObject<HTMLElement | null>
-	) {
-		function onError() {
-			const button = document.getElementById(id)
-			button?.dispatchEvent(new CustomEvent("setError", { detail: true }))
-		}
-
-		function onErrorCleared() {
-			if (ref?.current?.querySelector(".hasError")) return
-
-			const button = document.getElementById(id)
-			button?.dispatchEvent(
-				new CustomEvent("setError", { detail: false })
-			)
-		}
-
-		return [onError, onErrorCleared]
 	}
 
 	function Dependencies({ version }: { version: PackVersion }) {
@@ -686,20 +659,13 @@ export default function PackEdit() {
 
 	function ProjectDetails() {
 		const ref = useRef<HTMLDivElement>(null)
-		const [onError, onErrorCleared] = createErrorHandlers(
-			"editProjectDetailsChoice",
-			ref
-		)
 
-		useEffect(() => {
-			ref.current?.addEventListener("error", onError)
-			ref.current?.addEventListener("errorCleared", onErrorCleared)
-
-			return () => {
-				ref.current?.removeEventListener("error", onError)
-				ref.current?.removeEventListener("errorCleared", onErrorCleared)
-			}
-		}, [])
+		useErrorEventHandlers(ref, (hasError) => {
+			const button = document.getElementById("editProjectDetailsChoice")
+			button?.dispatchEvent(
+				new CustomEvent("setError", { detail: hasError })
+			)
+		})
 
 		return (
 			<div
@@ -1071,13 +1037,16 @@ export default function PackEdit() {
 
 		const [versions, setVersions] = useState<PackVersion[]>([])
 		const [selectedVersion, setSelectedVersion] = useState<PackVersion>()
-		
-		const [onError, onErrorCleared] = createErrorHandlers(
-			"editVersionsChoice",
-			ref
-		)
+
+		useErrorEventHandlers(ref, (hasError) => {
+			const button = document.getElementById("editVersionsChoice")
+			button?.dispatchEvent(
+				new CustomEvent("setError", { detail: hasError })
+			)
+		})
 
 		const updateVersions = () => {
+			console.log(packData.versions)
 			let versions = [...(packData?.versions ?? [])].sort((a, b) =>
 				compare(
 					valid(a.name) ? a.name : coerce(a.name) ?? "0.0.1",
@@ -1091,139 +1060,7 @@ export default function PackEdit() {
 			updateVersions()
 			setSelectedVersion(packData?.versions[0])
 		}, [packData])
-
-		useEffect(() => {
-			console.log("add listeners")
-			ref.current?.addEventListener("error", onError)
-			ref.current?.addEventListener("errorCleared", onErrorCleared)
-
-			return () => {
-				ref.current?.removeEventListener("error", onError)
-				ref.current?.removeEventListener("errorCleared", onErrorCleared)
-			}
-		}, [ref])
-
-		function VersionSelectOption({
-			version,
-			index,
-		}: {
-			version: PackVersion
-			index: number
-		}) {
-			const select = (version: PackVersion) => {
-				const matches = packData.versions.filter(
-					(v) => v.name === selectedVersion?.name
-				)
-
-				if (matches.length > 1)
-					return alert("Resolve version name conflict!")
-
-				if (
-					selectedVersion !== undefined &&
-					valid(selectedVersion?.name) == null
-				)
-					return alert("Selected version name is not valid SemVer")
-
-				setSelectedVersion(version)
-			}
-
-			function onError() {
-				const option = document.getElementById(
-					`versions/${index}_select`
-				)
-				option?.style.setProperty("color", "var(--disturbing)")
-				option?.classList.add("hasError")
-			}
-			function onErrorCleared(this: HTMLElement, e: Event) {
-				console.log(e.target)
-				console.log(matchingVersion?.querySelector(".hasError"))
-				if (matchingVersion?.querySelector(".hasError")) return
-
-				const option = document.getElementById(
-					`versions/${index}_select`
-				)
-
-				option?.style.setProperty("color", null)
-				option?.classList.remove("hasError")
-			}
-			let matchingVersion: HTMLElement | null = null
-
-			useEffect(() => {
-				matchingVersion = document.getElementById(`versions/${index}`)
-				matchingVersion?.addEventListener("error", onError)
-				matchingVersion?.addEventListener(
-					"errorCleared",
-					onErrorCleared
-				)
-
-				return () => {
-					matchingVersion?.removeEventListener("error", onError)
-					matchingVersion?.removeEventListener(
-						"errorCleared",
-						onErrorCleared
-					)
-				}
-			}, [])
-
-			return (
-				<span
-					className={`versionChoice ${version === selectedVersion ? "selected" : ""}`}
-					id={`versions/${index}_select`}
-					key={version.name}
-					onClick={(e) => {
-						if (!(e.target instanceof HTMLSpanElement)) return
-						select(version)
-					}}
-				>
-					<span id={`packVersionOption${version.name}`}>
-						{version.name}
-					</span>
-					{versions.length > 1 && (
-						<div
-							id="trashButton"
-							className="container"
-							style={{
-								position: "absolute",
-								right: "0.75rem",
-								top: 0,
-								height: "100%",
-								transition: "all 0.2s ease-in-out",
-							}}
-						>
-							<button
-								style={{
-									backgroundColor: "transparent",
-									width: "2rem",
-									height: "2rem",
-									padding: 0,
-								}}
-								onClick={(e) => {
-									e.preventDefault()
-									const idx = packData.versions.findIndex(
-										(version) => version === version
-									)
-									packData.versions.splice(idx, 1)
-
-									if (selectedVersion === version) {
-										setSelectedVersion(
-											packData.versions[
-												packData.versions.length === idx
-													? idx - 1
-													: idx
-											]
-										)
-									}
-
-									updateVersions()
-								}}
-							>
-								<Trash />
-							</button>
-						</div>
-					)}
-				</span>
-			)
-		}
+	
 
 		function VersionSelect({ packData }: { packData: PackData }) {
 			return (
@@ -1242,8 +1079,11 @@ export default function PackEdit() {
 						.map((v, i) => (
 							<VersionSelectOption
 								key={`version_option_${i}`}
-								version={v}
 								index={i}
+								version={v}
+								setSelectedVersion={setSelectedVersion} 
+								allVersions={packData.versions} 
+								onDelete={updateVersions}								
 							/>
 						))}
 
@@ -1298,7 +1138,7 @@ export default function PackEdit() {
 				</div>
 				{versions.map((v, i) => (
 					<div
-						key={`version_info_${i}`}
+						key={`version_info_${v.name}`}
 						id={`versions/${i}`}
 						className="versionInfo"
 						style={{

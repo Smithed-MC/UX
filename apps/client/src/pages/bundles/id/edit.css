@@ -1,41 +1,3 @@
-@keyframes fadeInAndOut {
-	0% {
-		opacity: 0;
-		visibility: visible;
-	}
-
-	20% {
-		opacity: 1;
-	}
-
-	80% {
-		opacity: 1;
-	}
-
-	100% {
-		opacity: 0;
-		visibility: hidden;
-	}
-}
-
-.editorContainer {
-	display: flex;
-	width: 100%;
-	height: 100%;
-	box-sizing: border-box;
-	justify-content: safe center;
-	place-items: safe start;
-	flex-direction: column;
-
-	max-width: 24.375rem;
-	gap: 4rem;
-}
-
-.editorOrganizer {
-	width: 100%;
-	height: 100%;
-}
-
 .editBundleDetails,
 .editBundleVersions {
 	display: grid;
@@ -91,6 +53,7 @@
 	box-sizing: border-box;
 	grid-area: iconGrid;
 	grid-template-areas:
+	 	"id	  id"
 		"icon name"
 		"icon description";
 

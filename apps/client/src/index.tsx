@@ -50,15 +50,16 @@ import { PackBundle, UserData } from "data-types"
 import { Helmet } from "react-helmet"
 import { ClientContext, defaultContext, IClientContext } from "./context.js"
 
-import { Cross, Logo } from "components/svg.js"
+import { Cross, Edit, Logo } from "components/svg.js"
 
 
 import Cookies from "js-cookie"
 import Article from "./pages/article.js"
-import BundleEdit, { BundleEditError } from "./pages/bundles/id/edit.js"
-import { loadBundleEdit } from "./pages/bundles/id/loader.js"
+import BundleEdit from "./pages/bundles/id/edit.js"
+import { loadBundleEdit } from "./pages/bundles/id/edit.loader.js"
 import Smithie from "./widget/Smithie.js"
-import { loadPackEdit } from "./pages/packs/id/loader.js"
+import { loadPackEdit } from "./pages/packs/id/edit.loader.js"
+import EditorError from "./pages/editors/error.js"
 
 initializeApp({
 	databaseURL: "https://mc-smithed-default-rtdb.firebaseio.com",
@@ -353,9 +354,8 @@ export const subRoutes: RouteObject[] = [
 		path: "packs/:id/edit",
 		element: <PackEdit />,
 		loader: loadPackEdit,
-		shouldRevalidate: ({currentParams, nextParams}) => {
-			return currentParams !== nextParams
-		}
+		errorElement: <EditorError/>
+
 	},
 	{
 		path: ":owner",
@@ -382,7 +382,7 @@ export const subRoutes: RouteObject[] = [
 		element: (
 			<BundleEdit/>
 		),
-		errorElement: <BundleEditError />,
+		errorElement: <EditorError />,
 		loader: loadBundleEdit
 	},
 	{
