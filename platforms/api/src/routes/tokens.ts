@@ -31,7 +31,11 @@ function expiresToSeconds(expires: string): number {
 	return charToMultiplier["h"]
 }
 
-async function signJWT(tokenEntry: PAToken, tokenDocId: string, expires: string): Promise<string> {
+async function signJWT(
+	tokenEntry: PAToken,
+	tokenDocId: string,
+	expires: string
+) {
 	const jwt = await new jose.SignJWT({})
 		.setProtectedHeader({
 			alg: "RS256",
@@ -43,7 +47,7 @@ async function signJWT(tokenEntry: PAToken, tokenDocId: string, expires: string)
 		.setAudience(
 			"https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit"
 		)
-		.setExpirationTime(expires)
+		.setExpirationTime(expires !== undefined ? (expires as string) : "1h")
 		.setIssuedAt(Math.round(Date.now() / 1000))
 		.sign(privateKey)
 
@@ -112,7 +116,7 @@ API_APP.route({
 		).id
 
 		try {
-			const jwt = signJWT(tokenEntry, tokenDocId, expires)
+			const jwt = await signJWT(tokenEntry, tokenDocId, expires)
 			return { tokenDocId, tokenEntry, token: jwt }
 		} catch (e) {
 			res.status(500).send((e as Error).message)
@@ -272,6 +276,6 @@ API_APP.route({
 
 		await doc.ref.set(tokenEntry)
 		const jwt = await signJWT(tokenEntry, id, tokenEntry.expiration + "s")
-		return {token: jwt, tokenEntry: tokenEntry}
+		return { token: jwt, tokenEntry: tokenEntry }
 	},
 })
