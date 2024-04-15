@@ -278,16 +278,16 @@ export async function loadPackBrowseData({
 export async function loadRootData({ request }: { request: Request }) {
 	if (import.meta.env.SSR) {
 		const cookie = Cookie.parse(request.headers.get("cookie") ?? "")
-		if (!("smithedUser" in cookie)) {
-			return { user: undefined }
-		}
+		
 
-		const user = JSON.parse(cookie["smithedUser"])
+		const user = "smithedUser" in cookie ? JSON.parse(cookie["smithedUser"]) : undefined
+		const siteSettings = "smithedSiteSettings" in cookie ? JSON.parse(cookie["smithedSiteSettings"]) : undefined
+		return { user, siteSettings }
 
-		return { user: user }
+
 	}
 
-	return { user: undefined }
+	return { user: undefined, siteSettings: undefined }
 }
 
 export interface ArticleLoaderData {

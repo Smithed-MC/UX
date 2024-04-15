@@ -52,7 +52,7 @@ export default function Modal({
 					position: "absolute",
 					top: `calc(100% - ${offset ?? "0.5rem"})`,
 					padding: "1rem 1rem 1rem 1rem",
-					zIndex: open ? 1000 : -100,
+					zIndex: 1000,
 					opacity: open ? 1 : 0,
 					pointerEvents: open ? 'all' : 'none',
 					transition: "opacity 0.25s ease-in-out",

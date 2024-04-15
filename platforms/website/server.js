@@ -7,6 +7,7 @@ import fetch from "node-fetch"
 import dotenv from "dotenv"
 import { generateSitemap } from "./generate-sitemap.js"
 import compression from "compression"
+import Cookie from "cookie"
 
 dotenv.config()
 
@@ -23,7 +24,6 @@ console.log("Running on port:", process.env.PORT)
 globalThis.fetch = fetch
 
 async function createServer() {
-
 	const TEMPLATE = isProd
 		? fs.readFileSync(path.resolve(distFolder, "index.html"), "utf-8")
 		: ""
@@ -92,12 +92,25 @@ async function createServer() {
 			const { html: appHtml, helmet } = result
 			// console.timeEnd('Render content')
 			// console.time('Replace w/ helmet and ssr')
+
+			const cookie = Cookie.parse(req.headers["cookie"] ?? "")
+
+			const siteSettings =
+				"smithedSiteSettings" in cookie
+					? JSON.parse(cookie["smithedSiteSettings"])
+					: undefined
+
+			const themeCSS = siteSettings
+				? `${Object.entries(siteSettings.theme.variables).map(([k, v]) => `--${k}: ${v} !important;`).join(' ')}`
+				: ""
+
 			// // 5. Inject the app-rendered HTML into the template.
 			const html = template
 				.replace(`<!--helmet-title-outlet-->`, helmet.title.toString())
 				.replace(`<!--helmet-meta-outlet-->`, helmet.meta.toString())
 				.replace(`<!--helmet-link-outlet-->`, helmet.link.toString())
 				.replace(`<!--ssr-outlet-->`, appHtml)
+				.replace(`<!--theme-style-->`, themeCSS)
 			// console.timeEnd('Replace w/ helmet and ssr')
 
 			// // 6. Send the rendered HTML back.

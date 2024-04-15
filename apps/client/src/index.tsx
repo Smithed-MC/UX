@@ -32,7 +32,7 @@ import {
 	setUsersBundles,
 	store,
 } from "store"
-import { useAppDispatch, useAppSelector } from "hooks"
+import { useAppDispatch, useAppSelector, useSiteSettings } from "hooks"
 import { PackBundle, UserData } from "data-types"
 import { Helmet } from "react-helmet"
 import { ClientContext, defaultContext, IClientContext } from "./context.js"
@@ -44,7 +44,6 @@ import { loadBundleEdit } from "./pages/bundles/id/edit.loader.js"
 import { loadPackEdit } from "./pages/packs/id/edit.loader.js"
 import EditorError from "./pages/editors/error.js"
 import React from "react"
-import loadable from "@loadable/component"
 import loadPackData from "./pages/packs/id/index.loader.js"
 
 initializeApp({
@@ -64,6 +63,10 @@ export function ClientApplet() {
 	const [hideWarning, setHideWarning] = useState(false)
 	const location = useLocation()
 	const context = useContext(ClientContext)
+	const [siteSettings, applySettings] = useSiteSettings()
+
+	if (!import.meta.env.SSR)
+		applySettings(siteSettings)
 
 	function resetBundleData() {
 		dispatch(setUsersBundles([]))
@@ -253,7 +256,7 @@ function Footer() {
 		<div
 			className="container"
 			style={{
-				width: "100%",
+				width: "100.5vw",
 				backgroundColor: "var(--bold)",
 				borderTop: "0.125rem solid var(--border)",
 			}}
@@ -320,6 +323,7 @@ import PackBrowsePage from "./pages/packs/index.js"
 import BundlePage from "./pages/bundles/id/index.js"
 import BundleEditor from "./pages/bundles/id/edit.js"
 import ArticlePage from "./pages/article.js"
+import loadSettingsData from "./pages/settings.loader"
 
 // Don't reorder these please
 export const subRoutes: RouteObject[] = [
@@ -331,6 +335,7 @@ export const subRoutes: RouteObject[] = [
 	{
 		path: "settings",
 		element: <Settings />,
+		loader: loadSettingsData
 	},
 	{
 		path: "browse",

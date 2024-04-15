@@ -62,7 +62,7 @@ export default function IconTextButton({
 						width: 2,
 						height: 20,
 						opacity: 0.15,
-						backgroundColor: style?.color ?? "white"
+						backgroundColor: style?.color ?? "var(--foreground)"
 					}}
 				/>
 			)}

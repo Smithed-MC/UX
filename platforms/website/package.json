@@ -12,6 +12,7 @@
 	},
 	"dependencies": {
 		"client": "*",
-		"database": "*"
+		"database": "*",
+		"hooks": "*"
 	}
 }

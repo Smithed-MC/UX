@@ -162,7 +162,7 @@ export default function Login({
 								style={{
 									width: "1rem",
 									height: "1rem",
-									border: "2px solid var(--text)",
+									border: "2px solid var(--foreground)",
 									borderTop: "2px solid var(--accent)",
 								}}
 							/>

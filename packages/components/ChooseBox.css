@@ -66,7 +66,10 @@
 	border-radius: 0 0 var(--defaultBorderRadius) var(--defaultBorderRadius);
 	border: 0.125rem solid var(--background);
 	border-top: none;
-	overflow: hidden;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	background-color: var(--section);
+	max-height: 16rem;
 }
 
 .chooseBoxOptions.flip {

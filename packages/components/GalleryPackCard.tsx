@@ -266,7 +266,7 @@ export default function GalleryPackCard({
 						>
 							{`by `}
 							<Link
-								style={{ color: "var(--text)" }}
+								style={{ color: "var(--foreground)" }}
 								to={`/${author}`}
 							>
 								{author}

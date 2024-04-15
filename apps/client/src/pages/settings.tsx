@@ -1,35 +1,43 @@
-import { invoke, tauri } from "@tauri-apps/api"
-import { listen } from "@tauri-apps/api/event"
-import { WebviewWindow } from "@tauri-apps/api/window"
-import { open } from "@tauri-apps/api/shell"
-import { useEffect } from "react"
+import { CategoryBar, CategoryChoice, ChooseBox } from "components"
+import { Account, Globe, Refresh } from "components/svg"
+import {
+	DARK_THEME,
+	LIGHT_THEME,
+	useFirebaseUser,
+	useQueryParams,
+	useSiteSettings,
+	useSmithedUser,
+} from "hooks"
+import Cookies from "js-cookie"
+import { useState } from "react"
+import { useNavigate, useLoaderData } from "react-router-dom"
+import SiteSettings from "./settings/siteSettings"
+import AccountSettings from "./settings/accountSettings"
+import { PAToken, UserData } from "data-types"
+
+
 
 export default function Settings() {
-	useEffect(() => {
-		const unsubscribe = listen<string>("store_users", (event) => {
-			localStorage.setItem("mc_users", event.payload)
-		})
-		return () => {
-			unsubscribe.then((v) => v())
-		}
-	})
+	const tab = (useQueryParams().tab as string | null) ?? "site"
+	const loaderData = useLoaderData() as {user: UserData, tokens: {tokenDocId: string, tokenEntry: PAToken}[]}|null
+	const navigate = useNavigate()
 
 	return (
-		<div>
-			<h1>Settings</h1>
-			Version: 0.3.0
-			{/* <button onClick={async () => {
-            
-            const deviceCodeResp = JSON.parse(await invoke('get_device_code'))
-
-            alert("Your device code is: " + deviceCodeResp.user_code)
-            const window = new WebviewWindow("microsoftSignIn", {url: deviceCodeResp.verification_uri})
-            const token = await tauri.invoke('get_minecraft_token', {deviceCode: deviceCodeResp.device_code})
-            window.close()
-        }}>Register User</button>
-        <button onClick={async () => {
-            await tauri.invoke('launch_game')
-        }}>Launch Game</button> */}
+		<div className="container" style={{ width: "100%", gap: "4rem" }}>
+			<CategoryBar
+				defaultValue={tab}
+				onChange={(v) => navigate("?tab=" + v)}
+			>
+				<CategoryChoice value={"site"} text={"Site"} icon={<Globe />} />
+				<CategoryChoice
+					value={"account"}
+					text={"Account"}
+					icon={<Account />}
+					hidden={loaderData == null}
+				/>
+			</CategoryBar>
+			{tab === "site" && <SiteSettings />}
+			{loaderData != null && tab === "account" && <AccountSettings tokens={loaderData.tokens}/>}
 		</div>
 	)
 }

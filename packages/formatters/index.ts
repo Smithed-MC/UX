@@ -28,7 +28,24 @@ export function prettyTimeDifference(start: number) {
 		return returnFormat(hours, "hour")
 	}
 }
+const charToMultiplier: Record<string, number> = {
+	"s": 1,
+	"m": 60,
+	"h": 60 * 60,
+	"d": 60 * 60 * 24,
+	"y": 60 * 60 * 24 * 365
+}
 
+export function expiresToSeconds(expires: string): number {
+	for (const suffix in charToMultiplier) {
+		const match = expires.match(new RegExp(`([0-9]+)${suffix}`))
+
+		if (match) {
+			return Number.parseInt(match[1]) * charToMultiplier[suffix]
+		}
+	}
+	return charToMultiplier["h"]
+}
 function fixBlob(matches: RegExpExecArray, user: string, repo: string) {
 	const path = matches.shift()
 

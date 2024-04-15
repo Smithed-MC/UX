@@ -1,6 +1,11 @@
 import { Type } from "@sinclair/typebox"
 import { API_APP, sendError } from "../app.js"
-import { HTTPResponses, PAToken, PermissionScope, PermissionScopeSchema } from "data-types"
+import {
+	HTTPResponses,
+	PAToken,
+	PermissionScope,
+	PermissionScopeSchema,
+} from "data-types"
 import { getAuth } from "firebase-admin/auth"
 import * as jose from "jose"
 import { privateKey, serviceAccount } from "database"
@@ -8,11 +13,11 @@ import { getFirestore } from "firebase-admin/firestore"
 import { randomUUID } from "crypto"
 
 const charToMultiplier: Record<string, number> = {
-	"s": 1,
-	"m": 60,
-	"h": 60 * 60,
-	"d": 60 * 60 * 24,
-	"y": 60 * 60 * 24 * 365
+	s: 1,
+	m: 60,
+	h: 60 * 60,
+	d: 60 * 60 * 24,
+	y: 60 * 60 * 24 * 365,
 }
 
 function expiresToSeconds(expires: string): number {
@@ -26,22 +31,41 @@ function expiresToSeconds(expires: string): number {
 	return charToMultiplier["h"]
 }
 
+async function signJWT(tokenEntry: PAToken, tokenDocId: string, expires: string): Promise<string> {
+	const jwt = await new jose.SignJWT({})
+		.setProtectedHeader({
+			alg: "RS256",
+			tokenUid: tokenEntry.tokenUid,
+			docId: tokenDocId,
+		})
+		.setIssuer(serviceAccount.client_email)
+		.setSubject(serviceAccount.client_email)
+		.setAudience(
+			"https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit"
+		)
+		.setExpirationTime(expires)
+		.setIssuedAt(Math.round(Date.now() / 1000))
+		.sign(privateKey)
+
+	return "smithed-" + jwt
+}
+
 /*
  * @route POST /tokens
  * This route allows the creation of a PAT
  *
  * @query token: string
  * Specifically a Firebase ID Token, not another PAT
- * 
+ *
  * @query expires: string
  * How long should the token be valid for, in the form `<num><h|>
- * 
+ *
  * @query name: string?
  * Name of token shown in the UI
- * 
+ *
  * @query scopes: PermissionScope[]? = []
- * List of permissions for the token 
- * 
+ * List of permissions for the token
+ *
  * @return OK: {tokenDocId: string, tokenEntry: PAToken, token: string}
  * @return SERVER_ERROR: ApiError
  *
@@ -54,9 +78,9 @@ API_APP.route({
 	schema: {
 		querystring: Type.Object({
 			token: Type.String(),
-			expires: Type.String({default: "1h"}),
-			name: Type.String({default: "A token"}),
-			scopes: Type.Array(PermissionScopeSchema, {default: []})
+			expires: Type.String({ default: "1h" }),
+			name: Type.String({ default: "A token" }),
+			scopes: Type.Array(PermissionScopeSchema, { default: [] }),
 		}),
 	},
 	handler: async (req, res) => {
@@ -80,30 +104,19 @@ API_APP.route({
 			expiration: lifetime,
 			scopes: scopes,
 			tokenUid: randomUUID(),
-			name: name
+			name: name,
 		}
 
-		const tokenDocId = (await getFirestore().collection("tokens").add(tokenEntry)).id
+		const tokenDocId = (
+			await getFirestore().collection("tokens").add(tokenEntry)
+		).id
 
 		try {
-			const jwt = await new jose.SignJWT({})
-				.setProtectedHeader({ alg: "RS256", tokenUid: tokenEntry.tokenUid, docId: tokenDocId })
-				.setIssuer(serviceAccount.client_email)
-				.setSubject(serviceAccount.client_email)
-				.setAudience(
-					"https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit"
-				)
-				.setExpirationTime(
-					expires !== undefined ? (expires as string) : "1h"
-				)
-				.setIssuedAt(Math.round(Date.now() / 1000))
-				.sign(privateKey)
-
-			return {tokenDocId, tokenEntry, token: "smithed-" + jwt}
+			const jwt = signJWT(tokenEntry, tokenDocId, expires)
+			return { tokenDocId, tokenEntry, token: jwt }
 		} catch (e) {
 			res.status(500).send((e as Error).message)
 		}
-
 	},
 })
 
@@ -125,7 +138,7 @@ API_APP.route({
 	url: "/tokens",
 	schema: {
 		querystring: Type.Object({
-			token: Type.String()
+			token: Type.String(),
 		}),
 	},
 	handler: async (req, res) => {
@@ -141,15 +154,18 @@ API_APP.route({
 			)
 		}
 
-		const query = await getFirestore().collection("tokens").where("owner", "==", uid).get()
+		const query = await getFirestore()
+			.collection("tokens")
+			.where("owner", "==", uid)
+			.get()
 		const docs = query.docs
-		return docs.map(d => ({tokenDocId: d.id, tokenEntry: d.data()}))
+		return docs.map((d) => ({ tokenDocId: d.id, tokenEntry: d.data() }))
 	},
 })
 
 /*
  * @route DELETE /tokens/:id
- * This route gets all tokens owned by the user
+ * This route deletes a given token
  *
  * @query token: string
  * Specifically a Firebase ID Token, not another PAT
@@ -168,10 +184,10 @@ API_APP.route({
 	url: "/tokens/:id",
 	schema: {
 		params: Type.Object({
-			id: Type.String()
+			id: Type.String(),
 		}),
 		querystring: Type.Object({
-			token: Type.String()
+			token: Type.String(),
 		}),
 	},
 	handler: async (req, res) => {
@@ -198,5 +214,64 @@ API_APP.route({
 			)
 
 		await doc.ref.delete()
+	},
+})
+
+/*
+ * @route POST /tokens/:id/refresh
+ * This refreshes a given token
+ *
+ * @query token: string
+ * Specifically a Firebase ID Token, not another PAT
+ *
+ * @param id: string
+ * The Doc Id for the token
+ *
+ * @return OK: {tokenEntry: PAToken, token: string}
+ * @return SERVER_ERROR: ApiError
+ *
+ * @example Get a token
+ * fetch('https://api.smithed.dev/v2/tokens/123456?token=<ID Token Here>')
+ */
+API_APP.route({
+	method: "POST",
+	url: "/tokens/:id/refresh",
+	schema: {
+		params: Type.Object({
+			id: Type.String(),
+		}),
+		querystring: Type.Object({
+			token: Type.String(),
+		}),
+	},
+	handler: async (req, res) => {
+		const { id } = req.params
+		const { token } = req.query
+
+		try {
+			var uid = (await getAuth().verifyIdToken(token)).uid
+		} catch {
+			return sendError(
+				res,
+				HTTPResponses.BAD_REQUEST,
+				"Invalid token, ensure it is a Firebase token and not a PAT"
+			)
+		}
+
+		const doc = await getFirestore().collection("tokens").doc(id).get()
+		if (!doc.exists || doc.data()?.owner !== uid)
+			return sendError(
+				res,
+				HTTPResponses.NOT_FOUND,
+				"The token does not exist"
+			)
+		const tokenEntry = doc.data() as PAToken
+
+		tokenEntry.createdAt = Date.now()
+		tokenEntry.tokenUid = randomUUID()
+
+		await doc.ref.set(tokenEntry)
+		const jwt = await signJWT(tokenEntry, id, tokenEntry.expiration + "s")
+		return {token: jwt, tokenEntry: tokenEntry}
 	},
 })
