@@ -12,7 +12,7 @@ import {
 	PATokenSchema,
 	SortSchema,
 	UserDataSchema,
-} from "data-types"
+} from "data-types/index.js"
 import {
 	TProperties,
 	TObject,

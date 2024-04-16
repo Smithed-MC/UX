@@ -36,7 +36,8 @@ jobs:
                   cache-dependency-path: "**/package-lock.json"
             - run: npm i
               working-directory: ./code
-            - run: cat code/node_modules/ts-node/package.json | grep version
+            - run: npx turbo run lint --filter=data-types --filter=doc-generator -- --noEmit false
+              working-directory: ./code
             - name: Generate Docs
-              run: DOC_REPO="${GITHUB_WORKSPACE}/docs" npx ts-node --esm index.ts
+              run: DOC_REPO="${GITHUB_WORKSPACE}/docs" node index.js
               working-directory: ./code/packages/doc-generator
