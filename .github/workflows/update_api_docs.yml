@@ -34,6 +34,10 @@ jobs:
                   node-version: ${{ matrix.node-version }}
                   cache: "npm"
                   cache-dependency-path: "**/package-lock.json"
-            - run: cd code && npm ci
+            - run: npm ci
+              working-directory: ./code
+            - run: npm i -g ts-node
+              working-directory: ./code
             - name: Generate Docs
-              run: cd code/packages/doc-generator && DOC_REPO="${GITHUB_WORKSPACE}/docs" ts-node --esm index.ts
+              run: DOC_REPO="${GITHUB_WORKSPACE}/docs" ts-node --esm index.ts
+              working-directory: ./code/packages/doc-generator
