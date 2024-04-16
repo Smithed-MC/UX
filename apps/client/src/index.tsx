@@ -94,7 +94,7 @@ export function ClientApplet() {
 
 		const getData = async (id: string) => {
 			const resp = await fetch(
-				import.meta.env.VITE_API_SERVER + `/bundles/${id}`
+				import.meta.env.VITE_API_SERVER + `/bundles/${id}?token=` + await user.getIdToken()
 			)
 
 			if (!resp.ok) return undefined
@@ -243,7 +243,7 @@ export function ClientApplet() {
 					paddingBottom: "1rem",
 				}}
 			>
-				<NavBar tabs={context.navbarTabs} logoUrl={context.logoUrl} />
+				<NavBar tabs={context.navbarTabs} logoUrl={context.logoUrl} onSignout={() => resetUserData()} />
 				<Outlet />
 			</div>
 			{context.enableFooter ? <Footer /> : <br />}

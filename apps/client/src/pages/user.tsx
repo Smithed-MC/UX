@@ -656,28 +656,6 @@ export default function User() {
 						</div>
 						{editable && (
 							<div className="container profileControlContainer">
-								<Link
-									to="../account"
-									className="buttonLike profileControl first"
-									title="Sign Out"
-									onClick={() => {
-										getAuth().signOut()
-									}}
-								>
-									<div
-										style={{
-											display: "flex",
-											flexDirection: "row",
-											gap: 2,
-											width: 16,
-											height: 16,
-											alignItems: "center",
-										}}
-									>
-										<BackArrow />
-										<Line fill="var(--foreground)" />
-									</div>
-								</Link>
 								{!editingUserData && (
 									<IconTextButton
 										className="accentedButtonLike profileControl last"

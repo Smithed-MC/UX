@@ -252,7 +252,7 @@ export function EditBundle({ close }: EditBundleProps) {
 	)
 }
 
-export default function NavBar({ tabs, logoUrl }: NavBarProps) {
+export default function NavBar({ tabs, logoUrl, onSignout }: NavBarProps) {
 	const [open, setOpen] = useState(previousState)
 
 	const [editBundleOpen, setEditBundleOpen] = useState(false)
@@ -441,6 +441,7 @@ export default function NavBar({ tabs, logoUrl }: NavBarProps) {
 									iconElement={<Right style={{color: 'var(--disturbing)'}}/>}
 									onClick={() => {
 										getAuth().signOut()
+										onSignout
 									}}
 									href=""
 								/>
@@ -468,4 +469,5 @@ export default function NavBar({ tabs, logoUrl }: NavBarProps) {
 export interface NavBarProps {
 	tabs: readonly JSX.Element[]
 	logoUrl: string
+	onSignout: () => void
 }
