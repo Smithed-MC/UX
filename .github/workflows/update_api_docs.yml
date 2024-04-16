@@ -43,10 +43,12 @@ jobs:
               working-directory: ./code/packages/doc-generator
             - name: Push Docs to repo
               working-directory: ./docs
+              env: 
+                GITHUB_TOKEN: ${{secrets.DOCS_PAT}}
               run: |
-                echo ${{secrets.DOCS_PAT}}
                 cd docs
+                git config --unset-all http.https://github.com/.extraheader
                 git config --global user.name 'Git bot'
                 git config --global user.email 'bot@noreply.github.com'
-                git remote set-url origin https://${{ secrets.DOCS_PAT }}@github.com/Smithed-MC/Docs.git
+                git remote set-url origin https://user:$GITHUB_TOKEN@github.com/Smithed-MC/Docs.git
                 git commit -am "deploy: Auto updated API docs" && git push || echo "No changes to commit"
