@@ -9,6 +9,7 @@ import {
 	PackDataSchema,
 	PackReferenceSchema,
 	PackVersionSchema,
+	PATokenSchema,
 	SortSchema,
 	UserDataSchema,
 } from "data-types"
@@ -27,7 +28,7 @@ import {
 interface Config {
 	targets: string[]
 	extensions: RegExp
-	outDir: string
+	docRepo: string
 }
 
 interface Directive {
@@ -185,8 +186,8 @@ function extract(t: string, config: Config) {
 		const route = routeGroup[1]
 
 		const filePath = path.join(
-			config.outDir,
-			route.replaceAll(":", "") + ".md"
+			config.docRepo,
+			route.replaceAll(":", "") + ".inc"
 		)
 
 		if (files[filePath] === undefined)
@@ -256,9 +257,9 @@ function registerSchema(name: string, schema: TSchema) {
 }
 
 function start(config: Config) {
-	if (fs.existsSync(config.outDir))
-		fs.rmSync(config.outDir, { recursive: true, force: true })
-	fs.mkdirSync(config.outDir)
+	if (fs.existsSync(config.docRepo))
+		fs.rmSync(config.docRepo, { recursive: true, force: true })
+	fs.mkdirSync(config.docRepo)
 
 	const dataTypes = [
 		registerSchema("PackReference", PackReferenceSchema),
@@ -270,9 +271,10 @@ function start(config: Config) {
 		registerSchema("PackBundle", BundleSchema),
 		registerSchema("UserData", UserDataSchema),
 		registerSchema("SortOptions", SortSchema),
+		registerSchema("PAToken", PATokenSchema)
 	].join("\n")
 
-	fs.writeFileSync(path.join(config.outDir, "data-types.md"), dataTypes)
+	fs.writeFileSync(path.join(config.docRepo, "data-types.inc"), dataTypes)
 
 	for (const t of config.targets) {
 		readDirectory(t, config)
@@ -280,26 +282,27 @@ function start(config: Config) {
 
 	const imports = []
 	for (const file in files) {
+		console.log(file)
 		file.split(path.sep).forEach((cur, idx, arr) => {
 			if (idx === arr.length - 1) return
 
 			const part = arr.slice(0, idx + 1).join(path.sep)
-			if (!fs.existsSync(part)) fs.mkdirSync(part)
+			if (!fs.existsSync(part) && part !== "") fs.mkdirSync(part)
 		})
 
 		fs.writeFileSync(file, files[file])
 		imports.push(
 			path
 				.join(
-					path.basename(config.outDir),
-					file.replace(path.normalize(config.outDir), "")
+					path.basename(config.docRepo),
+					file.replace(path.normalize(config.docRepo), "")
 				)
 				.replaceAll(path.sep, "/")
 		)
 	}
 
 	fs.writeFileSync(
-		path.join(config.outDir, "routes.md"),
+		path.join(config.docRepo, "routes.inc"),
 		imports
 			.map(
 				(i) => `
@@ -313,6 +316,10 @@ function start(config: Config) {
 if (fs.existsSync("./config.json")) {
 	const config = JSON.parse(
 		fs.readFileSync("./config.json", { encoding: "utf-8" })
+	)
+	config.docRepo = path.join(
+		process.env.DOC_REPO ?? config.docRepo,
+		"docs/api/generated"
 	)
 
 	start(config)

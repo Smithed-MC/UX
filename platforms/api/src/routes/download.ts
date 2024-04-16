@@ -57,7 +57,7 @@ async function getFilename(packs: string[], mode: string) {
  * @return SERVER_ERROR: ApiError
  *
  * @example Download packs
- * fetch('https://api.smithed.dev/v2/download?pack=tcc&pack=manic&version=1.19)
+ * fetch('https://api.smithed.dev/v2/download?pack=tcc&pack=manic&version=1.19')
  */
 API_APP.route({
 	method: "GET",

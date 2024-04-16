@@ -1,5 +1,5 @@
 {
 	"targets": ["../../platforms/api/src/routes"],
-	"outDir": "B:/Projects/Docs/Smithed Docs/docs/api/generated",
+	"docRepo": "B:/Projects/Docs/Smithed Docs/",
 	"extensions": "/ts/g"
 }

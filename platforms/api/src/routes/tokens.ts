@@ -74,7 +74,7 @@ async function signJWT(
  * @return SERVER_ERROR: ApiError
  *
  * @example Get a 1 day token
- * fetch('https://api.smithed.dev/v2/tokens?token=<ID Token Here>&expires=1d, {mode: "POST"})
+ * fetch('https://api.smithed.dev/v2/tokens?token=<ID Token Here>&expires=1d', {mode: "POST"})
  */
 API_APP.route({
 	method: "POST",
