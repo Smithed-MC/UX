@@ -39,4 +39,4 @@ jobs:
             - run: cat code/node_modules/ts-node/package.json | grep version
             - name: Generate Docs
               run: DOC_REPO="${GITHUB_WORKSPACE}/docs" npx ts-node --esm index.ts
-              working-directory: ./code
+              working-directory: ./code/packages/doc-generator
