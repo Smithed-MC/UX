@@ -11,5 +11,8 @@
 		"generate": "ts-node-esm index.ts"
 	},
 	"author": "",
-	"license": "ISC"
+	"license": "ISC",
+	"dependencies": {
+		"data-types": "*"
+	}
 }
