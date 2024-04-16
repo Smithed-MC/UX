@@ -84,7 +84,7 @@ API_APP.route({
  * Retrieve a specific user's pfp
  *
  * @param id
- * The user's UID or plaintext username. Using UID is more performant as it is a direct lookup.
+ * The user's UID or plain text username. Using UID is more performant as it is a direct lookup.
  *
  * @return OK: ArrayBuffer
  * @return NOT_FOUND: ApiError
