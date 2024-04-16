@@ -36,4 +36,4 @@ jobs:
                   cache-dependency-path: "**/package-lock.json"
             - run: cd code && npm ci && npm i -g ts-node
             - name: Generate Docs
-              run: cd code/packages/doc-generator && DOC_REPO="${GITHUB_WORKSPACE}/docs" npm run generate
+              run: cd code/packages/doc-generator && DOC_REPO="${GITHUB_WORKSPACE}/docs" ts-node index.ts
