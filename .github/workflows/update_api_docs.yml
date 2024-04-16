@@ -47,5 +47,5 @@ jobs:
                 cd docs
                 git config --global user.name 'Git bot'
                 git config --global user.email 'bot@noreply.github.com'
-                git remote set-url origin https://x-access-token:${{ secrets.DOCS_PAT }}@github.com/Smithed-MC/Docs
+                git remote set-url origin https://${{ secrets.DOCS_PAT }}@github.com/Smithed-MC/Docs.git
                 git commit -am "deploy: Auto updated API docs" && git push || echo "No changes to commit"
