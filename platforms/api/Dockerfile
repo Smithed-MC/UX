@@ -6,7 +6,7 @@ RUN apt -y upgrade
 RUN apt install -y software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt update
-RUN apt install -y python3.10 curl git
+RUN apt install -y python3.12 curl git
 
 
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
