@@ -27,6 +27,7 @@ jobs:
                   cache: "npm"
             - run: npm ci
             - run: npx turbo run build --filter=api --filter=website
+            - run: npm run test
             - name: Deploy to DevOps
               uses: peter-evans/repository-dispatch@v2
               with:
