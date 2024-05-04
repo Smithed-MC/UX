@@ -6,7 +6,7 @@ RUN apt -y upgrade
 RUN apt install -y software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt update
-RUN apt install -y python3-full python3-pip git
+RUN apt install -y python3-full python3-pip git curl
 
 RUN pip install --break-system-packages smithed==0.15.9 rich 
 
