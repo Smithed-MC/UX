@@ -6,12 +6,9 @@ RUN apt -y upgrade
 RUN apt install -y software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt update
-RUN apt install -y python3.10 curl git
+RUN apt install -y python3-full python3-pip git
 
-
-RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-RUN python3 get-pip.py
-RUN pip install smithed==0.15.9 rich
+RUN pip install --break-system-packages smithed==0.15.9 rich 
 
 RUN mkdir /usr/local/nvm
 ENV NVM_DIR /usr/local/nvm

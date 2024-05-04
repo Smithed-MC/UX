@@ -7,8 +7,12 @@
 	"types": "index.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"lint": "tsc"
+		"lint": "tsc",
+		"generate": "ts-node-esm index.ts"
 	},
 	"author": "",
-	"license": "ISC"
+	"license": "ISC",
+	"dependencies": {
+		"data-types": "*"
+	}
 }

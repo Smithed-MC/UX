@@ -18,6 +18,9 @@
 		},
 		"serve": {
 			"dependsOn": ["^build"]
+		},
+		"generate": {
+			"dependsOn": ["^lint"]
 		}
 	}
 }
