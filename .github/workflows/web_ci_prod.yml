@@ -29,10 +29,12 @@ jobs:
                   cache: "npm"
             - run: npm ci
             - run: npx turbo run build --filter=api --filter=website
-            - run: npm run test
+            - run: echo '${{ secrets.ADMIN_CERT }}' > /secret.json && npm run test && rm /secret.json
               env:
                 SMITHED_EMAIL: ${{ secrets.SMITHED_EMAIL }}
                 SMITHED_PASSWORD: ${{ secrets.SMITHED_PASSWORD }}
+                ADMIN_CERT: /secret.json
+                TYPESENSE_API_KEY: ${{ secrets.TYPESENSE_API_KEY }}
             - name: Deploy to DevOps
               uses: peter-evans/repository-dispatch@v2
               with:
