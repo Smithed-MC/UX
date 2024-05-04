@@ -30,6 +30,9 @@ jobs:
             - run: npm ci
             - run: npx turbo run build --filter=api --filter=website
             - run: npm run test
+              env:
+                SMITHED_EMAIL: ${{ secrets.SMITHED_EMAIL }}
+                SMITHED_PASSWORD: ${{ secrets.SMITHED_PASSWORD }}
             - name: Deploy to DevOps
               uses: peter-evans/repository-dispatch@v2
               with:
