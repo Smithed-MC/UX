@@ -33,7 +33,7 @@ jobs:
               env:
                 SMITHED_EMAIL: ${{ secrets.SMITHED_EMAIL }}
                 SMITHED_PASSWORD: ${{ secrets.SMITHED_PASSWORD }}
-                ADMIN_CERT: ./secret.json
+                ADMIN_CERT: ${{github.workspace}}/secret.json
                 TYPESENSE_API_KEY: ${{ secrets.TYPESENSE_API_KEY }}
             - name: Deploy to DevOps
               uses: peter-evans/repository-dispatch@v2
