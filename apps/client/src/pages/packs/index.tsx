@@ -1,10 +1,6 @@
 import { IconInput, ChooseBox, GalleryPackCard } from "components"
 import { useEffect, useRef, useState } from "react"
-import {
-	SortOptions,
-	fullMinecraftVersions,
-	packCategories,
-} from "data-types"
+import { SortOptions, fullMinecraftVersions, packCategories } from "data-types"
 import { AddToBundleModal } from "../../widget/packInfo.js"
 import { Link, useLoaderData, useNavigate } from "react-router-dom"
 import "./index.css"
@@ -182,7 +178,7 @@ export default function PacksBrowser(props: any) {
 							}
 							onChange={(e) => {
 								updateUrl(
-									e.currentTarget.value.replaceAll(" ", "+")
+									e.currentTarget.value
 								)
 							}}
 						/>
