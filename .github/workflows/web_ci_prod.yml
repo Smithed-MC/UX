@@ -35,6 +35,8 @@ jobs:
                 SMITHED_PASSWORD: ${{ secrets.SMITHED_PASSWORD }}
                 ADMIN_CERT: ${{github.workspace}}/secret.json
                 TYPESENSE_API_KEY: ${{ secrets.TYPESENSE_API_KEY }}
+                REDIS: "false"
+                DOCKER: "false"
             - name: Deploy to DevOps
               uses: peter-evans/repository-dispatch@v2
               with:
