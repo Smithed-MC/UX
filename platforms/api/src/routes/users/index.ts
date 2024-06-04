@@ -49,6 +49,34 @@ API_APP.route({
 	},
 })
 
+API_APP.route({
+	method: "GET",
+	url: "/users/count",
+	schema: {
+		querystring: Type.Object({
+            search: Type.Optional(Type.String()),
+        }),
+	},
+	handler: async (request, reply) => {
+		const requestIdentifier =
+			"GET-USERS-COUNT::" + hash.sha1().update(request.url).digest("hex")
+		const tryCachedResult = await get(requestIdentifier)
+
+		if (tryCachedResult) {
+			return tryCachedResult.item
+		}
+
+        const found = (await TYPESENSE_APP.collections("users").documents().search({
+            q: request.query.search ?? "",
+            query_by: ["displayName"]
+        })).found
+
+        await set(requestIdentifier, found, 5 * 60 * 1000)
+		return found
+	},
+})
+
+
 async function requestUsersFromTypesense(query: {search?: string, limit: number, page: number}) {
 	const {
 		search,
