@@ -112,7 +112,7 @@ API_APP.route({
 		) {
 			reply.header("Content-Type", "image/png")
 			request.log.info("served cached /users/", id)
-			return tryCachedResult.item
+			return Buffer.from(tryCachedResult.item, "base64")
 		}
 
 		request.log.info("Querying Firebase for User w/ ID " + id)
@@ -132,7 +132,7 @@ API_APP.route({
 
 		const data = Buffer.from(pfp.split(",")[1], "base64")
 
-		await set(requestIdentifier, data, 60 * 60 * 1000)
+		await set(requestIdentifier, data.toString("base64"), 60 * 60 * 1000)
 		reply.header("Content-Type", "image/png")
 		return data
 	},
