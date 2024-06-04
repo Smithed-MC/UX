@@ -18,7 +18,7 @@ export let TYPESENSE_APP: Client
 
 export const API_APP = fastify({
 	logger: {
-		level: "debug",
+		level: process.env.NODE_ENV === "production" ? "warn" : "debug",
 		transport: {
 			target: "@mgcrea/pino-pretty-compact",
 			options: { translateTime: "HH:MM:ss Z", ignore: "pid,hostname" },
