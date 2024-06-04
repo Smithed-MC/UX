@@ -239,7 +239,6 @@ export function ClientApplet() {
 					boxSizing: "border-box",
 					flexGrow: 1,
 					justifyContent: "start",
-					paddingTop: "1rem",
 					paddingBottom: "1rem",
 				}}
 			>

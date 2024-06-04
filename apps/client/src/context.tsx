@@ -1,8 +1,15 @@
-import { DownloadButton, IconTextButton, NavButton } from "components"
+import {
+	DownloadButton,
+	IconInput,
+	IconTextButton,
+	Link,
+	NavButton,
+} from "components"
 import { svg } from "components"
-import { Download, Right } from "components/svg"
+import { Browse, Download, Popout, Right, Search } from "components/svg"
 import { getAuth } from "firebase/auth"
 import { createContext } from "react"
+import ContentSearch from "./widget/ContentSearch"
 
 export interface IClientContext {
 	navbarTabs: readonly JSX.Element[]
@@ -15,14 +22,17 @@ export interface IClientContext {
 
 export const defaultContext: IClientContext = {
 	navbarTabs: [
+		<NavButton className="navBarOption start" to="/packs" key="browse">
+			Packs
+		</NavButton>,
 		<NavButton
-			className="navBarOption start"
-			text="Packs"
-			to="/packs"
-			key="browse"
-			icon={svg.Browse}
-			selectedClass="accentedButtonLike"
-		/>,
+			className="navBarOption"
+			to="https://weld.smithed.dev"
+			key="weld"
+		>
+			Weld <Popout />
+		</NavButton>,
+		<ContentSearch/>,
 	],
 	enableFooter: true,
 	logoUrl: "/",

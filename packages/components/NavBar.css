@@ -21,6 +21,16 @@
 	border: 0.125rem solid var(--warning) !important;
 }
 
+.navBarOption {
+	color: var(--foreground);
+	font-weight: 400;
+	text-decoration: none;
+	padding: 1rem;
+	align-items: center;
+	display: flex;
+	gap: 0.25rem;
+}
+
 @keyframes navbarSlidedown {
 	0% {
 		opacity: 1;
@@ -59,7 +69,7 @@
 }
 
 .navBarContainer {
-	gap: 2rem;
+	gap: 1rem;
 }
 
 @media screen and (max-width: 64rem) {

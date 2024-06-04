@@ -1,0 +1,42 @@
+.contentSearchBox:has(> * > input:not(:focus))>.suggestions {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.contentSearchBox:has(> * input:focus)>.input {
+    border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0;
+}
+
+.contentSearchBox {
+    position: relative;
+
+    .suggestions {
+        transition: opacity 0.1s ease-in-out;
+
+        position: absolute;
+        top: 100%;
+        color: rgba(255, 255, 255, 0.5);
+        background-color: var(--bold);
+        border-radius: 0 0 var(--defaultBorderRadius) var(--defaultBorderRadius);
+        padding: 0.5rem 1rem;
+
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+
+        box-sizing: border-box;
+        font-size: 0.875rem;
+    }
+
+    .suggestions > * .char {
+        font-family: 'JetBrains Mono';
+        margin-right: 0.25rem;
+        font-size: 1rem;
+    }
+
+    .suggestions > * b, .char {
+        color: var(--foreground) !important;
+        font-weight: 600;
+    }
+}

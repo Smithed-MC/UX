@@ -1,4 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
 :root {
 	font-family: Lexend;
 	position: absolute;
@@ -142,10 +144,10 @@ summary:active {
 .input,
 select {
 	border: none;
-	border-radius: var(--defaultBorderRadius);
+	border-radius: calc(var(--defaultBorderRadius) * 0.5);
 	font-family: Lexend;
 	font-size: 1rem;
-	border: 0.125rem solid transparent;
+	/* border: 0.125rem solid transparent; */
 	box-sizing: border-box;
 }
 
@@ -178,8 +180,9 @@ select select {
 
 .input,
 select {
-	background-color: var(--bold);
-	border: 0.125rem solid var(--border);
+	background-color: var(--section);
+	border: 0.125rem solid transparent;
+	transition: all 0.1s ease-in-out;
 	color: var(--foreground);
 	width: 19.25rem;
 	height: 2.25rem;

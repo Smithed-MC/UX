@@ -336,82 +336,56 @@ export default function NavBar({ tabs, logoUrl, onSignout }: NavBarProps) {
 			>
 				Smithed
 			</Link>
-			<div
-				className="navBarHide"
-				style={{
-					width: 1,
-					height: 36,
-					background: "var(--foreground)",
-				}}
-			/>
-
 			{tabs}
 			<div
 				style={{
 					display: "flex",
 					flexGrow: 1,
 					flexDirection: "row",
-					gap: "2rem",
+					gap: "1rem",
 					justifyContent: "end",
 					// overflow: "hidden",
 				}}
 			>
-				{/* {selectedBundle !== "" && !import.meta.env.SSR && (
-					<IconTextButton
-						style={{
-							flexGrow: 1,
-							overflow: "hidden",
-							maxWidth: "min-content",
-						}}
-						className="navBarOption middle navBarBundle"
-						text={
-							<div
-								style={{
-									display: "flex",
-									flexShrink: 1,
-									flexDirection: "row",
-									color: "var(--warning)",
-									gap: "0.25rem",
-								}}
-							>
-								<span
-									style={{
-										WebkitLineClamp: 1,
-										margin: 0,
-										textOverflow: "ellipsis",
-										overflow: "hidden",
-										width: "calc(100%)",
-										whiteSpace: "nowrap",
-									}}
-								>
-									{curBundle?.name}
-								</span>
-								<span style={{ flexShrink: 0 }}>
-									[{curBundle?.packs.length}]
-								</span>
-							</div>
-						}
-						iconElement={<Jigsaw style={{ flexShrink: 0 }} />}
-						reverse
-						onClick={() => setEditBundleOpen(!editBundleOpen)}
-					/>
-				)} */}
-
 				{user && (
 					<Modal
 						className="navBarModal"
 						trigger={
-							<IconTextButton
-								style={{ width: "100%" }}
-								className="navBarOption end"
-								text={user.displayName}
-								iconElement={
-									<Right
-										style={{ transform: "rotate(90deg)" }}
-									/>
-								}
-								reverse
-							/>
+							<span
+								className="container"
+								style={{ flexDirection: "row" }}
+							>
+								<IconTextButton
+									style={{
+										width: "100%",
+										backgroundColor: "transparent",
+										height: '2.5rem'
+									}}
+									className="navBarOption end"
+									text={
+										<div className="container" style={{flexDirection: 'row', gap: '1rem'}}>
+											<img
+												style={{
+													width: "2rem",
+													height: "2rem",
+													borderRadius:
+														"calc(var(--defaultBorderRadius) * 0.5)",
+												}}
+												src={user.pfp}
+											/>
+											{user.displayName}
+										</div>
+									}
+									iconElement={
+										<Right
+											style={{
+												transform: "rotate(90deg)",
+											}}
+										/>
+									}
+									reverse
+								/>
+							</span>
 						}
 						content={(ctx) => (
 							<div className="container">
@@ -438,7 +412,13 @@ export default function NavBar({ tabs, logoUrl, onSignout }: NavBarProps) {
 								<NavModalOption
 									style={{ color: "var(--disturbing)" }}
 									text="Logout"
-									iconElement={<Right style={{color: 'var(--disturbing)'}}/>}
+									iconElement={
+										<Right
+											style={{
+												color: "var(--disturbing)",
+											}}
+										/>
+									}
 									onClick={() => {
 										getAuth().signOut()
 										onSignout
