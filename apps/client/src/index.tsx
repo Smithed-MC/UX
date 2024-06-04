@@ -17,13 +17,7 @@ import "./style.css"
 import { getAuth } from "firebase/auth"
 
 import { Provider } from "react-redux"
-import {
-	loadArticleData,
-	loadPackBrowseData,
-	loadHomePageData,
-	loadRootData,
-	loadUserPageData,
-} from "./loaders.js"
+
 
 import {
 	selectSelectedBundle,
@@ -40,11 +34,10 @@ import { ClientContext, defaultContext, IClientContext } from "./context.js"
 import { Cross, Logo } from "components/svg.js"
 
 import Cookies from "js-cookie"
-import { loadBundleEdit } from "./pages/bundles/id/edit.loader.js"
-import { loadPackEdit } from "./pages/packs/id/edit.loader.js"
+
+
 import EditorError from "./pages/editors/error.js"
 import React from "react"
-import loadPackData from "./pages/packs/id/index.loader.js"
 
 initializeApp({
 	databaseURL: "https://mc-smithed-default-rtdb.firebaseio.com",
@@ -313,16 +306,37 @@ function Footer() {
 }
 
 import Home from "./pages/home.js"
+
 import Settings from "./pages/settings.js"
+import loadSettingsData from "./pages/settings.loader"
+
 import Account from "./pages/account.js"
+
 import PackEditor from "./pages/packs/id/edit.js"
+import { loadPackEdit } from "./pages/packs/id/edit.loader.js"
+
 import User from "./pages/user.js"
+
 import PackPage from "./pages/packs/id/index.js"
+import loadPackData from "./pages/packs/id/index.loader.js"
+
 import PackBrowsePage from "./pages/packs/index.js"
 import BundlePage from "./pages/bundles/id/index.js"
+
 import BundleEditor from "./pages/bundles/id/edit.js"
+import { loadBundleEdit } from "./pages/bundles/id/edit.loader.js"
+
 import ArticlePage from "./pages/article.js"
-import loadSettingsData from "./pages/settings.loader"
+import UserBrowsePage from "./pages/users/index.js"
+import loadUserBrowseData from "./pages/users/index.loader.js"
+
+import {
+	loadArticleData,
+	loadPackBrowseData,
+	loadHomePageData,
+	loadRootData,
+	loadUserPageData,
+} from "./loaders.js"
 
 // Don't reorder these please
 export const subRoutes: RouteObject[] = [
@@ -388,6 +402,11 @@ export const subRoutes: RouteObject[] = [
 		element: <PackBrowsePage />,
 		loader: loadPackBrowseData,
 	},
+	{
+		path: "users",
+		element: <UserBrowsePage />,
+		loader: loadUserBrowseData
+	}
 ]
 
 export const routes = [

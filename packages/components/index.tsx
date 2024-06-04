@@ -17,6 +17,7 @@ import IconTextButton from './IconTextButton'
 import IconInput from './IconInput'
 import GalleryPackCard from './GalleryPackCard'
 import ChooseBox from './ChooseBox'
+import PageSelector from "./PageSelector"
 
 export {
 	NavButton,
@@ -38,5 +39,6 @@ export {
 	CategoryChoice,
 	type DownloadButton,
 	Modal,
-	Link
+	Link,
+	PageSelector
 }

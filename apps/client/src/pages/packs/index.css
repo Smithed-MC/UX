@@ -22,25 +22,7 @@
 	gap: 2rem;
 }
 
-.browsePageButton {
-	padding: 0.5rem;
-	border-radius: var(--defaultBorderRadius);
-	color: var(--foreground);
-	text-decoration: none;
-	aspect-ratio: 1 / 1 !important;
-	width: auto;
-	height: 1.25rem;
-	text-align: center;
-	vertical-align: center;
-	opacity: 0.5;
-	transition: all 0.2s ease-in-out;
-}
 
-.browsePageButton:hover,
-.browsePageButton.selected {
-	background-color: var(--section);
-	opacity: 1;
-}
 
 @media screen and (max-width: 1024px) {
 	.browserRoot,

@@ -1,3 +1,6 @@
 .childInput {
 	outline: none;
 }
+.childInput::placeholder {
+	font-weight: 400;
+}
