@@ -12,23 +12,21 @@
 .galleryPackCard {
 	display: flex;
 	align-items: flex-start;
-	justify-content: left;
+	justify-content: center;
 	flex-direction: column;
 
 	max-width: 100%;
 	width: 100%;
 	flex-shrink: 1;
 	box-sizing: border-box;
-	background-color: var(--section);
+	background-color: rgba(0, 0, 0, 0.07);
 	border-radius: var(--defaultBorderRadius);
+	border: 0.125rem solid var(--border);
 
 	transition: all 0.2s;
-	/* overflow: hidden; */
-
-	min-height: 19.375rem;
-	max-height: 19.375rem;
-	position: absolute;
-	bottom: 0;
+	overflow: hidden;
+	/* position: absolute; */
+	/* bottom: 0; */
 }
 
 .galleryPackCard > .packInfo {
@@ -77,55 +75,20 @@
 	border-radius: var(--defaultBorderRadius);
 }
 
-.galleryPackCard.displayGallery > .galleryImage::after {
-	/* background: url(<path-to-image>), lightgray 50% / contain no-repeat; */
-	box-shadow: inset 0px 0px 32px 0px rgba(0, 0, 0, 0.5);
-	content: "";
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	border-radius: var(--defaultBorderRadius);
-	pointer-events: none;
-}
-
-.galleryPackCard > * > .carousel {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	background: rgba(0, 0, 0, 0.1);
-	backdrop-filter: blur(8px);
-	padding: 0.5rem 0rem;
-
-	display: flex;
-	justify-content: center;
-
-	gap: 1rem;
-
-	border-radius: var(--defaultBorderRadius);
-	z-index: 1;
-}
-
 .galleryPackCard > .galleryImage {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	flex-grow: 1;
-	overflow: hidden;
+	/* overflow: hidden; */
 	width: 100%;
 	flex-direction: column;
-	border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0;
+	/* border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0; */
 }
 
 .galleryPackCard > .galleryImage > img {
 	user-select: none;
 	-webkit-user-drag: none;
-}
-
-.galleryPackCard > .galleryImage > .thumbnail:hover {
-	opacity: 0.8;
-}
-.galleryPackCard > .galleryImage > .thumbnail:active {
-	opacity: 0.6;
 }
 
 .galleryPackCard > .packInfo > .author,
@@ -141,14 +104,15 @@
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
 
-	-webkit-line-clamp: 3;
-	height: 60px;
-	max-height: 60px;
+	-webkit-line-clamp: 2;
+	height: 40px;
+	max-height: 40px;
 
 	margin: 0.5rem 0 1rem 0;
 
 	grid-area: description;
 	box-sizing: border-box;
+	opacity: 0.5;
 }
 
 .galleryPackCard > .packInfo > .author {
@@ -173,7 +137,6 @@
 	padding: 0.375rem 1rem 0.375rem 1rem;
 
 	background-color: var(--bold);
-	border-radius: 0 0 var(--defaultBorderRadius) var(--defaultBorderRadius);
 
 	display: flex;
 	flex-direction: row;
@@ -196,8 +159,34 @@
 	container: galleryPackCardContainer;
 	container-type: inline-size;
 	width: 100%;
-	height: 19.375rem;
 	position: relative;
+}
+
+.galleryPackCard {
+	.galleryImage {
+		.infoBox {
+			position: absolute;
+			padding: 0.25rem 1rem;
+			border-radius: calc(var(--defaultBorderRadius) * 0.5);
+			overflow: hidden;
+			flex-direction: row;
+			z-index: 0;
+			gap: 1rem;
+			background-color: rgba(0, 0, 0, 0.2);
+			backdrop-filter: blur(10px);
+		}
+
+		.carousel {
+			opacity: 0;
+			transition: opacity 0.1s ease-in-out;
+		}
+	}
+
+	.galleryImage:has(.thumbnail:hover, .carousel:hover) {
+		.carousel {
+			opacity: 1;
+		}
+	}
 }
 
 @keyframes galleryPackCardShake {

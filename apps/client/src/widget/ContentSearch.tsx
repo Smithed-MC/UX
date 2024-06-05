@@ -2,6 +2,7 @@ import { IconInput } from "components"
 import { Browse } from "components/svg"
 import { FunctionComponent, useState } from "react"
 import "./ContentSearch.css"
+import { matchPath, useLocation, useMatch, useNavigate } from "react-router-dom"
 
 const icons: Record<string, JSX.Element> = {
 	packs: <Browse />,
@@ -37,18 +38,27 @@ const icons: Record<string, JSX.Element> = {
 
 export default function ContentSearch() {
 	const [mode, setMode] = useState<"packs" | "bundles" | "users">("packs")
+	const navigate = useNavigate()
+	const location = useLocation()
+
+	if (
+		matchPath("/users", location.pathname) ||
+		matchPath("/packs", location.pathname)
+	)
+		return <></>
 
 	return (
-		<div className="contentSearchBox navBarHide">
+		<div className="contentSearchBox navBarHide" style={{ flexGrow: 1 }}>
 			<IconInput
 				className=""
-				style={{ flexGrow: 1 }}
+				style={{ flexGrow: 1, width: "100%" }}
 				iconElement={icons[mode]}
 				placeholder="Search..."
 				onKeyDown={(e) => {
 					switch (e.key) {
 						case "Enter": {
-                            const search = e.currentTarget.value
+							const search = e.currentTarget.value
+							navigate(`/${mode}?search=${search}`)
 							break
 						}
 						case "@": {
@@ -61,11 +71,11 @@ export default function ContentSearch() {
 							e.preventDefault()
 							break
 						}
-                        case "Escape": {
-                            setMode("packs")
-                            e.preventDefault()
-                            break
-                        }
+						case "Escape": {
+							setMode("packs")
+							e.preventDefault()
+							break
+						}
 					}
 				}}
 			/>

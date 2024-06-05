@@ -95,12 +95,17 @@
 	}
 }
 
-@media screen and (max-width: 43rem) {
-	.navBarContainer {
-		gap: 0.25rem;
+@media screen and (max-width: 32rem) {
+
+	.navBarAccount > :not(:first-child) {
+		display: none;
 	}
 
-	.navBarOption > *:not(:first-child) {
+	.navBarModal  .modalContent {
+		margin-right: 8rem;
+	}
+
+	/* .navBarOption > *:not(:first-child) {
 		display: none;
 	}
 
@@ -119,5 +124,5 @@
 
 	.navBarOption:last-child, .navBarOption.end {
 		border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0 !important;
-	}
+	} */
 }

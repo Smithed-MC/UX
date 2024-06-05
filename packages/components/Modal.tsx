@@ -94,6 +94,7 @@ export default function Modal({
 					</svg>
 				</div>
 				<div
+					className="modalContent"
 					style={{
 						padding: "0.5rem",
 						background: "var(--bold)",
@@ -102,6 +103,7 @@ export default function Modal({
 						minWidth: "4rem",
 						width: "max-content",
 						border: "0.125rem solid var(--border)",
+						right: "auto",
 						zIndex: -1,
 					}}
 				>

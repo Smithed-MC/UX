@@ -20,8 +20,6 @@ import {
 } from "../../loaders.js"
 import PageSelector from "components/PageSelector.js"
 
-
-
 export default function PacksBrowser(props: any) {
 	const params = useQueryParams()
 	const { search, category, sort, version, page } = params
@@ -81,6 +79,13 @@ export default function PacksBrowser(props: any) {
 		setShowWidget(showWidget === p ? undefined : p)
 	}
 
+	function onPageChangePressed() {
+		const cards = document.getElementById(
+			"packCardContainer"
+		)! as HTMLDivElement
+		cards.style.setProperty("opacity", "0.2")
+	}
+
 	useEffect(() => {
 		updateUrl(search)
 	}, [search, categories.size, packSort, versions.size])
@@ -127,9 +132,7 @@ export default function PacksBrowser(props: any) {
 								search != null ? (search as string) : undefined
 							}
 							onChange={(e) => {
-								updateUrl(
-									e.currentTarget.value
-								)
+								updateUrl(e.currentTarget.value)
 							}}
 						/>
 						<ChooseBox
@@ -199,6 +202,7 @@ export default function PacksBrowser(props: any) {
 							}
 							params={createBrowseSearchParams(params)}
 							itemsPerPage={PACKS_PER_PAGE}
+							onChange={onPageChangePressed}
 						/>
 					)}
 				</div>
@@ -268,6 +272,7 @@ export default function PacksBrowser(props: any) {
 						}
 						params={createBrowseSearchParams(params)}
 						itemsPerPage={PACKS_PER_PAGE}
+						onChange={onPageChangePressed}
 					/>
 				)}
 			</div>

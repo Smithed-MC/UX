@@ -17,7 +17,7 @@
 	justify-content: center;
 	align-items: center;
 	gap: 1rem;
-	border-radius: var(--defaultBorderRadius);
+	border-radius: calc(var(--defaultBorderRadius) * 0.5);
 	cursor: pointer;
 
 	border: 0.125rem solid var(--background);
@@ -26,12 +26,14 @@
 }
 
 .chooseBoxTrigger.open.noflip {
-	border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0;
+	border-radius: calc(var(--defaultBorderRadius) * 0.5)
+		calc(var(--defaultBorderRadius) * 0.5) 0 0;
 	border-bottom: 0.125rem solid var(--border);
 }
 
 .chooseBoxTrigger.open.flip {
-	border-radius: 0 0 var(--defaultBorderRadius) var(--defaultBorderRadius);
+	border-radius: 0 0 calc(var(--defaultBorderRadius) * 0.5)
+		calc(var(--defaultBorderRadius) * 0.5);
 	border-top: 0.125rem solid var(--border);
 }
 
@@ -63,7 +65,8 @@
 	display: flex;
 	flex-direction: column;
 
-	border-radius: 0 0 var(--defaultBorderRadius) var(--defaultBorderRadius);
+	border-radius: 0 0 calc(var(--defaultBorderRadius) * 0.5)
+		calc(var(--defaultBorderRadius) * 0.5);
 	border: 0.125rem solid var(--background);
 	border-top: none;
 	overflow-y: scroll;
@@ -73,7 +76,8 @@
 }
 
 .chooseBoxOptions.flip {
-	border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0;
+	border-radius: calc(var(--defaultBorderRadius) * 0.5)
+		calc(var(--defaultBorderRadius) * 0.5) 0 0;
 }
 
 .chooseBoxOptions.open {

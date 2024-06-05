@@ -5,12 +5,14 @@ export default function PageSelector({
 	totalItems,
 	currentPage,
 	params,
-    itemsPerPage
+    itemsPerPage,
+	onChange
 }: {
 	totalItems: number
 	currentPage: number
 	params: URLSearchParams
     itemsPerPage: number
+	onChange?: () => void
 }) {
 	const numberOfPages = Math.ceil(totalItems / itemsPerPage)
 
@@ -26,14 +28,7 @@ export default function PageSelector({
 				key={"pageButton" + p}
 				className={`pageSelectorButton ${currentPage === p ? "selected" : ""}`}
 				to={`?page=${p}&` + params}
-				onClick={() => {
-					if (currentPage === p) return
-
-					const cards = document.getElementById(
-						"packCardContainer"
-					)! as HTMLDivElement
-					cards.style.setProperty("opacity", "0.2")
-				}}
+				onClick={p !== currentPage ? onChange : undefined}
 				unstable_viewTransition
 			>
 				{p}

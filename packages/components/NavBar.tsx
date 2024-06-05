@@ -315,35 +315,33 @@ export default function NavBar({ tabs, logoUrl, onSignout }: NavBarProps) {
 				flexDirection: "row",
 				width: "100%",
 				boxSizing: "border-box",
+				justifyContent: "start",
 				zIndex: 1,
 			}}
 		>
-			<Logo
-				className="navBarHide"
-				style={{ width: "1.5rem", height: "1.5rem" }}
-			/>
 			<Link
-				className="navBarHide"
 				style={{
+					display: 'flex',
 					fontSize: "24px",
 					lineHeight: "30px",
 					fontWeight: "700",
 					fontFamily: "Lexend",
 					color: "var(--foreground)",
 					textDecoration: "none",
+					alignItems: 'center'
 				}}
 				to={logoUrl}
 			>
-				Smithed
+				<Logo style={{ width: "1.5rem", height: "1.5rem" }} />
+				<span className="navBarHide" style={{marginLeft: "1rem"}}>Smithed</span>
 			</Link>
 			{tabs}
 			<div
 				style={{
 					display: "flex",
-					flexGrow: 1,
 					flexDirection: "row",
 					gap: "1rem",
-					justifyContent: "end",
+					marginLeft: "auto",
 					// overflow: "hidden",
 				}}
 			>
@@ -359,19 +357,30 @@ export default function NavBar({ tabs, logoUrl, onSignout }: NavBarProps) {
 									style={{
 										width: "100%",
 										backgroundColor: "transparent",
-										height: '2.5rem'
+										height: "2.5rem",
 									}}
-									className="navBarOption end"
+									className="navBarOption navBarAccount"
 									text={
-										<div className="container" style={{flexDirection: 'row', gap: '1rem'}}>
+										<div
+											className="container"
+											style={{
+												flexDirection: "row",
+												gap: "1rem",
+											}}
+										>
 											<img
+												className="navBarHide"
 												style={{
 													width: "2rem",
 													height: "2rem",
 													borderRadius:
 														"calc(var(--defaultBorderRadius) * 0.5)",
 												}}
-												src={user.pfp}
+												src={
+													import.meta.env
+														.VITE_API_SERVER +
+													`/users/${user.uid}/pfp`
+												}
 											/>
 											{user.displayName}
 										</div>
@@ -431,7 +440,7 @@ export default function NavBar({ tabs, logoUrl, onSignout }: NavBarProps) {
 				)}
 				{!user && (
 					<IconTextButton
-						className="navBarOption"
+						className="navBarOption navBarAccount"
 						text={"Login"}
 						to={"/account"}
 						icon={AccountSvg}
