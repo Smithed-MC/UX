@@ -15,49 +15,61 @@ import { getPackDoc, validateToken } from "database"
 import { coerce, valid } from "semver"
 import hash from "hash.js"
 import { request } from "express"
+import sharp from "sharp"
 import { IncomingMessage, ServerResponse } from "http"
 
 
-export async function updateGalleryData(packData: any, reply: FastifyReply|undefined) {
+export async function updateGalleryData(packData: any, packId: string, reply: FastifyReply|undefined) {
 	if (packData.display.gallery === undefined)
 		return
-
+	const bucket = getStorage().bucket()
+	
 	for (let i = 0; i < packData.display.gallery.length; i++) {
-		const g = packData.display.gallery[i]
+			const g = packData.display.gallery[i]
 
-		if (typeof g === "string") {
-			if (!g.startsWith("http")) {
-				const buffer = Buffer.from(g.split(",")[1])
-				if (buffer.byteLength > 1324 * 1024)
-					return reply ? sendError(
-						reply,
-						HTTPResponses.BAD_REQUEST,
-						`Gallery image ${i} exceeds 1MB`
-					) : undefined
+			if (typeof g === "string") {
+				if (!g.startsWith("http")) {
+					const image = await getWebp(g)
 
-				let uid = hash.sha1().update(g).digest("hex")
+					if (image.byteLength > 1324 * 1024)
+						return reply ? sendError(
+							reply,
+							HTTPResponses.BAD_REQUEST,
+							`Gallery image ${i} exceeds 1MB`
+						) : undefined
 
-				getStorage().bucket().file(`gallery_images/${uid}`).save(g)
+					let uid = hash.sha1().update(image).digest("hex")
+					bucket.file(`gallery_images/${packId}-${uid}.webp`).save(image)
 
-				packData.display.gallery[i] = {
-					type: "bucket",
-					uid: uid,
+					packData.display.gallery[i] = {
+						type: "file",
+						uid: uid,
+					}
 				}
-			}
-		} else if (g.content) {
-			let uid = hash.sha1().update(g.content).digest("hex")
+			} else if (g.content) {
+				const image = await getWebp(g.content)
 
-			if (g.uid !== uid) {
-				getStorage().bucket().file(`gallery_images/${g.uid}`).delete()
-				getStorage()
-					.bucket()
-					.file(`gallery_images/${uid}`)
-					.save(g.content)
-			}
+				const uid = hash.sha1().update(image).digest("hex")
 
-			delete g.content
+				if (g.uid !== uid) {
+					if (g.type === "file") {
+						bucket
+							.file(`gallery_images/${packId}-${g.uid}.webp`)
+							.delete()
+					} else {
+						bucket.file(`gallery_images/${g.uid}`).delete()
+					}
+
+					bucket
+						.file(`gallery_images/${packId}-${uid}.webp`)
+						.save(image)
+
+					g.uid = uid
+				}
+
+				delete g.content
+			}
 		}
-	}
 }
 
 /*
@@ -117,6 +129,11 @@ const PartialPackDataSchema = Type.Partial(
 )
 type PartialPackData = Static<typeof PartialPackDataSchema>
 
+async function getWebp(content: string) {
+	const buffer = Buffer.from(content.split(",").at(-1)!, "base64")
+	return await sharp(buffer).webp({lossless: true}).toBuffer()
+}
+
 const setPack = async (response: any, reply: any) => {
 	const { id: packId } = response.params
 	const { token } = response.query
@@ -152,11 +169,13 @@ const setPack = async (response: any, reply: any) => {
 				)
 		}
 
+	const bucket = getStorage().bucket()
+
 	if (packData.display?.gallery) {
 		const existingGallery: PackGalleryImage[] =
 			(await doc.get("data.display.gallery")) ?? []
 
-		await updateGalleryData(packData, reply)
+		await updateGalleryData(packData, doc.id, reply)
 
 		const newGallery = packData.display?.gallery
 		const missingImages = existingGallery.filter(
@@ -172,10 +191,10 @@ const setPack = async (response: any, reply: any) => {
 		for (const missingImage of missingImages) {
 			if (typeof missingImage !== "object") continue
 
-			getStorage()
-				.bucket()
-				.file(`gallery_images/${missingImage.uid}`)
-				.delete()
+			if (missingImage.type === "bucket")
+				bucket.file(`gallery_images/${missingImage.uid}`).delete()
+			else if (missingImage.type === "file")
+				bucket.file(`gallery_images/${doc.id}-${missingImage.uid}.webp`).delete()
 		}
 	}
 
@@ -615,17 +634,28 @@ API_APP.route({
 
 		console.time("Get image")
 		if (typeof img === "object") {
-			const buffer = (
-				await getStorage()
-					.bucket()
-					.file(`gallery_images/${img.uid}`)
-					.download()
-			)[0]
+			switch (img.type) {
+				case "bucket": {
+					const buffer = (
+						await getStorage()
+							.bucket()
+							.file(`gallery_images/${img.uid}`)
+							.download()
+					)[0]
 
-			content = Buffer.from(
-				buffer.toString("utf8").split(",")[1],
-				"base64"
-			)
+					content = Buffer.from(
+						buffer.toString("utf8").split(",")[1],
+						"base64"
+					)
+					break
+				}
+				case "file": {
+					return reply.redirect(
+						HTTPResponses.FOUND,
+						`https://firebasestorage.googleapis.com/v0/b/mc-smithed.appspot.com/o/gallery_images%2F${doc.id}-${img.uid}.webp?alt=media`
+					)
+				}
+			}
 		} else {
 			content = Buffer.from(img.split(",")[1], "base64")
 		}
