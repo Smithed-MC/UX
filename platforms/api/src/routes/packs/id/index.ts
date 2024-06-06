@@ -10,7 +10,14 @@ import {
 	PackMetaData,
 	PermissionScope,
 } from "data-types"
-import { FastifyRequest, FastifyReply, FastifySchema, FastifyTypeProviderDefault, RawServerDefault, RouteGenericInterface } from "fastify"
+import {
+	FastifyRequest,
+	FastifyReply,
+	FastifySchema,
+	FastifyTypeProviderDefault,
+	RawServerDefault,
+	RouteGenericInterface,
+} from "fastify"
 import { getPackDoc, validateToken } from "database"
 import { coerce, valid } from "semver"
 import hash from "hash.js"
@@ -18,58 +25,63 @@ import { request } from "express"
 import sharp from "sharp"
 import { IncomingMessage, ServerResponse } from "http"
 
-
-export async function updateGalleryData(packData: any, packId: string, reply: FastifyReply|undefined) {
-	if (packData.display.gallery === undefined)
-		return
+export async function updateGalleryData(
+	packData: any,
+	packId: string,
+	reply: FastifyReply | undefined
+): Promise<boolean> {
+	if (packData.display.gallery === undefined) return true
 	const bucket = getStorage().bucket()
-	
+
 	for (let i = 0; i < packData.display.gallery.length; i++) {
-			const g = packData.display.gallery[i]
+		const g = packData.display.gallery[i]
 
-			if (typeof g === "string") {
-				if (!g.startsWith("http")) {
-					const image = await getWebp(g)
+		if (typeof g === "string") {
+			if (!g.startsWith("http")) {
+				const image = await getWebp(g)
 
-					if (image.byteLength > 1324 * 1024)
-						return reply ? sendError(
+				if (image.byteLength > 1324 * 1024) {
+					if (reply)
+						sendError(
 							reply,
 							HTTPResponses.BAD_REQUEST,
 							`Gallery image ${i} exceeds 1MB`
-						) : undefined
+						)
 
-					let uid = hash.sha1().update(image).digest("hex")
-					bucket.file(`gallery_images/${packId}-${uid}.webp`).save(image)
-
-					packData.display.gallery[i] = {
-						type: "file",
-						uid: uid,
-					}
-				}
-			} else if (g.content) {
-				const image = await getWebp(g.content)
-
-				const uid = hash.sha1().update(image).digest("hex")
-
-				if (g.uid !== uid) {
-					if (g.type === "file") {
-						bucket
-							.file(`gallery_images/${packId}-${g.uid}.webp`)
-							.delete()
-					} else {
-						bucket.file(`gallery_images/${g.uid}`).delete()
-					}
-
-					bucket
-						.file(`gallery_images/${packId}-${uid}.webp`)
-						.save(image)
-
-					g.uid = uid
+					return false
 				}
 
-				delete g.content
+				let uid = hash.sha1().update(image).digest("hex")
+				bucket.file(`gallery_images/${packId}-${uid}.webp`).save(image)
+
+				packData.display.gallery[i] = {
+					type: "file",
+					uid: uid,
+				}
 			}
+		} else if (g.content) {
+			const image = await getWebp(g.content)
+
+			const uid = hash.sha1().update(image).digest("hex")
+
+			if (g.uid !== uid) {
+				if (g.type === "file") {
+					bucket
+						.file(`gallery_images/${packId}-${g.uid}.webp`)
+						.delete()
+				} else {
+					bucket.file(`gallery_images/${g.uid}`).delete()
+				}
+
+				bucket.file(`gallery_images/${packId}-${uid}.webp`).save(image)
+
+				g.uid = uid
+			}
+
+			delete g.content
 		}
+	}
+	return true
 }
 
 /*
@@ -130,8 +142,10 @@ const PartialPackDataSchema = Type.Partial(
 type PartialPackData = Static<typeof PartialPackDataSchema>
 
 async function getWebp(content: string) {
-	const buffer = Buffer.from(content.split(",").at(-1)!, "base64")
-	return await sharp(buffer).webp({lossless: true}).toBuffer()
+	const urlParts = content.split(",")
+
+	const buffer = Buffer.from(urlParts.at(-1)!, "base64")
+	return await sharp(buffer, {animated: urlParts[0].includes("image/gif")}).webp({ lossless: true }).toBuffer()
 }
 
 const setPack = async (response: any, reply: any) => {
@@ -194,7 +208,9 @@ const setPack = async (response: any, reply: any) => {
 			if (missingImage.type === "bucket")
 				bucket.file(`gallery_images/${missingImage.uid}`).delete()
 			else if (missingImage.type === "file")
-				bucket.file(`gallery_images/${doc.id}-${missingImage.uid}.webp`).delete()
+				bucket
+					.file(`gallery_images/${doc.id}-${missingImage.uid}.webp`)
+					.delete()
 		}
 	}
 
