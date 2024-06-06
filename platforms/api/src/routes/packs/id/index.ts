@@ -75,8 +75,10 @@ const PartialPackDataSchema = Type.Partial(
 type PartialPackData = Static<typeof PartialPackDataSchema>
 
 async function getWebp(content: string) {
-	const buffer = Buffer.from(content.split(",").at(-1)!, "base64")
-	return await sharp(buffer).webp({lossless: true}).toBuffer()
+	const urlParts = content.split(",")
+
+	const buffer = Buffer.from(urlParts.at(-1)!, "base64")
+	return await sharp(buffer, {animated: urlParts[0].includes("image/gif")}).webp({ lossless: true }).toBuffer()
 }
 
 const setPack = async (response: any, reply: any) => {
