@@ -89,6 +89,7 @@
 		"remark-inline-links": "^6.0.1",
 		"remark-remove-comments": "^1.0.1",
 		"semver": "^7.3.8",
+		"sharp": "^0.33.4",
 		"turbo": "^1.10.12",
 		"typesense": "^1.7.2",
 		"vite": "^4.3.9",

@@ -125,6 +125,11 @@ export const PackGalleryImageSchema = Type.Union([
 		uid: Type.String(),
 		content: Type.Optional(Type.String()),
 	}),
+	Type.Object({
+		type: Type.Literal("file"),
+		uid: Type.String(),
+		content: Type.Optional(Type.String())
+	}),
 	Type.String(),
 ])
 
@@ -312,6 +317,7 @@ export type PAToken = Static<typeof PATokenSchema>
 export enum HTTPResponses {
 	OK = 200,
 	CREATED = 201,
+	FOUND = 302,
 	BAD_REQUEST = 400,
 	UNAUTHORIZED = 401,
 	FORBIDDEN = 403,

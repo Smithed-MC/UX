@@ -53,7 +53,7 @@ export default function GalleryManager({
 			<input
 				ref={fileUploadRef}
 				type="file"
-				accept="image/png, image/jpeg"
+				accept="image/png, image/jpeg, image/gif, image/webp"
 				hidden
 				onChange={OnFileUpload}
 			/>
