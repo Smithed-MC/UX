@@ -149,8 +149,24 @@
 @media screen and (max-width: 43rem) {
 	.userButtonsContainer {
 		width: 100%;
-		gap: 0.25rem;
+		gap: 0.25rem !important; 
 		justify-content: center;
+		flex-direction: row !important;
+	}
+
+	.userButtonsContainer > * > *:nth-child(n + 2) {
+		display: none;
+	}
+	.userButtonsContainer > *:first-child {
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+	}
+	.userButtonsContainer > *:last-child {
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+	}
+	.userButtonsContainer > *:not(:first-child):not(:last-child) {
+		border-radius: 0;
 	}
 
 	.packPageHeader {
@@ -180,15 +196,24 @@
 	}
 }
 
-@media screen and (max-width: 51rem) {
+@media screen and (min-width: 43rem) and (max-width: 51rem) {
 	.userButtonsContainer {
-		flex-direction: column;
+		flex-direction: row;
+		flex-wrap: wrap;
 		align-items: center;
 		gap: 1rem;
 	}
 
-	.packInfoMediaButton {
-		width: 100% !important;
+	.packPageHeader {
+		grid-template-areas:
+			"details"
+			"userButtons";
+		grid-template-columns: 1fr;
+
+		align-items: center;
+	}
+	.packPageHeader {
+		align-items: center;
 	}
 }
 

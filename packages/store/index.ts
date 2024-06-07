@@ -5,7 +5,7 @@ import { PackBundle, UserData } from "data-types"
 import Cookies from "js-cookie"
 
 function getDefault<T>(key: string, defaultValue: T) {
-	if (import.meta.env.SSR) return defaultValue
+	if ((import.meta as any).env.SSR) return defaultValue
 
 	const stored = localStorage.getItem("smithed.dev:" + key)
 

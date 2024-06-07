@@ -1,4 +1,5 @@
 import { useRouteError, useNavigate } from "react-router-dom"
+import Link from "./Link"
 
 export function RootError() {
 	const error: any = useRouteError()
@@ -23,10 +24,10 @@ export function RootError() {
 				Sorry, we've encountered an error on our end!
 				<br />
 				Report it to the{" "}
-				<a href="https://github.com/Smithed-MC/UX">github</a>.
+				<Link to="https://github.com/Smithed-MC/UX">github</Link>.
 			</p>
 			<a
-				className="button"
+				className="buttonLike"
 				onClick={() => {
 					navigate(-1)
 				}}

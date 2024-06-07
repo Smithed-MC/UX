@@ -1,15 +1,9 @@
-import { PackCard, IconInput, ChooseBox, GalleryPackCard } from "components"
-import React, { useEffect, useRef, useState } from "react"
-import {
-	PackData,
-	SortOptions,
-	fullMinecraftVersions,
-	packCategories,
-	supportedMinecraftVersions,
-} from "data-types"
-import { AddToBundleModal } from "../widget/packInfo.js"
+import { IconInput, ChooseBox, GalleryPackCard } from "components"
+import { useEffect, useRef, useState } from "react"
+import { SortOptions, fullMinecraftVersions, packCategories } from "data-types"
+import { AddToBundleModal } from "../../widget/packInfo.js"
 import { Link, useLoaderData, useNavigate } from "react-router-dom"
-import "./packsBrowser.css"
+import "./index.css"
 import {
 	useAppDispatch,
 	useAppSelector,
@@ -23,7 +17,7 @@ import {
 	BrowsePageData,
 	PACKS_PER_PAGE,
 	createBrowseSearchParams,
-} from "../loaders.js"
+} from "../../loaders.js"
 
 function RenderPages({
 	totalPacks,
@@ -125,6 +119,9 @@ export default function PacksBrowser(props: any) {
 			sort: packSort,
 		})
 		if (page) params.set("page", page as string)
+		document
+			.getElementById("packCardContainer")
+			?.style.setProperty("opacity", "0.2")
 		navigate("/packs?" + params)
 	}
 
@@ -142,7 +139,7 @@ export default function PacksBrowser(props: any) {
 		document
 			.getElementById("packCardContainer")
 			?.style.setProperty("opacity", "1")
-	}, [page])
+	}, [page, packs])
 
 	return (
 		<div
@@ -181,7 +178,7 @@ export default function PacksBrowser(props: any) {
 							}
 							onChange={(e) => {
 								updateUrl(
-									e.currentTarget.value.replaceAll(" ", "+")
+									e.currentTarget.value
 								)
 							}}
 						/>

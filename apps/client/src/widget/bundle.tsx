@@ -115,7 +115,7 @@ export function CreateBundle({
 					<IconTextButton
 						icon={Account}
 						text={"Login"}
-						href="/account"
+						to="/account"
 					/>
 				</div>
 			</div>

@@ -47,6 +47,7 @@ import { ReactComponent as Gear } from "./assets/gear.svg"
 import { ReactComponent as CurlyBraces } from "./assets/curly_braces.svg"
 import { ReactComponent as YouTube } from "./assets/youtube.svg"
 import { ReactComponent as ColorPicker } from "./assets/color-picker.svg"
+import { ReactComponent as Pin } from "./assets/pin.svg"
 
 export {
 	Account,
@@ -98,4 +99,5 @@ export {
 	CurlyBraces,
 	YouTube,
 	ColorPicker,
+	Pin
 }

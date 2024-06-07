@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use anyhow::{bail, Context};
-use mcvm::net::download;
+use mcvm::core::net::download;
 use reqwest::Client;
 
 /// Install mods so that datapacks work

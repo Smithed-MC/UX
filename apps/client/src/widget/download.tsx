@@ -1,4 +1,4 @@
-import { PackVersionDownload } from "components"
+import { Link } from "components"
 import { PackData, PackEntry } from "data-types"
 import React from "react"
 import "./download.css"
@@ -36,14 +36,14 @@ export default function Download({
 			<label style={{ fontSize: "2rem", textDecoration: "underline" }}>
 				Downloads
 			</label>
-			<a
+			<Link
 				className="button downloadButton"
 				style={{ fontSize: "1rem", maxWidth: 196, width: "100%" }}
 				rel="nofollow"
-				href={import.meta.env.VITE_API_SERVER + `/download?pack=${id}`}
+				to={import.meta.env.VITE_API_SERVER + `/download?pack=${id}`}
 			>
 				Download Latest
-			</a>
+			</Link>
 			<div
 				className="container"
 				style={{
@@ -52,9 +52,9 @@ export default function Download({
 					flexDirection: "column-reverse",
 				}}
 			>
-				{versions.map((v) => (
-					<PackVersionDownload key={v.name} version={v} packId={id} />
-				))}
+				{/* {versions.map((v) => ( */}
+					{/* <PackVersionDownload key={v.name} version={v} packId={id} /> */}
+				{/* ))} */}
 			</div>
 		</div>
 	)

@@ -17,6 +17,7 @@ import { parseToken, validateToken } from "database"
 import { coerce } from "semver"
 import { SearchResponseHit } from "typesense/lib/Typesense/Documents.js"
 import hash from "hash.js"
+import { updateGalleryData } from "./id/index.js"
 
 type ReceivedPackResult = {
 	docId: string
@@ -240,7 +241,7 @@ API_APP.route({
 				)
 		}
 
-		const documentData: Omit<Omit<PackMetaData, 'docId'>, 'rawId'> & {
+		const documentData: Omit<Omit<PackMetaData, "docId">, "rawId"> & {
 			data: PackData
 			id: string
 			state: string
@@ -263,6 +264,16 @@ API_APP.route({
 		}
 
 		const result = await firestore.collection("packs").add(documentData)
+
+		if (data.display.gallery) {
+			const successful = await updateGalleryData(data, result.id, reply)
+		
+			if (!successful) {
+				await result.delete()
+			} else {
+				result.set(data)
+			}
+		}
 
 		return reply.status(HTTPResponses.CREATED).send({
 			packId: result.id,

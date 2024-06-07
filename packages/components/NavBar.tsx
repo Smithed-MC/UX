@@ -9,8 +9,20 @@ import {
 
 import "./style.css"
 import "./NavBar.css"
-import { Check, Cross, Download, Jigsaw, Logo, Trash } from "./svg.js"
-import { IconTextButton } from "./IconTextButton"
+import {
+	AddToBundle,
+	Check,
+	Cross,
+	Download,
+	Jigsaw,
+	Logo,
+	NewFolder,
+	Plus,
+	Right,
+	Settings,
+	Trash,
+} from "./svg.js"
+import IconTextButton, { IconTextButtonProps } from "./IconTextButton"
 import { Account as AccountSvg } from "components/svg.js"
 import {
 	selectSelectedBundle,
@@ -18,6 +30,9 @@ import {
 	setUsersBundles,
 } from "store"
 import { BundleUpdater, PackBundle, PackData } from "data-types"
+import Link from "./Link"
+import Modal from "./Modal"
+import { getAuth } from "firebase/auth"
 
 interface NavButtonProps {
 	onOpen: () => void
@@ -169,19 +184,19 @@ export function EditBundle({ close }: EditBundleProps) {
 						onClick={close}
 					/>
 					{packs.length > 0 && (
-						<a
+						<Link
 							className="buttonLike"
 							style={{
 								fill: "var(--foreground)",
 								padding: "0.5rem",
 							}}
-							href={
+							to={
 								import.meta.env.VITE_API_SERVER +
 								`/bundles/${curBundle.uid}/download`
 							}
 						>
 							<Download />
-						</a>
+						</Link>
 					)}
 					{packs.length > 0 && (
 						<IconTextButton
@@ -237,7 +252,7 @@ export function EditBundle({ close }: EditBundleProps) {
 	)
 }
 
-export function NavBar(props: NavBarProps) {
+export default function NavBar({ tabs, logoUrl, onSignout }: NavBarProps) {
 	const [open, setOpen] = useState(previousState)
 
 	const [editBundleOpen, setEditBundleOpen] = useState(false)
@@ -279,6 +294,20 @@ export function NavBar(props: NavBarProps) {
 
 	const curBundle = bundles.find((b) => b.uid === selectedBundle)
 
+	function NavModalOption(props: IconTextButtonProps) {
+		return (
+			<IconTextButton
+				reverse
+				{...props}
+				style={{
+					backgroundColor: "transparent",
+					width: "100%",
+					...props.style,
+				}}
+			/>
+		)
+	}
+
 	return (
 		<div
 			className="container navBarContainer"
@@ -293,7 +322,7 @@ export function NavBar(props: NavBarProps) {
 				className="navBarHide"
 				style={{ width: "1.5rem", height: "1.5rem" }}
 			/>
-			<a
+			<Link
 				className="navBarHide"
 				style={{
 					fontSize: "24px",
@@ -303,10 +332,10 @@ export function NavBar(props: NavBarProps) {
 					color: "var(--foreground)",
 					textDecoration: "none",
 				}}
-				href={props.logoUrl}
+				to={logoUrl}
 			>
 				Smithed
-			</a>
+			</Link>
 			<div
 				className="navBarHide"
 				style={{
@@ -316,7 +345,7 @@ export function NavBar(props: NavBarProps) {
 				}}
 			/>
 
-			{props.getTabs && props.getTabs()}
+			{tabs}
 			<div
 				style={{
 					display: "flex",
@@ -324,7 +353,7 @@ export function NavBar(props: NavBarProps) {
 					flexDirection: "row",
 					gap: "2rem",
 					justifyContent: "end",
-					overflow: "hidden",
+					// overflow: "hidden",
 				}}
 			>
 				{/* {selectedBundle !== "" && !import.meta.env.SSR && (
@@ -367,13 +396,68 @@ export function NavBar(props: NavBarProps) {
 						onClick={() => setEditBundleOpen(!editBundleOpen)}
 					/>
 				)} */}
-				<IconTextButton
-					className="navBarOption end"
-					text={user?.displayName ?? "Login"}
-					href={"/" + (user?.displayName ?? "account")}
-					icon={AccountSvg}
-					reverse={true}
-				/>
+
+				{user && (
+					<Modal
+						className="navBarModal"
+						trigger={
+							<IconTextButton
+								style={{ width: "100%" }}
+								className="navBarOption end"
+								text={user.displayName}
+								iconElement={
+									<Right
+										style={{ transform: "rotate(90deg)" }}
+									/>
+								}
+								reverse
+							/>
+						}
+						content={(ctx) => (
+							<div className="container">
+								<NavModalOption
+									text="Open profile"
+									icon={AccountSvg}
+									href={"/" + user?.displayName}
+								/>
+								<NavModalOption
+									text="New pack"
+									icon={Plus}
+									href={"/packs/new/edit"}
+								/>
+								<NavModalOption
+									text="New bundle"
+									icon={NewFolder}
+									href={"/bundles/new/edit"}
+								/>
+								<NavModalOption
+									text="Settings"
+									icon={Settings}
+									href={"/settings"}
+								/>
+								<NavModalOption
+									style={{ color: "var(--disturbing)" }}
+									text="Logout"
+									iconElement={<Right style={{color: 'var(--disturbing)'}}/>}
+									onClick={() => {
+										getAuth().signOut()
+										onSignout
+									}}
+									href=""
+								/>
+							</div>
+						)}
+					/>
+				)}
+				{!user && (
+					<IconTextButton
+						className="navBarOption"
+						text={"Login"}
+						to={"/account"}
+						icon={AccountSvg}
+						reverse={true}
+					/>
+				)}
 			</div>
 			{/* {editBundleOpen && (
 				<EditBundle close={() => setEditBundleOpen(false)} />
@@ -383,6 +467,7 @@ export function NavBar(props: NavBarProps) {
 }
 
 export interface NavBarProps {
-	getTabs: (() => JSX.Element[]) | undefined
+	tabs: readonly JSX.Element[]
 	logoUrl: string
+	onSignout: () => void
 }

@@ -2,17 +2,127 @@ import {
 	browserLocalPersistence,
 	browserSessionPersistence,
 	getAuth,
+	getRedirectResult,
+	GithubAuthProvider,
 	indexedDBLocalPersistence,
 	setPersistence,
 	signInWithEmailAndPassword,
+	signInWithPopup,
+	signInWithRedirect,
+	UserCredential,
 } from "firebase/auth"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import "./login.css"
 import { FirebaseError } from "firebase/app"
-import { IconInput, IconTextButton, Spinner } from "components"
-import { Right, Key, At } from "components/svg"
-import { useNavigate } from "react-router-dom"
+import { IconInput, IconTextButton, Link, Spinner } from "components"
+import { Right, Key, At, Github, Account, Cross, Check } from "components/svg"
+import { useNavigate, useNavigation } from "react-router-dom"
 import Cookies from "js-cookie"
+import { HTTPResponses, UserData } from "data-types"
+import { setUserData } from "store"
+import { useDispatch } from "react-redux"
+import { useAppDispatch } from "hooks"
+
+const githubProvider = new GithubAuthProvider()
+githubProvider.setCustomParameters({
+	allow_signup: "false",
+})
+
+function DisplayNamePopup({
+	onClose,
+}: {
+	onClose: (success: boolean) => void
+}) {
+	const [displayNameError, setDisplayNameError] = useState<string>()
+
+	return (
+		<div
+			className="container"
+			style={{
+				position: "absolute",
+				top: 0,
+				left: 0,
+				backgroundColor: "rgba(0,0,0,0.5)",
+				width: "100%",
+				height: "100%",
+				zIndex: 1000,
+			}}
+		>
+			<div
+				className="container"
+				style={{
+					padding: "1rem",
+					borderRadius: "calc(var(--defaultBorderRadius))",
+					border: "0.125rem solid var(--border)",
+					backgroundColor: "var(--background)",
+					gap: "1rem",
+				}}
+			>
+				This account has not been registered.
+				<br />
+				Please choose a display name
+				<IconInput
+					id="display_name_input"
+					icon={Account}
+					placeholder="Display Name"
+					onChange={() => setDisplayNameError(undefined)}
+				/>
+				{displayNameError && (
+					<span
+						style={{
+							color: "var(--disturbing)",
+							marginTop: "-0.5rem",
+						}}
+					>
+						{displayNameError}
+					</span>
+				)}
+				<div
+					className="container"
+					style={{ flexDirection: "row", gap: "0.5rem" }}
+				>
+					<IconTextButton
+						className="invalidButtonLike"
+						icon={Cross}
+						text="Cancel"
+						onClick={() => {
+							getAuth().signOut()
+							onClose(false)
+						}}
+					/>
+					<IconTextButton
+						className="successButtonLike"
+						icon={Check}
+						text="Save"
+						onClick={async () => {
+							const displayName = (
+								document.getElementById(
+									"display_name_input"
+								)! as HTMLInputElement
+							).value
+							if (displayName.length < 3) return
+
+							const user = getAuth().currentUser
+							if (user == null) return
+
+							const resp = await fetch(
+								import.meta.env.VITE_API_SERVER +
+									`/users/${user.uid}/setup?displayName=${displayName}&token=${await user.getIdToken()}`
+							)
+
+							if (resp.ok) return onClose(true)
+
+							if (resp.status === HTTPResponses.CONFLICT)
+								return setDisplayNameError(
+									"Display name is taken!"
+								)
+						}}
+					/>
+				</div>
+			</div>
+		</div>
+	)
+}
 
 export default function Login({
 	clickSignUp,
@@ -29,20 +139,43 @@ export default function Login({
 
 	const [loggingIn, setLoggingIn] = useState(false)
 
+	const [showDisplayNamePrompt, setShowDisplayNamePrompt] = useState(false)
+
 	const navigate = useNavigate()
+	const dispatch = useAppDispatch()
+
+	useEffect(() => {
+		function safeSignOut() {
+			if (showDisplayNamePrompt) getAuth().signOut()
+		}
+
+		window.addEventListener("beforeunload", safeSignOut)
+		return () => window.removeEventListener("beforeunload", safeSignOut)
+	}, [])
+
+	async function doneLoggingIn(uid: string) {
+		const resp = await fetch(
+			import.meta.env.VITE_API_SERVER + `/users/${uid}`
+		)
+		if (!resp.ok) return navigate("/" + uid)
+
+		const userData: UserData = await resp.json()
+
+		dispatch(setUserData(userData))
+
+		if (window.history.length > 1) window.history.back()
+		else navigate("/" + uid)
+	}
 
 	// console.log(getAuth().currentUser)
 	const login = async () => {
 		if (email === "" || password === "") return
 		setLoggingIn(true)
 		try {
-			Cookies.set("smithedPersistence", staySignedIn ? "true" : "false", {
-				expires: 14,
-			})
 			await setPersistence(
 				getAuth(),
 				staySignedIn
-					? indexedDBLocalPersistence
+					? browserLocalPersistence
 					: browserSessionPersistence
 			)
 			const cred = await signInWithEmailAndPassword(
@@ -51,7 +184,7 @@ export default function Login({
 				password
 			)
 
-			navigate("/" + cred.user.uid)
+			doneLoggingIn(cred.user.uid)
 		} catch (e: any) {
 			setLoggingIn(false)
 			const error = e as FirebaseError
@@ -129,13 +262,14 @@ export default function Login({
 				className="container"
 				style={{ flexDirection: "row", gap: "1.25rem" }}
 			>
-				<a
+				<Link
+					to="/discord"
 					className="compactButton"
 					style={{ opacity: 0.3 }}
 					onClick={clickHelp}
 				>
 					Need help?
-				</a>
+				</Link>
 				<div
 					style={{
 						width: "0.25rem",
@@ -161,7 +295,7 @@ export default function Login({
 								style={{
 									width: "1rem",
 									height: "1rem",
-									border: "2px solid var(--text)",
+									border: "2px solid var(--foreground)",
 									borderTop: "2px solid var(--accent)",
 								}}
 							/>
@@ -174,6 +308,58 @@ export default function Login({
 					disabled={email === "" || password === ""}
 				/>
 			</div>
+			<IconTextButton
+				icon={Github}
+				text="Github Sign In"
+				onClick={async () => {
+					try {
+						const cred = await signInWithPopup(
+							getAuth(),
+							githubProvider
+						)
+						if (!cred) {
+							alert("Failed to get credientials")
+							return
+						}
+
+						const userResp = await fetch(
+							import.meta.env.VITE_API_SERVER +
+								`/users/${cred.user.uid}`
+						)
+
+						if (
+							!userResp.ok &&
+							userResp.status !== HTTPResponses.NOT_FOUND
+						) {
+							alert(
+								"Failed to fetch user data!\n" +
+									(await userResp.json()).message
+							)
+							return
+						}
+
+						if (
+							!userResp.ok &&
+							userResp.status === HTTPResponses.NOT_FOUND
+						) {
+							setShowDisplayNamePrompt(true)
+							return
+						}
+
+						doneLoggingIn(cred.user.uid)
+					} catch (e) {
+						alert(e)
+					}
+				}}
+			/>
+			{showDisplayNamePrompt && (
+				<DisplayNamePopup
+					onClose={(success) => {
+						setShowDisplayNamePrompt(false)
+						if (success) doneLoggingIn(getAuth().currentUser!.uid)
+					}}
+				/>
+			)}
 		</div>
 	)
 }

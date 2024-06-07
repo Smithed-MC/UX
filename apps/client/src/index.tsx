@@ -1,31 +1,20 @@
-import { NavBar, RootError } from "components"
-import { StrictMode, useEffect, useState, useTransition } from "react"
+import { Link, NavBar, RootError } from "components"
+import { useContext, useEffect, useState } from "react"
 import {
 	createBrowserRouter,
 	Outlet,
 	redirect,
+	RouteObject,
 	RouterProvider,
 	ScrollRestoration,
 	useLocation,
 } from "react-router-dom"
 import { initializeApp } from "firebase/app"
-import {
-	User as FirebaseUser,
-	browserSessionPersistence,
-	indexedDBLocalPersistence,
-	setPersistence,
-} from "firebase/auth"
+import { User as FirebaseUser } from "firebase/auth"
 
-import PacksBrowser from "./pages/packsBrowser.js"
-import Home from "./pages/home.js"
-import Packs, { loadPackData } from "./pages/pack.js"
 import "./style.css"
 
-import Account from "./pages/account.js"
 import { getAuth } from "firebase/auth"
-import Edit from "./pages/edit.js"
-import Bundles from "./pages/bundle.js"
-import Settings from "./pages/settings.js"
 
 import { Provider } from "react-redux"
 import {
@@ -35,31 +24,27 @@ import {
 	loadRootData,
 	loadUserPageData,
 } from "./loaders.js"
-import User from "./pages/user.js"
+
 import {
 	selectSelectedBundle,
-	selectUsersBundles,
 	setSelectedBundle,
 	setUserData,
 	setUsersBundles,
 	store,
 } from "store"
-import { useAppDispatch, useAppSelector } from "hooks"
+import { useAppDispatch, useAppSelector, useSiteSettings } from "hooks"
 import { PackBundle, UserData } from "data-types"
 import { Helmet } from "react-helmet"
-import { ClientInject, getDefaultInject } from "./inject.js"
+import { ClientContext, defaultContext, IClientContext } from "./context.js"
 
 import { Cross, Logo } from "components/svg.js"
 
-export type { ClientInject } from "./inject.js"
-
 import Cookies from "js-cookie"
-import Article from "./pages/article.js"
-
-interface ClientProps {
-	platform: "desktop" | "website"
-	inject: ClientInject
-}
+import { loadBundleEdit } from "./pages/bundles/id/edit.loader.js"
+import { loadPackEdit } from "./pages/packs/id/edit.loader.js"
+import EditorError from "./pages/editors/error.js"
+import React from "react"
+import loadPackData from "./pages/packs/id/index.loader.js"
 
 initializeApp({
 	databaseURL: "https://mc-smithed-default-rtdb.firebaseio.com",
@@ -72,11 +57,16 @@ initializeApp({
 	measurementId: "G-40SRKC35Z0",
 })
 
-export function ClientApplet(props: ClientProps) {
+export function ClientApplet() {
 	const dispatch = useAppDispatch()
 	const selectedBundle = useAppSelector(selectSelectedBundle)
 	const [hideWarning, setHideWarning] = useState(false)
 	const location = useLocation()
+	const context = useContext(ClientContext)
+	const [siteSettings, applySettings] = useSiteSettings()
+
+	if (!import.meta.env.SSR)
+		applySettings(siteSettings)
 
 	function resetBundleData() {
 		dispatch(setUsersBundles([]))
@@ -104,7 +94,7 @@ export function ClientApplet(props: ClientProps) {
 
 		const getData = async (id: string) => {
 			const resp = await fetch(
-				import.meta.env.VITE_API_SERVER + `/bundles/${id}`
+				import.meta.env.VITE_API_SERVER + `/bundles/${id}?token=` + await user.getIdToken()
 			)
 
 			if (!resp.ok) return undefined
@@ -142,17 +132,17 @@ export function ClientApplet(props: ClientProps) {
 		setHideWarning(!!sessionStorage.getItem("hereBeDragons"))
 
 		const unsub = getAuth().onAuthStateChanged(async (user) => {
-			const persistence = Cookies.get("smithedPersistence") === "true"
-
-			await setPersistence(
-				getAuth(),
-				persistence
-					? indexedDBLocalPersistence
-					: browserSessionPersistence
-			)
-
-			loadBundles(user)
-			loadUserData(user)
+			if (user) {
+				Cookies.set("smithedToken", await user?.getIdToken(true), {
+					sameSite: "strict",
+				})
+				loadBundles(user)
+				loadUserData(user)
+			} else {
+				Cookies.remove("smithedToken")
+				resetBundleData()
+				resetUserData()
+			}
 		})
 
 		return () => {
@@ -203,15 +193,15 @@ export function ClientApplet(props: ClientProps) {
 				>
 					<span>
 						{"You are currently on the unstable branch. "}
-						<a
-							href={
+						<Link
+							to={
 								"https://smithed.net" +
 								location.pathname +
 								location.search
 							}
 						>
 							Click here
-						</a>
+						</Link>
 						{" to go to safety."}
 					</span>
 					<Cross
@@ -253,13 +243,10 @@ export function ClientApplet(props: ClientProps) {
 					paddingBottom: "1rem",
 				}}
 			>
-				<NavBar
-					getTabs={props.inject.getNavbarTabs}
-					logoUrl={props.inject.logoUrl}
-				/>
+				<NavBar tabs={context.navbarTabs} logoUrl={context.logoUrl} onSignout={() => resetUserData()} />
 				<Outlet />
 			</div>
-			{props.inject.enableFooter ? <Footer /> : <br />}
+			{context.enableFooter ? <Footer /> : <br />}
 		</div>
 	)
 }
@@ -269,7 +256,7 @@ function Footer() {
 		<div
 			className="container"
 			style={{
-				width: "100%",
+				width: "100.5vw",
 				backgroundColor: "var(--bold)",
 				borderTop: "0.125rem solid var(--border)",
 			}}
@@ -302,18 +289,18 @@ function Footer() {
 				</div>
 				<div className="container footerSmallGroup">
 					<b style={{ fontSize: "1.5rem" }}>SOCIAL</b>
-					<a
+					<Link
 						className="compactButton"
-						href="https://smithed.dev/discord"
+						to="https://smithed.dev/discord"
 					>
 						Discord
-					</a>
-					<a
+					</Link>
+					<Link
 						className="compactButton"
-						href="https://github.com/Smithed-MC"
+						to="https://github.com/Smithed-MC"
 					>
 						Github
-					</a>
+					</Link>
 				</div>
 				<div className="container footerSmallGroup">
 					<b style={{ fontSize: "1.5rem" }}>POLICIES</b>
@@ -326,8 +313,20 @@ function Footer() {
 	)
 }
 
+import Home from "./pages/home.js"
+import Settings from "./pages/settings.js"
+import Account from "./pages/account.js"
+import PackEditor from "./pages/packs/id/edit.js"
+import User from "./pages/user.js"
+import PackPage from "./pages/packs/id/index.js"
+import PackBrowsePage from "./pages/packs/index.js"
+import BundlePage from "./pages/bundles/id/index.js"
+import BundleEditor from "./pages/bundles/id/edit.js"
+import ArticlePage from "./pages/article.js"
+import loadSettingsData from "./pages/settings.loader"
+
 // Don't reorder these please
-export const subRoutes: any[] = [
+export const subRoutes: RouteObject[] = [
 	{
 		path: "",
 		element: <Home />,
@@ -336,6 +335,7 @@ export const subRoutes: any[] = [
 	{
 		path: "settings",
 		element: <Settings />,
+		loader: loadSettingsData
 	},
 	{
 		path: "browse",
@@ -350,49 +350,43 @@ export const subRoutes: any[] = [
 	},
 	{
 		path: "packs/:id/edit",
-		element: <Edit />,
+		element: <PackEditor />,
+		loader: loadPackEdit,
+		errorElement: <EditorError />,
 	},
 	{
 		path: ":owner",
-		element: (
-			<User
-				showBackButton={getDefaultInject().showBackButton}
-				bundleDownloadButton={getDefaultInject().bundleDownloadButton}
-			/>
-		),
+		element: <User />,
 		loader: loadUserPageData,
 	},
 	{
 		path: "packs/:id",
-		element: (
-			<Packs
-				packDownloadButton={getDefaultInject().packDownloadButton}
-				showBackButton={getDefaultInject().showBackButton}
-			/>
-		),
+		element: <PackPage />,
 		loader: loadPackData,
 	},
 	{
 		path: "bundles/:bundleId",
-		element: (
-			<Bundles
-				buttonDownloadFn={getDefaultInject().bundleDownloadButton}
-			/>
-		),
+		element: <BundlePage />,
+	},
+	{
+		path: "bundles/:id/edit",
+		element: <BundleEditor />,
+		errorElement: <EditorError />,
+		loader: loadBundleEdit,
 	},
 	{
 		path: "articles/:article",
-		element: <Article />,
+		element: <ArticlePage />,
 		loader: loadArticleData,
 	},
 	{
 		path: "articles",
-		element: <Article />,
+		element: <ArticlePage />,
 		loader: loadArticleData,
 	},
 	{
 		path: "packs",
-		element: <PacksBrowser />,
+		element: <PackBrowsePage />,
 		loader: loadPackBrowseData,
 	},
 ]
@@ -405,36 +399,18 @@ export const routes = [
 		id: "root",
 		element: (
 			<Provider store={store}>
-				<ClientApplet platform="website" inject={getDefaultInject()} />
+				<ClientApplet />
 			</Provider>
 		),
 		errorElement: <RootError />,
 	},
 ]
 
-// Set the default client applet to one with different props
-export function populateRouteProps(props: ClientProps) {
-	console.log("Populate")
-	routes[0].element = (
-		<Provider store={store}>
-			<ClientApplet {...props} />
-		</Provider>
-	)
-	subRoutes[5].element = (
-		<User
-			showBackButton={props.inject.showBackButton}
-			bundleDownloadButton={props.inject.bundleDownloadButton}
-		/>
-	)
-	subRoutes[6].element = (
-		<Packs
-			packDownloadButton={props.inject.packDownloadButton}
-			showBackButton={props.inject.showBackButton}
-		/>
-	)
-}
-
-export default function Client({ platform }: ClientProps) {
+export default function ClientParent({ context }: { context: IClientContext }) {
 	const router = createBrowserRouter(routes)
-	return <RouterProvider router={router} />
+	return (
+		<ClientContext.Provider value={context ?? defaultContext}>
+			<RouterProvider router={router} />
+		</ClientContext.Provider>
+	)
 }

@@ -1,6 +1,7 @@
-import React, { PropsWithChildren, useEffect } from "react"
+import React, { PropsWithChildren, useEffect, useId } from "react"
 import { useRef, useState } from "react"
 import "./CategoryBar.css"
+import { useFirebaseUser } from "hooks"
 
 interface CategoryBarProps {
 	children:
@@ -18,6 +19,8 @@ export default function CategoryBar({
 	if (!(children instanceof Array)) children = [children]
 
 	const [value, setValue] = useState<string>("")
+	const [hasSetSlide, setHasSetSlide] = useState<boolean>(false)
+	const firebaseUser = useFirebaseUser()
 
 	useEffect(() => {
 		if (!(children instanceof Array)) children = [children]
@@ -35,13 +38,16 @@ export default function CategoryBar({
 
 			if (child === undefined || child.props.disabled) {
 				setDefaultValue()
+			} else {
 			}
+
+
 		} else {
 			setDefaultValue()
 		}
 
 		setValue(defaultValue ?? "")
-	}, [])
+	}, [defaultValue])
 
 	const selectedChoice = useRef<HTMLButtonElement>(null)
 	const backgroundElement = useRef<HTMLDivElement>(null)
@@ -54,6 +60,13 @@ export default function CategoryBar({
 		shouldTransition: boolean = true
 	) {
 		if (selected == null) return
+
+		if (!hasSetSlide && shouldTransition) {
+			shouldTransition = false
+			setHasSetSlide(true)
+		}
+
+
 		const selectedRect = selected.getBoundingClientRect()
 
 		const backgroundStyle = backgroundElement.current!.style
@@ -62,8 +75,7 @@ export default function CategoryBar({
 
 		let transition = backgroundStyle.transition
 		if (!shouldTransition) backgroundStyle.setProperty("transition", "none")
-		else backgroundStyle.removeProperty("transition")
-
+		
 		backgroundStyle.setProperty("width", `${selectedRect.width}px`)
 		backgroundStyle.setProperty("height", `${selectedRect.height}px`)
 
@@ -92,9 +104,9 @@ export default function CategoryBar({
 	}, [])
 
 	useEffect(() => {
-		setValue(defaultValue ?? "")
-		updateBackgroundSlide(selectedChoice.current!, false)
-	}, [defaultValue])
+		updateBackgroundSlide(selectedChoice.current!, true)
+	}, [value, children])
+
 
 	function wrapOnClick(
 		c: React.ReactElement<
@@ -139,19 +151,37 @@ interface CategoryChoiceProps {
 	disabled?: boolean
 	hidden?: boolean
 	children?: any
+	id?: string
 	onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
 }
 
 export const CategoryChoice = React.forwardRef(function (
-	{ selected, onClick, children, icon, text, disabled }: CategoryChoiceProps,
+	{ selected, onClick, children, icon, text, disabled, id}: CategoryChoiceProps,
 	forwardRef?: React.ForwardedRef<HTMLButtonElement>
 ) {
+	const [hasError, setHasError] = useState(false)
+	const name = useId()
+
+	function setError(this: HTMLButtonElement, e: Event) {
+		setHasError((e as CustomEvent).detail)
+	}
+
+	useEffect(() => {
+		const button = document.getElementsByName(name)[0]
+
+		button?.addEventListener('setError', setError)
+		return () => button?.removeEventListener('setError', setError)
+	}, [])
+
+
 	return (
 		<button
-			className={`exclude container categoryChoice ${selected ? "selected" : ""}`}
+			className={`exclude container categoryChoice ${selected ? "selected" : ""} ${hasError ? "hasError" : ""}`}
 			onClick={onClick}
 			ref={forwardRef}
 			disabled={disabled}
+			id={id}
+			name={name}
 		>
 			<div
 				className="container content"

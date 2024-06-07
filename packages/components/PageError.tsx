@@ -1,4 +1,5 @@
 import React from "react"
+import Link from "./Link"
 
 interface ErrorPageProps {
 	title: string
@@ -31,16 +32,16 @@ export default function ErrorPage({
 			<label style={{ fontSize: "1.5rem", marginBottom: 16 }}>
 				{description}
 			</label>
-			<a
+			<Link
 				className="button"
-				href={returnLink}
+				to={returnLink}
 				style={{
 					padding: 12,
 					borderRadius: "var(--defaultBorderRadius)",
 				}}
 			>
 				{returnMessage}
-			</a>
+			</Link>
 		</div>
 	)
 }

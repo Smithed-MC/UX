@@ -94,20 +94,20 @@
 		display: none;
 	}
 
-	.navBarOption {
+	.navBarOption, .navBarModal {
 		height: 3rem !important;
 		flex-grow: 1;
 	}
 
-	.navBarOption.start {
+	.navBarOption:nth-child(4) {
 		border-radius: var(--defaultBorderRadius) 0 0 var(--defaultBorderRadius);
 	}
 
-	.navBarOption.middle {
+	.navBarOption:not(:nth-child(4)):not(:last-child) {
 		border-radius: 0;
 	}
 
-	.navBarOption.end {
-		border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0;
+	.navBarOption:last-child, .navBarOption.end {
+		border-radius: 0 var(--defaultBorderRadius) var(--defaultBorderRadius) 0 !important;
 	}
 }

@@ -22,7 +22,7 @@ export default ({ mode }) => {
 				process.env.VITE_NIGHTLY && process.env.VITE_NIGHTLY === "true"
 					? true
 					: false,
-		},
+			},
 		build: {
 			ssrEmitAssets: true,
 			ssrManifest: true,

@@ -5,7 +5,6 @@
 	font-weight: 300;
 	min-height: 100%;
 	min-width: 100%;
-	background: var(--background);
 
 	--bold: #000000;
 	--background: #121213;
@@ -28,7 +27,6 @@
 	--badAccent: rgb(255, 72, 72);
 	--goodAccent: rgb(144, 255, 71);
 	--foreground: #fff;
-	--text: #fff;
 	--codeText: rgb(255, 247, 136);
 	--subText: #aaa;
 	--smallScreenSize: 640px;
@@ -38,6 +36,11 @@
 	--mobileCutoff: 43rem;
 
 	overflow: hidden;
+}
+
+body {
+	background-color: var(--background);
+	color: var(--foreground)
 }
 
 @font-face {

@@ -6,7 +6,7 @@ import {
 import React, { useState } from "react"
 import "./login.css"
 import { FirebaseError } from "firebase/app"
-import { IconInput, IconTextButton } from "components"
+import { IconInput, IconTextButton, Link } from "components"
 import { Right, Key, At } from "components/svg"
 
 export default function ResetPassword({

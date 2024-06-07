@@ -1,18 +1,18 @@
 mod mods;
 
 use anyhow::Context;
+use mcvm::core::io::files;
+use mcvm::core::user::{User, UserKind};
+use mcvm::core::util::versions::MinecraftVersionDeser;
 use mcvm::data::config::instance::{read_instance_config, InstanceConfig};
 use mcvm::data::config::profile::ProfileConfig;
-use mcvm::data::id::ProfileID;
+use mcvm::data::id::{InstanceRef, ProfileID};
 use mcvm::data::instance::Instance;
 use mcvm::data::profile::update::update_profiles;
-use mcvm::data::user::{AuthState, User, UserKind};
 use mcvm::data::{config::Config, id::InstanceID};
-use mcvm::io::files;
-use mcvm::io::{files::paths::Paths, lock::Lockfile};
-use mcvm::shared::modifications::ClientType;
+use mcvm::io::files::paths::Paths;
+use mcvm::shared::modifications::{ClientType, Proxy};
 use mcvm::shared::Side;
-use mcvm::util::versions::MinecraftVersionDeser;
 use oauth2::ClientId;
 use reqwest::Client;
 use simple_error::bail;
@@ -32,10 +32,15 @@ pub async fn launch_bundle(
 ) -> anyhow::Result<()> {
     let instance = InstanceID::from(format!("smithed-bundle-{bundle_id}"));
     let profile_id = ProfileID::from(format!("smithed-bundle-{bundle_id}"));
+    let instance_ref = InstanceRef::new(profile_id.clone(), instance.clone());
     let paths: Paths = Paths::new().await?;
 
-    let mut lock = Lockfile::open(&paths)?;
-    let mut config = Config::load(&paths.project.config_dir().join("mcvm.json"), true, output)?;
+    let mut config = Config::load(
+        &paths.project.config_dir().join("mcvm.json"),
+        true,
+        &paths,
+        output,
+    )?;
 
     let user = "smithed-user".to_string();
     let user_kind = if offline {
@@ -45,32 +50,32 @@ pub async fn launch_bundle(
     };
     config
         .users
-        .users
-        .insert(user.clone(), User::new(user_kind, &user, "SmithedUser"));
-    config.users.state = AuthState::UserChosen(user.clone());
+        .add_user(User::new(user_kind, &user, "SmithedUser"));
+    config.users.choose_user(&user)?;
 
-    if !config.instances.contains_key(&instance) {
+    if !config.get_instance(&instance_ref).is_some() {
         let instance_config = InstanceConfig::Simple(Side::Client);
         let mut instances = HashMap::new();
         instances.insert(instance.clone(), instance_config.clone());
         let profile_config = ProfileConfig {
-            version: MinecraftVersionDeser::Version(bundle.version.clone()),
+            version: MinecraftVersionDeser::Version(bundle.version.clone().into()),
             modloader: Default::default(),
             client_type: ClientType::Fabric,
             server_type: Default::default(),
             instances,
             packages: Default::default(),
             package_stability: Default::default(),
+            proxy: Proxy::default(),
         };
         let mut profile = profile_config.to_profile(profile_id.clone());
-        profile.add_instance(instance.clone());
         let instance_val = read_instance_config(
             instance.clone(),
             &instance_config,
             &profile,
+            &[],
             &HashMap::new(),
         )?;
-        config.instances.insert(instance.clone(), instance_val);
+        profile.add_instance(instance_val);
         config.profiles.insert(profile_id.clone(), profile);
     }
 
@@ -78,31 +83,28 @@ pub async fn launch_bundle(
     let profile_list = [profile_id.clone()];
     update_profiles(&paths, &mut config, &profile_list, false, false, output).await?;
 
-    if let Some(instance) = config.instances.get_mut(&instance) {
+    if let Some(profile) = config.profiles.get_mut(&instance_ref.profile) {
+        let Some(instance) = profile.instances.get_mut(&instance_ref.instance) else {
+            bail!("Instance does not exist in profile");
+        };
         install_bundle_packs(&bundle, instance, &paths, client).await?;
         instance.ensure_dirs(&paths)?;
-        let mods_dir = &instance.dirs.get().game_dir.join("mods");
+        let mods_dir = &instance.get_dirs().get().game_dir.join("mods");
         files::create_dir(&mods_dir)?;
         install_mods(client, &mods_dir, &bundle.version)
             .await
             .context("Failed to install mods")?;
 
-        let (.., profile) = config
-            .profiles
-            .iter()
-            .find(|(.., profile)| profile.instances.contains(&instance.id))
-            .expect("Instance does not belong to any profiles");
         let mut handle = instance
             .launch(
                 &paths,
-                &mut lock,
                 &mut config.users,
                 &profile.version,
                 ClientId::new(super::auth::CLIENT_ID.into()),
                 output,
             )
             .await?;
-        handle.process.wait()?;
+        handle.wait()?;
     } else {
         bail!("Unknown instance '{}'", instance);
     }
@@ -120,7 +122,7 @@ async fn install_bundle_packs(
     instance
         .ensure_dirs(&paths)
         .context("Failed to create instance dirs")?;
-    let game_dir = &instance.dirs.get().game_dir;
+    let game_dir = &instance.get_dirs().get().game_dir;
     let paxi_dir = game_dir.join("config/paxi");
     files::create_leading_dirs(&paxi_dir).context("Failed to create leading dirs for Paxi dir")?;
     files::create_dir(&paxi_dir).context("Failed to create Paxi dir")?;

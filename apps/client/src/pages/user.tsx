@@ -5,7 +5,7 @@ import {
 	PackMetaData,
 	UserData,
 } from "data-types"
-import { useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { useLoaderData, useNavigate, useParams } from "react-router-dom"
 import { formatDownloads } from "formatters"
 import "./user.css"
@@ -15,6 +15,7 @@ import {
 	DownloadButton,
 	GalleryPackCard,
 	IconTextButton,
+	Link,
 	MarkdownRenderer,
 } from "components"
 import {
@@ -37,6 +38,7 @@ import {
 	Jigsaw,
 	Line,
 	Plus,
+	Smithed,
 	Trash,
 	Upload,
 } from "components/svg"
@@ -48,6 +50,8 @@ import { CreateBundle } from "../widget/bundle"
 import { BundleCard } from "components/BundleCard"
 import { UserStats } from "../loaders"
 import { selectUserData } from "store"
+import Smithie from "../widget/Smithie"
+import { ClientContext } from "../context"
 
 interface UserTabComponent {
 	editable: boolean
@@ -211,12 +215,11 @@ function UserPacks({
 function UserBundles({
 	bundles,
 	editable,
-	bundleDownloadButton,
 	visible,
 }: {
 	bundles: string[]
-	bundleDownloadButton: DownloadButton
 } & UserTabComponent) {
+	const clientContext = useContext(ClientContext)
 	return (
 		<div
 			key="bundles"
@@ -228,7 +231,7 @@ function UserBundles({
 					key={b}
 					id={b}
 					editable={editable}
-					bundleDownloadButton={bundleDownloadButton}
+					bundleDownloadButton={clientContext.bundleDownloadButton}
 				/>
 			))}
 		</div>
@@ -339,13 +342,12 @@ function UserAbout({
 	)
 }
 
-export default function User({
-	showBackButton,
-	bundleDownloadButton,
-}: UserProps) {
+export default function User() {
 	const { owner: userId } = useParams()
 	const { tab: defaultTab } = useQueryParams()
 	const firebaseUser = useFirebaseUser()
+
+	const clientContext = useContext(ClientContext)
 
 	const navigate = useNavigate()
 	const {
@@ -654,28 +656,6 @@ export default function User({
 						</div>
 						{editable && (
 							<div className="container profileControlContainer">
-								<a
-									href="../account"
-									className="buttonLike profileControl first"
-									title="Sign Out"
-									onClick={() => {
-										getAuth().signOut()
-									}}
-								>
-									<div
-										style={{
-											display: "flex",
-											flexDirection: "row",
-											gap: 2,
-											width: 16,
-											height: 16,
-											alignItems: "center",
-										}}
-									>
-										<BackArrow />
-										<Line fill="var(--foreground)" />
-									</div>
-								</a>
 								{!editingUserData && (
 									<IconTextButton
 										className="accentedButtonLike profileControl last"
@@ -772,12 +752,12 @@ export default function User({
 									zIndex: 1,
 								}}
 							>
-								<a
+								<Link
 									className="container newContentButton"
-									href="/packs/new/edit"
+									to="/packs/new/edit"
 								>
 									<Plus />
-								</a>
+								</Link>
 							</div>
 						)}
 					</CategoryChoice>
@@ -785,7 +765,7 @@ export default function User({
 						value="userBundles"
 						text="Bundles"
 						icon={<Folder />}
-						disabled={userStats.bundles.length === 0}
+						disabled={userStats.bundles.length === 0 && !editable}
 					>
 						{editable && (
 							<div
@@ -797,15 +777,12 @@ export default function User({
 									zIndex: 1,
 								}}
 							>
-								<a
+								<Link
 									className="container newContentButton"
-									onClick={(e) => {
-										e.preventDefault()
-										setShowBundleCreationModal(true)
-									}}
+									to="/bundles/new/edit"
 								>
 									<Plus />
-								</a>
+								</Link>
 							</div>
 						)}
 					</CategoryChoice>
@@ -824,7 +801,6 @@ export default function User({
 					visible={tab === "userBundles"}
 					bundles={userStats.bundles}
 					editable={editable}
-					bundleDownloadButton={bundleDownloadButton}
 				/>
 				<UserAbout
 					isEditing={editingUserData}
@@ -845,6 +821,11 @@ export default function User({
 					user={firebaseUser}
 				/>
 			)}
+
+			{[
+				"6HLRqeMx3zZQO4iWQcEfQMBMK8m2",
+				"ACICebloi6dIVDTcmo3pieZkadc2",
+			].includes(user.uid) && <Smithie />}
 		</div>
 	)
 }

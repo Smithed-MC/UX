@@ -6,7 +6,7 @@ import {
 import React, { useState } from "react"
 import "./login.css"
 import { FirebaseError } from "firebase/app"
-import { IconInput, IconTextButton } from "components"
+import { IconInput, IconTextButton, Link } from "components"
 import { Account, At, Key, Right } from "components/svg"
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
@@ -151,13 +151,13 @@ export default function SignUp({ clickLogin }: { clickLogin: () => void }) {
 				className="container"
 				style={{ flexDirection: "row", gap: "1.25rem" }}
 			>
-				<a
+				<Link
 					className="compactButton"
 					style={{ color: "var(--border)" }}
-					href="https://smithed.dev/discord"
+					to="/discord"
 				>
 					Need help
-				</a>
+				</Link>
 				<div
 					style={{
 						width: "0.25rem",

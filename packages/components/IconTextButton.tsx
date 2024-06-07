@@ -4,21 +4,23 @@ import {
 	FunctionComponent,
 	SVGProps,
 } from "react"
-import { Link } from "react-router-dom"
+import Link from "./Link"
 
 export type IconTextButtonProps = {
 	text: string | JSX.Element
 	icon?: FunctionComponent<SVGProps<SVGSVGElement>> | string
 	iconElement?: JSX.Element
 	reverse?: boolean
+	to?: string
 } & React.HTMLProps<HTMLAnchorElement>
 
-export function IconTextButton({
+export default function IconTextButton({
 	text,
 	icon: IconSvg,
 	iconElement,
 	reverse,
 	href,
+	to,
 	style,
 	target,
 	className,
@@ -28,11 +30,13 @@ export function IconTextButton({
 	rel,
 	disabled,
 }: IconTextButtonProps) {
+	const Element = (href || to) ? Link : (props: any) => <a {...props}/> 
+
 	return (
-		<a
+		<Element
 			className={`buttonLike${disabled ? " disabled" : ""} ` + className}
 			style={{ flexDirection: reverse ? "row-reverse" : "row", ...style }}
-			href={href}
+			to={href ?? to ?? ""}
 			target={target}
 			onClick={onClick}
 			rel={rel}
@@ -41,7 +45,7 @@ export function IconTextButton({
 		>
 			<div
 				className="container"
-				style={{ flexShrink: 0, height: "100%" }}
+				style={{ flexShrink: 0, height: "100%", width: "1rem" }}
 			>
 				{IconSvg !== undefined &&
 					typeof IconSvg === "string" &&
@@ -58,7 +62,7 @@ export function IconTextButton({
 						width: 2,
 						height: 20,
 						opacity: 0.15,
-						backgroundColor: "white",
+						backgroundColor: style?.color ?? "var(--foreground)"
 					}}
 				/>
 			)}
@@ -73,6 +77,6 @@ export function IconTextButton({
 			>
 				{text}
 			</span>
-		</a>
+		</Element>
 	)
 }

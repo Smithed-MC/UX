@@ -1,9 +1,9 @@
 use std::{collections::HashMap, error::Error, fs};
 
 use directories::ProjectDirs;
-use mcvm::data::{
-    config::Config,
-    user::{AuthState, User, UserKind},
+use mcvm::{
+    core::user::{User, UserKind},
+    data::config::Config,
 };
 use serde::{Deserialize, Serialize};
 use simple_error::bail;
@@ -73,14 +73,11 @@ pub fn load_config() -> Result<HashMap<String, User>, Box<dyn Error>> {
     for (user_id, user_data) in config_stored {
         config.insert(
             user_id,
-            User {
-                kind: UserKind::Microsoft { xbox_uid: None },
-                id: user_data.id,
-                name: user_data.name,
-                uuid: Some(user_data.uuid),
-                access_token: user_data.access_token,
-                keypair: None,
-            },
+            User::new(
+                UserKind::Microsoft { xbox_uid: None },
+                &user_data.id,
+                &user_data.name,
+            ),
         );
     }
 
@@ -99,15 +96,15 @@ pub fn save_config(config: &mut HashMap<String, User>) -> Result<(), Box<dyn Err
     let mut config_stored: HashMap<String, UserStored> = HashMap::new();
 
     for (user_id, user_data) in config {
-        match user_data.kind {
+        match user_data.get_kind() {
             UserKind::Microsoft { .. } => {
                 config_stored.insert(
                     user_id.to_owned(),
                     UserStored {
-                        id: user_data.id.to_owned(),
-                        name: user_data.name.to_owned(),
-                        uuid: user_data.uuid.to_owned().unwrap(),
-                        access_token: user_data.access_token.to_owned(),
+                        id: user_data.get_id().to_owned(),
+                        name: user_data.get_name().to_owned(),
+                        uuid: user_data.get_uuid().unwrap().to_owned(),
+                        access_token: user_data.get_access_token().map(|x| x.0.clone()),
                     },
                 );
             }
@@ -120,22 +117,16 @@ pub fn save_config(config: &mut HashMap<String, User>) -> Result<(), Box<dyn Err
     Ok(())
 }
 
-pub async fn add_user(
-    mc_profile: &MinecraftProfile,
-    access_token: String,
-) -> Result<(), Box<dyn Error>> {
+pub async fn add_user(mc_profile: &MinecraftProfile) -> Result<(), Box<dyn Error>> {
     let mut user_config = load_config()?;
 
     user_config.insert(
         mc_profile.name.clone(),
-        User {
-            kind: UserKind::Microsoft { xbox_uid: None },
-            id: mc_profile.id.clone(),
-            name: mc_profile.name.clone(),
-            uuid: Some(mc_profile.id.clone()),
-            access_token: Some(access_token),
-            keypair: None,
-        },
+        User::new(
+            UserKind::Microsoft { xbox_uid: None },
+            &mc_profile.id,
+            &mc_profile.name,
+        ),
     );
 
     save_config(&mut user_config).expect("Error while saving config");
@@ -144,16 +135,19 @@ pub async fn add_user(
 }
 
 pub async fn switch_user(config: &mut Config, name: String) -> Result<(), Box<dyn Error>> {
-    let users_config = load_config()?;
+    let mut users_config = load_config()?;
 
     if !users_config.contains_key(&name) {
         bail!("User not in config");
     }
 
-    config.users.users = users_config;
-    config.users.state = AuthState::Authed(name);
+    for user in users_config.values() {
+        config.users.add_user(user.clone());
+    }
 
-    save_config(&mut config.users.users)?;
+    config.users.choose_user(&name)?;
+
+    save_config(&mut users_config)?;
 
     Ok(())
 }

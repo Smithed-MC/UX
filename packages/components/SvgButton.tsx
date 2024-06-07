@@ -1,4 +1,5 @@
 import React from "react"
+import Link from "./Link"
 
 interface EditButtonProps {
 	link?: string
@@ -28,7 +29,7 @@ export default function SvgButton({
 			}}
 			{...props}
 		>
-			<a
+			<Link
 				className="button wobbleHover container"
 				style={{
 					width: 48,
@@ -40,7 +41,7 @@ export default function SvgButton({
 					boxSizing: "border-box",
 					...buttonStyle,
 				}}
-				href={link}
+				to={link ?? ""}
 				target="_blank"
 				onClick={onClick}
 			>
@@ -54,7 +55,7 @@ export default function SvgButton({
 						left: 8,
 					}}
 				/>
-			</a>
+			</Link>
 		</div>
 	)
 }

@@ -1,15 +1,15 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
-import App from "./App"
 import "./style.css"
 import LaunchPage from "./pages/launch/LaunchPage"
-import { ClientInject, populateRouteProps, subRoutes } from "client"
-import { IconTextButton, svg } from "components"
+import ClientParent, { subRoutes } from "client"
+import { IconTextButton, NavButton, svg } from "components"
 import AddToBundle from "./components/AddToBundle"
 import { invoke } from "@tauri-apps/api"
 import { PackReference } from "data-types"
 import EditLocalBundle from "./pages/EditLocalBundle"
 import ImportBundle from "./components/ImportBundle"
+import { defaultContext, IClientContext } from "client/src/context"
 
 // Injection code to modify the client so it works with the launcher
 const launchRoute = {
@@ -30,33 +30,20 @@ if (!subRoutes.includes(editLocalBundleRoute)) {
 	subRoutes.push(editLocalBundleRoute)
 }
 
-let inject: ClientInject = {
-	getNavbarTabs: () => {
-		return [
-			<IconTextButton
+const context: IClientContext = {
+	navbarTabs: [
+			<NavButton
 				className="navBarOption start"
+				selectedClass="successButtonLike"
 				text="Launch"
-				href="/launch"
+				to="/launch"
 				iconElement={<svg.Play fill="white" />}
 			/>,
-			<IconTextButton
-				className="navBarOption middle"
-				text="Browse"
-				href="/browse"
-				icon={svg.Browse}
-			/>,
-			<IconTextButton
-				className="navBarOption middle"
-				text="Discord"
-				href="https://smithed.dev/discord"
-				target="_blank"
-				icon={svg.Discord}
-			/>,
-		]
-	},
+			...defaultContext.navbarTabs
+	],
 	enableFooter: false,
 	logoUrl: "/launch",
-	packDownloadButton: (id, openPopup, closePopup) => (
+	packDownloadButton: ({id, openPopup, closePopup}) => (
 		<IconTextButton
 			className="accentedButtonLike"
 			iconElement={<svg.Plus fill="var(--foreground)" />}
@@ -94,7 +81,7 @@ let inject: ClientInject = {
 			reverse
 		/>
 	),
-	bundleDownloadButton: (id, openPopup, closePopup) => (
+	bundleDownloadButton: ({id, openPopup, closePopup}) => (
 		<IconTextButton
 			className="accentedButtonLike"
 			iconElement={<svg.Download fill="var(--foreground)" />}
@@ -131,10 +118,10 @@ let inject: ClientInject = {
 	showBackButton: true,
 }
 
-populateRouteProps({ platform: "desktop", inject: inject })
+// populateRouteProps({ platform: "desktop",   })
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 	<React.StrictMode>
-		<App />
+		<ClientParent context={context} />
 	</React.StrictMode>
 )

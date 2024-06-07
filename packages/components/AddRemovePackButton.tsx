@@ -1,5 +1,6 @@
 import React, { CSSProperties } from "react"
 import { AddToBundle, Edit, RemoveFromBundle } from "./svg"
+import Link from "./Link"
 
 interface AddButtonProps {
 	add: boolean
@@ -46,14 +47,14 @@ export default function AddRemovePackButton({
 				</button>
 			)}
 			{link !== undefined && (
-				<a
+				<Link
 					className="button wobbleHover container"
 					style={sharedStyle}
 					onClick={onClick}
-					href={link}
+					to={link}
 				>
 					<ButtonIcon />
-				</a>
+				</Link>
 			)}
 		</div>
 	)
