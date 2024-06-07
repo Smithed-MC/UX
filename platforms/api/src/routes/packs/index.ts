@@ -265,12 +265,14 @@ API_APP.route({
 
 		const result = await firestore.collection("packs").add(documentData)
 
-		const successful = await updateGalleryData(data, result.id, reply)
+		if (data.display.gallery) {
+			const successful = await updateGalleryData(data, result.id, reply)
 		
-		if (!successful) {
-			await result.delete()
-		} else {
-			result.set(data)
+			if (!successful) {
+				await result.delete()
+			} else {
+				result.set(data)
+			}
 		}
 
 		return reply.status(HTTPResponses.CREATED).send({
