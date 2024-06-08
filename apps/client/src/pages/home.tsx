@@ -22,6 +22,8 @@ import {
 } from "components/svg.js"
 
 import launcher_graphic from "../assets/launcher_graphic.png"
+import { ReactComponent as LauncherGraphic } from "../assets/launcher_graphic.svg"
+
 import libraries_box from "../assets/libraries_box.png"
 import wiki_books from "../assets/wiki_books.png"
 
@@ -52,10 +54,10 @@ function CategoryHeader({
 				gap: 12,
 				alignItems: "center",
 				zIndex: 1,
-				backgroundColor: "var(--bold)",
+				backgroundColor: "var(--background)",
 				width: "fit-content",
 				justifySelf: "center",
-				padding: "1rem",
+				padding: "0.5rem 1rem",
 				borderRadius: "var(--defaultBorderRadius)",
 			}}
 		>
@@ -194,27 +196,25 @@ export default function Home(props: any) {
 					style={{ flexDirection: "row", padding: "1rem" }}
 				>
 					<div className="container">
-						<span className="homeSectionHeader">
-							WELCOME TO{" "}
-							<span style={{ color: "var(--accent)" }}>
-								SMITHED
-							</span>
-						</span>
+						<span className="homeSectionHeader">Welcome!</span>
 						<span
 							style={{
-								fontSize: "1.5rem",
-								opacity: 0.33,
+								fontSize: "1rem",
 								textAlign: "center",
 							}}
 						>
-							The platform for exploring, sharing and
+							Smithed is an open-source platform for exploring,
+							sharing
 							<br />
-							supercharging minecraft data & resource packs.
+							and supercharging minecraft data & resource packs.
 						</span>
 					</div>
 				</div>
 			</div>
-			<div className="cardCarousel" style={{ overflow: "hidden" }}>
+			<div
+				className="cardCarousel"
+				style={{ overflow: "hidden", maxWidth: "60rem" }}
+			>
 				{/* <CategoryHeader icon={Download} text={"Top downloads"} color="success" sort="downloads"/>
             {packCard(downloadedPacks[currentPack])} */}
 				<CategoryHeader
@@ -227,7 +227,7 @@ export default function Home(props: any) {
 				<CategoryHeader
 					icon={Clock}
 					text={"Recently added"}
-					color="secondary"
+					color="success"
 					sort="newest"
 				/>
 				<PackCarousel packs={newestPacks} delay={200} />
@@ -240,7 +240,7 @@ export default function Home(props: any) {
 				icon={Right}
 				reverse
 				style={{ marginTop: "-2rem" }}
-				href="/browse"
+				href="/packs"
 			/>
 			<div
 				className="container"
@@ -250,54 +250,21 @@ export default function Home(props: any) {
 				<span
 					style={{
 						whiteSpace: "nowrap",
-						fontWeight: 700,
-						fontSize: "2rem",
 					}}
 				>
-					More Smithed
+					What do we offer?
 				</span>
 				<Divider />
 			</div>
-			<div
-				className="container homeSectionContainer"
-				style={{ justifyContent: "center" }}
-			>
+
+			<div className="container homeSectionContainer">
 				<div
 					className="container"
-					style={{
-						flexDirection: "row",
-						justifyContent: "center",
-						textAlign: "center",
-					}}
+					style={{ flexDirection: "row", gap: "2rem" }}
 				>
-					<div
-						className="container homeTextContainer"
-						style={{ alignItems: "center", gap: "1rem" }}
-					>
-						<span
-							className="homeSectionHeader"
-							style={{ textAlign: "center", width: "100%" }}
-						>
-							TRY{" "}
-							<span style={{ color: "var(--accent2)" }}>
-								WELD
-							</span>
-						</span>
-						The fastest pack merger in the west. Merge all your data
-						and resource packs into a single zip easily droppable
-						into any world or minecraft instance. <br />
-						<IconTextButton
-							className="secondaryAccentButtonLike"
-							text={"weld.smithed.dev"}
-							icon={Globe}
-							href="https://weld.smithed.dev"
-						/>
+					<div className="homeImageContainer">
+						<img src={launcher_graphic} />
 					</div>
-				</div>
-			</div>
-			<Divider />
-			<div className="container homeSectionContainer">
-				<div className="container" style={{ flexDirection: "row" }}>
 					<div className="container homeTextContainer">
 						<span className="homeSectionHeader">
 							THE{" "}
@@ -316,30 +283,84 @@ export default function Home(props: any) {
 						resourcepacks are automatically applied, and everything
 						is kept separate from your base game. No more cluttered
 						resourcepack folders.
-					</div>
-					<div className="homeImageContainer">
-						<img src={launcher_graphic} />
+						<IconTextButton
+							className="disturbingButtonLike"
+							text={"Download Experimental"}
+							iconElement={
+								<Download
+									style={{
+										width: 16,
+										fill: "var(--foreground)",
+									}}
+								/>
+							}
+							style={{ width: "fit-content", alignSelf: "end" }}
+							href="https://nightly.link/Smithed-MC/UX/workflows/nightly/main"
+						/>
 					</div>
 				</div>
-				<IconTextButton
-					className="disturbingButtonLike"
-					text={"Download Experimental"}
-					iconElement={
-						<Download
-							style={{ width: 16, fill: "var(--foreground)" }}
-						/>
-					}
-					style={{ width: "fit-content" }}
-					href="https://nightly.link/Smithed-MC/UX/workflows/nightly/main"
-				/>
 			</div>
-			<Divider />
-
+			<div
+				className="container homeSectionContainer"
+				style={{ justifyContent: "center" }}
+			>
+				<div
+					className="container"
+					style={{
+						flexDirection: "row",
+						gap: "2rem",
+					}}
+				>
+					<div className="homeImageContainer">
+						<Logo
+							style={{
+								color: "var(--warning)",
+								width: "100%",
+								height: "100%",
+								maxHeight: "15rem",
+							}}
+						/>
+					</div>
+					<div
+						className="container homeTextContainer"
+						style={{ gap: "1rem" }}
+					>
+						<span className="homeSectionHeader">
+							TRY{" "}
+							<span style={{ color: "var(--warning)" }}>
+								WELD
+							</span>
+						</span>
+						The fastest pack merger in the west. Merge all your data
+						and resource packs into a single zip easily droppable
+						into any world or minecraft instance. <br />
+						<IconTextButton
+							text={"weld.smithed.dev"}
+							icon={Globe}
+							href="https://weld.smithed.dev"
+							className="warningButtonLike"
+							style={{
+								alignSelf: "end",
+							}}
+						/>
+					</div>
+				</div>
+			</div>
 			<div className="container homeSectionContainer">
 				<div
 					className="container"
-					style={{ flexDirection: "row", width: "100%" }}
+					style={{ flexDirection: "row", width: "100%", gap: "2rem" }}
 				>
+					<div className="homeImageContainer">
+						<Logo
+							style={{
+								color: "var(--secondary)",
+								width: "100%",
+								height: "100%",
+								maxHeight: "15rem",
+							}}
+						/>
+					</div>
 					<div className="container homeTextContainer">
 						<span className="homeSectionHeader">
 							OUR{" "}
@@ -350,31 +371,32 @@ export default function Home(props: any) {
 						What are libraries without some documentation? The
 						answer: an unusable mess of code. Thankfully, we have
 						some!
-					</div>
-					<div className="homeImageContainer">
-						<img src={wiki_books} />
+						<IconTextButton
+							className="secondaryButtonLike"
+							text={"Visit wiki"}
+							iconElement={
+								<Globe
+									style={{
+										width: 16,
+										height: 16,
+										fill: "var(--foreground)",
+									}}
+								/>
+							}
+							style={{ alignSelf: "end" }}
+							href="https://wiki.smithed.dev"
+						/>
 					</div>
 				</div>
-				<IconTextButton
-					className="secondaryButtonLike"
-					text={"Visit wiki"}
-					iconElement={
-						<Globe
-							style={{
-								width: 16,
-								height: 16,
-								fill: "var(--foreground)",
-							}}
-						/>
-					}
-					style={{ width: "fit-content" }}
-					href="https://wiki.smithed.dev"
-				/>
 			</div>
-			<Divider />
-
 			<div className="container homeSectionContainer">
-				<div className="container" style={{ flexDirection: "row" }}>
+				<div
+					className="container"
+					style={{ flexDirection: "row", gap: "2rem", width: "100%" }}
+				>
+					<div className="homeImageContainer">
+						<img src={libraries_box}/>
+					</div>
 					<div className="container homeTextContainer">
 						<span className="homeSectionHeader">
 							THE{" "}
@@ -383,25 +405,27 @@ export default function Home(props: any) {
 							</span>
 						</span>
 						Tired of having to maintain annoying code across all
-						your packs? Want to let your users craft all their items
-						across packs in the same place? Check out our collection
-						of awesome community maintained libraries!{" "}
-					</div>
-					<div className="homeImageContainer">
-						<img src={libraries_box} />
+						your packs?
+						<br />
+						Want to let your users craft all their items across
+						packs in the same place? Check out our collection of
+						awesome community maintained libraries!{" "}
+						<IconTextButton
+							className="successButtonLike"
+							text={"Explore libraries"}
+							iconElement={
+								<Browse
+									style={{
+										width: 16,
+										fill: "var(--foreground)",
+									}}
+								/>
+							}
+							style={{ alignSelf: "end" }}
+							href="/smithed"
+						/>
 					</div>
 				</div>
-				<IconTextButton
-					className="successButtonLike"
-					text={"Explore libraries"}
-					iconElement={
-						<Browse
-							style={{ width: 16, fill: "var(--foreground)" }}
-						/>
-					}
-					style={{ width: "fit-content" }}
-					href="/smithed"
-				/>
 			</div>
 		</div>
 	)

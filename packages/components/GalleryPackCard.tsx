@@ -245,6 +245,7 @@ export default function GalleryPackCard({
 							opacity: 0,
 							transition: "opacity 0.1s ease-out",
 						}}
+						onClick={() => navigate(`/packs/${id}`)}
 						src={data?.display.icon}
 						onLoad={(e) =>
 							e.currentTarget.style.setProperty("opacity", "1")
@@ -262,6 +263,7 @@ export default function GalleryPackCard({
 								opacity: 0,
 								transition: "opacity 0.1s ease-out",
 							}}
+							onClick={() => navigate(`/packs/${id}`)}
 							src={`${import.meta.env.VITE_API_SERVER}/packs/${id}/gallery/${currentImage}`}
 							onLoad={(e) => {
 								e.currentTarget.style.setProperty(
@@ -404,8 +406,8 @@ export default function GalleryPackCard({
 							style={{
 								fontSize: "0.75rem",
 								backgroundColor: "var(--bold)",
-								borderRadius: "var(--defaultBorderRadius)",
-								padding: "0.5rem",
+								borderRadius: "calc(var(--defaultBorderRadius) * 0.5)",
+								padding: "0.25rem 0.5rem",
 								fontWeight: "normal",
 								width: "max-content",
 								whiteSpace: "nowrap",

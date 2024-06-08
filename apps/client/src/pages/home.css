@@ -9,28 +9,28 @@
 }
 
 .homeSectionHeader {
-	font-size: 4rem;
+	font-size: 2rem;
 	font-weight: 600;
 }
 
 .homeSectionContainer {
 	align-items: start;
-	gap: 24px;
+	gap: 1.5rem;
 	width: 100%;
 }
 
 .homeTextContainer {
-	width: 50%;
 	margin: 0;
 	align-items: start;
 	gap: 1rem;
+	flex-grow: 1;
 }
 
 .homeImageContainer {
-	flex-grow: 1;
-	width: 50%;
 	display: flex;
-	justify-content: right;
+	justify-content: center;
+	max-width: 22.5rem;
+	width: 50%;
 }
 
 .homeStyledPackCard {
