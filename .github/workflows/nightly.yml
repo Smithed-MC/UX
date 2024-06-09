@@ -54,7 +54,7 @@ jobs:
             - if: ${{ matrix.os == 'macos-latest'}}
               name: Install MacOS Dependencies
               run: |
-                  npm i turbo-darwin-64 @tauri-apps/cli-darwin-arm64 && 
+                  npm i turbo-darwin-arm64 @tauri-apps/cli-darwin-arm64 && 
                   rustup target add aarch64-apple-darwin
             - run: npm i
             - if: ${{ matrix.os == 'macos-latest'}}
