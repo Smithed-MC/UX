@@ -66,7 +66,7 @@ function AddToBundle({ onFinish, packId }: AddToBundleProps) {
 					text="Cancel"
 					icon={svg.Cross}
 					style={{ width: "fit-content" }}
-					onClick={async () => {
+					onClick={() => {
 						onFinish(undefined, undefined)
 					}}
 				/>
@@ -90,7 +90,7 @@ function AddToBundle({ onFinish, packId }: AddToBundleProps) {
 							return
 						}
 						const packVersion = await getPackVersion()
-						if (packVersion === undefined) {
+						if (packVersion === undefined || packVersion === null) {
 							setError("unsupported_pack")
 							return
 						}
