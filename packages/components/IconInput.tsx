@@ -30,8 +30,8 @@ export default function IconInput({
 			style={{
 				flexDirection: "row",
 				alignItems: "center",
-				gap: "1rem",
 				...style,
+				padding: "0.5rem 1rem 0.5rem 1rem"
 			}}
 		>
 			{(IconSvg || iconElement) && (
@@ -62,6 +62,7 @@ export default function IconInput({
 					fontSize: "1rem",
 					WebkitUserSelect: "none",
 					color: "var(--foreground)",
+					marginLeft: "1rem"
 				}}
 			></input>
 		</div>

@@ -12,6 +12,7 @@ export type IconTextButtonProps = {
 	iconElement?: JSX.Element
 	reverse?: boolean
 	to?: string
+	centered?: boolean
 } & React.HTMLProps<HTMLAnchorElement>
 
 export default function IconTextButton({
@@ -29,13 +30,18 @@ export default function IconTextButton({
 	onMouseLeave,
 	rel,
 	disabled,
+	centered,
 }: IconTextButtonProps) {
-	const Element = (href || to) ? Link : (props: any) => <a {...props}/> 
+	const Element = href || to ? Link : (props: any) => <a {...props} />
 
 	return (
 		<Element
 			className={`buttonLike${disabled ? " disabled" : ""} ` + className}
-			style={{ flexDirection: reverse ? "row-reverse" : "row", ...style }}
+			style={{
+				flexDirection: reverse ? "row-reverse" : "row",
+				justifyContent: centered ? "center" : undefined,
+				...style,
+			}}
 			to={href ?? to ?? ""}
 			target={target}
 			onClick={onClick}
@@ -62,17 +68,17 @@ export default function IconTextButton({
 						width: 2,
 						height: 20,
 						opacity: 0.15,
-						backgroundColor: style?.color ?? "var(--foreground)"
+						backgroundColor: style?.color ?? "var(--foreground)",
 					}}
 				/>
 			)}
 
 			<span
 				style={{
-					flexGrow: 1,
 					whiteSpace: "nowrap",
 					textOverflow: "ellipsis",
 					overflow: "hidden",
+					flexGrow: centered ? undefined : 1
 				}}
 			>
 				{text}
