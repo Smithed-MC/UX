@@ -19,7 +19,7 @@ function AddToBundle({ onFinish, packId }: AddToBundleProps) {
 			setAvailable(bundles)
 		}
 		get()
-	})
+	}, [])
 
 	async function getPackVersion() {
 		try {
