@@ -9,7 +9,7 @@ RUN apt update
 RUN apt install -y python3-full python3-pip git curl
 
 RUN pip install --break-system-packages smithed==0.15.9 rich 
-RUN pip install --break-system-packages git+https://github.com/TheNuclearNexus/beet@f6e21c92b7e1ce394106b163686460786e41a0eb
+RUN pip install --break-system-packages git+https://github.com/TheNuclearNexus/beet@e22a5156ac6d842c7197baa1445a02a6f30b7243
 
 RUN mkdir /usr/local/nvm
 ENV NVM_DIR /usr/local/nvm
