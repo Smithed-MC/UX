@@ -60,7 +60,7 @@ export const fullMinecraftVersions = supportedMinecraftVersions.filter(
 	(v) => !v.includes("-")
 )
 
-export const latestMinecraftVersion = "1.20.6"
+export const latestMinecraftVersion = "1.21"
 
 export const MinecraftVersionSchema = Type.Union(
 	supportedMinecraftVersions.map((v) => Type.Literal(v))
