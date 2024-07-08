@@ -271,7 +271,7 @@ API_APP.route({
 			if (!successful) {
 				await result.delete()
 			} else {
-				result.set(data)
+				result.set({data}, {merge: true})
 			}
 		}
 
