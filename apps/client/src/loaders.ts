@@ -11,6 +11,7 @@ import {
 } from "data-types"
 import Cookie from "cookie"
 import User from "./pages/user"
+import { sanitize } from "formatters"
 
 async function getUserData(id: string) {
 	const userDataResponse = await fetch(
@@ -20,15 +21,15 @@ async function getUserData(id: string) {
 	return await userDataResponse.json()
 }
 
-async function getUserPacks(id: string) {
+async function getUserPacks(requestingUser: UserData|undefined, id: string) {
 	const userPacksResponse = await fetch(
 		import.meta.env.VITE_API_SERVER +
-			`/users/${id}/packs?&scope=` +
-			BROWSE_SCOPES.join("&scope=")
+			`/users/${id}/packs?&hidden=${requestingUser && (requestingUser.uid === id || sanitize(requestingUser.displayName) === sanitize(id))}` +
+			`&scope=` + BROWSE_SCOPES.join("&scope=")
 	)
 	const packs: {
 		id: string
-		data: PackData
+		data: PackData	
 		meta: PackMetaData
 		owner: UserData
 	}[] = userPacksResponse.ok ? await userPacksResponse.json() : []
@@ -93,12 +94,16 @@ export interface UserStats {
 	id: string
 }
 
-export async function loadUserPageData({ params }: any) {
+export async function loadUserPageData({ request, params }: any) {
 	const id: string = params.owner
+
+	const cookie = Cookie.parse(request.headers.get("cookie") ?? "")
+	const userData =
+		"smithedUser" in cookie ? JSON.parse(cookie["smithedUser"]) : undefined
 
 	const [user, packs, bundles] = await Promise.all([
 		getUserData(id),
-		getUserPacks(id),
+		getUserPacks(userData, id),
 		getBundles(id),
 	])
 	// console.log(packIds)
@@ -278,13 +283,16 @@ export async function loadPackBrowseData({
 export async function loadRootData({ request }: { request: Request }) {
 	if (import.meta.env.SSR) {
 		const cookie = Cookie.parse(request.headers.get("cookie") ?? "")
-		
 
-		const user = "smithedUser" in cookie ? JSON.parse(cookie["smithedUser"]) : undefined
-		const siteSettings = "smithedSiteSettings" in cookie ? JSON.parse(cookie["smithedSiteSettings"]) : undefined
+		const user =
+			"smithedUser" in cookie
+				? JSON.parse(cookie["smithedUser"])
+				: undefined
+		const siteSettings =
+			"smithedSiteSettings" in cookie
+				? JSON.parse(cookie["smithedSiteSettings"])
+				: undefined
 		return { user, siteSettings }
-
-
 	}
 
 	return { user: undefined, siteSettings: undefined }
