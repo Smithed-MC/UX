@@ -100,6 +100,11 @@ export async function loadPackEdit({
 				getPackMetaData(packId, token)
 			])
 
+			if (!packMetaData.contributors.includes(userData.uid) && userData.role !== "admin")
+				throw new Response("You do not have access to edit this pack!", { 
+					status: HTTPResponses.FORBIDDEN
+				})
+
 			return { packData, packMetaData }
 		} catch (e) {
 			throw e
