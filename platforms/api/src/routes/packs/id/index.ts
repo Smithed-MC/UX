@@ -206,11 +206,12 @@ const setPack = async (response: any, reply: any) => {
 			if (typeof missingImage !== "object") continue
 
 			if (missingImage.type === "bucket")
-				bucket.file(`gallery_images/${missingImage.uid}`).delete()
+				bucket.file(`gallery_images/${missingImage.uid}`).delete().catch(r => {})
 			else if (missingImage.type === "file")
 				bucket
 					.file(`gallery_images/${doc.id}-${missingImage.uid}.webp`)
 					.delete()
+					.catch(r => {})
 		}
 	}
 
@@ -354,7 +355,6 @@ API_APP.route({
 			)
 
 		const owner: string = doc.get("owner")
-		console.log(owner)
 
 		const tokenData = await validateToken(reply, token, {
 			requiredUid: [owner],

@@ -305,6 +305,8 @@ export default function PackEdit() {
 			? `/packs?id=${packId}&token=${token}`
 			: `/packs/${packId}?token=${token}`
 
+		
+
 		console.log(uri)
 		const body = gzip(
 			JSON.stringify({
@@ -423,7 +425,7 @@ export default function PackEdit() {
 			)
 		}
 
-		useMemo(() => {
+		useEffect(() => {
 			getDependencies()
 		}, [version.dependencies.length])
 
@@ -451,10 +453,7 @@ export default function PackEdit() {
 						)
 					}}
 				/>
-				<button style={{ backgroundColor: "transparent" }}>
-					<Trash />
-				</button>
-
+				<div/>
 				{dependencies.map((d, i) => (
 					<>
 						<IconInput
@@ -481,6 +480,7 @@ export default function PackEdit() {
 							style={{ backgroundColor: "transparent" }}
 							onClick={() => {
 								version.dependencies.splice(i)
+								setDependencies([...version.dependencies])
 							}}
 						>
 							<Trash />
@@ -544,6 +544,8 @@ export default function PackEdit() {
 								id: metaData.docId,
 								version: versionName,
 							})
+
+							setDependencies([...version.dependencies])
 
 							idElement.value = ""
 							versionElement.value = ""

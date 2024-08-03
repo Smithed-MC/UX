@@ -22,7 +22,7 @@ for file in os.listdir(path):
     zips.append(ZipFile(path / file))
 
 if len(zips) >= 1:
-    with run_weld(zips) as context:
+    with run_weld(zips, { "require": ["beet.contrib.unknown_files"]}) as context:
         context.assets.name = 'welded-rp'
         context.data.name = 'welded-dp'
         context.meta.setdefault('minecraft', version)

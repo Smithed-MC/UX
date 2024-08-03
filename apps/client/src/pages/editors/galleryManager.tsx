@@ -12,12 +12,10 @@ export default function GalleryManager({
 	const [selectedImage, setSelectedImage] = useState(0)
 	const [images, setImages] = useState<PackGalleryImage[]>([])
 
-	
 	useEffect(() => {
 		display.gallery ??= []
 		display.gallery.forEach((g, i) => {
 			if (typeof g === "string") return
-			g.content = import.meta.env.VITE_API_SERVER + `/packs/${packId}/gallery/${i}`
 		})
 
 		setImages(display.gallery ?? [])
@@ -67,7 +65,8 @@ export default function GalleryManager({
 						src={
 							typeof images[selectedImage] === "string"
 								? images[selectedImage]
-								: images[selectedImage].content
+								: images[selectedImage].content ??
+									`${import.meta.env.VITE_API_SERVER}/packs/${packId}/gallery/${selectedImage}`
 						}
 					/>
 					<button
@@ -103,7 +102,12 @@ export default function GalleryManager({
 				{images.map((g, idx) => (
 					<img
 						key={`gImg${idx}`}
-						src={typeof g === "string" ? g : g.content}
+						src={
+							typeof g === "string"
+								? g
+								: g.content ??
+									`${import.meta.env.VITE_API_SERVER}/packs/${packId}/gallery/${idx}`
+						}
 						className="galleryImageButton"
 						onClick={() => setSelectedImage(idx)}
 					/>
