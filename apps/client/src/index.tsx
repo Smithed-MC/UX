@@ -10,7 +10,7 @@ import {
 	useLocation,
 } from "react-router-dom"
 import { initializeApp } from "firebase/app"
-import { User as FirebaseUser } from "firebase/auth"
+import { connectAuthEmulator, User as FirebaseUser } from "firebase/auth"
 
 import "./style.css"
 
@@ -56,6 +56,10 @@ initializeApp({
 	appId: "1:574184244682:web:498d168c09b39e4f0d7b33",
 	measurementId: "G-40SRKC35Z0",
 })
+
+if (import.meta.env.VITE_FIREBASE_EMULATOR) {
+	connectAuthEmulator(getAuth(), "http://127.0.0.1:9099", { disableWarnings: false })	
+}
 
 export function ClientApplet() {
 	const dispatch = useAppDispatch()
