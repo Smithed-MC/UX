@@ -102,7 +102,13 @@ export async function setupApp() {
 	TYPESENSE_APP = new Client({
 		apiKey: process.env.TYPESENSE_API_KEY ?? "",
 		nodes: [
-			{ host: "typesense.smithed.dev", protocol: "https", port: 443 },
+			{
+				host: process.env.TYPESENSE_HOST ?? "typesense.smithed.dev",
+				protocol: process.env.TYPESENSE_PROTOCOL ?? "https",
+				port: process.env.TYPESENSE_PORT
+					? Number.parseInt(process.env.TYPESENSE_PORT)
+					: 443,
+			},
 		],
 	})
 
