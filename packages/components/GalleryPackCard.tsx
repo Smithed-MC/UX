@@ -11,7 +11,7 @@ import {
 	PackBundle,
 	PackData,
 	PackEntry,
-	PackGalleryImage,
+	Image,
 	PackMetaData,
 } from "data-types"
 import { formatDownloads, prettyTimeDifference } from "formatters"
@@ -199,7 +199,7 @@ export default function GalleryPackCard({
 							<img
 								className="thumbnail"
 								style={{ width: "100%", cursor: "pointer" }}
-								src={((g: PackGalleryImage) =>
+								src={((g: Image) =>
 									typeof g === "object"
 										? g.content ??
 											`${import.meta.env.VITE_API_SERVER}/packs/${id}/gallery/${currentImage}`
