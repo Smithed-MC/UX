@@ -1,29 +1,130 @@
 import { Static, Type } from "@sinclair/typebox"
 import { API_APP, get, sendError, set } from "../../../app.js"
-import { getFirestore } from "firebase-admin/firestore"
 import { getStorage } from "firebase-admin/storage"
 import {
 	HTTPResponses,
 	PackData,
 	PackDataSchema,
-	PackGalleryImage,
+	Image,
 	PackMetaData,
 	PermissionScope,
 } from "data-types"
-import {
-	FastifyRequest,
-	FastifyReply,
-	FastifySchema,
-	FastifyTypeProviderDefault,
-	RawServerDefault,
-	RouteGenericInterface,
-} from "fastify"
+import { FastifyReply } from "fastify"
 import { getPackDoc, validateToken } from "database"
-import { coerce, valid } from "semver"
+import { coerce } from "semver"
 import hash from "hash.js"
-import { request } from "express"
 import sharp from "sharp"
-import { IncomingMessage, ServerResponse } from "http"
+
+export async function replyWithImage(
+	requestIdentifier: string,
+	bucketLocation: string,
+	filePrefix: string,
+	img: Image,
+	reply: FastifyReply
+) {
+	reply.header("Content-Type", "image/png")
+	let content: Buffer
+	if (typeof img === "object") {
+		switch (img.type) {
+			case "bucket": {
+				const buffer = (
+					await getStorage()
+						.bucket()
+						.file(`${bucketLocation}/${img.uid}`)
+						.download()
+				)[0]
+
+				content = Buffer.from(
+					buffer.toString("utf8").split(",")[1],
+					"base64"
+				)
+				break
+			}
+			case "file": {
+				return reply.redirect(
+					HTTPResponses.FOUND,
+					`https://firebasestorage.googleapis.com/v0/b/mc-smithed.appspot.com/o/${bucketLocation}%2F${filePrefix}-${img.uid}.webp?alt=media`
+				)
+			}
+		}
+	} else {
+		content = Buffer.from(img.split(",")[1], "base64")
+	}
+
+	await set(requestIdentifier, content.toString("base64"), 5 * 60 * 1000)
+	return reply.send(content)
+}
+
+export function deleteImage(
+	img: Image,
+	bucketLocation: string,
+	filePrefix: string
+) {
+	if (typeof img === "string") return
+
+	if (img.type === "file") {
+		getStorage()
+			.bucket()
+			.file(`${bucketLocation}/${filePrefix}-${img.uid}.webp`)
+			.delete()
+	} else {
+		getStorage().bucket().file(`${bucketLocation}/${img.uid}`).delete()
+	}
+}
+
+export async function uploadImage(
+	img: Image,
+	bucketLocation: string,
+	filePrefix: string,
+	reply?: FastifyReply,
+	imageName?: string
+): Promise<Image | null> {
+	const bucket = getStorage().bucket()
+	if (typeof img === "string") {
+		if (!img.startsWith("http")) {
+			const image = await getWebp(img)
+
+			if (image.byteLength > 1324 * 1024) {
+				if (reply)
+					sendError(
+						reply,
+						HTTPResponses.BAD_REQUEST,
+						`${imageName ?? "image"} exceeds 1MB`
+					)
+
+				return null
+			}
+
+			let uid = hash.sha1().update(image).digest("hex")
+			bucket
+				.file(`${bucketLocation}/${filePrefix}-${uid}.webp`)
+				.save(image)
+
+			return {
+				type: "file",
+				uid: uid,
+			}
+		}
+	} else if (img.content) {
+		const image = await getWebp(img.content)
+
+		const uid = hash.sha1().update(image).digest("hex")
+
+		if (img.uid !== uid) {
+			deleteImage(img, "gallery_images", filePrefix)
+
+			bucket
+				.file(`${bucketLocation}/${filePrefix}-${uid}.webp`)
+				.save(image)
+
+			img.uid = uid
+		}
+
+		delete img.content
+	}
+
+	return img
+}
 
 export async function updateGalleryData(
 	packData: any,
@@ -31,55 +132,20 @@ export async function updateGalleryData(
 	reply: FastifyReply | undefined
 ): Promise<boolean> {
 	if (packData.display.gallery === undefined) return true
-	const bucket = getStorage().bucket()
-
 	for (let i = 0; i < packData.display.gallery.length; i++) {
 		const g = packData.display.gallery[i]
+		const result = uploadImage(
+			g,
+			"gallery_images",
+			packId,
+			reply,
+			"Gallery Image " + i
+		)
 
-		if (typeof g === "string") {
-			if (!g.startsWith("http")) {
-				const image = await getWebp(g)
+		if (result == null) 
+			return false
 
-				if (image.byteLength > 1324 * 1024) {
-					if (reply)
-						sendError(
-							reply,
-							HTTPResponses.BAD_REQUEST,
-							`Gallery image ${i} exceeds 1MB`
-						)
-
-					return false
-				}
-
-				let uid = hash.sha1().update(image).digest("hex")
-				bucket.file(`gallery_images/${packId}-${uid}.webp`).save(image)
-
-				packData.display.gallery[i] = {
-					type: "file",
-					uid: uid,
-				}
-			}
-		} else if (g.content) {
-			const image = await getWebp(g.content)
-
-			const uid = hash.sha1().update(image).digest("hex")
-
-			if (g.uid !== uid) {
-				if (g.type === "file") {
-					bucket
-						.file(`gallery_images/${packId}-${g.uid}.webp`)
-						.delete()
-				} else {
-					bucket.file(`gallery_images/${g.uid}`).delete()
-				}
-
-				bucket.file(`gallery_images/${packId}-${uid}.webp`).save(image)
-
-				g.uid = uid
-			}
-
-			delete g.content
-		}
+		packData.display.gallery[i] = result
 	}
 	return true
 }
@@ -145,7 +211,9 @@ async function getWebp(content: string) {
 	const urlParts = content.split(",")
 
 	const buffer = Buffer.from(urlParts.at(-1)!, "base64")
-	return await sharp(buffer, {animated: urlParts[0].includes("image/gif")}).webp({ lossless: true }).toBuffer()
+	return await sharp(buffer, { animated: urlParts[0].includes("image/gif") })
+		.webp({ lossless: true })
+		.toBuffer()
 }
 
 const setPack = async (response: any, reply: any) => {
@@ -186,7 +254,7 @@ const setPack = async (response: any, reply: any) => {
 	const bucket = getStorage().bucket()
 
 	if (packData.display?.gallery) {
-		const existingGallery: PackGalleryImage[] =
+		const existingGallery: Image[] =
 			(await doc.get("data.display.gallery")) ?? []
 
 		await updateGalleryData(packData, doc.id, reply)
@@ -206,11 +274,15 @@ const setPack = async (response: any, reply: any) => {
 			if (typeof missingImage !== "object") continue
 
 			if (missingImage.type === "bucket")
-				bucket.file(`gallery_images/${missingImage.uid}`).delete()
+				bucket
+					.file(`gallery_images/${missingImage.uid}`)
+					.delete()
+					.catch((r) => {})
 			else if (missingImage.type === "file")
 				bucket
 					.file(`gallery_images/${doc.id}-${missingImage.uid}.webp`)
 					.delete()
+					.catch((r) => {})
 		}
 	}
 
@@ -354,7 +426,6 @@ API_APP.route({
 			)
 
 		const owner: string = doc.get("owner")
-		console.log(owner)
 
 		const tokenData = await validateToken(reply, token, {
 			requiredUid: [owner],
@@ -642,42 +713,14 @@ API_APP.route({
 				`Index ${index} not in bounds for length ${gallery.length}`
 			)
 
-		const img: PackGalleryImage = gallery[index]
+		const img: Image = gallery[index]
 
-		reply.header("Content-Type", "image/png")
-
-		let content: Buffer
-
-		console.time("Get image")
-		if (typeof img === "object") {
-			switch (img.type) {
-				case "bucket": {
-					const buffer = (
-						await getStorage()
-							.bucket()
-							.file(`gallery_images/${img.uid}`)
-							.download()
-					)[0]
-
-					content = Buffer.from(
-						buffer.toString("utf8").split(",")[1],
-						"base64"
-					)
-					break
-				}
-				case "file": {
-					return reply.redirect(
-						HTTPResponses.FOUND,
-						`https://firebasestorage.googleapis.com/v0/b/mc-smithed.appspot.com/o/gallery_images%2F${doc.id}-${img.uid}.webp?alt=media`
-					)
-				}
-			}
-		} else {
-			content = Buffer.from(img.split(",")[1], "base64")
-		}
-		console.timeEnd("Get image")
-
-		await set(requestIdentifier, content.toString("base64"), 5 * 60 * 1000)
-		return content
+		return await replyWithImage(
+			requestIdentifier,
+			"gallery_images",
+			doc.id,
+			img,
+			reply
+		)
 	},
 })

@@ -1,4 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
 :root {
 	font-family: Lexend;
 	position: absolute;
@@ -142,10 +144,10 @@ summary:active {
 .input,
 select {
 	border: none;
-	border-radius: var(--defaultBorderRadius);
+	border-radius: calc(var(--defaultBorderRadius) * 0.5);
 	font-family: Lexend;
 	font-size: 1rem;
-	border: 0.125rem solid transparent;
+	/* border: 0.125rem solid transparent; */
 	box-sizing: border-box;
 }
 
@@ -178,8 +180,9 @@ select select {
 
 .input,
 select {
-	background-color: var(--bold);
-	border: 0.125rem solid var(--border);
+	background-color: var(--section);
+	border: 0.125rem solid transparent;
+	transition: all 0.1s ease-in-out;
 	color: var(--foreground);
 	width: 19.25rem;
 	height: 2.25rem;
@@ -198,7 +201,8 @@ select:focus {
 }
 
 input::placeholder {
-	color: var(--border);
+	color: var(--foreground);
+	opacity: 0.5;
 	font-weight: 500;
 }
 
@@ -261,7 +265,7 @@ button:not(.exclude),
 .buttonLike {
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: start;
 	align-items: center;
 	padding: 0.5rem 1rem;
 	gap: 1rem;
@@ -356,6 +360,9 @@ button:disabled:not(.exclude),
 
 .successButtonLike {
 	background-color: var(--success);
+}
+.warningButtonLike {
+	background-color: var(--warning);
 }
 
 .secondaryButtonLike {

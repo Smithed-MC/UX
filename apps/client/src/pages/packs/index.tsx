@@ -18,59 +18,7 @@ import {
 	PACKS_PER_PAGE,
 	createBrowseSearchParams,
 } from "../../loaders.js"
-
-function RenderPages({
-	totalPacks,
-	currentPage,
-	params,
-}: {
-	totalPacks: number
-	currentPage: number
-	params: URLSearchParams
-}) {
-	const numberOfPages = Math.ceil(totalPacks / PACKS_PER_PAGE)
-
-	const formatSelected = (page: number) => `[${page}]`
-
-	currentPage = Math.max(1, Math.min(currentPage, numberOfPages))
-
-	let pageLinks = []
-	for (let p = 1; p <= numberOfPages; p++) {
-		pageLinks.push(
-			<Link
-				key={"pageButton" + p}
-				className={`browsePageButton ${currentPage === p ? "selected" : ""}`}
-				to={`/packs?page=${p}&` + params}
-				onClick={() => {
-					if (currentPage === p) return
-
-					const cards = document.getElementById(
-						"packCardContainer"
-					)! as HTMLDivElement
-					cards.style.setProperty("opacity", "0.2")
-				}}
-				unstable_viewTransition
-			>
-				{p}
-			</Link>
-		)
-	}
-
-	return (
-		<div
-			className="container"
-			key="pages"
-			style={{
-				flexDirection: "row",
-				gap: "0.25rem",
-				width: "100%",
-				justifyContent: "center",
-			}}
-		>
-			{pageLinks}
-		</div>
-	)
-}
+import PageSelector from "components/PageSelector.js"
 
 export default function PacksBrowser(props: any) {
 	const params = useQueryParams()
@@ -131,6 +79,13 @@ export default function PacksBrowser(props: any) {
 		setShowWidget(showWidget === p ? undefined : p)
 	}
 
+	function onPageChangePressed() {
+		const cards = document.getElementById(
+			"packCardContainer"
+		)! as HTMLDivElement
+		cards.style.setProperty("opacity", "0.2")
+	}
+
 	useEffect(() => {
 		updateUrl(search)
 	}, [search, categories.size, packSort, versions.size])
@@ -177,9 +132,7 @@ export default function PacksBrowser(props: any) {
 								search != null ? (search as string) : undefined
 							}
 							onChange={(e) => {
-								updateUrl(
-									e.currentTarget.value
-								)
+								updateUrl(e.currentTarget.value)
 							}}
 						/>
 						<ChooseBox
@@ -240,14 +193,16 @@ export default function PacksBrowser(props: any) {
 						/>
 					</div>
 					{packs.length > 1 && (
-						<RenderPages
-							totalPacks={totalPacks}
+						<PageSelector
+							totalItems={totalPacks}
 							currentPage={
 								page != null
 									? Number.parseInt(page as string)
 									: 0
 							}
 							params={createBrowseSearchParams(params)}
+							itemsPerPage={PACKS_PER_PAGE}
+							onChange={onPageChangePressed}
 						/>
 					)}
 				</div>
@@ -310,12 +265,14 @@ export default function PacksBrowser(props: any) {
 					)}
 				</div>
 				{packs.length >= 3 && (
-					<RenderPages
-						totalPacks={totalPacks}
+					<PageSelector
+						totalItems={totalPacks}
 						currentPage={
 							page != null ? Number.parseInt(page as string) : 0
 						}
 						params={createBrowseSearchParams(params)}
+						itemsPerPage={PACKS_PER_PAGE}
+						onChange={onPageChangePressed}
 					/>
 				)}
 			</div>

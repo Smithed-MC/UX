@@ -20,5 +20,5 @@
 		"src",
 		"../../packages/image-encode/defs.d.ts",
 		"../../packages/components/BundleCard.tsx"
-	]
+, "../../packages/components/PageSelector.tsx"	]
 }

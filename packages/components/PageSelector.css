@@ -1,0 +1,20 @@
+
+.pageSelectorButton {
+	padding: 0.5rem;
+	border-radius: var(--defaultBorderRadius);
+	color: var(--foreground);
+	text-decoration: none;
+	aspect-ratio: 1 / 1 !important;
+	width: auto;
+	height: 1.25rem;
+	text-align: center;
+	vertical-align: center;
+	opacity: 0.5;
+	transition: all 0.2s ease-in-out;
+}
+
+.pageSelectorButton:hover,
+.pageSelectorButton.selected {
+	background-color: var(--section);
+	opacity: 1;
+}

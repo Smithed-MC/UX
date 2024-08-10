@@ -1,21 +1,27 @@
-import { useMatch } from "react-router-dom"
+import { To } from "react-router-dom"
 import IconTextButton, { IconTextButtonProps } from "./IconTextButton.js"
+import { AnchorHTMLAttributes, HTMLProps } from "react"
+import Link from "./Link.js"
 
-interface NavButtonProps extends IconTextButtonProps {
-	selectedClass?: string
+
+interface NavButtonProps {
+	to: To,
+	children?: any,
+	className?: string
 }
 
 export default function NavButton({
-	selectedClass,
-	className,
+	to,
 	...props
 }: NavButtonProps) {
-	const match = useMatch(props.href ?? props.to ?? "")
 
 	return (
-		<IconTextButton
-			className={`${match != null ? selectedClass + " " : ""}${className ?? ""}`}
+		<Link
+			className={`navBarOption ${props.className ?? ''}`}
+		 	to={to}
 			{...props}
-		/>
+		>
+			{props.children}
+		</Link>
 	)
 }

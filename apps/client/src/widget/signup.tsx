@@ -1,17 +1,26 @@
 import {
 	createUserWithEmailAndPassword,
 	getAuth,
+	GithubAuthProvider,
 	signInWithEmailAndPassword,
+	signInWithPopup,
 } from "firebase/auth"
 import React, { useState } from "react"
 import "./login.css"
 import { FirebaseError } from "firebase/app"
 import { IconInput, IconTextButton, Link } from "components"
-import { Account, At, Key, Right } from "components/svg"
+import { Account, At, Github, Key, Right } from "components/svg"
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import { useAppDispatch } from "hooks"
 import { setUserData } from "store"
+import { HTTPResponses, UserData } from "data-types"
+import { DisplayNamePopup } from "./login"
+
+const githubProvider = new GithubAuthProvider()
+githubProvider.setCustomParameters({
+	allow_signup: "false",
+})
 
 export default function SignUp({ clickLogin }: { clickLogin: () => void }) {
 	const [email, setEmail] = useState("")
@@ -24,6 +33,8 @@ export default function SignUp({ clickLogin }: { clickLogin: () => void }) {
 
 	const [password, setPassword] = useState("")
 	const [confirmPassword, setConfirmPassword] = useState("")
+
+	const [showDisplayNamePrompt, setShowDisplayNamePrompt] = useState(false)
 
 	const dispatch = useAppDispatch()
 
@@ -88,12 +99,58 @@ export default function SignUp({ clickLogin }: { clickLogin: () => void }) {
 		}
 	}
 
+	const signInToGithub = async () => {
+		try {
+			const cred = await signInWithPopup(getAuth(), githubProvider)
+			if (!cred) {
+				alert("Failed to get credientials")
+				return
+			}
+
+			const userResp = await fetch(
+				import.meta.env.VITE_API_SERVER + `/users/${cred.user.uid}`
+			)
+
+			if (!userResp.ok && userResp.status !== HTTPResponses.NOT_FOUND) {
+				alert(
+					"Failed to fetch user data!\n" +
+						(await userResp.json()).message
+				)
+				return
+			}
+
+			if (!userResp.ok && userResp.status === HTTPResponses.NOT_FOUND) {
+				setShowDisplayNamePrompt(true)
+				return
+			}
+
+			doneLoggingIn(cred.user.uid)
+		} catch (e) {
+			alert(e)
+		}
+	}
+	
+	async function doneLoggingIn(uid: string) {
+		const resp = await fetch(
+			import.meta.env.VITE_API_SERVER + `/users/${uid}`
+		)
+		if (!resp.ok) return navigate("/" + uid)
+
+		const userData: UserData = await resp.json()
+
+		dispatch(setUserData(userData))
+
+		if (window.history.length > 1) window.history.back()
+		else navigate("/" + uid)
+	}
+	
 	return (
-		<div className="container" style={{ gap: 16 }}>
+		<div className="container" style={{ gap: "1rem", width: "100%" }}>
 			<IconInput
 				icon={Account}
 				title={displayNameError}
 				className={displayNameError != "" ? "invalidInput" : ""}
+				style={{ width: "100%" }}
 				type="text"
 				id=""
 				placeholder="Username"
@@ -104,11 +161,11 @@ export default function SignUp({ clickLogin }: { clickLogin: () => void }) {
 				}}
 				value={displayName}
 			/>
-
 			<IconInput
 				icon={At}
 				title={emailError}
 				className={emailError != "" ? "invalidInput" : ""}
+				style={{ width: "100%" }}
 				type="email"
 				id=""
 				placeholder="Email"
@@ -118,11 +175,11 @@ export default function SignUp({ clickLogin }: { clickLogin: () => void }) {
 				}}
 				value={email}
 			/>
-
 			<IconInput
 				icon={Key}
 				title={passwordError}
 				className={passwordError != "" ? "invalidInput" : ""}
+				style={{ width: "100%" }}
 				type="password"
 				placeholder="Password"
 				onChange={(e) => {
@@ -131,11 +188,11 @@ export default function SignUp({ clickLogin }: { clickLogin: () => void }) {
 				}}
 				value={password}
 			/>
-
 			<IconInput
 				icon={Key}
 				title={confirmPasswordError}
 				className={confirmPasswordError != "" ? "invalidInput" : ""}
+				style={{ width: "100%" }}
 				type="password"
 				placeholder="Confirm Password"
 				onChange={(e) => {
@@ -149,33 +206,17 @@ export default function SignUp({ clickLogin }: { clickLogin: () => void }) {
 			/>
 			<div
 				className="container"
-				style={{ flexDirection: "row", gap: "1.25rem" }}
+				style={{ gap: "1rem", flexDirection: "row", width: "100%" }}
 			>
-				<Link
-					className="compactButton"
-					style={{ color: "var(--border)" }}
-					to="/discord"
-				>
-					Need help
-				</Link>
-				<div
-					style={{
-						width: "0.25rem",
-						height: "0.25rem",
-						backgroundColor: "var(--border)",
-						borderRadius: "50%",
-						margin: "0rem -0.75rem",
-					}}
+				<IconTextButton
+					style={{ width: "50%" }}
+					text="Github"
+					icon={Github}
+					onClick={signInToGithub}
 				/>
-				<a
-					className="compactButton"
-					style={{ color: "var(--border)" }}
-					onClick={clickLogin}
-				>
-					Login
-				</a>
 				<IconTextButton
 					className="accentedButtonLike"
+					style={{ width: "50%" }}
 					text="Sign Up"
 					icon={Right}
 					reverse={true}
@@ -188,6 +229,43 @@ export default function SignUp({ clickLogin }: { clickLogin: () => void }) {
 					}
 				/>
 			</div>
+			<div
+				className="container"
+				style={{ flexDirection: "row", gap: "1.25rem" }}
+			>
+				<Link
+					className="compactButton"
+					style={{ opacity: 0.5 }}
+					to="/discord"
+				>
+					Need help
+				</Link>
+				<div
+					style={{
+						width: "0.25rem",
+						height: "0.25rem",
+						backgroundColor: "var(--foreground)",
+						borderRadius: "50%",
+						margin: "0rem -0.75rem",
+						opacity: 0.5,
+					}}
+				/>
+				<a
+					className="compactButton"
+					style={{ opacity: 0.5 }}
+					onClick={clickLogin}
+				>
+					Login
+				</a>
+			</div>
+			{showDisplayNamePrompt && (
+				<DisplayNamePopup
+					onClose={(success) => {
+						setShowDisplayNamePrompt(false)
+						if (success) doneLoggingIn(getAuth().currentUser!.uid)
+					}}
+				/>
+			)}{" "}
 		</div>
 	)
 }

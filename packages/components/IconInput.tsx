@@ -30,14 +30,14 @@ export default function IconInput({
 			style={{
 				flexDirection: "row",
 				alignItems: "center",
-				gap: "0.5rem",
 				...style,
+				padding: "0.5rem 1rem 0.5rem 1rem"
 			}}
 		>
 			{(IconSvg || iconElement) && (
 				<span
 					className="container"
-					style={{ color: "var(--border)", height: "100%" }}
+					style={{ color: "var(--foreground)", height: "100%" }}
 				>
 					{IconSvg !== undefined &&
 						typeof IconSvg === "string" &&
@@ -62,6 +62,7 @@ export default function IconInput({
 					fontSize: "1rem",
 					WebkitUserSelect: "none",
 					color: "var(--foreground)",
+					marginLeft: "1rem"
 				}}
 			></input>
 		</div>

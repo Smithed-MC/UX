@@ -130,7 +130,7 @@ export const BundleVersionSchema = Type.Object({
 	packs: Type.Array(PackReferenceSchema),
 })
 
-export const PackGalleryImageSchema = Type.Union([
+export const ImageSchema = Type.Union([
 	Type.Object({
 		type: Type.Literal("bucket"),
 		uid: Type.String(),
@@ -139,7 +139,7 @@ export const PackGalleryImageSchema = Type.Union([
 	Type.Object({
 		type: Type.Literal("file"),
 		uid: Type.String(),
-		content: Type.Optional(Type.String())
+		content: Type.Optional(Type.String()),
 	}),
 	Type.String(),
 ])
@@ -157,7 +157,7 @@ export const DisplaySchema = Type.Object({
 			homepage: Type.Optional(Type.String()),
 		})
 	),
-	gallery: Type.Optional(Type.Array(PackGalleryImageSchema)),
+	gallery: Type.Optional(Type.Array(ImageSchema)),
 })
 
 export const PackDataSchema = Type.Object({
@@ -241,8 +241,8 @@ export const UserDataSchema = Type.Object({
 	cleanName: Type.String(),
 	creationTime: Type.Number(),
 	uid: Type.String(),
-	pfp: Type.Optional(Type.String()),
-	banner: Type.Optional(Type.String()),
+	pfp: Type.Optional(ImageSchema),
+	banner: Type.Optional(ImageSchema),
 	biography: Type.Optional(Type.String({ maxLength: 2000 })),
 	role: Type.Readonly(
 		Type.Union([Type.Literal("member"), Type.Literal("admin")])
@@ -277,7 +277,6 @@ export const ArticleSchema = Type.Object({
 	]),
 })
 
-
 export enum PermissionScope {
 	READ_PACKS,
 	WRITE_PACKS,
@@ -288,18 +287,19 @@ export enum PermissionScope {
 	CREATE_BUNDLES,
 	DELETE_BUNDLES,
 	READ_USER,
-	WRITE_USER
+	WRITE_USER,
 }
 
-export const PermissionScopeSchema = Type.Enum(
-	PermissionScope
-)
+export const PermissionScopeSchema = Type.Enum(PermissionScope)
 
 export const PATokenSchema = Type.Object({
 	owner: Type.String(),
 	createdAt: Type.Number(),
 	expiration: Type.Number(),
-	scopes: Type.Array(PermissionScopeSchema, { default: [], uniqueItems: true}),
+	scopes: Type.Array(PermissionScopeSchema, {
+		default: [],
+		uniqueItems: true,
+	}),
 	tokenUid: Type.String(),
 	name: Type.String(),
 })
@@ -319,7 +319,7 @@ export type PackBundle = PackBundle_v1 | PackBundle_v2
 export type BundleVersion = Static<typeof BundleVersionSchema>
 
 export type PackReference = Static<typeof PackReferenceSchema>
-export type PackGalleryImage = Static<typeof PackGalleryImageSchema>
+export type Image = Static<typeof ImageSchema>
 
 export type UserData = Static<typeof UserDataSchema>
 

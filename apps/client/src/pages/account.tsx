@@ -7,7 +7,7 @@ import SignUp from "../widget/signup"
 
 import logo from "../assets/logo.png"
 import ResetPassword from "../widget/resetPassword"
-import { ColoredLogo } from "components/svg"
+import { ColoredLogo, Logo } from "components/svg"
 
 export default function Account() {
 	const user = useFirebaseUser()
@@ -28,29 +28,35 @@ export default function Account() {
 				flexGrow: 1,
 				height: "100%",
 				boxSizing: "border-box",
+				gap: "4rem"
 			}}
 		>
+			<span style={{fontSize: "2rem", fontWeight: 600}}>
+				Welcome back!
+			</span>
 			<div
 				className="container"
 				style={{
 					backgroundColor: "var(--backgroundAccent)",
-					padding: 12,
+					padding: "1rem",
 					borderRadius: "var(--defaultBorderRadius)",
-					gap: 32,
+					gap: "4rem",
 					justifyContent: "start",
+					flexDirection: "row",
+					width: "100%",
+					maxWidth: "42rem"
 				}}
 			>
-				<ColoredLogo
+				<Logo
 					style={{
 						width: "12rem",
 						height: "12rem",
-						color: "var(--accent)",
 						flexShrink: 0,
 					}}
 				/>
 				<div
 					className="container"
-					style={{ justifyContent: "center", height: "100%" }}
+					style={{ justifyContent: "center", height: "100%", width: "100%" }}
 				>
 					{tab === "login" && (
 						<Login

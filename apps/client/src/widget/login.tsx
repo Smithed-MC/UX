@@ -14,7 +14,7 @@ import {
 import React, { useEffect, useState } from "react"
 import "./login.css"
 import { FirebaseError } from "firebase/app"
-import { IconInput, IconTextButton, Link, Spinner } from "components"
+import { Checkbox, IconInput, IconTextButton, Link, Spinner } from "components"
 import { Right, Key, At, Github, Account, Cross, Check } from "components/svg"
 import { useNavigate, useNavigation } from "react-router-dom"
 import Cookies from "js-cookie"
@@ -28,7 +28,7 @@ githubProvider.setCustomParameters({
 	allow_signup: "false",
 })
 
-function DisplayNamePopup({
+export function DisplayNamePopup({
 	onClose,
 }: {
 	onClose: (success: boolean) => void
@@ -207,11 +207,48 @@ export default function Login({
 		}
 	}
 
+	const signInToGithub = async () => {
+		try {
+			const cred = await signInWithPopup(
+				getAuth(),
+				githubProvider
+			)
+			if (!cred) {
+				alert("Failed to get credientials")
+				return
+			}
+
+			const userResp = await fetch(
+				import.meta.env.VITE_API_SERVER +
+				`/users/${cred.user.uid}`
+			)
+
+			if (!userResp.ok &&
+				userResp.status !== HTTPResponses.NOT_FOUND) {
+				alert(
+					"Failed to fetch user data!\n" +
+					(await userResp.json()).message
+				)
+				return
+			}
+
+			if (!userResp.ok &&
+				userResp.status === HTTPResponses.NOT_FOUND) {
+				setShowDisplayNamePrompt(true)
+				return
+			}
+
+			doneLoggingIn(cred.user.uid)
+		} catch (e) {
+			alert(e)
+		}
+	}
 	return (
-		<div className="container" style={{ gap: "1rem" }}>
+		<div className="container" style={{ gap: "1rem", width: "100%" }}>
 			<IconInput
 				type="email"
 				className={emailError != "" ? "invalidInput" : ""}
+				style={{width: "100%"}}
 				placeholder="Email"
 				icon={At}
 				onChange={(e) => {
@@ -224,6 +261,7 @@ export default function Login({
 			<IconInput
 				type="password"
 				className={passwordError != "" ? "invalidInput" : ""}
+				style={{width: "100%"}}
 				placeholder="Password"
 				icon={Key}
 				onChange={(e) => {
@@ -245,48 +283,25 @@ export default function Login({
 					justifyContent: "start",
 				}}
 			>
-				<input
-					type="checkbox"
+				<span
+					className="container"
 					style={{
-						width: "1rem",
-						height: "1rem",
-						borderRadius: "var(--defaultBorderRadius)",
+						flexDirection: "row",
+						gap: "0.5rem",
+						width: "50%",
+						justifyContent: "start",
+						padding: "0rem 1rem"
 					}}
-					onChange={(e) => {
-						setStaySignedIn(e.currentTarget.checked)
-					}}
-				/>
-				<span style={{ opacity: 0.3 }}>Stay signed in?</span>
-			</div>
-			<div
-				className="container"
-				style={{ flexDirection: "row", gap: "1.25rem" }}
-			>
-				<Link
-					to="/discord"
-					className="compactButton"
-					style={{ opacity: 0.3 }}
-					onClick={clickHelp}
 				>
-					Need help?
-				</Link>
-				<div
-					style={{
-						width: "0.25rem",
-						height: "0.25rem",
-						backgroundColor: "var(--border)",
-						borderRadius: "50%",
-						margin: "0rem -0.75rem",
-					}}
-				/>
-				<a
-					className="compactButton"
-					style={{ opacity: 0.3 }}
-					onClick={clickSignUp}
-				>
-					Sign up
-				</a>
+					<Checkbox
+						onChange={(v) => {
+							setStaySignedIn(v)
+						}}
+					/>
+					<span>Stay signed in?</span>
+				</span>
 				<IconTextButton
+					style={{ width: "50%" }}
 					className="accentedButtonLike"
 					text="Login"
 					iconElement={
@@ -309,49 +324,40 @@ export default function Login({
 				/>
 			</div>
 			<IconTextButton
+				style={{ width: "100%", justifyContent: "center" }}
 				icon={Github}
-				text="Github Sign In"
-				onClick={async () => {
-					try {
-						const cred = await signInWithPopup(
-							getAuth(),
-							githubProvider
-						)
-						if (!cred) {
-							alert("Failed to get credientials")
-							return
-						}
-
-						const userResp = await fetch(
-							import.meta.env.VITE_API_SERVER +
-								`/users/${cred.user.uid}`
-						)
-
-						if (
-							!userResp.ok &&
-							userResp.status !== HTTPResponses.NOT_FOUND
-						) {
-							alert(
-								"Failed to fetch user data!\n" +
-									(await userResp.json()).message
-							)
-							return
-						}
-
-						if (
-							!userResp.ok &&
-							userResp.status === HTTPResponses.NOT_FOUND
-						) {
-							setShowDisplayNamePrompt(true)
-							return
-						}
-
-						doneLoggingIn(cred.user.uid)
-					} catch (e) {
-						alert(e)
-					}
-				}}
+				text="Github"
+				onClick={signInToGithub}
 			/>
+			<div
+				className="container"
+				style={{ flexDirection: "row", gap: "1.25rem" }}
+			>
+				<Link
+					to="/discord"
+					className="compactButton"
+					style={{ opacity: 0.5 }}
+					onClick={clickHelp}
+				>
+					Need help?
+				</Link>
+				<div
+					style={{
+						width: "0.25rem",
+						height: "0.25rem",
+						backgroundColor: "var(--foreground)",
+						borderRadius: "50%",
+						margin: "0rem -0.75rem",
+					}}
+				/>
+				<a
+					className="compactButton"
+					style={{ opacity: 0.3 }}
+					onClick={clickSignUp}
+				>
+					Sign up
+				</a>
+			</div>
 			{showDisplayNamePrompt && (
 				<DisplayNamePopup
 					onClose={(success) => {

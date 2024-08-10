@@ -40,18 +40,18 @@ interface SiteTheme {
 export const DARK_THEME: SiteTheme = {
 	type: "dark",
 	variables: {
-		bold: "#000000",
-		background: "#121213",
-		section: "#1d1f21",
+		bold: "#0A0A0A",
+		background: "#141414",
+		section: "#252525",
 		highlight: "#2e2e31",
 		border: "#4b4b4b",
 		foreground: "#fff8f0",
 		accent: "#1b48c4",
 		accent2: "#23a3ff",
-		warning: "#e8aa03",
+		warning: "#da9d00",
 		disturbing: "#c41b48",
-		success: "#1bc443",
-		secondary: "#c41b9c",
+		success: "#04B400",
+		secondary: "#B600C6",
 		bundle: "#971bc4",
 	},
 }
@@ -68,7 +68,7 @@ export const LIGHT_THEME: SiteTheme = {
 		border: "#a8a9b8",
 		disturbing: "#e60f48",
 		warning: "#ff7b00",
-		accent: "#5176db"
+		accent: "#5176db",
 	},
 }
 
@@ -77,16 +77,20 @@ export interface SiteSettings {
 }
 
 const defaultSettings: SiteSettings = {
-	theme: DARK_THEME
+	theme: DARK_THEME,
 }
 
 function applySettings(settings: SiteSettings) {
 	Cookies.set("smithedSiteSettings", JSON.stringify(settings))
 
-	for (const variable in settings.theme.variables) {
+	const variables =
+		settings.theme.type === "dark"
+			? DARK_THEME.variables
+			: settings.theme.variables
+	for (const variable in variables) {
 		document.body.style.setProperty(
 			"--" + variable,
-			settings.theme.variables[variable],
+			variables[variable],
 			"important"
 		)
 	}

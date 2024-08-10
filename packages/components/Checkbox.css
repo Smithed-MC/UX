@@ -1,0 +1,32 @@
+
+.checkbox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 0.25rem;
+    border: 0.125rem solid var(--foreground);
+    margin: 0.125rem;
+}
+
+.checkbox > .check {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 0.125rem;
+    background-color: var(--foreground);
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.checkbox:hover > .check {
+    opacity: 0.25;
+}
+
+.checkbox.selected > .check {
+    opacity: 1;
+}
+
+.checkbox.checkbox.selected:hover > .check {
+    opacity: 0.75;
+}

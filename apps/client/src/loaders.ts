@@ -10,7 +10,7 @@ import {
 	UserData,
 } from "data-types"
 import Cookie from "cookie"
-import User from "./pages/user"
+import User from "./pages/users/id"
 import { sanitize } from "formatters"
 
 async function getUserData(id: string) {

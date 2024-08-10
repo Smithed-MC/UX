@@ -15,6 +15,7 @@ export default ({ mode }) => {
 				"node:url": "url",
 				"import.meta.env.VITE_API_SERVER":
 					process.env.VITE_API_SERVER ?? "https://api.smithed.dev/v2",
+				"import.meta.env.VITE_FIREBASE_EMULATOR": process.env.VITE_FIREBASE_EMULATOR
 			},
 		},
 		define: {
