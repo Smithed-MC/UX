@@ -27,7 +27,8 @@ API_APP.route({
 		querystring: Type.Object({
             search: Type.Optional(Type.String()),
             limit: Type.Number({default: 20}),
-            page: Type.Number({default: 1, minimum: 1})
+            page: Type.Number({default: 1, minimum: 1}),
+			scope: Type.Array(Type.String(), {default: []})
         }),
 	},
 	handler: async (request, reply) => {
@@ -77,11 +78,12 @@ API_APP.route({
 })
 
 
-async function requestUsersFromTypesense(query: {search?: string, limit: number, page: number}) {
+async function requestUsersFromTypesense(query: {search?: string, limit: number, page: number, scope: string[]}) {
 	const {
 		search,
 		limit,
 		page,	
+		scope: scopes
 	} = query
 
 	const users = await TYPESENSE_APP.collections("users")
@@ -91,7 +93,7 @@ async function requestUsersFromTypesense(query: {search?: string, limit: number,
 			query_by: [
 			    "displayName",
 			],
-			include_fields: ["displayName", "id"],
+			include_fields: ["displayName", "id", ...scopes],
 			limit: limit,
 			page: page,
 		})
