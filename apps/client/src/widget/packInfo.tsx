@@ -34,6 +34,8 @@ import {
 import React, {
 	MouseEventHandler,
 	useContext,
+	useEffect,
+	useMemo,
 	useState,
 } from "react"
 import { useLoaderData, useNavigate } from "react-router-dom"
@@ -58,25 +60,7 @@ interface PackInfoProps {
 	style?: React.CSSProperties
 }
 
-if (
-	!import.meta.env.SSR &&
-	window.__TAURI_IPC__ !== undefined &&
-	markdownOptions !== undefined
-) {
-	markdownOptions.a = ({ children, ...props }) => (
-		<Link
-			{...props}
-			target="_blank"
-			to={""}
-			onClick={(e) => {
-				e.preventDefault()
-				open(props.href ?? "")
-			}}
-		>
-			{children}
-		</Link>
-	)
-}
+
 
 function WidgetOption({
 	isLatest,
@@ -117,56 +101,111 @@ function WidgetOption({
 	)
 }
 
-function showSupportedVersions(
-	packData: PackData,
+function SupportedVersionWidget({
+	longestVersion,
+	latestVersion,
+	attachedVersion,
+	minecraftVersion,
+	onClick,
+}: {
+	minecraftVersion: string
+	longestVersion: string
+	latestVersion: string
+	attachedVersion: string
 	onClick: (v: string) => void
-) {
-	const longestVersion = [...fullMinecraftVersions]
-		.sort((a, b) => a.length - b.length)
-		.at(-1)!
+}) {
+	const isLatest = latestVersion === attachedVersion
 
-	return [...fullMinecraftVersions]
-		.sort((a, b) => compare(coerce(a) ?? "", coerce(b) ?? ""))
-		.reverse()
-		.filter(
-			(mcVersion) =>
-				packData.versions.find((v) =>
-					v.supports.includes(mcVersion)
-				) !== undefined
+	return (
+		<WidgetOption
+			isLatest={isLatest}
+			onClick={() => onClick(minecraftVersion)}
+		>
+			<span
+				style={{
+					fontWeight: 600,
+					position: "relative",
+				}}
+			>
+				<span style={{ opacity: 0 }}>{longestVersion}</span>
+				<span style={{ position: "absolute", left: 0 }}>
+					{minecraftVersion}
+				</span>
+			</span>
+			<span style={{ opacity: 0.25, paddingRight: "2rem" }}>
+				{!attachedVersion.startsWith("v") && "v"}
+				{attachedVersion}
+			</span>
+		</WidgetOption>
+	)
+}
+
+function RenderSupportedVersions({
+	packData,
+	onClick,
+}: {
+	packData: { versions: PackVersion[] }
+	onClick: (v: string) => void
+}) {
+	const {
+		latestPackVersion,
+		gameToPackVersionMap,
+		supportedVersions,
+		longestVersion,
+	} = useMemo(() => {
+		const sortedPackVersions = packData?.versions.sort((a, b) =>
+			compare(coerce(a.name) ?? "", coerce(b.name) ?? "")
 		)
-		.map((v) => {
-			const sortedVersions = packData?.versions
-				.sort((a, b) =>
-					compare(coerce(a.name) ?? "", coerce(b.name) ?? "")
-				)
-				.reverse()
-			const attachedVersion = sortedVersions?.find((ver) =>
-				ver.supports.includes(v)
-			)
-			const latestVersion = sortedVersions?.at(0)
 
-			const isLatest = latestVersion === attachedVersion
+		const latestPackVersion = sortedPackVersions.at(-1)!.name
 
-			return (
-				<WidgetOption isLatest={isLatest} onClick={() => onClick(v)}>
-					<span
-						style={{
-							fontWeight: 600,
-							position: "relative",
-						}}
-					>
-						<span style={{ opacity: 0 }}>{longestVersion}</span>
-						<span style={{ position: "absolute", left: 0 }}>
-							{v}
-						</span>
-					</span>
-					<span style={{ opacity: 0.25, paddingRight: "2rem" }}>
-						{!attachedVersion?.name.startsWith("v") && "v"}
-						{attachedVersion?.name}
-					</span>
-				</WidgetOption>
+		const gameToPackVersionMap: Record<string, string> = {}
+		for (const v of sortedPackVersions) {
+			v.supports.forEach(
+				(mcVersion) => (gameToPackVersionMap[mcVersion] = v.name)
 			)
-		})
+		}
+
+		const supportedVersions = [...supportedMinecraftVersions]
+			.sort((a, b) => compare(coerce(a) ?? "", coerce(b) ?? ""))
+			.reverse()
+			.filter(
+				(mcVersion) =>
+					packData.versions.find((v) =>
+						v.supports.includes(mcVersion)
+					) !== undefined
+			)
+
+		const longestVersion = [...supportedVersions]
+			.sort((a, b) => a.length - b.length)
+			.at(-1)!
+
+		return {
+			latestPackVersion,
+			gameToPackVersionMap,
+			supportedVersions,
+			longestVersion,
+		}
+	}, [packData, supportedMinecraftVersions])
+
+	if (supportedVersions.length === 0) {
+		return <span>No available versions</span>
+	}
+
+	return (
+		<>
+			{supportedVersions.map((v) => (
+				<SupportedVersionWidget
+					minecraftVersion={v}
+					latestVersion={latestPackVersion}
+					longestVersion={longestVersion}
+					attachedVersion={gameToPackVersionMap[v]}
+					onClick={onClick}
+					key={v}
+				/>
+			))}
+		</>
+	)
 }
 
 function showPackVersions(
@@ -280,10 +319,13 @@ export function AddToBundleModal({
 					<label style={{ fontWeight: 600 }}>
 						Choose Minecraft version
 					</label>
-					{showSupportedVersions(packData!, (v) => {
-						setMinecraftVersion(v)
-						changePage("right")
-					})}
+					<RenderSupportedVersions
+						packData={packData!}
+						onClick={(v: string) => {
+							setMinecraftVersion(v)
+							changePage("right")
+						}}
+					/>
 				</div>
 				<div
 					className="container compactButton"
@@ -618,13 +660,6 @@ function DownloadPackModal({
 	const [packVersion, setPackVersion] = useState<PackVersion>()
 	const [showAllVersions, setShowAllVersions] = useState<string>()
 
-	const supportedVersions = showSupportedVersions(packData!, (v) => {
-		setMinecraftVersion(v)
-		setPage("packVersion")
-	})
-
-	const navigate = useNavigate()
-
 	function download(packVersion: PackVersion | undefined, mode: string) {
 		const url =
 			import.meta.env.VITE_API_SERVER +
@@ -786,8 +821,13 @@ function DownloadPackModal({
 								Choose Minecraft Version
 							</span>
 
-							{supportedVersions}
-
+							<RenderSupportedVersions
+								packData={packData!}
+								onClick={(v) => {
+									setMinecraftVersion(v)
+									setPage("packVersion")
+								}}
+							/>
 							<div
 								style={{
 									width: "100%",
@@ -831,11 +871,7 @@ function DownloadPackModal({
 									backgroundColor: "var(--border)",
 								}}
 							/>
-							{supportedVersions.length > 1 ? (
-								<BackButton page={"gameVersion"} />
-							) : (
-								<CloseButton close={close} />
-							)}
+							<BackButton page={"gameVersion"} />
 						</div>
 					)}
 				</>
@@ -844,153 +880,4 @@ function DownloadPackModal({
 	)
 }
 
-export default function PackInfo({
-	id,
-	style,
-}: PackInfoProps) {
-	const loaderData = useLoaderData() as any
-	// console.log(loaderData)
-	const clientContext = useContext(ClientContext)
 
-	const DownloadButton = clientContext.packDownloadButton
-
-	const packData: PackData | undefined = loaderData.packData
-	const metaData: PackMetaData | undefined = loaderData.metaData
-	const owner: UserData | undefined = loaderData.owner
-	const fullview: string = loaderData.fullview
-	// console.log(fullview)
-	const [injectPopup, setInjectPopup] = useState<undefined | JSX.Element>(
-		undefined
-	)
-
-	return (
-		<div
-			className="container packInfoRoot"
-			style={{ width: "100%", gap: "4rem", ...style }}
-		>
-			<div className="packPageHeader" style={{}}>
-				<div className="packDetailsContainer">
-					<img
-						src={packData?.display.icon}
-						style={{
-							gridArea: "icon",
-							borderRadius: "var(--defaultBorderRadius)",
-						}}
-					></img>
-					<label
-						style={{
-							gridArea: "name",
-							fontSize: "1.5rem",
-							fontWeight: 600,
-						}}
-					>
-						{packData?.display.name}
-					</label>
-					<label style={{ gridArea: "byLine" }}>
-						by <Link to={`/${owner?.uid}`}>{owner?.displayName}</Link>
-						<label className="packDetailsUpdateInfo">
-							{` ∙ ${metaData?.stats.updated ? "Updated" : "Uploaded"} ${prettyTimeDifference(metaData?.stats.updated ?? metaData?.stats.added ?? 0)} ago`}
-						</label>
-					</label>
-				</div>
-				<div className="downloadContainer">
-					{/* <AddToBundleModal
-						trigger={
-							<div
-								className="buttonLike"
-								style={{ display: "flex" }}
-								onClick={() => setShowBundleSelection(true)}
-							>
-								<Plus />
-							</div>
-						}
-						packData={packData}
-						isOpen={showBundleSelection}
-						close={() => setShowBundleSelection(false)}
-						id={id}
-					/> */}
-					<div className="container" style={{ gap: "0.5rem" }}>
-						<DownloadPackModal packData={packData!} packId={id}>
-							<DownloadButton
-								id={id}
-								openPopup={(element) => {
-									setInjectPopup(element)
-								}}
-								closePopup={() => {
-									setInjectPopup(undefined)
-								}}
-							/>
-						</DownloadPackModal>
-
-						<label style={{ color: "var(--border)" }}>
-							{(() => {
-								const version = packData?.versions
-									.sort((a, b) =>
-										compare(
-											coerce(a.name) ?? "",
-											coerce(b.name) ?? ""
-										)
-									)
-									.at(-1)
-
-								if (
-									version?.supports[0] ===
-									version?.supports.at(-1)
-								)
-									return version?.supports[0]
-
-								return `${version?.supports[0]} — ${version?.supports.at(-1)}`
-							})()}
-						</label>
-					</div>
-				</div>
-				<div className="userButtonsContainer">
-					{clientContext.showBackButton && <BackButton />}
-					{packData?.display.urls?.discord &&
-						packData?.display.urls?.discord.length > 0 && (
-							<IconTextButton
-								className={"packInfoMediaButton"}
-								icon={Discord}
-								text={"Join Discord"}
-								to={packData?.display.urls?.discord}
-							/>
-						)}
-					{packData?.display.urls?.homepage &&
-						packData?.display.urls?.homepage.length > 0 && (
-							<IconTextButton
-								className={"packInfoMediaButton"}
-								iconElement={<Globe fill="var(--foreground)" />}
-								text={"Official website"}
-								to={packData?.display.urls?.homepage}
-							/>
-						)}
-					{packData?.display.urls?.source &&
-						packData?.display.urls?.source.length > 0 && (
-							<IconTextButton
-								className={"packInfoMediaButton"}
-								icon={Github}
-								text={"Source code"}
-								to={packData?.display.urls?.source}
-							/>
-						)}
-					<IconTextButton
-						className="accentedButtonLike packInfoSmallDownload packInfoMediaButton"
-						iconElement={<Download fill="var(--foreground)" />}
-						text={"Download"}
-						to={
-							import.meta.env.VITE_API_SERVER +
-							`/download?pack=${id}`
-						}
-						rel="nofollow"
-					/>
-				</div>
-			</div>
-			<div style={{ maxWidth: "53rem" }}>
-				{fullview !== undefined && fullview !== "" && (
-					<MarkdownRenderer style={{}}>{fullview}</MarkdownRenderer>
-				)}
-			</div>
-			{injectPopup}
-		</div>
-	)
-}

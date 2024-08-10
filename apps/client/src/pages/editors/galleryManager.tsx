@@ -1,5 +1,5 @@
 import { Trash, Plus } from "components/svg"
-import { PackGalleryImage } from "data-types"
+import { Image } from "data-types"
 import { useState, useEffect, useRef } from "react"
 
 export default function GalleryManager({
@@ -7,10 +7,10 @@ export default function GalleryManager({
 	display,
 }: {
 	packId: string
-	display: { gallery?: PackGalleryImage[] }
+	display: { gallery?: Image[] }
 }) {
 	const [selectedImage, setSelectedImage] = useState(0)
-	const [images, setImages] = useState<PackGalleryImage[]>([])
+	const [images, setImages] = useState<Image[]>([])
 
 	useEffect(() => {
 		display.gallery ??= []

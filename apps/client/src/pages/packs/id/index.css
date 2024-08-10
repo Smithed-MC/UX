@@ -18,3 +18,26 @@
 		grid-template-columns: auto minmax(auto, 320px);
 	}
 }
+
+.packPage {
+	.packVersions {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		row-gap: 1rem;
+		align-content: center;
+	}
+	.packVersions > * {
+		background-color: var(--section);
+		padding: 1rem;
+	}
+
+	.packVersions > *:nth-child(3n + 1) {
+		border-top-left-radius: var(--defaultBorderRadius);
+		border-bottom-left-radius: var(--defaultBorderRadius);
+	}
+	
+	.packVersions > *:nth-child(3n + 3) {
+		border-top-right-radius: var(--defaultBorderRadius);
+		border-bottom-right-radius: var(--defaultBorderRadius);
+	}
+}

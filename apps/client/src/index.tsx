@@ -319,7 +319,7 @@ import Account from "./pages/account.js"
 import PackEditor from "./pages/packs/id/edit.js"
 import { loadPackEdit } from "./pages/packs/id/edit.loader.js"
 
-import User from "./pages/user.js"
+import User from "./pages/users/id/index.js"
 
 import PackPage from "./pages/packs/id/index.js"
 import loadPackData from "./pages/packs/id/index.loader.js"

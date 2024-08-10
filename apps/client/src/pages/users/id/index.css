@@ -169,6 +169,18 @@
 	column-gap: 1rem;
 }
 
+.userIconAndName > * > .uploadPfpButton {
+	opacity: 0;
+	transition: 0.2s all ease-in-out;
+	background-color: transparent !important;
+	border: transparent !important; 
+}
+
+.userIconAndName > * > .uploadPfpButton:hover {
+	opacity: 1;
+	backdrop-filter: blur(2px);
+}
+
 .userName,
 .userJoinTime {
 	height: 100%;

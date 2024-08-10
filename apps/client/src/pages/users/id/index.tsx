@@ -8,7 +8,7 @@ import {
 import { useContext, useEffect, useRef, useState } from "react"
 import { useLoaderData, useNavigate, useParams } from "react-router-dom"
 import { formatDownloads } from "formatters"
-import "./user.css"
+import "./index.css"
 import {
 	CategoryBar,
 	CategoryChoice,
@@ -46,12 +46,12 @@ import { Helmet } from "react-helmet"
 import { getAuth } from "firebase/auth"
 import { User as FirebaseUser } from "firebase/auth"
 import { prettyTimeDifference } from "formatters"
-import { CreateBundle } from "../widget/bundle"
+import { CreateBundle } from "../../../widget/bundle"
 import { BundleCard } from "components/BundleCard"
-import { UserStats } from "../loaders"
+import { UserStats } from "../../../loaders"
 import { selectUserData } from "store"
-import Smithie from "../widget/Smithie"
-import { ClientContext } from "../context"
+import Smithie from "../../../widget/Smithie"
+import { ClientContext } from "../../../context"
 
 interface UserTabComponent {
 	editable: boolean
@@ -479,7 +479,15 @@ export default function User() {
 						>
 							{banner && (
 								<img
-									src={banner}
+									src={
+										(typeof banner === "string"
+											? banner
+											: null) ??
+										import.meta.env.VITE_API_SERVER +
+											"/users/" +
+											userId +
+											"/banner"
+									}
 									style={{
 										position: "absolute",
 										width: "100%",
@@ -504,6 +512,8 @@ export default function User() {
 											width: "6rem",
 											height: "6rem",
 											background: "none",
+											justifyContent: "center",
+											alignItems: "center",
 										}}
 										onClick={() => {
 											document
@@ -517,6 +527,7 @@ export default function User() {
 											style={{
 												width: "3rem",
 												height: "3rem",
+												position: "absolute",
 											}}
 										/>
 									</button>
@@ -586,7 +597,16 @@ export default function User() {
 							>
 								{!showFallbackPFP && (
 									<img
-										src={pfp ?? ""}
+										src={
+											typeof pfp === "string"
+												? pfp
+												: null ??
+													import.meta.env
+														.VITE_API_SERVER +
+														"/users/" +
+														userId +
+														"/pfp"
+										}
 										style={{
 											width: 64,
 											height: 64,
@@ -609,11 +629,11 @@ export default function User() {
 
 								{editingUserData && (
 									<button
+										className="uploadPfpButton"
 										style={{
 											width: 64,
 											height: 64,
 											position: "absolute",
-											backgroundColor: "rgba(0,0,0,0.50)",
 										}}
 										onClick={() => {
 											pfpUploadRef.current?.click()

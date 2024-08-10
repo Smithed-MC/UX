@@ -11,7 +11,7 @@ import {
 	PackBundle,
 	PackData,
 	PackEntry,
-	PackGalleryImage,
+	Image,
 	PackMetaData,
 } from "data-types"
 import { formatDownloads, prettyTimeDifference, sanitize } from "formatters"
@@ -125,6 +125,39 @@ export function getBadges(packData?: PackData, author?: string) {
 		)
 
 	return badges
+}
+
+export function GalleryImage({
+	onClick,
+	onError,
+	currentImage,
+	packId,
+}: {
+	onClick: () => void
+	onError: () => void
+	currentImage: number
+	packId: string
+}) {
+	return (
+		<img
+			id={"thumbnail"}
+			className="thumbnail"
+			style={{
+				width: "100%",
+				cursor: "pointer",
+				overflow: "hidden",
+				aspectRatio: "16 / 9",
+				opacity: 0,
+				transition: "opacity 0.1s ease-out",
+			}}
+			onClick={onClick}
+			src={`${import.meta.env.VITE_API_SERVER}/packs/${packId}/gallery/${currentImage}`}
+			onLoad={(e) => {
+				e.currentTarget.style.setProperty("opacity", "1")
+			}}
+			onError={onError}
+		/>
+	)
 }
 
 export default function GalleryPackCard({
@@ -252,25 +285,10 @@ export default function GalleryPackCard({
 						}
 					/>
 					{gallery && gallery?.length > 0 && (
-						<img
-							id="thumbnail"
-							className="thumbnail"
-							style={{
-								width: "100%",
-								cursor: "pointer",
-								overflow: "hidden",
-								aspectRatio: "16 / 9",
-								opacity: 0,
-								transition: "opacity 0.1s ease-out",
-							}}
+						<GalleryImage
+							currentImage={currentImage}
+							packId={id}
 							onClick={() => navigate(`/packs/${id}`)}
-							src={`${import.meta.env.VITE_API_SERVER}/packs/${id}/gallery/${currentImage}`}
-							onLoad={(e) => {
-								e.currentTarget.style.setProperty(
-									"opacity",
-									"1"
-								)
-							}}
 							onError={() => {
 								const carousel: HTMLDivElement =
 									card.current!.querySelector(".carousel")!
@@ -292,6 +310,9 @@ export default function GalleryPackCard({
 									padding: "0.25rem 0.5rem",
 									height: "2rem",
 									width: "2rem",
+									backgroundColor: "var(--bold)",
+									alignItems: "center",
+									justifyContent: "center",
 								}}
 								onClick={() =>
 									setCurrentImage(
@@ -312,6 +333,9 @@ export default function GalleryPackCard({
 									padding: "0.25rem 0.5rem",
 									height: "2rem",
 									width: "2rem",
+									backgroundColor: "var(--bold)",
+									alignItems: "center",
+									justifyContent: "center",
 								}}
 								onClick={() =>
 									setCurrentImage(
@@ -399,19 +423,27 @@ export default function GalleryPackCard({
 							gap: "1rem",
 						}}
 					>
-						<span style={{ flexShrink: 1, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
+						<span
+							style={{
+								flexShrink: 1,
+								whiteSpace: "nowrap",
+								textOverflow: "ellipsis",
+								overflow: "hidden",
+							}}
+						>
 							{data?.display.name}
 						</span>
 						<span
 							style={{
 								fontSize: "0.75rem",
 								backgroundColor: "var(--bold)",
-								borderRadius: "calc(var(--defaultBorderRadius) * 0.5)",
+								borderRadius:
+									"calc(var(--defaultBorderRadius) * 0.5)",
 								padding: "0.25rem 0.5rem",
 								fontWeight: "normal",
 								width: "max-content",
 								whiteSpace: "nowrap",
-								alignSelf: 'start'
+								alignSelf: "start",
 							}}
 						>
 							{data?.versions
