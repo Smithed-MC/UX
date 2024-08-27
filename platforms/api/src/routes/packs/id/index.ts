@@ -134,7 +134,7 @@ export async function updateGalleryData(
 	if (packData.display.gallery === undefined) return true
 	for (let i = 0; i < packData.display.gallery.length; i++) {
 		const g = packData.display.gallery[i]
-		const result = uploadImage(
+		const result = await uploadImage(
 			g,
 			"gallery_images",
 			packId,
