@@ -1,5 +1,5 @@
 import { IconInput, IconTextButton } from "components"
-import { Account, Edit } from "components/svg"
+import { Account, Edit, SummitLogoFull } from "components/svg"
 import { Helmet } from "react-helmet"
 import { Divider } from "./home"
 
@@ -46,65 +46,144 @@ export default function SummitPage() {
 			<Helmet>
 				<meta
 					name="description"
-					content="Come explore Smithed's first ever convention!"
+					content="Come explore Smithed's first ever in-game convention! Join us: 11/2 - 11/9"
 				/>
 
 				<meta name="og:image" content="/summit-logo.png" />
 			</Helmet>
 
 			<div className="container" style={{ gap: "2rem" }}>
-				<span className="header" style={{ alignSelf: "center" }}>
-					Here comes{" "}
-					<span style={{ color: "var(--accent2)" }}>
-						Smithed Summit
-					</span>
-					!
+				<span
+					className="header"
+					style={{ alignSelf: "center", textAlign: "center" }}
+				>
+					Introducing
+					<SummitLogoFull
+						style={{ maxHeight: "12rem", color: "var(--accent2)" }}
+					/>
 				</span>
 				<div style={{ textAlign: "center" }}>
 					A minecraft event featuring datapack creators, map makers,
 					and more!
 					<br />
 					Come explore our server and enjoy the many live panels being
-					hosted through out the week of the event!
+					hosted throughout the week of the event!
 				</div>
 				<div
-					className="container"
 					style={{
-						gap: "0.5rem",
-						borderRadius: "var(--defaultBorderRadius)",
-						backgroundColor: "var(--section)",
-						width: "max-content",
-						padding: "1rem",
-						alignSelf: "center",
+						display: "grid",
+						gridTemplateColumns: "repeat(auto-fill, 14rem)",
+						justifyContent: "center",
+						gap: "2rem",
+						width: "100%",
 					}}
 				>
-					<span style={{ color: "var(--subText)" }}>
-						Save the dates
-					</span>
 					<div
 						className="container"
 						style={{
-							flexDirection: "row",
 							gap: "0.5rem",
-							fontSize: "1.5rem",
-							fontWeight: 500,
+							borderRadius: "var(--defaultBorderRadius)",
+							backgroundColor: "var(--section)",
+							width: "100%",
+							padding: "1rem",
+							alignSelf: "center",
 						}}
 					>
-						Nov. 2
+						<span style={{ color: "var(--subText)" }}>
+							Save the dates
+						</span>
 						<div
+							className="container"
 							style={{
-								width: "1rem",
-								height: "0.25rem",
-								backgroundColor: "var(--subText)",
+								flexDirection: "row",
+								gap: "0.5rem",
+								fontSize: "1.5rem",
+								fontWeight: 500,
 							}}
-						></div>
-						Nov. 9
+						>
+							Nov. 2
+							<div
+								style={{
+									width: "1rem",
+									height: "0.25rem",
+									backgroundColor: "var(--subText)",
+								}}
+							></div>
+							Nov. 9
+						</div>
+					</div>
+					<div
+						className="container"
+						style={{
+							gap: "0.5rem",
+							borderRadius: "var(--defaultBorderRadius)",
+							backgroundColor: "var(--section)",
+							width: "100%",
+							padding: "1rem",
+							alignSelf: "center",
+						}}
+					>
+						<span style={{ color: "var(--subText)" }}>
+							Reserve your spot
+						</span>
+						<div
+							className="container compactButton"
+							style={{
+								flexDirection: "row",
+								gap: "0.5rem",
+								fontSize: "1.5rem",
+								fontWeight: 500,
+							}}
+							onClick={() => {
+								const rect =
+									document
+										.getElementById("rsvpHeader")
+										?.getBoundingClientRect()!
+								
+                                document.getElementById("app")?.children.item(0)?.scrollTo({behavior: "smooth", top: rect.top - rect.height / 2})
+							}}
+						>
+							RSVP
+						</div>
+					</div>
+					<div
+						className="container"
+						style={{
+							gap: "0.5rem",
+							borderRadius: "var(--defaultBorderRadius)",
+							backgroundColor: "var(--section)",
+							width: "100%",
+							padding: "1rem",
+							alignSelf: "center",
+						}}
+					>
+						<span style={{ color: "var(--subText)" }}>
+							Share it around!
+						</span>
+						<div
+							className="container"
+							style={{
+								flexDirection: "row",
+								gap: "0.5rem",
+								fontSize: "1.5rem",
+								fontWeight: 500,
+							}}
+						>
+							<a
+								href="/summit"
+								style={{ color: "var(--foreground)" }}
+							>
+								/summit
+							</a>
+						</div>
 					</div>
 				</div>
-
 				<div className="container" style={{}}>
 					Generously sponsored by
-					<img src={BloomLogo} style={{ height: "5rem" }} />
+					<img
+						src={BloomLogo}
+						style={{ height: "5rem", filter: "saturate(80%)" }}
+					/>
 					<a
 						href="https://bloom.host"
 						style={{ color: "var(--subText)" }}
@@ -194,10 +273,14 @@ export default function SummitPage() {
 				</div>
 			</div>
 			<div className="container" style={{ width: "100%", gap: "1rem" }}>
-				<span className="header" style={{ alignSelf: "center" }}>
+				<span
+					id="rsvpHeader"
+					className="header"
+					style={{ alignSelf: "center" }}
+				>
 					Sign me up!
 				</span>
-				<div className="container" style={{ gap: "1rem" }}>
+				<div className="container" style={{ gap: "1rem", width: "100%", textAlign: "center" }}>
 					RSVP to be notified with all updates about Summit!
 					<RSVP />
 				</div>
@@ -215,13 +298,14 @@ function RSVP() {
 		<>
 			<div
 				className="container"
-				style={{ gap: "1rem", flexDirection: "row" }}
+				style={{ gap: "1rem", flexDirection: "row", width: "100%", flexWrap: "wrap" }}
 			>
 				<IconInput
 					icon={Account}
 					placeholder="Email"
 					defaultValue={email}
 					onChange={(e) => setEmail(e.currentTarget.value)}
+                    style={{width: "100%", maxWidth: "24rem"}}
 				/>
 				<IconTextButton
 					icon={Edit}
