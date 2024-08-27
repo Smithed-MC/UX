@@ -100,6 +100,8 @@ export async function uploadImage(
 				.file(`${bucketLocation}/${filePrefix}-${uid}.webp`)
 				.save(image)
 
+			console.log("uploading new image")
+
 			return {
 				type: "file",
 				uid: uid,
@@ -134,7 +136,7 @@ export async function updateGalleryData(
 	if (packData.display.gallery === undefined) return true
 	for (let i = 0; i < packData.display.gallery.length; i++) {
 		const g = packData.display.gallery[i]
-		const result = uploadImage(
+		const result = await uploadImage(
 			g,
 			"gallery_images",
 			packId,
@@ -216,11 +218,11 @@ async function getWebp(content: string) {
 		.toBuffer()
 }
 
-const setPack = async (response: any, reply: any) => {
-	const { id: packId } = response.params
-	const { token } = response.query
+const setPack = async (request: any, reply: any) => {
+	const { id: packId } = request.params
+	const { token } = request.query
 
-	const { data: packData }: { data: PartialPackData } = response.body
+	const { data: packData }: { data: PartialPackData } = request.body
 
 	const doc = await getPackDoc(packId)
 	if (doc === undefined)
@@ -303,6 +305,7 @@ const setPack = async (response: any, reply: any) => {
 	const requestIdentifier = "GET-PACK::" + packId
 	await set(requestIdentifier, undefined, 1)
 
+	request.log.info(packData)
 	await doc.ref.set({ data: packData }, { merge: true })
 	return reply.status(HTTPResponses.OK).send("Updated data")
 }

@@ -301,7 +301,7 @@ button:not(.exclude),
 }
 
 button:hover:not(:disabled):not(.exclude),
-.buttonLike:hover:not(:disabled) {
+.buttonLike:hover:not(.disabled) {
 	/* Highlight */
 
 	background: var(--section);
@@ -324,18 +324,18 @@ button:hover:not(:disabled):not(.exclude),
 }
 
 button:focus:not(:disabled):not(.exclude),
-.buttonLike:focus:not(:disabled) {
+.buttonLike:focus:not(.disabled) {
 	outline: none;
 	border: 0.125rem solid var(--foreground);
 }
 
 button:active:not(:disabled):not(.exclude),
-.buttonLike:active:not(:disabled) {
+.buttonLike:active:not(.disabled) {
 	filter: brightness(90%);
 }
 
 button:disabled:not(.exclude),
-.buttonLike:disabled {
+.buttonLike.disabled {
 	opacity: 0.5 !important;
 	cursor: default;
 }
@@ -343,7 +343,7 @@ button:disabled:not(.exclude),
 .accentedButtonLike {
 	background-color: var(--accent);
 }
-.secondaryAccentButtonLike {
+.lightAccentedButtonLike {
 	background-color: var(--accent2);
 }
 .disturbingButtonLike {

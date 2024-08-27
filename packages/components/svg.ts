@@ -49,6 +49,8 @@ import { ReactComponent as YouTube } from "./assets/youtube.svg"
 import { ReactComponent as ColorPicker } from "./assets/color-picker.svg"
 import { ReactComponent as Pin } from "./assets/pin.svg"
 import { ReactComponent as Popout } from "./assets/popout.svg"
+import { ReactComponent as Flag } from "./assets/flag.svg"
+import { ReactComponent as SummitLogo } from "./assets/summit-logo.svg"
 
 export {
 	Account,
@@ -102,4 +104,6 @@ export {
 	ColorPicker,
 	Pin,
 	Popout,
+	Flag,
+	SummitLogo
 }

@@ -1,0 +1,97 @@
+.summitPage {
+	section {
+		display: grid;
+		grid-template-areas:
+			"image header"
+			"image text";
+
+		grid-template-columns: 1fr 1fr;
+
+		column-gap: 2rem;
+		row-gap: 1rem;
+		box-sizing: content-box;
+	}
+
+	.text {
+		display: flex;
+		gap: 1rem;
+		flex-direction: column;
+		justify-content: start;
+		grid-area: text;
+	}
+
+	.image {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		grid-area: image;
+
+		text-align: center;
+		color: var(--subText);
+
+		img {
+			border-radius: var(--defaultBorderRadius);
+			overflow: hidden;
+			width: 100%;
+			border-width: 0.125rem;
+			border-style: solid;
+		}
+	}
+
+	.header {
+		font-size: 2rem;
+		font-weight: 600;
+		/* justify-self: start; */
+		grid-area: header;
+		place-self: start;
+		align-self: end;
+	}
+
+	.attendeeCard {
+		max-width: 22rem;
+		box-sizing: content-box;
+		display: flex;
+		align-items: center;
+
+		padding: 1rem;
+		gap: 1rem;
+
+		border-radius: var(--defaultBorderRadius);
+		background-color: var(--section);
+
+		img {
+			width: 4rem;
+			border-radius: calc(var(--defaultBorderRadius) * 0.75);
+			background-color: var(--highlight);
+			border: 0.125rem solid var(--border);
+		}
+
+		.name {
+			font-size: 1.25rem;
+			font-weight: 600;
+		}
+
+		.website {
+			color: var(--subText);
+		}
+	}
+}
+
+@media screen and (max-width: 48rem) {
+	.summitPage {
+		section {
+			grid-template-areas:
+				"header"
+				"image"
+				"text";
+
+			grid-template-columns: 1fr;
+			row-gap: 2rem;
+		}
+		
+		.header {
+			place-self: center;
+			text-align: center;
+		}
+	}
+}

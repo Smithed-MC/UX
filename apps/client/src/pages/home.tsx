@@ -75,7 +75,7 @@ function CategoryHeader({
 	)
 }
 
-const Divider = () => (
+export const Divider = () => (
 	<div style={{ width: "100%", padding: "32px 0px" }}>
 		<div
 			style={{

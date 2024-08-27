@@ -32,7 +32,7 @@ export default function IconTextButton({
 	disabled,
 	centered,
 }: IconTextButtonProps) {
-	const Element = href || to ? Link : (props: any) => <a {...props} />
+	const Element = href || to ? Link : (props: any) => <a {...props}/>
 
 	return (
 		<Element

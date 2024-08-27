@@ -2,7 +2,7 @@ import { useQueryParams } from "hooks"
 import { useLoaderData, useNavigate } from "react-router-dom"
 import { UserBrowserData } from "./index.loader"
 import { IconInput, IconTextButton, PageSelector } from "components"
-import { Browse, Right } from "components/svg"
+import { Account, Browse, Flag, FlagCrossed, Right } from "components/svg"
 import { sanitize } from "formatters"
 import { useEffect, useRef, useState } from "react"
 
@@ -66,7 +66,11 @@ export default function UsersBrowser() {
 	)
 }
 
-function User({ user }: { user: { id: string; displayName: string } }) {
+function User({
+	user,
+}: {
+	user: { id: string; displayName: string; biography: string }
+}) {
 	const [imageError, setImageError] = useState(false)
 	const imgRef = useRef<HTMLImageElement | null>(null)
 
@@ -85,56 +89,104 @@ function User({ user }: { user: { id: string; displayName: string } }) {
 				border: "0.125rem solid var(--border)",
 				borderRadius: "calc(var(--defaultBorderRadius) * 1.5)",
 				padding: "1rem",
-				flexDirection: "row",
+				flexDirection: "column",
 				gap: "1rem",
 				width: "100%",
 				justifyContent: "start",
 			}}
 		>
 			<div
-				style={{
-					width: "4rem",
-					height: "4rem",
-					borderRadius: "var(--defaultBorderRadius)",
-					overflow: "hidden",
-					backgroundColor: "var(--bold)",
-					border: "0.125rem solid var(--border)",
-				}}
+				className="container"
+				style={{ gap: "1rem", flexDirection: "row", width: "100%" }}
 			>
-				<img
+				<div
 					style={{
-						width: "100%",
-						height: "100%",
-						opacity: 0,
-						transition: "opacity 0.1s ease-out"
+						width: "6rem",
+						height: "6rem",
+						borderRadius: "var(--defaultBorderRadius)",
+						overflow: "hidden",
+						backgroundColor: "var(--bold)",
+						flexShrink: 0,
+						position: "relative",
 					}}
-					ref={imgRef}
-					onLoad={(e) =>
-						e.currentTarget.style.setProperty("opacity", "1")
-					}
-				/>
+				>
+					<Account
+						id="accountIcon"
+						style={{
+							width: "100%",
+							height: "100%",
+							opacity: 1,
+							padding: "1rem",
+							position: "absolute",
+							boxSizing: "border-box",
+						}}
+					/>
+					<img
+						style={{
+							width: "100%",
+							height: "100%",
+							opacity: 0,
+							transition: "opacity 0.1s ease-out",
+						}}
+						ref={imgRef}
+						onLoad={(e) => {
+							e.currentTarget.style.setProperty("opacity", "1")
+							const icon =
+								e.currentTarget.parentElement!.querySelector(
+									"#accountIcon"
+								) as HTMLElement
+							icon.style.setProperty("opacity", "0")
+						}}
+					/>
+				</div>
+				<div
+					className="container"
+					style={{
+						height: "100%",
+						justifyContent: "center",
+						alignItems: "start",
+						flexGrow: 1,
+					}}
+				>
+					<div
+						style={{
+							fontWeight: 600,
+							fontSize: "1.25rem",
+							height: "min-content",
+						}}
+					>
+						{user.displayName}
+					</div>
+					<div
+						style={{
+							lineHeight: "1.25rem",
+							lineClamp: 2,
+							textOverflow: "ellipsis",
+							height: "2.5rem",
+							overflow: "hidden",
+							opacity: "0.5",
+						}}
+					>
+						{user.biography}
+					</div>
+				</div>
 			</div>
 			<div
 				className="container"
-				style={{
-					height: "100%",
-					justifyContent: "start",
-					alignItems: "start",
-					flexGrow: 1,
-				}}
+				style={{ gap: "1rem", flexDirection: "row", width: "100%" }}
 			>
-				<div style={{ flexGrow: 1, fontWeight: 600 }}>
-					{user.displayName}
-				</div>
+				<IconTextButton icon={Flag} text={"Report"} style={{backgroundColor: "var(--highlight)"}} />
 				<IconTextButton
 					icon={Right}
-					text={"Profile"}
+					text={"Open"}
 					reverse
 					style={{
 						backgroundColor: "var(--accent)",
 						alignSelf: "end",
 						justifySelf: "end",
+						width: "100%",
 					}}
+					centered
 					href={"/" + sanitize(user.displayName)}
 				/>
 			</div>
