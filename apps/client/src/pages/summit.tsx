@@ -43,6 +43,9 @@ export default function SummitPage() {
 		id: string,
 		behavior: "smooth" | "auto" | "instant" = "smooth"
 	) {
+        if (id === "")
+            return
+        
 		const rect = mainRef.current!.querySelector("#" + id)?.getBoundingClientRect()
 
 		console.log(rect)
