@@ -45,7 +45,7 @@ export default function SummitPage() {
 	) {
         if (id === "")
             return
-        
+
 		const rect = mainRef.current!.querySelector("#" + id)?.getBoundingClientRect()
 
 		console.log(rect)
@@ -55,15 +55,18 @@ export default function SummitPage() {
 		document
 			.getElementById("app")
 			?.children.item(0)
-			?.scrollTo({
+			?.scrollBy({
 				behavior: behavior,
 				top: rect.top - rect.height / 2,
 			})
 	}
 
 	useEffect(() => {
-		scrollTo(location.hash.slice(1), "instant")
-	}, [location.hash])
+        if (import.meta.env.SSR)
+            return
+
+		setTimeout(() => scrollTo(location.hash.slice(1), "smooth"), 10)
+	}, [])
 
 	return (
 		<div
