@@ -17,7 +17,8 @@ import MCCLogo from "../assets/summit/mcc_logo.png"
 import SmithieHappy from "../assets/smithie/awww.png"
 
 import "./summit.css"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { useLocation } from "react-router-dom"
 
 const EMAIL_REGEX =
 	/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g
@@ -31,7 +32,36 @@ const ATTENDEES = [
 	["You!", SmithieHappy, ""],
 ].sort((a, b) => a[0].localeCompare(b[0]))
 
+const SUMMIT_LINK =
+	(import.meta.env.DEV ? "smithed.dev" : "smithed.net") + "/summit"
+
 export default function SummitPage() {
+	const location = useLocation()
+	const mainRef = useRef<HTMLDivElement | null>(null)
+
+	function scrollTo(
+		id: string,
+		behavior: "smooth" | "auto" | "instant" = "smooth"
+	) {
+		const rect = mainRef.current!.querySelector("#" + id)?.getBoundingClientRect()
+
+		console.log(rect)
+
+		if (rect == null) return
+
+		document
+			.getElementById("app")
+			?.children.item(0)
+			?.scrollTo({
+				behavior: behavior,
+				top: rect.top - rect.height / 2,
+			})
+	}
+
+	useEffect(() => {
+		scrollTo(location.hash.slice(1), "instant")
+	}, [location.hash])
+
 	return (
 		<div
 			className="container summitPage"
@@ -42,6 +72,7 @@ export default function SummitPage() {
 				gap: "4rem",
 				paddingBottom: 80,
 			}}
+			ref={mainRef}
 		>
 			<Helmet>
 				<meta
@@ -135,12 +166,7 @@ export default function SummitPage() {
 								fontWeight: 500,
 							}}
 							onClick={() => {
-								const rect =
-									document
-										.getElementById("rsvpHeader")
-										?.getBoundingClientRect()!
-								
-                                document.getElementById("app")?.children.item(0)?.scrollTo({behavior: "smooth", top: rect.top - rect.height / 2})
+								scrollTo("rsvp")
 							}}
 						>
 							RSVP
@@ -156,6 +182,10 @@ export default function SummitPage() {
 							padding: "1rem",
 							alignSelf: "center",
 						}}
+						onMouseOut={(e) => {
+							document.querySelector("#summitLink")!.innerHTML =
+								SUMMIT_LINK
+						}}
 					>
 						<span style={{ color: "var(--subText)" }}>
 							Share it around!
@@ -165,15 +195,28 @@ export default function SummitPage() {
 							style={{
 								flexDirection: "row",
 								gap: "0.5rem",
-								fontSize: "1.5rem",
+								fontSize: "1rem",
 								fontWeight: 500,
 							}}
 						>
 							<a
+								id="summitLink"
 								href="/summit"
 								style={{ color: "var(--foreground)" }}
+								onClick={(e) => {
+									e.preventDefault()
+									navigator.clipboard.writeText(
+										"https://smithed" +
+											(import.meta.env.DEV
+												? ".dev"
+												: ".net") +
+											"/summit"
+									)
+
+									e.currentTarget.innerText = "Copied!"
+								}}
 							>
-								/summit
+								{SUMMIT_LINK}
 							</a>
 						</div>
 					</div>
@@ -207,6 +250,7 @@ export default function SummitPage() {
 				<Divider />
 			</div>
 			<SummitSection
+				id="booths"
 				image={GM4Booth}
 				imageDescription="Gamemode 4's booth on the Summit server"
 				header={"CHECK OUT THE BOOTHS"}
@@ -229,6 +273,7 @@ export default function SummitPage() {
 				/>
 			</SummitSection>
 			<SummitSection
+				id="panels"
 				image={MainStage}
 				imageDescription="Summit's largest stage out of the 3 on the server."
 				header={"WATCH THE PANELS"}
@@ -250,7 +295,11 @@ export default function SummitPage() {
 					}}
 				/>
 			</SummitSection>
-			<div className="container" style={{ width: "100%", gap: "2rem" }}>
+			<div
+				className="container"
+				style={{ width: "100%", gap: "2rem" }}
+				id="attendees"
+			>
 				<span className="header" style={{ alignSelf: "center" }}>
 					Who's coming?
 				</span>
@@ -265,6 +314,7 @@ export default function SummitPage() {
 				>
 					{ATTENDEES.map((attendee) => (
 						<AttendeeCard
+							key={attendee[0]}
 							name={attendee[0]}
 							image={attendee[1]}
 							website={attendee[2]}
@@ -272,15 +322,18 @@ export default function SummitPage() {
 					))}
 				</div>
 			</div>
-			<div className="container" style={{ width: "100%", gap: "1rem" }}>
-				<span
-					id="rsvpHeader"
-					className="header"
-					style={{ alignSelf: "center" }}
-				>
+			<div
+				className="container"
+				style={{ width: "100%", gap: "1rem" }}
+				id="rsvp"
+			>
+				<span className="header" style={{ alignSelf: "center" }}>
 					Sign me up!
 				</span>
-				<div className="container" style={{ gap: "1rem", width: "100%", textAlign: "center" }}>
+				<div
+					className="container"
+					style={{ gap: "1rem", width: "100%", textAlign: "center" }}
+				>
 					RSVP to be notified with all updates about Summit!
 					<RSVP />
 				</div>
@@ -298,14 +351,19 @@ function RSVP() {
 		<>
 			<div
 				className="container"
-				style={{ gap: "1rem", flexDirection: "row", width: "100%", flexWrap: "wrap" }}
+				style={{
+					gap: "1rem",
+					flexDirection: "row",
+					width: "100%",
+					flexWrap: "wrap",
+				}}
 			>
 				<IconInput
 					icon={Account}
 					placeholder="Email"
 					defaultValue={email}
 					onChange={(e) => setEmail(e.currentTarget.value)}
-                    style={{width: "100%", maxWidth: "24rem"}}
+					style={{ width: "100%", maxWidth: "24rem" }}
 				/>
 				<IconTextButton
 					icon={Edit}
@@ -355,7 +413,7 @@ function AttendeeCard({
 	website: string
 }) {
 	return (
-		<div className="attendeeCard">
+		<div className="attendeeCard" key={name}>
 			<img src={image} />
 			<div
 				className="container"
@@ -375,12 +433,14 @@ function AttendeeCard({
 }
 
 function SummitSection({
+	id,
 	image,
 	imageDescription,
 	header,
 	children,
 	color,
 }: {
+	id: string
 	image: string
 	imageDescription: string
 	header: string
@@ -392,7 +452,7 @@ function SummitSection({
 	const headerEnd = headerParts.at(-1)
 
 	return (
-		<section>
+		<section key={header} id={id}>
 			<div className="image">
 				<img src={image} style={{ borderColor: `var(--${color})` }} />
 				{imageDescription}
