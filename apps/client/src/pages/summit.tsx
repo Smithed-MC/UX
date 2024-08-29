@@ -13,6 +13,7 @@ import VTLogo from "../assets/summit/vt_logo.png"
 import BeetLogo from "../assets/summit/beet_logo.png"
 import StardustLogo from "../assets/summit/stardust_logo.png"
 import MCCLogo from "../assets/summit/mcc_logo.png"
+import TCCLogo from "../assets/summit/tcc_logo.png"
 
 import SmithieHappy from "../assets/smithie/awww.png"
 
@@ -29,6 +30,7 @@ const ATTENDEES = [
 	["Beet", BeetLogo, "https://mcbeet.dev/"],
 	["Stardust Labs", StardustLogo, "https://stardustlabs.net/"],
 	["r/MinecraftCommands", MCCLogo, "https://discord.gg/9wNcfsH"],
+	["The Creeper's Code", TCCLogo, "https://thecreeperscode.com"],
 	["You!", SmithieHappy, ""],
 ].sort((a, b) => a[0].localeCompare(b[0]))
 
@@ -43,10 +45,11 @@ export default function SummitPage() {
 		id: string,
 		behavior: "smooth" | "auto" | "instant" = "smooth"
 	) {
-        if (id === "")
-            return
+		if (id === "") return
 
-		const rect = mainRef.current!.querySelector("#" + id)?.getBoundingClientRect()
+		const rect = mainRef
+			.current!.querySelector("#" + id)
+			?.getBoundingClientRect()
 
 		console.log(rect)
 
@@ -62,8 +65,7 @@ export default function SummitPage() {
 	}
 
 	useEffect(() => {
-        if (import.meta.env.SSR)
-            return
+		if (import.meta.env.SSR) return
 
 		setTimeout(() => scrollTo(location.hash.slice(1), "smooth"), 10)
 	}, [])
@@ -99,20 +101,24 @@ export default function SummitPage() {
 						style={{ maxHeight: "12rem", color: "var(--accent2)" }}
 					/>
 				</span>
-				<div style={{ textAlign: "center" }}>
-					A minecraft event featuring datapack creators, map makers,
+				<div style={{ textAlign: "center", maxWidth: "48rem" }}>
+					A convention held inside of Minecraft, featuring datapack creators, map makers,
 					and more!
 					<br />
-					Come explore our server and enjoy the many live panels being
-					hosted throughout the week of the event!
+					<br />
+					Over the course of a week, you'll be able to explore
+					community made <a href="#booths">booths</a>, live{" "}
+					<a href="#panels">panels</a>, and discover various
+					collectables hidden around the server!
 				</div>
 				<div
 					style={{
-						display: "grid",
-						gridTemplateColumns: "repeat(auto-fill, 14rem)",
+						display: "flex",
+						flexDirection: "row",
 						justifyContent: "center",
 						gap: "2rem",
 						width: "100%",
+						flexWrap: "wrap",
 					}}
 				>
 					<div
@@ -124,6 +130,7 @@ export default function SummitPage() {
 							width: "100%",
 							padding: "1rem",
 							alignSelf: "center",
+							maxWidth: "14rem",
 						}}
 					>
 						<span style={{ color: "var(--subText)" }}>
@@ -158,6 +165,7 @@ export default function SummitPage() {
 							width: "100%",
 							padding: "1rem",
 							alignSelf: "center",
+							maxWidth: "14rem",
 						}}
 					>
 						<span style={{ color: "var(--subText)" }}>
@@ -187,6 +195,8 @@ export default function SummitPage() {
 							width: "100%",
 							padding: "1rem",
 							alignSelf: "center",
+							maxWidth: "14rem",
+							height: "5.625rem",
 						}}
 						onMouseOut={(e) => {
 							document.querySelector("#summitLink")!.innerHTML =
@@ -310,13 +320,7 @@ export default function SummitPage() {
 					Who's coming?
 				</span>
 				<div
-					style={{
-						width: "100%",
-						display: "grid",
-						gridTemplateColumns: "repeat(auto-fill, 22rem)",
-						gap: "2rem",
-						justifyContent: "center",
-					}}
+					className="attendeesContainer"
 				>
 					{ATTENDEES.map((attendee) => (
 						<AttendeeCard
