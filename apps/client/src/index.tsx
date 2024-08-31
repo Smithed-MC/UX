@@ -277,7 +277,7 @@ function Footer() {
 					</div>
 
 					<p style={{ color: "var(--border)" }}>
-						<b>Copyright © 2023 Smithed</b>
+						<b>Copyright © 2024 Smithed</b>
 						<br />
 						Not an official Minecraft product. Not approved by or
 						associated with Mojang Studios

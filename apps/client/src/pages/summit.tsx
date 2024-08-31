@@ -7,6 +7,7 @@ import BloomLogo from "../assets/summit/bloom_logo.svg"
 
 import GM4Booth from "../assets/summit/gm4_booth.webp"
 import MainStage from "../assets/summit/main_stage.webp"
+import Plushies from "../assets/summit/plushies.webp"
 
 import GM4Logo from "../assets/summit/gm4_logo.svg"
 import VTLogo from "../assets/summit/vt_logo.png"
@@ -102,8 +103,8 @@ export default function SummitPage() {
 					/>
 				</span>
 				<div style={{ textAlign: "center", maxWidth: "48rem" }}>
-					A convention held inside of Minecraft, featuring datapack creators, map makers,
-					and more!
+					A convention held inside of Minecraft, featuring datapack
+					creators, map makers, and more!
 					<br />
 					<br />
 					Over the course of a week, you'll be able to explore
@@ -311,6 +312,27 @@ export default function SummitPage() {
 					}}
 				/>
 			</SummitSection>
+			<SummitSection
+				id="collectibles"
+				image={Plushies}
+				imageDescription="Plushies of Smithie found around the world"
+				header={"FIND THE SECRETS"}
+				color="disturbing"
+			>
+				While you go between booths, keep your eyes peeled for various
+				secrets! Spread throughout the server are stickers and plushies
+				waiting to be collected.
+				<br />
+				<br />
+				If you're interested in exploring the server, make sure to RSVP!
+				<IconTextButton
+					className="disturbingButtonLike"
+					text={"RSVP now!"}
+					icon={Account}
+					href="#rsvp"
+					style={{ alignSelf: "end" }}
+				/>
+			</SummitSection>
 			<div
 				className="container"
 				style={{ width: "100%", gap: "2rem" }}
@@ -319,9 +341,7 @@ export default function SummitPage() {
 				<span className="header" style={{ alignSelf: "center" }}>
 					Who's coming?
 				</span>
-				<div
-					className="attendeesContainer"
-				>
+				<div className="attendeesContainer">
 					{ATTENDEES.map((attendee) => (
 						<AttendeeCard
 							key={attendee[0]}
@@ -344,7 +364,7 @@ export default function SummitPage() {
 					className="container"
 					style={{ gap: "1rem", width: "100%", textAlign: "center" }}
 				>
-					RSVP to be notified with all updates about Summit!
+					RSVP to reserve a spot!
 					<RSVP />
 				</div>
 			</div>

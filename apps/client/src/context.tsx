@@ -6,7 +6,14 @@ import {
 	NavButton,
 } from "components"
 import { svg } from "components"
-import { Browse, Download, Popout, Right, Search } from "components/svg"
+import {
+	Browse,
+	Download,
+	Popout,
+	Right,
+	Search,
+	SummitLogo,
+} from "components/svg"
 import { getAuth } from "firebase/auth"
 import { createContext } from "react"
 import ContentSearch from "./widget/ContentSearch"
@@ -25,6 +32,9 @@ export const defaultContext: IClientContext = {
 		<NavButton className="navBarOption start" to="/packs" key="browse">
 			Packs
 		</NavButton>,
+		// <NavButton className="navBarOption" to="/summit" key="summit">
+		// 	<span>Summit</span>
+		// </NavButton>,
 		<NavButton
 			className="navBarOption"
 			to="https://weld.smithed.dev"
@@ -32,7 +42,7 @@ export const defaultContext: IClientContext = {
 		>
 			Weld <Popout />
 		</NavButton>,
-		<ContentSearch/>,
+		<ContentSearch />,
 	],
 	enableFooter: true,
 	logoUrl: "/",
