@@ -535,6 +535,7 @@ function MapGallery({ images }: { images: string[] }) {
 
 	return (
 		<div className="mapGallery">
+			<span className="header">Take a peek at the world</span>
 			<div className="imageHolder">
 				<img ref={currentImageRef} src={images[index]} />
 			</div>

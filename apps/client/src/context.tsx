@@ -32,9 +32,9 @@ export const defaultContext: IClientContext = {
 		<NavButton className="navBarOption start" to="/packs" key="browse">
 			Packs
 		</NavButton>,
-		// <NavButton className="navBarOption" to="/summit" key="summit">
-		// 	<span>Summit</span>
-		// </NavButton>,
+		<NavButton className="navBarOption" to="/summit" key="summit">
+			Summit
+		</NavButton>,
 		<NavButton
 			className="navBarOption"
 			to="https://weld.smithed.dev"
