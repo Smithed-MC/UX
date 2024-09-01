@@ -9,6 +9,7 @@ interface ChooseBoxProps {
 	choices: { value: string; content: string }[]
 	onChange?: (value: string | string[]) => void
 	style?: CSSProperties
+	triggerStyle?: CSSProperties
 	className?: string
 	flip?: boolean
 	beforeOpen?: () => void
@@ -26,6 +27,7 @@ export default function ChooseBox({
 	flip,
 	beforeOpen,
 	title,
+	triggerStyle
 }: ChooseBoxProps) {
 	const [value, setValue] = useState<string | string[]>(
 		defaultValue ?? (multiselect ? [] : "")
@@ -190,6 +192,7 @@ export default function ChooseBox({
 			{options}
 			<div
 				className={`chooseBoxTrigger ${open ? "open" : ""} ${flip ? "flip" : "noflip"}`}
+				style={triggerStyle}
 				onMouseDown={clickTrigger}
 				ref={triggerRef}
 				tabIndex={0}

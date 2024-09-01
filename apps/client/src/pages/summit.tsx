@@ -1,5 +1,5 @@
 import { IconInput, IconTextButton } from "components"
-import { Account, Edit, SummitLogoFull } from "components/svg"
+import { Account, Edit, Right, SummitLogoFull } from "components/svg"
 import { Helmet } from "react-helmet"
 import { Divider } from "./home"
 
@@ -15,6 +15,15 @@ import BeetLogo from "../assets/summit/beet_logo.png"
 import StardustLogo from "../assets/summit/stardust_logo.png"
 import MCCLogo from "../assets/summit/mcc_logo.png"
 import TCCLogo from "../assets/summit/tcc_logo.png"
+
+import GImg1 from "../assets/summit/gallery/beach_stage.webp"
+import GImg2 from "../assets/summit/gallery/gm4.webp"
+import GImg3 from "../assets/summit/gallery/mountain.webp"
+import GImg4 from "../assets/summit/gallery/mountain2.webp"
+import GImg5 from "../assets/summit/gallery/spawn_center.webp"
+import GImg6 from "../assets/summit/gallery/spawn_crane.webp"
+
+const GALLERY_IMAGES = [GImg1, GImg2, GImg3, GImg4, GImg5, GImg6]
 
 import SmithieHappy from "../assets/smithie/awww.png"
 
@@ -333,6 +342,9 @@ export default function SummitPage() {
 					style={{ alignSelf: "end" }}
 				/>
 			</SummitSection>
+
+			<MapGallery images={GALLERY_IMAGES} />
+
 			<div
 				className="container"
 				style={{ width: "100%", gap: "2rem" }}
@@ -493,5 +505,60 @@ function SummitSection({
 			</span>
 			<div className="text">{children}</div>
 		</section>
+	)
+}
+
+function MapGallery({ images }: { images: string[] }) {
+	const [index, setIndex] = useState(0)
+	const currentImageRef = useRef<HTMLImageElement>(null)
+
+	const mod = (n: number, m: number) => ((n % m) + m) % m
+
+	function CycleImage(direction: number) {
+		const image = currentImageRef.current!
+		const nextIndex = mod(index + direction, images.length)
+
+		// if (image.style.opacity !== "0.5") {
+		// 	image.style.setProperty("opacity", "0.5")
+		// 	setTimeout(() => setIndex(nextIndex), 100)
+		// } else {
+		setIndex(nextIndex)
+		// }
+	}
+
+	// useEffect(() => {
+	// 	const image = currentImageRef.current!
+	// 	const timeout = setTimeout(() => image.style.setProperty("opacity", "1"), 200)
+
+	// 	return () => clearTimeout(timeout)
+	// }, [index])
+
+	return (
+		<div className="mapGallery">
+			<div className="imageHolder">
+				<img ref={currentImageRef} src={images[index]} />
+			</div>
+			<div className="buttonHolder">
+				<button onClick={() => CycleImage(-1)}>
+					<Right style={{ transform: "rotate(180deg)" }} />
+				</button>
+				{images.map((_, i) => (
+					<div
+						key={i}
+						style={{
+							width: "0.5rem",
+							height: "0.5rem",
+							borderRadius: "50%",
+							backgroundColor: "var(--foreground)",
+							opacity: i == index ? 1 : 0.2,
+							transition: "all 0.2s ease-in-out",
+						}}
+					/>
+				))}
+				<button onClick={() => CycleImage(1)}>
+					<Right />
+				</button>
+			</div>
+		</div>
 	)
 }

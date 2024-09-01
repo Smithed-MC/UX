@@ -117,18 +117,21 @@ export const PackDownloadOptionsSchema = Type.Partial(
 	{ minProperties: 1 }
 )
 
-export const PackVersionSchema = Type.Object({
+export const CommonVersionSchema = Type.Object({
 	name: Type.String({ minLength: 1 }),
-	downloads: PackDownloadOptionsSchema,
 	supports: Type.Array(MinecraftVersionSchema, { minItems: 1 }),
+})
+
+export const PackVersionSchema = Type.Object({
+	downloads: PackDownloadOptionsSchema,
 	dependencies: Type.Array(PackReferenceSchema),
+	...CommonVersionSchema.properties,
 })
 
 export const BundleVersionSchema = Type.Object({
-	name: Type.String({ minLength: 1 }),
 	patches: Type.Array(PackDownloadOptionsSchema),
-	supports: Type.Array(MinecraftVersionSchema, { minItems: 1 }),
 	packs: Type.Array(PackReferenceSchema),
+	...CommonVersionSchema.properties,
 })
 
 export const ImageSchema = Type.Union([
@@ -304,6 +307,8 @@ export const PATokenSchema = Type.Object({
 	tokenUid: Type.String(),
 	name: Type.String(),
 })
+
+export type CommonVersion = Static<typeof CommonVersionSchema>
 
 export type Article = Static<typeof ArticleSchema>
 export type PackMetaData = Static<typeof MetaDataSchema>

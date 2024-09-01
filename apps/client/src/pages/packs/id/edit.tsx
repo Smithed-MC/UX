@@ -1,14 +1,11 @@
-import { Value, ValueError, ValueErrorType } from "@sinclair/typebox/value"
+import { Value, ValueErrorType } from "@sinclair/typebox/value"
 import {
 	CategoryBar,
 	CategoryChoice,
 	ChooseBox,
 	IconInput,
 	IconTextButton,
-	Link,
-	MarkdownRenderer,
 	Modal,
-	Spinner,
 } from "components"
 import {
 	Trash,
@@ -19,10 +16,8 @@ import {
 	Jigsaw,
 	Text as TextSvg,
 	At,
-	Refresh,
 	File,
 	Account,
-	Home,
 	Github,
 	YouTube,
 	Discord,
@@ -30,6 +25,7 @@ import {
 	Cross,
 } from "components/svg"
 import {
+	HTTPResponses,
 	PackData,
 	PackDataSchema,
 	PackDependency,
@@ -37,18 +33,14 @@ import {
 	PackVersion,
 	UserData,
 	packCategories,
-	supportedMinecraftVersions,
 } from "data-types"
-import { useFirebaseUser, useQueryParams, useSmithedUser } from "hooks"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useFirebaseUser, useSmithedUser } from "hooks"
+import { useEffect, useRef, useState } from "react"
 import {
-	createSearchParams,
 	useLoaderData,
 	useLocation,
 	useNavigate,
-	useNavigation,
 	useParams,
-	useSearchParams,
 } from "react-router-dom"
 import { coerce, compare, satisfies, inc, valid } from "semver"
 import { gzip } from "pako"
@@ -59,9 +51,10 @@ import {
 	setPropertyByPath,
 	LargeTextInput,
 	validUrlRegex,
+	SupportedVersionSelect,
 } from "../../editors/inputs"
 import GalleryManager from "../../editors/galleryManager"
-import { loadPackEdit, PackEditLoaderData } from "./edit.loader"
+import { PackEditLoaderData } from "./edit.loader"
 import qs from "query-string"
 import ReadmePreview from "../../editors/readmePreview"
 import {
@@ -70,158 +63,7 @@ import {
 } from "../../editors/errorEvents"
 import "../../editors/common.css"
 import VersionSelectOption from "../../editors/versionSelectOption"
-import Error from "../../editors/error"
-
-interface SavingState {
-	mode: "off" | "saving" | "saved" | "error"
-	error?: {
-		error: string
-		statusCode: number
-		message: string
-	}
-}
-
-function SavingModal({
-	state,
-	changeState,
-}: {
-	state: SavingState
-	changeState: (state: SavingState) => void
-}) {
-	const modalContainer = useRef<HTMLDivElement>(null)
-	const modalBody = useRef<HTMLDivElement>(null)
-
-	const closeModal = (initialDelay: number) =>
-		setTimeout(async () => {
-			const delay = (delay: number) =>
-				new Promise((resolve) => {
-					setTimeout(resolve, delay)
-				})
-
-			// Have to reset these first for some reason
-			modalBody.current?.style.setProperty("animation", "")
-			modalContainer.current?.style.setProperty("animation", "")
-			await delay(10)
-			modalBody.current?.style.setProperty(
-				"animation",
-				"slideInContent 0.6s reverse"
-			)
-			modalContainer.current?.style.setProperty(
-				"animation",
-				"fadeInBackground 1s ease-in-out reverse"
-			)
-			await delay(0.6 * 1000 - 10)
-			changeState({ mode: "off" })
-		}, initialDelay)
-
-	useEffect(() => {
-		if (state.mode === "saved") {
-			var timeout = closeModal(2000)
-		}
-		return () => {
-			clearTimeout(timeout)
-		}
-	}, [state])
-
-	if (state.mode === "off")
-		return <div style={{ display: "none", position: "absolute" }} />
-
-	return (
-		<div
-			style={{
-				display: "flex",
-				position: "fixed",
-				top: 0,
-				left: 0,
-				width: "100%",
-				height: "100%",
-				fontSize: "1.125rem",
-				justifyContent: "center",
-				alignItems: "center",
-				color: "var(--goodAccent)",
-				backgroundColor: "rgba(0,0,0,0.5)",
-				animation: "fadeInBackground 1s ease-in-out",
-				zIndex: 10,
-			}}
-			ref={modalContainer}
-		>
-			<div
-				className="container"
-				style={{
-					backgroundColor: "var(--section)",
-					border: "0.125rem solid var(--border)",
-					width: "100%",
-					maxWidth: 384,
-					aspectRatio: "2 / 1",
-					padding: 16,
-					borderRadius: "var(--defaultBorderRadius)",
-					gap: 16,
-					animation: "slideInContent 1s",
-					transition: "transform 0.6s cubic-bezier(0.87, 0, 0.13, 1)",
-				}}
-				ref={modalBody}
-			>
-				{state.mode === "saving" && (
-					<div>
-						<h3 style={{ margin: 0 }}>Saving pack...</h3>
-						<Spinner />
-					</div>
-				)}
-				{state.mode === "saved" && (
-					<div>
-						<label
-							style={{
-								margin: 0,
-								fontSize: "2rem",
-								color: "var(--success)",
-							}}
-						>
-							Pack saved!
-						</label>
-					</div>
-				)}
-				{state.mode === "error" && (
-					<div
-						className="container"
-						style={{ alignItems: "center", height: "100%" }}
-					>
-						<h3
-							style={{
-								margin: 0,
-								width: "100%",
-								textAlign: "center",
-							}}
-						>
-							An error occured
-						</h3>
-						<label
-							style={{
-								color: "var(--subText)",
-								width: "100%",
-								textAlign: "center",
-							}}
-						>
-							{state.error?.error}
-							<label style={{ color: "var(--badAccent)" }}>
-								{" "}
-								{state.error?.statusCode}
-							</label>
-						</label>
-						<p style={{ flexGrow: 1, width: "100%" }}>
-							{state.error?.message.replace("body/data/", "")}
-						</p>
-						<button
-							className="buttonLike invalidButtonLike"
-							onClick={() => closeModal(0)}
-						>
-							Close
-						</button>
-					</div>
-				)}
-			</div>
-		</div>
-	)
-}
+import SaveWidget, { SavingState } from "../../editors/saveWidget"
 
 let depUidToRaw: Record<string, string> = {}
 let initialContributors: string[] = []
@@ -243,8 +85,6 @@ export default function PackEdit() {
 	const navigate = useNavigate()
 
 	const { packData, packMetaData } = useLoaderData() as PackEditLoaderData
-
-	const [savingState, setSavingState] = useState<SavingState>({ mode: "off" })
 
 	async function onLoad() {
 		if (user == null) return
@@ -274,7 +114,7 @@ export default function PackEdit() {
 		onLoad()
 	}, [packData, packMetaData, user])
 
-	async function savePack() {
+	async function savePack(setSavingState: (state: SavingState) => void) {
 		if (packData === undefined) return
 
 		const errors = [...Value.Errors(PackDataSchema, packData)]
@@ -292,6 +132,14 @@ export default function PackEdit() {
 					sendErrorEvent(path, e)
 				}
 			}
+			setSavingState({
+				mode: "error",
+				error: {
+					message: "There are fields that are incomplete!",
+					statusCode: HTTPResponses.BAD_REQUEST,
+					error: "",
+				},
+			})
 			return
 		}
 
@@ -304,8 +152,6 @@ export default function PackEdit() {
 		const uri = isNew
 			? `/packs?id=${packId}&token=${token}`
 			: `/packs/${packId}?token=${token}`
-
-		
 
 		console.log(uri)
 		const body = gzip(
@@ -453,7 +299,8 @@ export default function PackEdit() {
 						)
 					}}
 				/>
-				<div/>
+				<div />
+
 				{dependencies.map((d, i) => (
 					<>
 						<IconInput
@@ -593,18 +440,10 @@ export default function PackEdit() {
 						return undefined
 					}}
 				/>
-				<ChooseBox
-					style={{ gridArea: "supports" }}
-					placeholder="Supported Versions"
-					choices={supportedMinecraftVersions.map((version) => ({
-						value: version,
-						content: version,
-					}))}
-					onChange={(v) => {
-						version.supports = typeof v === "string" ? [v] : v
-					}}
-					defaultValue={version.supports ?? []}
-					multiselect
+				<SupportedVersionSelect
+					version={version}
+					path={`versions/${index}/supports`}
+					area="supports"
 				/>
 				<TextInput
 					dataRef={version}
@@ -1062,7 +901,6 @@ export default function PackEdit() {
 			updateVersions()
 			setSelectedVersion(packData?.versions[0])
 		}, [packData])
-	
 
 		function VersionSelect({ packData }: { packData: PackData }) {
 			return (
@@ -1083,9 +921,9 @@ export default function PackEdit() {
 								key={`version_option_${i}`}
 								index={i}
 								version={v}
-								setSelectedVersion={setSelectedVersion} 
-								allVersions={packData.versions} 
-								onDelete={updateVersions}								
+								setSelectedVersion={setSelectedVersion}
+								allVersions={packData.versions}
+								onDelete={updateVersions}
 							/>
 						))}
 
@@ -1400,26 +1238,8 @@ export default function PackEdit() {
 				<Versions />
 				<Management />
 			</div>
-			<div
-				className="container"
-				style={{ flexDirection: "row", width: "100%", gap: "1rem" }}
-			>
-				<IconTextButton
-					className="buttonLike invalidButtonLike"
-					text="Cancel"
-					icon={Cross}
-					onClick={() => {
-						navigate(-1)
-					}}
-				/>
-				<IconTextButton
-					className="buttonLike successButtonLike"
-					text="Save"
-					icon={Check}
-					onClick={savePack}
-				/>
-			</div>
-			<SavingModal state={savingState} changeState={setSavingState} />
+			<SaveWidget onSave={savePack} />
 		</div>
 	)
 }
+

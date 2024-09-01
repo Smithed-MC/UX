@@ -5,7 +5,6 @@ import {
 	IconInput,
 	IconTextButton,
 	Modal,
-	Spinner,
 } from "components"
 
 import {
@@ -20,19 +19,17 @@ import {
 	File,
 	YouTube,
 	Discord,
-	Cross,
-	Right,
 	NewFolder,
 	Folder,
 } from "components/svg"
 import {
 	BundleSchema_v2,
 	BundleVersion,
+	HTTPResponses,
 	PackBundle_v2,
 	PackData,
 	PackDownloadOptions,
 	bundleCategories,
-	supportedMinecraftVersions,
 } from "data-types"
 import { useFirebaseUser } from "hooks"
 import { useEffect, useRef, useState } from "react"
@@ -46,6 +43,7 @@ import { compare, inc, valid } from "semver"
 import {
 	TextInput,
 	LargeTextInput,
+	SupportedVersionSelect,
 } from "../../editors/inputs"
 import ReadmePreview from "../../editors/readmePreview"
 import { Value } from "@sinclair/typebox/value"
@@ -60,162 +58,7 @@ import { Pack } from "./edit/pack.js"
 import SearchPacks from "./edit/searchPacks"
 import VersionSelectOption from "../../editors/versionSelectOption"
 
-import Error from '../../editors/error'
-import { loadBundleEdit } from "./edit.loader"
-
-interface SavingState {
-	mode: "off" | "saving" | "saved" | "error"
-	error?: {
-		error: string
-		statusCode: number
-		message: string
-	}
-}
-
-function SavingModal({
-	state,
-	changeState,
-}: {
-	state: SavingState
-	changeState: (state: SavingState) => void
-}) {
-	const modalContainer = useRef<HTMLDivElement>(null)
-	const modalBody = useRef<HTMLDivElement>(null)
-
-	const closeModal = (initialDelay: number) =>
-		setTimeout(async () => {
-			const delay = (delay: number) =>
-				new Promise((resolve) => {
-					setTimeout(resolve, delay)
-				})
-
-			// Have to reset these first for some reason
-			modalBody.current?.style.setProperty("animation", "")
-			modalContainer.current?.style.setProperty("animation", "")
-			await delay(10)
-			modalBody.current?.style.setProperty(
-				"animation",
-				"slideInContent 0.6s reverse"
-			)
-			modalContainer.current?.style.setProperty(
-				"animation",
-				"fadeInBackground 1s ease-in-out reverse"
-			)
-			await delay(0.6 * 1000 - 10)
-			changeState({ mode: "off" })
-		}, initialDelay)
-
-	useEffect(() => {
-		if (state.mode === "saved") {
-			var timeout = closeModal(2000)
-		}
-		return () => {
-			clearTimeout(timeout)
-		}
-	}, [state])
-
-	if (state.mode === "off")
-		return <div style={{ display: "none", position: "absolute" }} />
-
-	return (
-		<div
-			style={{
-				display: "flex",
-				position: "fixed",
-				top: 0,
-				left: 0,
-				width: "100%",
-				height: "100%",
-				fontSize: "1.125rem",
-				justifyContent: "center",
-				alignItems: "center",
-				color: "var(--goodAccent)",
-				backgroundColor: "rgba(0,0,0,0.5)",
-				animation: "fadeInBackground 1s ease-in-out",
-				zIndex: 10,
-			}}
-			ref={modalContainer}
-		>
-			<div
-				className="container"
-				style={{
-					backgroundColor: "var(--section)",
-					border: "0.125rem solid var(--border)",
-					width: "100%",
-					maxWidth: 384,
-					aspectRatio: "2 / 1",
-					padding: 16,
-					borderRadius: "var(--defaultBorderRadius)",
-					gap: 16,
-					animation: "slideInContent 1s",
-					transition: "transform 0.6s cubic-bezier(0.87, 0, 0.13, 1)",
-				}}
-				ref={modalBody}
-			>
-				{state.mode === "saving" && (
-					<div className="container" style={{ gap: "1rem" }}>
-						<h3 style={{ margin: 0 }}>Saving bundle...</h3>
-						<Spinner />
-					</div>
-				)}
-				{state.mode === "saved" && (
-					<div>
-						<label
-							style={{
-								margin: 0,
-								fontSize: "2rem",
-								color: "var(--success)",
-							}}
-						>
-							Bundle saved!
-						</label>
-					</div>
-				)}
-				{state.mode === "error" && (
-					<div
-						className="container"
-						style={{ alignItems: "center", height: "100%" }}
-					>
-						<h3
-							style={{
-								margin: 0,
-								width: "100%",
-								textAlign: "center",
-							}}
-						>
-							An error occured
-						</h3>
-						<label
-							style={{
-								color: "var(--subText)",
-								width: "100%",
-								textAlign: "center",
-							}}
-						>
-							{state.error?.error}
-							<label style={{ color: "var(--badAccent)" }}>
-								{" "}
-								{state.error?.statusCode}
-							</label>
-						</label>
-						<p style={{ flexGrow: 1, width: "100%" }}>
-							{state.error?.message.replace("body/data/", "")}
-						</p>
-						<button
-							className="buttonLike invalidButtonLike"
-							onClick={() => closeModal(0)}
-						>
-							Close
-						</button>
-					</div>
-				)}
-			</div>
-		</div>
-	)
-}
-
-let depUidToRaw: Record<string, string> = {}
-let initialContributors: string[] = []
+import SaveWidget, { SavingState } from "../../editors/saveWidget"
 
 export default function BundleEdit() {
 	const user = useFirebaseUser()
@@ -231,7 +74,6 @@ export default function BundleEdit() {
 	} = useLoaderData() as any
 
 	const navigate = useNavigate()
-	const [savingState, setSavingState] = useState<SavingState | undefined>()
 	const [selectedVersion, setSelectedVersion] = useState<BundleVersion>()
 	const [versions, setVersions] = useState<BundleVersion[]>(
 		bundleData.versions
@@ -256,7 +98,7 @@ export default function BundleEdit() {
 		setSelectedVersion(bundleData?.versions[0])
 	}, [bundleData])
 
-	async function saveBundle() {
+	async function saveBundle(setSavingState: (state: SavingState) => void) {
 		if (bundleData === undefined) return
 
 		const errors = [...Value.Errors(BundleSchema_v2, bundleData)]
@@ -266,7 +108,7 @@ export default function BundleEdit() {
 				const path = e.path.slice(1)
 				sendErrorEvent(path, e)
 			}
-			return
+			return setSavingState({mode: "error", error: {error: "", statusCode: HTTPResponses.BAD_REQUEST, message: "There are fields that are incomplete!"}})
 		}
 
 		setSavingState({ mode: "saving" })
@@ -709,23 +551,11 @@ export default function BundleEdit() {
 								return undefined
 							}}
 						/>
-						<ChooseBox
-							style={{ gridArea: "supports" }}
-							placeholder="Supported Versions"
-							choices={supportedMinecraftVersions.map(
-								(version) => ({
-									value: version,
-									content: version,
-								})
-							)}
-							onChange={(v) => {
-								version.supports =
-									typeof v === "string" ? [v] : v
-							}}
-							defaultValue={version.supports ?? []}
-							multiselect
+						<SupportedVersionSelect
+							path={`versions/${index}/supports`}
+							area="supports"
+							version={version}
 						/>
-
 						<span
 							style={{
 								fontWeight: 500,
@@ -1049,50 +879,7 @@ export default function BundleEdit() {
 				<Versions />
 				{/* {tab === "management" && <Management />} */}
 			</div>
-			<div
-				className="container"
-				style={{
-					flexDirection: "row",
-					width: "100%",
-					justifyContent: "end",
-					position: "sticky",
-					bottom: "1rem",
-					right: "1rem",
-				}}
-			>
-				<div
-					className="container"
-					style={{
-						flexDirection: "row",
-						gap: "1rem",
-						backgroundColor: "var(--background)",
-						borderRadius: "calc(1.5 * var(--defaultBorderRadius))",
-						padding: "0.5rem",
-					}}
-				>
-					<IconTextButton
-						className="buttonLike invalidButtonLike"
-						text="Cancel"
-						icon={Cross}
-						onClick={() => {
-							navigate(-1)
-						}}
-						reverse
-					/>
-					<IconTextButton
-						className="buttonLike accentedButtonLike"
-						text={isNew ? "Publish" : "Save"}
-						iconElement={
-							<Right style={{ transform: "rotate(90deg)" }} />
-						}
-						onClick={saveBundle}
-						reverse
-					/>
-				</div>
-			</div>
-			{savingState && (
-				<SavingModal state={savingState} changeState={setSavingState} />
-			)}
+			<SaveWidget onSave={saveBundle} />
 		</div>
 	)
 }

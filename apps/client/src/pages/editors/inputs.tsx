@@ -1,8 +1,11 @@
 import { ValueError, ValueErrorType } from "@sinclair/typebox/errors"
-import { IconInput } from "components"
+import { ChooseBox, IconInput } from "components"
+import { CommonVersion, supportedMinecraftVersions } from "data-types"
 import { useEffect, useReducer, useRef, useState } from "react"
+import { useErrorEventHandlers } from "./errorEvents"
 
-export const validUrlRegex = /^http(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#=_]*)?$/gi
+export const validUrlRegex =
+	/^http(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#=_]*)?$/gi
 
 export function getPropertyByPath(obj: any, path: string) {
 	const properties = path.split("/") // Split the path string into an array of property names
@@ -49,12 +52,12 @@ function InputError({ error, inset }: { error?: string; inset?: boolean }) {
 						? undefined
 						: `calc(100% - var(--defaultBorderRadius)`
 					: inset
-                        ? "1rem"
-                        : 0,
+						? "1rem"
+						: 0,
 				width: "max-content",
 				height: "max-content",
-                minHeight: "1.125rem",
-                boxSizing: 'border-box',
+				minHeight: "1.125rem",
+				boxSizing: "border-box",
 				backgroundColor: "var(--disturbing)",
 				paddingLeft: inset
 					? "1rem"
@@ -71,11 +74,7 @@ function InputError({ error, inset }: { error?: string; inset?: boolean }) {
 				opacity: error ? 1 : 0,
 			}}
 		>
-			<span
-				style={{ zIndex: 2, padding: "0.5rem 0rem" }}
-			>
-				{error}
-			</span>
+			<span style={{ zIndex: 2, padding: "0.5rem 0rem" }}>{error}</span>
 		</div>
 	)
 }
@@ -123,8 +122,7 @@ export function TextInput({
 
 	function onError(this: HTMLInputElement, e: ErrorEvent) {
 		const error = e.error as ValueError
-        if (e.error === undefined)
-            return
+		if (e.error === undefined) return
 		setError(error.message)
 	}
 
@@ -166,7 +164,9 @@ export function TextInput({
 						setError(error)
 						return
 					} else {
-                        e.currentTarget.parentElement?.classList.remove('hasError')
+						e.currentTarget.parentElement?.classList.remove(
+							"hasError"
+						)
 						dispatchErrorCleared(e.currentTarget)
 						setError(undefined)
 					}
@@ -239,4 +239,103 @@ export const LargeTextInput = ({
 			<InputError error={error} inset={false} />
 		</div>
 	)
+}
+
+export function SupportedVersionSelect({
+	version,
+	path,
+	area,
+}: {
+	version: CommonVersion
+	path: string
+	area: string
+}) {
+	const [error, setError] = useState<string>()
+	const ref = useRef<HTMLDivElement>(null)
+
+	function onError(this: HTMLDivElement, e: ErrorEvent) {
+		const error = e.error as ValueError
+
+		setErrorMessage(error.type, error.message)
+	}
+
+	useEffect(() => {
+		if (!ref.current) return
+		ref.current.addEventListener("error", onError)
+
+		return () => ref.current?.removeEventListener("error", onError)
+	}, [ref])
+
+	return (
+		<div
+			ref={ref}
+			style={{ gridArea: area, position: "relative" }}
+			className="inputField"
+			id={path}
+		>
+			<ChooseBox
+				triggerStyle={
+					error
+						? {
+								borderColor: "var(--disturbing)",
+								borderRadius:
+									"var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0",
+								transition: "all 0.15s ease-in-out",
+							}
+						: undefined
+				}
+				placeholder="Supported Versions"
+				choices={supportedMinecraftVersions.map((version) => ({
+					value: version,
+					content: version,
+				}))}
+				onChange={(v) => {
+					version.supports = typeof v === "string" ? [v] : v
+
+					if (version.supports.length === 0) {
+						setErrorMessage(ValueErrorType.ArrayMinItems, "")
+						dispatchError(ref.current!)
+					} else {
+						setError(undefined)
+						dispatchErrorCleared(ref.current!)
+					}
+				}}
+				beforeOpen={() => {
+					setError(undefined)
+					dispatchErrorCleared(ref.current!)
+				}}
+				defaultValue={version.supports ?? []}
+				multiselect
+			/>
+
+			<div
+				style={{
+					position: "absolute",
+					backgroundColor: "var(--disturbing)",
+					top: "calc(100% - 0.125rem)",
+					width: "100%",
+					textAlign: "center",
+					borderRadius:
+						"0 0 var(--defaultBorderRadius) var(--defaultBorderRadius)",
+					padding: "0.5rem",
+					boxSizing: "border-box",
+					zIndex: error ? 1 : -1,
+					opacity: error ? 1 : 0,
+					transition: "opacity 0.15s ease-in-out",
+				}}
+			>
+				{error}
+			</div>
+		</div>
+	)
+
+	function setErrorMessage(error: ValueErrorType, fallback: string) {
+		switch (error) {
+			case ValueErrorType.ArrayMinItems:
+				setError("At least one version is required")
+				break
+			default:
+				setError(fallback)
+		}
+	}
 }
