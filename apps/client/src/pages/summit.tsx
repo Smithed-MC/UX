@@ -521,14 +521,7 @@ function MapGallery({ images }: { images: string[] }) {
 		image.style.setProperty("filter", "blur(0.125rem) saturate(50%)")
 		setTimeout(() => setIndex(nextIndex), 150)
 	}
-
-	// useEffect(() => {
-	// 	const image = currentImageRef.current!
-	// 	const timeout = setTimeout(() => image.style.setProperty("opacity", "1"), 200)
-
-	// 	return () => clearTimeout(timeout)
-	// }, [index])
-
+	
 	return (
 		<div className="mapGallery">
 			<span className="header">Take a peek at the world</span>

@@ -66,11 +66,11 @@ export default function ContentSearch() {
 							e.preventDefault()
 							break
 						}
-						case "#": {
-							setMode(mode === "bundles" ? "packs" : "bundles")
-							e.preventDefault()
-							break
-						}
+						// case "#": {
+						// 	setMode(mode === "bundles" ? "packs" : "bundles")
+						// 	e.preventDefault()
+						// 	break
+						// }
 						case "Escape": {
 							setMode("packs")
 							e.preventDefault()
@@ -88,9 +88,9 @@ export default function ContentSearch() {
 					and <b>teams</b>
 					<br />
 				</span>
-				<span>
+				{/* <span>
 					<span className="char">#</span> To search for <b>bundles</b>
-				</span>
+				</span> */}
 			</div>
 		</div>
 	)
