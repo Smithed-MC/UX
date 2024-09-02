@@ -518,12 +518,8 @@ function MapGallery({ images }: { images: string[] }) {
 		const image = currentImageRef.current!
 		const nextIndex = mod(index + direction, images.length)
 
-		// if (image.style.opacity !== "0.5") {
-		// 	image.style.setProperty("opacity", "0.5")
-		// 	setTimeout(() => setIndex(nextIndex), 100)
-		// } else {
-		setIndex(nextIndex)
-		// }
+		image.style.setProperty("filter", "blur(0.125rem) saturate(50%)")
+		setTimeout(() => setIndex(nextIndex), 150)
 	}
 
 	// useEffect(() => {
@@ -537,7 +533,13 @@ function MapGallery({ images }: { images: string[] }) {
 		<div className="mapGallery">
 			<span className="header">Take a peek at the world</span>
 			<div className="imageHolder">
-				<img ref={currentImageRef} src={images[index]} />
+				<img
+					ref={currentImageRef}
+					src={images[index]}
+					onLoad={(e) => {
+						e.currentTarget.style.setProperty("filter", "blur(0px)")
+					}}
+				/>
 			</div>
 			<div className="buttonHolder">
 				<button onClick={() => CycleImage(-1)}>
