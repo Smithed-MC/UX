@@ -16,6 +16,7 @@ import {
 	Modal,
 } from "components"
 import "./index.css"
+import "../../../widget/packInfo.css"
 import { Helmet } from "react-helmet"
 import {
 	Discord,
@@ -100,7 +101,7 @@ export default function Packs() {
 					className="container packInfoRoot"
 					style={{ width: "100%", gap: "4rem" }}
 				>
-					<div className="packPageHeader" style={{}}>
+					<div className="packPageHeader">
 						<div className="packDetailsContainer">
 							<img
 								src={packData?.display.icon}
