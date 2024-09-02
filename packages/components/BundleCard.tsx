@@ -9,7 +9,6 @@ import { useEffect, useRef, useState } from "react"
 import { DownloadButton, IconTextButton, Link } from "components"
 import { useAppDispatch, useFirebaseUser } from "hooks"
 import { Check, Cross, Folder, Gear, NewFolder, Trash } from "components/svg"
-import { setSelectedBundle } from "store"
 import { compare } from "semver"
 
 export function BundleCard({

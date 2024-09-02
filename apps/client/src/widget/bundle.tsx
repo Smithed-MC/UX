@@ -12,7 +12,6 @@ import { sanitize } from "formatters"
 import { useAppDispatch, useAppSelector, useFirebaseUser } from "hooks"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { selectUsersBundles, setSelectedBundle, setUsersBundles } from "store"
 
 interface CreateBundleProps {
 	close?: () => void
@@ -33,7 +32,6 @@ export function CreateBundle({
 	const [version, setVersion] = useState<MinecraftVersion>()
 
 	const user = useFirebaseUser()
-	const bundles = useAppSelector(selectUsersBundles)
 
 	const dispatch = useAppDispatch()
 	const navigate = useNavigate()
@@ -62,6 +60,7 @@ export function CreateBundle({
 					patches: [],
 				},
 			],
+			categories: [],
 			visibility: "private",
 		}
 
@@ -84,14 +83,12 @@ export function CreateBundle({
 		const { uid } = await resp.json()
 		bundleData.uid = uid
 
-		dispatch(setUsersBundles([bundleData, ...bundles]))
 		if (finishCallback) finishCallback(bundleData)
 		return uid
 	}
 	const finishAndEdit = async () => {
 		const uid = await finish()
 		if (uid === undefined) return
-		dispatch(setSelectedBundle(uid))
 
 		navigate(`/browse`)
 	}

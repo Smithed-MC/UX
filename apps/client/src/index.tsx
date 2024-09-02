@@ -20,10 +20,7 @@ import { Provider } from "react-redux"
 
 
 import {
-	selectSelectedBundle,
-	setSelectedBundle,
 	setUserData,
-	setUsersBundles,
 	store,
 } from "store"
 import { useAppDispatch, useAppSelector, useSiteSettings } from "hooks"
@@ -56,7 +53,6 @@ if (import.meta.env.VITE_FIREBASE_EMULATOR) {
 
 export function ClientApplet() {
 	const dispatch = useAppDispatch()
-	const selectedBundle = useAppSelector(selectSelectedBundle)
 	const [hideWarning, setHideWarning] = useState(false)
 	const location = useLocation()
 	const context = useContext(ClientContext)
@@ -66,8 +62,6 @@ export function ClientApplet() {
 		applySettings(siteSettings)
 
 	function resetBundleData() {
-		dispatch(setUsersBundles([]))
-		dispatch(setSelectedBundle(""))
 	}
 
 	function resetUserData() {
@@ -86,8 +80,6 @@ export function ClientApplet() {
 
 		const bundleIds: string[] = await resp.json()
 
-		if (bundleIds.find((b) => b === selectedBundle) === undefined)
-			dispatch(setSelectedBundle(""))
 
 		const getData = async (id: string) => {
 			const resp = await fetch(
@@ -101,7 +93,6 @@ export function ClientApplet() {
 		const bundles = (
 			await Promise.all(bundleIds.map((id) => getData(id)))
 		).filter((b) => b !== undefined)
-		dispatch(setUsersBundles(bundles))
 	}
 
 	async function loadUserData(user: FirebaseUser | null) {

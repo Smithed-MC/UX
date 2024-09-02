@@ -26,8 +26,6 @@ function setStorage(key: string, value: any, child: () => void) {
 }
 
 const initialState = {
-	selectedBundle: getDefault<string>("selectedBundle", ""),
-	usersBundles: getDefault<PackBundle[]>("usersBundles", []),
 	userData: getDefault<UserData | {}>("userData", {}),
 }
 
@@ -35,18 +33,6 @@ const userSlice = createSlice({
 	name: "user",
 	initialState,
 	reducers: {
-		setSelectedBundle: (state, action) =>
-			setStorage(
-				"selectedBundle",
-				action.payload,
-				() => (state.selectedBundle = action.payload)
-			),
-		setUsersBundles: (state, action) =>
-			setStorage(
-				"usersBundles",
-				action.payload,
-				() => (state.usersBundles = action.payload)
-			),
 		setUserData: (state, action) => {
 			if (Object.keys(action.payload).length > 1) {
 				Cookies.set(
@@ -76,9 +62,7 @@ export type RootState = ReturnType<typeof store.getState>
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch
 
-export const { setSelectedBundle, setUsersBundles, setUserData } =
+export const { setUserData } =
 	userSlice.actions
 
-export const selectSelectedBundle = (state: RootState) => state.selectedBundle
-export const selectUsersBundles = (state: RootState) => state.usersBundles
 export const selectUserData = (state: RootState) => state.userData

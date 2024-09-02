@@ -168,7 +168,6 @@ export default function GalleryPackCard({
 	state,
 	style,
 	parentStyle,
-	bundleData,
 	user,
 	addWidget,
 	packAuthor,

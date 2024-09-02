@@ -1,7 +1,6 @@
 import { IconInput, ChooseBox, GalleryPackCard } from "components"
 import { useEffect, useRef, useState } from "react"
 import { SortOptions, fullMinecraftVersions, packCategories } from "data-types"
-import { AddToBundleModal } from "../../widget/packInfo.js"
 import { Link, useLoaderData, useNavigate } from "react-router-dom"
 import "./index.css"
 import {
@@ -11,7 +10,6 @@ import {
 	useQueryParams,
 } from "hooks"
 import { Browse as BrowseSvg, Plus } from "components/svg.js"
-import { selectSelectedBundle, selectUsersBundles } from "store"
 import { Helmet } from "react-helmet"
 import {
 	BrowsePageData,
@@ -24,8 +22,6 @@ export default function PacksBrowser(props: any) {
 	const params = useQueryParams()
 	const { search, category, sort, version, page } = params
 
-	const selectedBundle = useAppSelector(selectSelectedBundle)
-	const bundles = useAppSelector(selectUsersBundles)
 	// console.log(bundles)
 
 	const dispatch = useAppDispatch()
@@ -212,7 +208,6 @@ export default function PacksBrowser(props: any) {
 							tag="browsePackCard"
 							key={p.id}
 							id={p.id}
-							state={selectedBundle !== "" ? "add" : undefined}
 							onClick={() => onClick(p.id)}
 							parentStyle={{
 								zIndex: addPack === p.id ? 1 : undefined,
@@ -223,37 +218,12 @@ export default function PacksBrowser(props: any) {
 										? "0.125rem solid var(--accent)"
 										: "",
 							}}
-							bundleData={bundles.find(
-								(b) => b.uid === selectedBundle
-							)}
 							packData={p.pack}
 							packMeta={p.meta}
 							packAuthor={p.author}
 							user={user}
 							addWidget={
-								<AddToBundleModal
-									trigger={
-										<div
-											className="buttonLike"
-											style={{
-												display: "flex",
-												backgroundColor:
-													"var(--highlight)",
-											}}
-											onClick={() =>
-												setAddPack(
-													addPack !== p.id ? p.id : ""
-												)
-											}
-										>
-											<Plus />
-										</div>
-									}
-									packData={p.pack}
-									isOpen={addPack === p.id}
-									close={() => setAddPack(undefined)}
-									id={p.id}
-								/>
+								<></>
 							}
 						/>
 					))}
