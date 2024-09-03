@@ -24,7 +24,7 @@
 	border: 0.125rem solid var(--border);
 
 	transition: all 0.2s;
-	overflow: hidden;
+	/* overflow: hidden; */
 	/* position: absolute; */
 	/* bottom: 0; */
 }
@@ -40,12 +40,11 @@
 	column-gap: 1rem;
 
 	grid-template-areas:
-		"name name name"
-		"description description description"
-		"author author open"
-		"footer footer footer";
+		"name"
+		"description"
+		"open";
 
-	grid-template-columns: 1fr auto auto;
+	grid-template-columns: 1fr;
 
 	background-color: var(--section);
 	border-radius: 0 0 var(--defaultBorderRadius) var(--defaultBorderRadius);
@@ -83,7 +82,8 @@
 	/* overflow: hidden; */
 	width: 100%;
 	flex-direction: column;
-	/* border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0; */
+	border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0;
+	background-color: var(--section);
 }
 
 .galleryPackCard > .galleryImage > img {

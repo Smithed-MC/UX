@@ -288,11 +288,18 @@ export async function loadRootData({ request }: { request: Request }) {
 			"smithedUser" in cookie
 				? JSON.parse(cookie["smithedUser"])
 				: undefined
+
 		const siteSettings =
 			"smithedSiteSettings" in cookie
 				? JSON.parse(cookie["smithedSiteSettings"])
 				: undefined
-		return { user, siteSettings }
+
+		const currentBundle = 
+			"currentBundle" in cookie
+				? JSON.parse(cookie["currentBundle"])
+				: null
+				
+		return { user, siteSettings, currentBundle }
 	}
 
 	return { user: undefined, siteSettings: undefined }

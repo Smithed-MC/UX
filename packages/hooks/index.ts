@@ -5,7 +5,7 @@ import * as queryString from "query-string"
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux"
 import { UserData } from "data-types"
 
-import { AppDispatch, RootState, selectUserData } from "store"
+import { AppDispatch, CurrentBundle, RootState, selectCurrentBundle, selectUserData, setCurrentBundle } from "store"
 import Cookies from "js-cookie"
 
 export function useFirebaseUser() {
@@ -30,6 +30,18 @@ export function useSmithedUser(): UserData | undefined {
 		: useAppSelector(selectUserData)
 
 	return user && Object.keys(user).length > 0 ? user : undefined
+}
+
+export function useCurrentBundle(): [CurrentBundle | null, (bundle: CurrentBundle | null) => void] {
+	const bundle = (import.meta as any).env.SSR 
+		? (useRouteLoaderData("root") as any)?.currentBundle
+		: useAppSelector(selectCurrentBundle)
+
+	const dispatch = useAppDispatch()
+
+	const set = (state: CurrentBundle|null) => dispatch(setCurrentBundle(state))
+
+	return [bundle, set]
 }
 
 interface SiteTheme {

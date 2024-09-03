@@ -476,9 +476,11 @@ export default function GalleryPackCard({
 							gap: "1rem",
 							placeSelf: "end",
 							gridArea: "open",
+							width: "100%",
+							justifyContent: "end"
 						}}
 					>
-						{/* {addWidget} */}
+						{state === "add" && addWidget}
 						{state === "editable" && (
 							<Link
 								className="buttonLike accentedButtonLike"

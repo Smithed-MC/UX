@@ -323,6 +323,13 @@ button:hover:not(:disabled):not(.exclude),
 	background-color: var(--highlight) !important;
 }
 
+.boldButtonLike {
+	background-color: var(--bold) !important;
+}
+.boldButtonLike:hover {
+	background-color: var(--highlight) !important;
+}
+
 button:focus:not(:disabled):not(.exclude),
 .buttonLike:focus:not(.disabled) {
 	outline: none;

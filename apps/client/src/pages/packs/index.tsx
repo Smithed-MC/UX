@@ -1,30 +1,55 @@
-import { IconInput, ChooseBox, GalleryPackCard } from "components"
+import {
+	IconInput,
+	ChooseBox,
+	GalleryPackCard,
+	IconTextButton,
+	Modal,
+} from "components"
 import { useEffect, useRef, useState } from "react"
-import { SortOptions, fullMinecraftVersions, packCategories } from "data-types"
+import {
+	PackData,
+	PackDependency,
+	SortOptions,
+	fullMinecraftVersions,
+	latestMinecraftVersion,
+	packCategories,
+} from "data-types"
 import { Link, useLoaderData, useNavigate } from "react-router-dom"
 import "./index.css"
 import {
 	useAppDispatch,
 	useAppSelector,
+	useCurrentBundle,
 	useFirebaseUser,
 	useQueryParams,
+	useSmithedUser,
 } from "hooks"
-import { Browse as BrowseSvg, Plus } from "components/svg.js"
+import {
+	Browse as BrowseSvg,
+	Copy,
+	Download,
+	Plus,
+	Right,
+	Trash,
+	Warning,
+} from "components/svg.js"
 import { Helmet } from "react-helmet"
 import {
 	BrowsePageData,
+	DataForPackCards,
 	PACKS_PER_PAGE,
 	createBrowseSearchParams,
 } from "../../loaders.js"
 import PageSelector from "components/PageSelector.js"
+import { CurrentBundle } from "store"
+import {
+	GameVersionPage,
+	PackVersionPage,
+} from "../../widget/downloadPackWidget"
 
 export default function PacksBrowser(props: any) {
 	const params = useQueryParams()
 	const { search, category, sort, version, page } = params
-
-	// console.log(bundles)
-
-	const dispatch = useAppDispatch()
 
 	const { count: totalPacks, packs } = useLoaderData() as BrowsePageData
 	const [categories, setCategories] = useState(
@@ -222,8 +247,9 @@ export default function PacksBrowser(props: any) {
 							packMeta={p.meta}
 							packAuthor={p.author}
 							user={user}
+							state={"add"}
 							addWidget={
-								<></>
+								<AddWidget pack={p} setAddPack={setAddPack} />
 							}
 						/>
 					))}
@@ -246,6 +272,328 @@ export default function PacksBrowser(props: any) {
 					/>
 				)}
 			</div>
+			<CurrentBundleWidget />
 		</div>
+	)
+}
+
+function CurrentBundleWidget() {
+	const [currentBundle, setCurrentBundle] = useCurrentBundle()
+	const [foldout, setFoldout] = useState(true)
+
+	function removeFromBundle(pack: PackDependency) {
+		const packs = [...(currentBundle?.packs ?? [])]
+
+		const index = packs.findIndex((p) => p.id === pack.id)
+		packs.splice(index, 1)
+
+		if (packs.length === 0) return setCurrentBundle(null)
+
+		const bundle = {
+			gameVersion: currentBundle?.gameVersion ?? latestMinecraftVersion,
+			packs: packs,
+		}
+
+		setCurrentBundle(bundle)
+	}
+
+	if (currentBundle == null || currentBundle.packs.length === 0) return <></>
+
+	const downloadLink =
+		import.meta.env.VITE_API_SERVER +
+		`/download?version=${currentBundle.gameVersion}&` +
+		currentBundle.packs.map((p) => `pack=${p.id}@${p.version}`).join("&")
+
+	return (
+		<div
+			className="container"
+			style={{
+				position: "fixed",
+				right: "0rem",
+				bottom: "0rem",
+				backgroundColor: "var(--section)",
+				border: "0.125rem solid var(--border)",
+				borderRadius: "var(--defaultBorderRadius)",
+				padding: "1rem",
+				paddingRight: "0.5rem",
+				gap: "1rem",
+				margin: "1rem",
+				maxWidth: "100vw",
+			}}
+		>
+			<div
+				className="container"
+				style={{
+					flexDirection: "row",
+					gap: "0.5rem",
+					width: "100%",
+					justifyContent: "space-between",
+					paddingRight: "0.5rem",
+					paddingBottom: "0.5rem",
+					borderBottom: "0.125rem solid var(--border)"
+				}}
+			>
+				<span>
+					<span style={{ fontWeight: 600 }}>Current Bundle</span>
+					{" for "} {currentBundle.gameVersion}
+				</span>
+				<button
+					className="boldButtonLike container"
+					onClick={() => setFoldout(!foldout)}
+					style={{ width: "3rem", justifyContent: "center" }}
+				>
+					<Right
+						style={{
+							transform: foldout
+								? "rotate(90deg)"
+								: "rotate(180deg)",
+							transition: "transform 0.1s ease-in-out",
+						}}
+					/>
+				</button>
+			</div>
+			<div
+				style={{
+					display: "grid",
+					gridTemplateColumns: "1fr auto auto",
+					alignItems: "center",
+					maxHeight: foldout ? "22rem" : "0",
+					overflowY: "auto",
+					width: "100%",
+					rowGap: "0.5rem",
+					columnGap: "1rem",
+					transition: "all 0.3s ease-in-out",
+					scrollbarGutter: "stable",
+					marginBottom: foldout ? "0rem" : "-1rem",
+				}}
+			>
+				{currentBundle?.packs.map((p) => (
+					<>
+						<span
+							key={p.id + "-name"}
+							style={{
+								whiteSpace: "nowrap",
+								textOverflow: "ellipsis",
+								overflow: "hidden",
+							}}
+						>
+							- {p.name}
+						</span>
+						<span
+							key={p.id + "-version"}
+							style={{
+								maxWidth: "3rem",
+								whiteSpace: "nowrap",
+								textOverflow: "ellipsis",
+								overflow: "hidden",
+							}}
+						>
+							{p.version}
+						</span>
+						<button
+							key={p.id + "-trash"}
+							className="exclude buttonLike disturbingButtonLike invalidButtonLike"
+							onClick={() => removeFromBundle(p)}
+						>
+							<Trash />
+						</button>
+					</>
+				))}
+			</div>
+			<div
+				className="container"
+				style={{
+					flexDirection: "row",
+					gap: "0.5rem",
+					width: "100%",
+					paddingRight: "0.5rem",
+				}}
+			>
+				<IconTextButton
+					icon={Download}
+					text={
+						<span
+							style={{
+								textOverflow: "ellipsis",
+								whiteSpace: "nowrap",
+								overflow: "hidden",
+							}}
+						>
+							Download
+						</span>
+					}
+					centered
+					style={{ width: "100%" }}
+					className="accentedButtonLike"
+					href={downloadLink}
+				/>
+				<button
+					className="boldButtonLike container"
+					onClick={() => {
+						navigator.clipboard.writeText(downloadLink)
+						alert("Download link copied to clipboard!")
+					}}
+					style={{ boxSizing: "border-box" }}
+				>
+					<Copy />
+				</button>
+			</div>
+		</div>
+	)
+}
+
+function AddModal({
+	packId,
+	packData,
+	currentBundle,
+	setCurrentBundle,
+	onOpen,
+	onClose,
+}: {
+	packId: string
+	packData: PackData
+	currentBundle: CurrentBundle | null
+	setCurrentBundle: (bundle: CurrentBundle) => void
+	onOpen: () => void
+	onClose: () => void
+}) {
+	const [page, setPage] = useState<"gameVersion" | "packVersion">(
+		currentBundle?.gameVersion ? "packVersion" : "gameVersion"
+	)
+	const [gameVersion, setGameVersion] = useState<string>()
+
+	function addToBundle(version: string) {
+		const packs = [...(currentBundle?.packs ?? [])]
+
+		packs.push({
+			id: packId,
+			version: version,
+			name: packData.display.name,
+		})
+
+		const bundle = {
+			gameVersion: currentBundle?.gameVersion ?? gameVersion!,
+			packs: packs,
+		}
+
+		setCurrentBundle(bundle)
+	}
+
+	return (
+		<Modal
+			trigger={
+				<button className="boldButtonLike">
+					<Plus />
+				</button>
+			}
+			onOpen={() => {
+				setPage(
+					currentBundle?.gameVersion ? "packVersion" : "gameVersion"
+				)
+				onOpen()
+			}}
+			onClose={onClose}
+			content={({ close }) => (
+				<>
+					{page === "gameVersion" && (
+						<GameVersionPage
+							packData={packData}
+							onSelect={(v) => {
+								setGameVersion(v)
+								setPage("packVersion")
+							}}
+							onClose={close}
+						/>
+					)}
+					{page === "packVersion" && (
+						<PackVersionPage
+							packData={packData}
+							gameVersion={
+								currentBundle?.gameVersion ?? gameVersion!
+							}
+							onSelect={(e, version) => {
+								addToBundle(version.name)
+								close(e)
+							}}
+							showAllVersions={true}
+							onBack={() => setPage("gameVersion")}
+							backEnabled={
+								currentBundle?.gameVersion === undefined
+							}
+						/>
+					)}
+				</>
+			)}
+		/>
+	)
+}
+
+function AddWidget({
+	pack,
+	setAddPack,
+}: {
+	pack: DataForPackCards
+	setAddPack: (b: string | undefined) => void
+}) {
+	const [currentBundle, setCurrentBundle] = useCurrentBundle()
+
+	function isAdded() {
+		return currentBundle?.packs.find((p) => p.id === pack.id) !== undefined
+	}
+
+	const [contained, setContained] = useState(isAdded())
+
+	function removeFromBundle() {
+		if (!isAdded()) return
+
+		const packs = [...(currentBundle?.packs ?? [])]
+
+		const index = packs.findIndex((p) => p.id === pack.id)
+		packs.splice(index, 1)
+
+		const bundle = {
+			gameVersion: currentBundle?.gameVersion ?? latestMinecraftVersion,
+			packs: packs,
+		}
+
+		setCurrentBundle(bundle)
+	}
+
+	useEffect(() => {
+		setContained(isAdded())
+	}, [currentBundle])
+
+	if (
+		currentBundle?.gameVersion &&
+		!pack.pack.versions.some((v) =>
+			v.supports.includes(currentBundle?.gameVersion)
+		)
+	) return (
+		<div className="container" style={{flexDirection: "row", gap: "0.5rem", justifyContent: "start", flexGrow: 1, color: "var(--disturbing)", alignSelf: "end", height: "100%"}}>
+			<Warning />
+			Incompatible with {currentBundle?.gameVersion}
+		</div>
+	)
+
+
+		if (contained)
+			return (
+				<button
+					className={"exclude buttonLike invalidButtonLike"}
+					onClick={removeFromBundle}
+				>
+					<Trash />
+				</button>
+			)
+
+	return (
+		<AddModal
+			packId={pack.id}
+			packData={pack.pack}
+			currentBundle={currentBundle}
+			setCurrentBundle={setCurrentBundle}
+			onOpen={() => setAddPack(pack.id)}
+			onClose={() => setAddPack(undefined)}
+		/>
 	)
 }

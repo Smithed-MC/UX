@@ -33,7 +33,8 @@ import { useContext, useState } from "react"
 import { compare, coerce, SemVer } from "semver"
 import { ClientContext } from "../../../context"
 import BackButton from "../../../widget/BackButton"
-import { useQueryParams } from "hooks"
+import { useCurrentBundle, useQueryParams } from "hooks"
+import { DownloadPackModal } from "../../../widget/downloadPackWidget"
 
 if (
 	!import.meta.env.SSR &&
@@ -145,40 +146,46 @@ export default function Packs() {
 						close={() => setShowBundleSelection(false)}
 						id={id}
 					/> */}
-							{/* <div className="container" style={{ gap: "0.5rem" }}>
-						<DownloadPackModal packData={packData!} packId={id}>
-							<DownloadButton
-								id={id}
-								openPopup={(element) => {
-									setInjectPopup(element)
-								}}
-								closePopup={() => {
-									setInjectPopup(undefined)
-								}}
-							/>
-						</DownloadPackModal>
+							<div
+								className="container"
+								style={{ gap: "0.5rem" }}
+							>
+								<DownloadPackModal
+									packData={packData!}
+									packId={id!}
+								>
+									<DownloadButton
+										id={id!}
+										openPopup={(element) => {
+											setInjectPopup(element)
+										}}
+										closePopup={() => {
+											setInjectPopup(undefined)
+										}}
+									/>
+								</DownloadPackModal>
 
-						<label style={{ color: "var(--border)" }}>
-							{(() => {
-								const version = packData?.versions
-									.sort((a, b) =>
-										compare(
-											coerce(a.name) ?? "",
-											coerce(b.name) ?? ""
+								<label style={{ color: "var(--border)" }}>
+									{(() => {
+										const version = packData?.versions
+											.sort((a, b) =>
+												compare(
+													coerce(a.name) ?? "",
+													coerce(b.name) ?? ""
+												)
+											)
+											.at(-1)
+
+										if (
+											version?.supports[0] ===
+											version?.supports.at(-1)
 										)
-									)
-									.at(-1)
+											return version?.supports[0]
 
-								if (
-									version?.supports[0] ===
-									version?.supports.at(-1)
-								)
-									return version?.supports[0]
-
-								return `${version?.supports[0]} — ${version?.supports.at(-1)}`
-							})()}
-						</label>
-					</div> */}
+										return `${version?.supports[0]} — ${version?.supports.at(-1)}`
+									})()}
+								</label>
+							</div>
 						</div>
 						<div className="userButtonsContainer">
 							{clientContext.showBackButton && <BackButton />}
@@ -276,13 +283,7 @@ function PackReadMe({ readme }: { readme: string }) {
 	)
 }
 
-function PackGallery({
-	id,
-	gallery,
-}: {
-	id: string
-	gallery: Image[]
-}) {
+function PackGallery({ id, gallery }: { id: string; gallery: Image[] }) {
 	return (
 		<div
 			style={{
@@ -387,7 +388,7 @@ function DownloadOption({
 function PackVersionEntry({
 	id,
 	version,
-	latest
+	latest,
 }: {
 	id: string
 	version: PackVersion
@@ -398,7 +399,10 @@ function PackVersionEntry({
 	return (
 		<>
 			<span>
-				<span style={{ fontWeight: 600 }}>{version.name}{latest ? " - Latest" : ""}</span>
+				<span style={{ fontWeight: 600 }}>
+					{version.name}
+					{latest ? " - Latest" : ""}
+				</span>
 				<br />
 				{version.supports.length > 1 && (
 					<>
@@ -407,7 +411,7 @@ function PackVersionEntry({
 				)}
 				{version.supports.length == 1 && <>{version.supports[0]}</>}
 			</span>
-			<div className="container" style={{alignItems: 'start'}}>
+			<div className="container" style={{ alignItems: "start" }}>
 				{version.downloads.datapack &&
 					!version.downloads.resourcepack &&
 					"Datapack"}

@@ -19,18 +19,20 @@ export default function Modal({
 	trigger,
 	content,
 	onClose,
+	onOpen,
 	style,
 	offset,
 	fragment,
-	className
+	className,
 }: {
-	trigger: React.ReactElement,
+	trigger: React.ReactElement
 	fragment?: boolean
 	className?: string
 	style?: CSSProperties
 	offset?: string | number
 	content?: (ctx: ModalContext) => React.ReactElement
 	onClose?: () => void
+	onOpen?: () => void
 }) {
 	const [open, setOpen] = useState(false)
 
@@ -38,8 +40,9 @@ export default function Modal({
 		...trigger.props,
 		onClick: (e: MouseEvent) => {
 			e.preventDefault()
+			if (open && onClose) onClose()
+			if (!open && onOpen) onOpen()
 			setOpen(!open)
-			if (!open && onClose) onClose()
 		},
 	})
 
@@ -54,7 +57,7 @@ export default function Modal({
 					padding: "1rem 1rem 1rem 1rem",
 					zIndex: 1000,
 					opacity: open ? 1 : 0,
-					pointerEvents: open ? 'all' : 'none',
+					pointerEvents: open ? "all" : "none",
 					transition: "opacity 0.25s ease-in-out",
 				}}
 			>
@@ -121,8 +124,7 @@ export default function Modal({
 		</>
 	)
 
-	if (fragment)
-		return frag
+	if (fragment) return frag
 
 	return (
 		<div
