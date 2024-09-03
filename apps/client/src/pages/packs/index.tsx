@@ -362,7 +362,7 @@ function CurrentBundleWidget() {
 					width: "100%",
 					rowGap: "0.5rem",
 					columnGap: "1rem",
-					transition: "all 0.3s ease-in-out",
+					transition: "all 0.2s ease-in-out",
 					scrollbarGutter: "stable",
 					marginBottom: foldout ? "0rem" : "-1rem",
 				}}
@@ -407,6 +407,8 @@ function CurrentBundleWidget() {
 					gap: "0.5rem",
 					width: "100%",
 					paddingRight: "0.5rem",
+					paddingTop: "0.5rem",
+					borderTop: "0.125rem solid var(--border)"
 				}}
 			>
 				<IconTextButton
