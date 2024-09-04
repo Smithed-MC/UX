@@ -14,15 +14,12 @@ import {
 	latestMinecraftVersion,
 	packCategories,
 } from "data-types"
-import { Link, useLoaderData, useNavigate } from "react-router-dom"
+import { useLoaderData, useNavigate } from "react-router-dom"
 import "./index.css"
 import {
-	useAppDispatch,
-	useAppSelector,
 	useCurrentBundle,
 	useFirebaseUser,
 	useQueryParams,
-	useSmithedUser,
 } from "hooks"
 import {
 	Browse as BrowseSvg,
