@@ -44,8 +44,7 @@ const ATTENDEES = [
 	["You!", SmithieHappy, ""],
 ].sort((a, b) => a[0].localeCompare(b[0]))
 
-const SUMMIT_LINK =
-	(import.meta.env.DEV ? "smithed.dev" : "smithed.net") + "/summit"
+const SUMMIT_LINK = "smithed.net/summit"
 
 export default function SummitPage() {
 	const location = useLocation()

@@ -86,7 +86,7 @@ export default function Packs() {
 				/>
 				<meta name="og:image" content={packData.display.icon} />
 				<meta name="og:site_name" content="Smithed" />
-				<link rel="canonical" href={`https://${import.meta.env.VITE_NIGHTLY ? "smithed.dev" : "smithed.net"}/packs/${packData.id}`}/>
+				<link rel="canonical" href={`https://${import.meta.env.VITE_NIGHTLY ? "nightly.smithed.dev" : "smithed.net"}/packs/${packData.id}`}/>
 			</Helmet>
 			<div
 				className="container"

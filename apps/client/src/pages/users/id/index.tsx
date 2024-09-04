@@ -417,7 +417,7 @@ export default function User() {
 					<IconTextButton
 						icon={Discord}
 						text={"Report a problem"}
-						href="https://smithed.dev/discord"
+						href="/discord"
 					/>
 				</div>
 			</div>

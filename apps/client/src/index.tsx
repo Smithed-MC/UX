@@ -278,7 +278,7 @@ function Footer() {
 					<b style={{ fontSize: "1.5rem" }}>SOCIAL</b>
 					<Link
 						className="compactButton"
-						to="https://smithed.dev/discord"
+						to="/discord"
 					>
 						Discord
 					</Link>
