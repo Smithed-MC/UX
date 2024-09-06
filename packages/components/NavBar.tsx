@@ -24,7 +24,7 @@ import {
 } from "./svg.js"
 import IconTextButton, { IconTextButtonProps } from "./IconTextButton"
 import { Account as AccountSvg } from "components/svg.js"
-import { BundleUpdater, PackBundle, PackData } from "data-types"
+import { BundleUpdater, PackBundle, PackData, UserData } from "data-types"
 import Link from "./Link"
 import Modal from "./Modal"
 import { getAuth } from "firebase/auth"
@@ -74,21 +74,6 @@ export default function NavBar({ tabs, logoUrl, onSignout }: NavBarProps) {
 		)
 	}
 
-
-	function NavModalOption(props: IconTextButtonProps) {
-		return (
-			<IconTextButton
-				reverse
-				{...props}
-				style={{
-					backgroundColor: "transparent",
-					width: "100%",
-					...props.style,
-				}}
-			/>
-		)
-	}
-
 	return (
 		<div
 			className="container navBarContainer"
@@ -102,19 +87,21 @@ export default function NavBar({ tabs, logoUrl, onSignout }: NavBarProps) {
 		>
 			<Link
 				style={{
-					display: 'flex',
+					display: "flex",
 					fontSize: "24px",
 					lineHeight: "30px",
 					fontWeight: "700",
 					fontFamily: "Lexend",
 					color: "var(--foreground)",
 					textDecoration: "none",
-					alignItems: 'center'
+					alignItems: "center",
 				}}
 				to={logoUrl}
 			>
 				<Logo style={{ width: "1.5rem", height: "1.5rem" }} />
-				<span className="navBarHide" style={{marginLeft: "1rem"}}>Smithed</span>
+				<span className="navBarHide" style={{ marginLeft: "1rem" }}>
+					Smithed
+				</span>
 			</Link>
 			{tabs}
 			<div
@@ -126,99 +113,7 @@ export default function NavBar({ tabs, logoUrl, onSignout }: NavBarProps) {
 					// overflow: "hidden",
 				}}
 			>
-				{user && (
-					<Modal
-						className="navBarModal"
-						trigger={
-							<span
-								className="container"
-								style={{ flexDirection: "row" }}
-							>
-								<IconTextButton
-									style={{
-										width: "100%",
-										backgroundColor: "transparent",
-										height: "2.5rem",
-									}}
-									className="navBarOption navBarAccount"
-									text={
-										<div
-											className="container"
-											style={{
-												flexDirection: "row",
-												gap: "1rem",
-											}}
-										>
-											<img
-												className="navBarHide"
-												style={{
-													width: "2rem",
-													height: "2rem",
-													borderRadius:
-														"calc(var(--defaultBorderRadius) * 0.5)",
-												}}
-												src={
-													import.meta.env
-														.VITE_API_SERVER +
-													`/users/${user.uid}/pfp`
-												}
-											/>
-											{user.displayName}
-										</div>
-									}
-									iconElement={
-										<Right
-											style={{
-												transform: "rotate(90deg)",
-											}}
-										/>
-									}
-									reverse
-								/>
-							</span>
-						}
-						content={(ctx) => (
-							<div className="container">
-								<NavModalOption
-									text="Open profile"
-									icon={AccountSvg}
-									href={"/" + user?.displayName}
-								/>
-								<NavModalOption
-									text="New pack"
-									icon={Plus}
-									href={"/packs/new/edit"}
-								/>
-								<NavModalOption
-									text="New bundle"
-									icon={NewFolder}
-									href={"/bundles/new/edit"}
-								/>
-								<NavModalOption
-									text="Settings"
-									icon={Settings}
-									href={"/settings"}
-								/>
-								<NavModalOption
-									style={{ color: "var(--disturbing)" }}
-									text="Logout"
-									iconElement={
-										<Right
-											style={{
-												color: "var(--disturbing)",
-											}}
-										/>
-									}
-									onClick={() => {
-										getAuth().signOut()
-										onSignout
-									}}
-									href=""
-								/>
-							</div>
-						)}
-					/>
-				)}
+				{user && <UserButton user={user} onSignout={onSignout} />}
 				{!user && (
 					<IconTextButton
 						className="navBarOption navBarAccount"
@@ -240,4 +135,139 @@ export interface NavBarProps {
 	tabs: readonly JSX.Element[]
 	logoUrl: string
 	onSignout: () => void
+}
+
+function NavModalOption(props: IconTextButtonProps) {
+	return (
+		<IconTextButton
+			reverse
+			{...props}
+			style={{
+				backgroundColor: "transparent",
+				width: "100%",
+				...props.style,
+			}}
+		/>
+	)
+}
+
+function UserButton({
+	user,
+	onSignout,
+}: {
+	user: UserData
+	onSignout: () => void
+}) {
+	const [fallback, setFallback] = useState(false)
+	return (
+		<Modal
+			className="navBarModal"
+			trigger={
+				<span className="container" style={{ flexDirection: "row" }}>
+					<IconTextButton
+						style={{
+							width: "100%",
+							backgroundColor: "transparent",
+							height: "2.5rem",
+						}}
+						className="navBarOption navBarAccount"
+						text={
+							<div
+								className="container"
+								style={{
+									flexDirection: "row",
+									gap: "1rem",
+								}}
+							>
+								{!fallback && (
+									<img
+										className="navBarHide"
+										style={{
+											width: "2rem",
+											height: "2rem",
+											borderRadius:
+												"calc(var(--defaultBorderRadius) * 0.5)",
+										}}
+										src={
+											import.meta.env.VITE_API_SERVER +
+											`/users/${user.uid}/pfp`
+										}
+										onError={() => setFallback(true)}
+									/>
+								)}
+								{fallback && (
+									<div
+										className="navBarHide container"
+										style={{
+											width: "2rem",
+											height: "2rem",
+											borderRadius:
+												"calc(var(--defaultBorderRadius) * 0.5)",
+											backgroundColor: "var(--bold)",
+										}}
+									>
+										<AccountSvg
+											style={{
+												width: "1rem",
+												height: "1rem",
+											}}
+										/>
+									</div>
+								)}
+								{user.displayName}
+							</div>
+						}
+						iconElement={
+							<Right
+								style={{
+									transform: "rotate(90deg)",
+								}}
+							/>
+						}
+						reverse
+					/>
+				</span>
+			}
+			content={(ctx) => (
+				<div className="container">
+					<NavModalOption
+						text="Open profile"
+						icon={AccountSvg}
+						href={"/" + user?.displayName}
+					/>
+					<NavModalOption
+						text="New pack"
+						icon={Plus}
+						href={"/packs/new/edit"}
+					/>
+					<NavModalOption
+						text="New bundle"
+						icon={NewFolder}
+						href={"/bundles/new/edit"}
+					/>
+					<NavModalOption
+						text="Settings"
+						icon={Settings}
+						href={"/settings"}
+					/>
+					<NavModalOption
+						style={{ color: "var(--disturbing)" }}
+						text="Logout"
+						iconElement={
+							<Right
+								style={{
+									color: "var(--disturbing)",
+								}}
+							/>
+						}
+						onClick={() => {
+							getAuth().signOut()
+							onSignout
+						}}
+						href=""
+					/>
+				</div>
+			)}
+		/>
+	)
 }

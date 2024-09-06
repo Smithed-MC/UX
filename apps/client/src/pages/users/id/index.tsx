@@ -48,10 +48,10 @@ import { User as FirebaseUser } from "firebase/auth"
 import { prettyTimeDifference } from "formatters"
 import { CreateBundle } from "../../../widget/bundle"
 import { BundleCard } from "components/BundleCard"
-import { UserStats } from "../../../loaders"
 import { selectUserData } from "store"
 import Smithie from "../../../widget/Smithie"
 import { ClientContext } from "../../../context"
+import { UserStats } from "./index.loader"
 
 interface UserTabComponent {
 	editable: boolean
@@ -369,7 +369,6 @@ export default function User() {
 		useState(false)
 	const [showFallbackPFP, setShowFallbackPFP] = useState(false)
 
-	const dispatch = useAppDispatch()
 	const viewingUser = useAppSelector(selectUserData)
 
 	const pfpUploadRef = useRef<HTMLInputElement>(null)
@@ -600,20 +599,17 @@ export default function User() {
 										src={
 											typeof pfp === "string"
 												? pfp
-												: null ??
-													import.meta.env
+												: import.meta.env
 														.VITE_API_SERVER +
-														"/users/" +
-														userId +
-														"/pfp"
+													"/users/" +
+													userId +
+													"/pfp"
 										}
 										style={{
-											width: 64,
-											height: 64,
+											width: "4rem",
+											height: "4rem",
 											margin: 0,
 										}}
-										width={64}
-										height={64}
 										onError={(e) =>
 											setShowFallbackPFP(true)
 										}
@@ -622,7 +618,7 @@ export default function User() {
 								{showFallbackPFP && (
 									<div className="userFallbackPFP">
 										<Account
-											style={{ width: 32, height: 32 }}
+											style={{ width: "2rem", height: "2rem" }}
 										/>
 									</div>
 								)}
@@ -631,8 +627,8 @@ export default function User() {
 									<button
 										className="uploadPfpButton"
 										style={{
-											width: 64,
-											height: 64,
+											width: "4rem",
+											height: "4rem",
 											position: "absolute",
 										}}
 										onClick={() => {
@@ -641,7 +637,7 @@ export default function User() {
 									>
 										<Upload
 											fill="var(--foreground)"
-											style={{ width: 32, height: 32 }}
+											style={{ width: "2rem", height: "2rem" }}
 										/>
 										<input
 											ref={pfpUploadRef}

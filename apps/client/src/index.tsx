@@ -325,12 +325,13 @@ import ArticlePage from "./pages/article.js"
 import UserBrowsePage from "./pages/users/index.js"
 import loadUserBrowseData from "./pages/users/index.loader.js"
 
+import loadUserData from "./pages/users/id/index.loader.js"
+
 import {
 	loadArticleData,
 	loadPackBrowseData,
 	loadHomePageData,
 	loadRootData,
-	loadUserPageData,
 } from "./loaders.js"
 import SummitPage from "./pages/summit"
 
@@ -366,7 +367,7 @@ export const subRoutes: RouteObject[] = [
 	{
 		path: ":owner",
 		element: <User />,
-		loader: loadUserPageData,
+		loader: loadUserData,
 	},
 	{
 		path: "packs/:id",
