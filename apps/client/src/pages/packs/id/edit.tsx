@@ -841,7 +841,7 @@ export default function PackEdit() {
 					</span>
 					{packCategories.map((c) => (
 						<span
-							className={`categoryChoice ${packData.categories.includes(c) ? "selected" : ""}`}
+							className={`categoryChoice ${packData.categories?.includes(c) ? "selected" : ""}`}
 							key={"categoryChoice" + c.replace(" ", "")}
 							onClick={(e) => {
 								if (packData.categories.includes(c)) {
