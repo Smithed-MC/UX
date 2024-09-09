@@ -8,8 +8,7 @@ RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt update
 RUN apt install -y python3-full python3-pip git curl
 
-RUN pip install --break-system-packages smithed==0.15.9 rich 
-RUN pip install --break-system-packages git+https://github.com/TheNuclearNexus/beet@e22a5156ac6d842c7197baa1445a02a6f30b7243
+RUN pip install --break-system-packages git+https://github.com/Smithed-MC/smithed-python@aca17c2347e38f6400d631540213361f82a83c1d rich 
 
 RUN mkdir /usr/local/nvm
 ENV NVM_DIR /usr/local/nvm
