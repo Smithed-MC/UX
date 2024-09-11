@@ -2,9 +2,16 @@ import { IconTextButton, MarkdownRenderer } from "components"
 import { Globe, Refresh } from "components/svg"
 import { useState, useEffect } from "react"
 import { TextInput, validUrlRegex } from "./inputs"
+import { HTTPResponses } from "data-types"
+import { correctGithubLinks, normalizeRelativeLinks } from "formatters"
 
-export default function ReadmePreview({ dataRef }: { dataRef: {display: {webPage?: string }} }) {
+export default function ReadmePreview({
+	dataRef,
+}: {
+	dataRef: { display: { webPage?: string } }
+}) {
 	const [readme, setReadme] = useState<string>()
+	const [error, setError] = useState<[string, number, string]>()
 
 	useEffect(() => {
 		loadReadme()
@@ -13,14 +20,25 @@ export default function ReadmePreview({ dataRef }: { dataRef: {display: {webPage
 	async function loadReadme() {
 		if (!dataRef.display.webPage) return
 
-		const response = await fetch(dataRef.display.webPage)
+		try {
+			const response = await fetch(correctGithubLinks(dataRef.display.webPage))
 
-		if (!response.ok) {
-			setReadme('<span style="color: red;">Failed to load readme!</span>')
-			return
+			if (!response.ok) {
+				setError([
+					"Failed to load readme!",
+					response.status,
+					response.statusText,
+				])
+				return
+			}
+
+			const newReadme = await response.text()
+			setReadme(normalizeRelativeLinks(dataRef.display.webPage, newReadme))
+			setError(undefined)
+		} catch (e) {
+			const error = e as Error;
+			setError(["Failed to load readme!", HTTPResponses.SERVER_ERROR, error.message])
 		}
-		const newReadme = await response.text()
-		setReadme(newReadme)
 	}
 
 	return (
@@ -40,7 +58,9 @@ export default function ReadmePreview({ dataRef }: { dataRef: {display: {webPage
 					placeholder="Link to README.md"
 					icon={Globe}
 					path="display/webPage"
-					validate={(v) => !validUrlRegex.test(v) ? "Invalid url" : undefined}
+					validate={(v) =>
+						!validUrlRegex.test(v) ? "Invalid url" : undefined
+					}
 					insetError
 				/>
 				<IconTextButton
@@ -60,7 +80,17 @@ export default function ReadmePreview({ dataRef }: { dataRef: {display: {webPage
 					overflow: "hidden",
 				}}
 			>
-				<MarkdownRenderer>{readme}</MarkdownRenderer>
+				{error && (
+					<>
+						<h2 style={{color: "var(--disturbing)"}}>{error[0]}</h2>
+						<span style={{color: "var(--border)"}}>Response Code:</span> {error[1]}
+						<br />
+						<span style={{color: "var(--border)"}}>Response Text:</span> {error[2]}
+					</>
+				)}
+				{error === undefined && (
+					<MarkdownRenderer>{readme}</MarkdownRenderer>
+				)}
 			</div>
 		</>
 	)
