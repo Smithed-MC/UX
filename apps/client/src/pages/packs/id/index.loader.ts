@@ -1,5 +1,5 @@
 import { PackData, PackMetaData, UserData } from "data-types"
-import { correctGithubLinks } from "formatters"
+import { correctGithubLinks, normalizeRelativeLinks } from "formatters"
 
 async function getPack(id: string) {
 	const response = await fetch(
@@ -28,17 +28,18 @@ async function getOwner(id: string) {
 	return data as UserData
 }
 
+
 async function getReadMe(packData?: PackData) {
 	if (packData !== undefined && packData.display.webPage !== undefined && packData.display.webPage.startsWith("https://")) {
 		// console.log(packData.display.webPage)
 		try {
-			const response = await fetch(
-				correctGithubLinks(packData.display.webPage)
-			)
+			const url = correctGithubLinks(packData.display.webPage)
+			const response = await fetch(url)
+			
 			// console.log(response.status, response.statusText)
 			if (response.ok) {
 				// console.log('returning text')
-				return await response.text()
+				return normalizeRelativeLinks(url, await response.text())
 			}
 		} catch {
 			return "An error occured loading pack's readme"
@@ -46,6 +47,7 @@ async function getReadMe(packData?: PackData) {
 	}
 	return packData?.display.description ?? "No ReadMe has been specified"
 }
+
 export default async function loadPackData({ params }: any) {
 	const id: string = params.id
 	const [packData, metaData] = await Promise.all([getPack(id), getMeta(id)])

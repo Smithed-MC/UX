@@ -115,3 +115,14 @@ export function sanitize(value: string) {
 		.replaceAll(" ", "-")
 		.replace(/(\s+|\[|\]|{|}|\||\\|"|%|~|#|<|>|\?)/g, "")
 }
+
+export function normalizeRelativeLinks(sourceUrl: string, readme: string) {
+	if (sourceUrl.endsWith("/"))
+		sourceUrl = sourceUrl.slice(0, -1)
+
+	sourceUrl = sourceUrl.split("/").slice(0, -1).join("/") + "/"
+
+	console.log(readme)
+	readme = readme.replaceAll("./", sourceUrl)
+	return readme
+}
