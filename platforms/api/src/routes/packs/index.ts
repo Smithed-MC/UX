@@ -273,6 +273,8 @@ API_APP.route({
 			} else {
 				result.set(documentData, {merge: true})
 			}
+		} else {
+			result.set(documentData, {merge: true})
 		}
 
 		return reply.status(HTTPResponses.CREATED).send({
