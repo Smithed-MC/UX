@@ -28,8 +28,8 @@ async function getOwner(id: string) {
 	return data as UserData
 }
 
-async function getFullview(packData?: PackData) {
-	if (packData !== undefined && packData.display.webPage !== undefined) {
+async function getReadMe(packData?: PackData) {
+	if (packData !== undefined && packData.display.webPage !== undefined && packData.display.webPage.startsWith("https://")) {
 		// console.log(packData.display.webPage)
 		try {
 			const response = await fetch(
@@ -44,14 +44,14 @@ async function getFullview(packData?: PackData) {
 			return "An error occured loading pack's readme"
 		}
 	}
-	return ""
+	return packData?.display.description ?? "No ReadMe has been specified"
 }
 export default async function loadPackData({ params }: any) {
 	const id: string = params.id
 	const [packData, metaData] = await Promise.all([getPack(id), getMeta(id)])
 
 	const [fullview, owner] = await Promise.all([
-		getFullview(packData),
+		getReadMe(packData),
 		getOwner(metaData?.owner ?? ""),
 	])
 

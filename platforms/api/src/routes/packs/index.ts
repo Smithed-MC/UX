@@ -263,15 +263,15 @@ API_APP.route({
 			data: data,
 		}
 
-		const result = await firestore.collection("packs").add(documentData)
-
+		const result = await firestore.collection("packs").add({})
+		
 		if (data.display.gallery) {
 			const successful = await updateGalleryData(data, result.id, reply)
-		
+			
 			if (!successful) {
 				await result.delete()
 			} else {
-				result.set({data}, {merge: true})
+				result.set(documentData, {merge: true})
 			}
 		}
 
