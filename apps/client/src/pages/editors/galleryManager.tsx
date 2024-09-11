@@ -117,6 +117,7 @@ export default function GalleryManager({
 					style={{
 						background: images.length > 0 ? "none" : undefined,
 						width: images.length == 0 ? "100%" : undefined,
+						justifyContent: images.length > 0 ? "center" : undefined
 					}}
 					onClick={() => {
 						fileUploadRef.current?.click()

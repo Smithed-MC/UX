@@ -228,6 +228,11 @@ export default function PackEdit() {
 				return
 			}
 		}
+		
+		if (isNew) {
+			const { uid } = await mainSaveResp.json()
+			navigate(`/packs/${uid}/edit`)
+		}
 
 		setSavingState({ mode: "saved" })
 	}
@@ -267,7 +272,7 @@ export default function PackEdit() {
 			)
 
 			setDependencies(
-				resolvedDependencies.sort((a, b) => a.id.localeCompare(b.id))
+				[...resolvedDependencies.sort((a, b) => a.id.localeCompare(b.id))]
 			)
 		}
 

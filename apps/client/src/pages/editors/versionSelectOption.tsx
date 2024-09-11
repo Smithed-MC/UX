@@ -83,6 +83,7 @@ export default function VersionSelectOption({
 							width: "2rem",
 							height: "2rem",
 							padding: 0,
+							justifyContent: "center"
 						}}
 						onClick={(e) => {
 							e.preventDefault()
