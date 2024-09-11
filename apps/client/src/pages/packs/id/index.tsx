@@ -86,7 +86,10 @@ export default function Packs() {
 				/>
 				<meta name="og:image" content={packData.display.icon} />
 				<meta name="og:site_name" content="Smithed" />
-				<link rel="canonical" href={`https://${import.meta.env.VITE_NIGHTLY ? "nightly.smithed.dev" : "smithed.net"}/packs/${packData.id}`}/>
+				<link
+					rel="canonical"
+					href={`https://smithed.net/packs/${packData.id}`}
+				/>
 			</Helmet>
 			<div
 				className="container"
@@ -254,16 +257,17 @@ export default function Packs() {
 							text="Versions"
 						/>
 					</CategoryBar>
-					{tab == "readme" && <PackReadMe readme={fullview} />}
-					{tab == "gallery" && (
-						<PackGallery
-							id={id!}
-							gallery={packData.display.gallery!}
-						/>
-					)}
-					{tab == "versions" && (
-						<PackVersions id={id!} versions={packData.versions} />
-					)}
+					<PackReadMe visible={tab === "readme"} readme={fullview} />
+					<PackGallery
+						visible={tab === "gallery"}
+						id={id!}
+						gallery={packData.display.gallery!}
+					/>
+					<PackVersions
+						visible={tab === "versions"}
+						id={id!}
+						versions={packData.versions}
+					/>
 					{injectPopup}
 				</div>
 			</div>
@@ -276,22 +280,39 @@ export interface PacksProps {
 	showBackButton: boolean
 }
 
-function PackReadMe({ readme }: { readme: string }) {
+function PackReadMe({ visible, readme }: { visible: boolean; readme: string }) {
 	return (
-		<div style={{ maxWidth: "53rem", width: "100%" }}>
+		<div
+			style={{
+				maxWidth: "53rem",
+				width: "100%",
+				display: visible ? undefined : "none",
+				alignContent: "center"
+			}}
+		>
 			<MarkdownRenderer>{readme}</MarkdownRenderer>
 		</div>
 	)
 }
 
-function PackGallery({ id, gallery }: { id: string; gallery: Image[] }) {
+function PackGallery({
+	visible,
+	id,
+	gallery,
+}: {
+	visible: boolean
+	id: string
+	gallery: Image[]
+}) {
 	return (
 		<div
 			style={{
-				maxWidth: "53rem",
-				display: "grid",
-				gridTemplateColumns: "50% 50%",
+				width: "100%",
+				display: visible ? "flex" : "none",
+				flexWrap: "wrap",
 				gap: "2rem",
+				flexDirection: "row",
+				justifyContent: "center",
 			}}
 		>
 			{gallery.map((v, i) => (
@@ -301,6 +322,7 @@ function PackGallery({ id, gallery }: { id: string; gallery: Image[] }) {
 						width: "100%",
 						borderRadius: "var(--defaultBorderRadius)",
 						border: "0.125rem solid var(--border)",
+						maxWidth: "28rem",
 					}}
 					src={`https://api.smithed.dev/v2/packs/${id}/gallery/${i}`}
 				/>
@@ -312,12 +334,17 @@ function PackGallery({ id, gallery }: { id: string; gallery: Image[] }) {
 function PackVersions({
 	id,
 	versions,
+	visible,
 }: {
 	id: string
 	versions: PackVersion[]
+	visible: boolean
 }) {
 	return (
-		<div style={{ maxWidth: "53rem" }} className="packVersions">
+		<div
+			style={{ maxWidth: "53rem", display: visible ? undefined : "none" }}
+			className="packVersions"
+		>
 			{versions
 				.sort(
 					(a, b) =>
@@ -450,45 +477,57 @@ function PackVersionEntry({
 					)}
 				{version.downloads.datapack &&
 					version.downloads.resourcepack && (
-						<Modal
-							trigger={
-								<button
-									style={{
-										backgroundColor: "var(--accent)",
-									}}
-								>
-									<Download />
-								</button>
-							}
-							content={({}) => (
-								<>
-									<DownloadOption
-										value="datapack"
-										text={"Datapack"}
-										icon={<Jigsaw />}
-										id={id}
-										version={version.name}
-									/>
-									<DownloadOption
-										value="resourcepack"
-										text={"Resourcepack"}
-										icon={<Picture />}
-										id={id}
-										version={version.name}
-									/>
-									<DownloadOption
-										value="both"
-										text={"Combined"}
-										icon={<CurlyBraces />}
-										color={"var(--success)"}
-										id={id}
-										version={version.name}
-									/>
-								</>
-							)}
-						/>
+						<DownloadVersionModal id={id} version={version} />
 					)}
 			</div>
 		</>
+	)
+}
+
+function DownloadVersionModal({
+	id,
+	version,
+}: {
+	id: string
+	version: PackVersion
+}) {
+	return (
+		<Modal
+			trigger={
+				<button
+					style={{
+						backgroundColor: "var(--accent)",
+					}}
+				>
+					<Download />
+				</button>
+			}
+			content={({}) => (
+				<>
+					<DownloadOption
+						value="datapack"
+						text={"Datapack"}
+						icon={<Jigsaw />}
+						id={id}
+						version={version.name}
+					/>
+					<DownloadOption
+						value="resourcepack"
+						text={"Resourcepack"}
+						icon={<Picture />}
+						id={id}
+						version={version.name}
+					/>
+					<DownloadOption
+						value="both"
+						text={"Combined"}
+						icon={<CurlyBraces />}
+						color={"var(--success)"}
+						id={id}
+						version={version.name}
+					/>
+				</>
+			)}
+		/>
 	)
 }
