@@ -84,6 +84,7 @@ export async function uploadImage(
 		if (!img.startsWith("http")) {
 			const image = await getWebp(img)
 
+
 			if (image.byteLength > 1324 * 1024) {
 				if (reply)
 					sendError(
@@ -209,13 +210,16 @@ const PartialPackDataSchema = Type.Partial(
 )
 type PartialPackData = Static<typeof PartialPackDataSchema>
 
-async function getWebp(content: string) {
+async function getWebp(content: string): Promise<Buffer> {
 	const urlParts = content.split(",")
 
 	const buffer = Buffer.from(urlParts.at(-1)!, "base64")
-	return await sharp(buffer, { animated: urlParts[0].includes("image/gif") })
-		.webp({ lossless: true })
+
+	const webpBuffer = await sharp(buffer, { animated: urlParts[0].includes("image/gif") })
+		.webp()
 		.toBuffer()
+
+	return webpBuffer
 }
 
 const setPack = async (request: any, reply: any) => {
