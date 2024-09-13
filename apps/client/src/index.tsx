@@ -368,11 +368,17 @@ export const subRoutes: RouteObject[] = [
 		path: ":owner",
 		element: <User />,
 		loader: loadUserData,
+		shouldRevalidate: ({currentParams, nextParams}) => {
+			return currentParams["owner"] !== nextParams["owner"]
+		}
 	},
 	{
 		path: "packs/:id",
 		element: <PackPage />,
 		loader: loadPackData,
+		shouldRevalidate: ({currentParams, nextParams}) => {
+			return currentParams["id"] !== nextParams["id"]
+		}
 	},
 	{
 		path: "bundles/:bundleId",
