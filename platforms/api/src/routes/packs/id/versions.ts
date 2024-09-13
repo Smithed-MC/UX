@@ -9,6 +9,7 @@ import {
 } from "data-types"
 import { coerce, compare } from "semver"
 import { getPackDoc, validateToken } from "database"
+import { invalidateCachedData } from "./index.js"
 
 /*
  * @route GET /packs/:id/versions
@@ -140,6 +141,8 @@ API_APP.route({
 		versionData.name = versionId
 		versions.push(versionData)
 
+		invalidateCachedData(await doc.get("data.id"), doc.id)
+		
 		await doc.ref.set(
 			{
 				data: {
@@ -256,6 +259,8 @@ API_APP.route({
 			{ merge: true }
 		)
 
+		invalidateCachedData(await doc.get("data.id"), doc.id)
+
 		return reply
 			.status(HTTPResponses.CREATED)
 			.send(`Version ${versionId} successfully updated`)
@@ -344,6 +349,8 @@ API_APP.route({
 			},
 			{ merge: true }
 		)
+
+		invalidateCachedData(await doc.get("data.id"), doc.id)
 
 		return reply
 			.status(HTTPResponses.CREATED)

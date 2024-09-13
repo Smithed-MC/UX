@@ -1,5 +1,5 @@
 import { Static, Type } from "@sinclair/typebox"
-import { API_APP, get, sendError, set } from "../../../app.js"
+import { API_APP, get, invalidate, sendError, set } from "../../../app.js"
 import { getStorage } from "firebase-admin/storage"
 import {
 	HTTPResponses,
@@ -306,8 +306,7 @@ const setPack = async (request: any, reply: any) => {
 		)
 	}
 
-	const requestIdentifier = "GET-PACK::" + packId
-	await set(requestIdentifier, undefined, 1)
+	invalidateCachedData(packData.id, doc.id)
 
 	request.log.info(packData)
 	await doc.ref.set({ data: packData }, { merge: true })
@@ -731,3 +730,10 @@ API_APP.route({
 		)
 	},
 })
+
+export function invalidateCachedData(id: string | undefined, docId: string) {
+	if (id !== undefined)
+		invalidate("**" + id + "**")
+	invalidate("**" + docId + "**")
+}
+

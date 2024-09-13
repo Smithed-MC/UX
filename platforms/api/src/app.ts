@@ -13,6 +13,8 @@ import { HTTPResponses } from "data-types"
 import abCache from "abstract-cache"
 import IORedis from "ioredis"
 import { Client } from "typesense"
+import { resolve } from "path"
+import { rejects } from "assert"
 
 export let TYPESENSE_APP: Client
 
@@ -64,7 +66,7 @@ export let REDIS: IORedis | undefined = undefined
 
 async function registerCacheRedis() {
 	const redis = new IORedis({
-		host: process.env.DOCKER ? "redis" : "127.0.0.1",
+		host: process.env.DOCKER === "true" ? "redis" : "127.0.0.1",
 	})
 	REDIS = redis
 
@@ -124,6 +126,8 @@ export async function setupApp() {
 		methods: ["GET", "PUT", "POST", "PATCH", "DELETE"],
 	})
 
+	console.log(API_APP.cache)
+
 	// API_APP.addHook('preHandler', (request, reply, done) => {
 	//     reply.header("Access-Control-Allow-Origin", "*");
 	//     reply.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, OPTIONS, DELETE");
@@ -165,4 +169,14 @@ export async function set(
 			return resolve()
 		})
 	})
+}
+
+export async function invalidate(pattern: string): Promise<void> {
+	if (REDIS === undefined)
+		return
+
+	const matches = await REDIS.keys(pattern)
+	if (matches.length === 0)
+		return 
+	const deleted = await REDIS.del(matches)
 }
