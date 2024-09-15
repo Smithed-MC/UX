@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://beta.smithed.dev/sitemap.xml
+User-agent: *
+Disallow: /*.php
+
+User-agent: *
+Disallow: /*.js
+
+Sitemap: https://smithed.net/sitemap.xml
