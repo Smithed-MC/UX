@@ -258,11 +258,13 @@ export default function Packs() {
 						/>
 					</CategoryBar>
 					<PackReadMe visible={tab === "readme"} readme={fullview} />
-					<PackGallery
-						visible={tab === "gallery"}
-						id={id!}
-						gallery={packData.display.gallery!}
-					/>
+					{packData.display.gallery && (
+						<PackGallery
+							visible={tab === "gallery"}
+							id={id!}
+							gallery={packData.display.gallery!}
+						/>
+					)}
 					<PackVersions
 						visible={tab === "versions"}
 						id={id!}
@@ -287,7 +289,7 @@ function PackReadMe({ visible, readme }: { visible: boolean; readme: string }) {
 				maxWidth: "53rem",
 				width: "100%",
 				display: visible ? undefined : "none",
-				alignContent: "center"
+				alignContent: "center",
 			}}
 		>
 			<MarkdownRenderer>{readme}</MarkdownRenderer>
