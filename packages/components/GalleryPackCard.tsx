@@ -420,6 +420,7 @@ export default function GalleryPackCard({
 							width: "100%",
 							position: "relative",
 							gap: "1rem",
+							overflow: "hidden"
 						}}
 					>
 						<span
@@ -465,6 +466,7 @@ export default function GalleryPackCard({
 							width: displayGallery ? 0 : undefined,
 							height: displayGallery ? 0 : undefined,
 							display: displayGallery ? "none" : undefined,
+							overflow: "hidden"
 						}}
 					>
 						{data?.display.description}

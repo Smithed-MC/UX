@@ -1,8 +1,8 @@
-
 import Cookie from "cookie"
 import { UserData, PackData, PackMetaData, PackBundle } from "data-types"
 import { sanitize } from "formatters"
 import { BROWSE_SCOPES } from "../../../loaders"
+import { redirect } from "react-router-dom"
 
 async function getUserData(id: string) {
 	const userDataResponse = await fetch(
@@ -12,15 +12,16 @@ async function getUserData(id: string) {
 	return await userDataResponse.json()
 }
 
-async function getPacks(requestingUser: UserData|undefined, id: string) {
+async function getPacks(requestingUser: UserData | undefined, id: string) {
 	const userPacksResponse = await fetch(
 		import.meta.env.VITE_API_SERVER +
 			`/users/${id}/packs?&hidden=${requestingUser !== undefined && (requestingUser.uid === id || sanitize(requestingUser.displayName) === sanitize(id))}` +
-			`&scope=` + BROWSE_SCOPES.join("&scope=")
+			`&scope=` +
+			BROWSE_SCOPES.join("&scope=")
 	)
 	const packs: {
 		id: string
-		data: PackData	
+		data: PackData
 		meta: PackMetaData
 		owner: UserData
 	}[] = userPacksResponse.ok ? await userPacksResponse.json() : []
@@ -36,30 +37,6 @@ async function getBundles(id: string) {
 		: []
 
 	return bundleIds
-}
-
-async function getBundleData(id: string): Promise<PackBundle | undefined> {
-	const bundleDataResponse = await fetch(
-		import.meta.env.VITE_API_SERVER + `/bundles/${id}`
-	)
-	return bundleDataResponse.ok ? await bundleDataResponse.json() : undefined
-}
-
-async function getPackData(
-	id: string
-): Promise<{ id: string; pack: PackData; meta: PackMetaData }> {
-	const packDataResponse = await fetch(
-		import.meta.env.VITE_API_SERVER + `/packs/${id}`
-	)
-	const packMetaResponse = await fetch(
-		import.meta.env.VITE_API_SERVER + `/packs/${id}/meta`
-	)
-
-	return {
-		id: id,
-		pack: await packDataResponse.json(),
-		meta: await packMetaResponse.json(),
-	}
 }
 
 async function getDownloads(id: string, packs: { meta: PackMetaData }[]) {
@@ -91,8 +68,13 @@ export default async function loader({ request, params }: any) {
 	const userData =
 		"smithedUser" in cookie ? JSON.parse(cookie["smithedUser"]) : undefined
 
-	const [user, packs, bundles] = await Promise.all([
-		getUserData(id),
+	const user = await getUserData(id)
+
+	if (user === undefined) {
+		return { user: undefined, userStats: undefined }
+	}
+
+	const [packs, bundles] = await Promise.all([
 		getPacks(userData, id),
 		getBundles(id),
 	])

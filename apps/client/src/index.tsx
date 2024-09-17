@@ -68,32 +68,32 @@ export function ClientApplet() {
 		dispatch(setUserData({}))
 	}
 
-	async function loadBundles(user: FirebaseUser | null) {
-		if (user == null) {
-			return resetBundleData()
-		}
+	// async function loadBundles(user: FirebaseUser | null) {
+	// 	if (user == null) {
+	// 		return resetBundleData()
+	// 	}
 
-		const resp = await fetch(
-			import.meta.env.VITE_API_SERVER + `/users/${user.uid}/bundles`
-		)
-		if (!resp.ok) return resetBundleData()
+	// 	const resp = await fetch(
+	// 		import.meta.env.VITE_API_SERVER + `/users/${user.uid}/bundles`
+	// 	)
+	// 	if (!resp.ok) return resetBundleData()
 
-		const bundleIds: string[] = await resp.json()
+	// 	const bundleIds: string[] = await resp.json()
 
 
-		const getData = async (id: string) => {
-			const resp = await fetch(
-				import.meta.env.VITE_API_SERVER + `/bundles/${id}?token=` + await user.getIdToken()
-			)
+	// 	const getData = async (id: string) => {
+	// 		const resp = await fetch(
+	// 			import.meta.env.VITE_API_SERVER + `/bundles/${id}?token=` + await user.getIdToken()
+	// 		)
 
-			if (!resp.ok) return undefined
+	// 		if (!resp.ok) return undefined
 
-			return (await resp.json()) as PackBundle
-		}
-		const bundles = (
-			await Promise.all(bundleIds.map((id) => getData(id)))
-		).filter((b) => b !== undefined)
-	}
+	// 		return (await resp.json()) as PackBundle
+	// 	}
+	// 	const bundles = (
+	// 		await Promise.all(bundleIds.map((id) => getData(id)))
+	// 	).filter((b) => b !== undefined)
+	// }
 
 	async function loadUserData(user: FirebaseUser | null) {
 		if (user == null) return resetUserData()
@@ -124,11 +124,17 @@ export function ClientApplet() {
 				Cookies.set("smithedToken", await user?.getIdToken(true), {
 					sameSite: "strict",
 				})
-				loadBundles(user)
+
+				const savedUserJson = Cookies.get("smithedUser") 
+
+				if (savedUserJson && JSON.parse(savedUserJson).uid === user.uid)
+					return
+
+				// loadBundles(user)
 				loadUserData(user)
 			} else {
 				Cookies.remove("smithedToken")
-				resetBundleData()
+				// resetBundleData()
 				resetUserData()
 			}
 		})
