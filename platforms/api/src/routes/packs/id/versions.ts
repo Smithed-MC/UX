@@ -234,8 +234,8 @@ API_APP.route({
 		if (versionIndex === -1)
 			return sendError(
 				reply,
-				HTTPResponses.CONFLICT,
-				`Version with ID ${versionId} already exists`
+				HTTPResponses.NOT_FOUND,
+				`Version with ID ${versionId} doesn't exist`
 			)
 
 		versions[versionIndex].dependencies =
