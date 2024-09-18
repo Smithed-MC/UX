@@ -84,11 +84,14 @@
 	flex-direction: column;
 	border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0;
 	background-color: var(--section);
+	border-top: 0.125rem solid var(--border);
+	margin-top: -0.125rem;
 }
 
 .galleryPackCard > .galleryImage > img {
 	user-select: none;
 	-webkit-user-drag: none;
+	border-radius: var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0;
 }
 
 .galleryPackCard > .packInfo > .author,
@@ -186,6 +189,24 @@
 		.carousel {
 			opacity: 1;
 		}
+	}
+
+	div:has(> .thumbnail) {
+		position: relative;
+	}
+
+	div:has(> .thumbnail)::after {
+		position: absolute;
+		content: "";
+		width: 100%;
+		height: 100%;
+		left: 0;
+		top: 0;
+		transition: all 0.1s ease-in-out;
+	}
+
+	div:has(> .thumbnail.transition)::after {
+		backdrop-filter: blur(0.125rem) grayscale(50%);
 	}
 }
 

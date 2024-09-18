@@ -139,24 +139,29 @@ export function GalleryImage({
 	packId: string
 }) {
 	return (
-		<img
-			id={"thumbnail"}
-			className="thumbnail"
-			style={{
-				width: "100%",
-				cursor: "pointer",
-				overflow: "hidden",
-				aspectRatio: "16 / 9",
-				opacity: 0,
-				transition: "opacity 0.1s ease-out",
-			}}
-			onClick={onClick}
-			src={`${import.meta.env.VITE_API_SERVER}/packs/${packId}/gallery/${currentImage}`}
-			onLoad={(e) => {
-				e.currentTarget.style.setProperty("opacity", "1")
-			}}
-			onError={onError}
-		/>
+		<div
+			style={{ borderRadius: "var(--borderRadius)", overflow: "hidden" }}
+		>
+			<img
+				id={"thumbnail"}
+				className="thumbnail"
+				style={{
+					width: "100%",
+					cursor: "pointer",
+					overflow: "hidden",
+					aspectRatio: "16 / 9",
+					opacity: 0,
+					transition: "opacity 0.1s ease-out",
+				}}
+				onClick={onClick}
+				src={`${import.meta.env.VITE_API_SERVER}/packs/${packId}/gallery/${currentImage}`}
+				onLoad={(e) => {
+					e.currentTarget.style.setProperty("opacity", "1")
+					e.currentTarget.classList.remove("transition")
+				}}
+				onError={onError}
+			/>
+		</div>
 	)
 }
 
@@ -201,6 +206,17 @@ export default function GalleryPackCard({
 			thumbnail.src = `${import.meta.env.VITE_API_SERVER}/packs/${id}/gallery/0`
 		}
 	}, [packData])
+
+	const mod = (n: number, m: number) => ((n % m) + m) % m
+
+	function CycleImage(direction: number) {
+		const thumbnail: HTMLDivElement =
+			card.current!.querySelector("#thumbnail")!
+		const nextIndex = mod(currentImage + direction, gallery!.length)
+
+		thumbnail.classList.add("transition")
+		setTimeout(() => setCurrentImage(nextIndex), 150)
+	}
 
 	return (
 		<div
@@ -313,15 +329,7 @@ export default function GalleryPackCard({
 									alignItems: "center",
 									justifyContent: "center",
 								}}
-								onClick={() =>
-									setCurrentImage(
-										((currentImage == 0
-											? gallery?.length
-											: currentImage) -
-											1) %
-											gallery?.length
-									)
-								}
+								onClick={() => CycleImage(-1)}
 							>
 								<Right
 									style={{ transform: "rotate(180deg)" }}
@@ -336,11 +344,7 @@ export default function GalleryPackCard({
 									alignItems: "center",
 									justifyContent: "center",
 								}}
-								onClick={() =>
-									setCurrentImage(
-										(currentImage + 1) % gallery?.length
-									)
-								}
+								onClick={() => CycleImage(1)}
 							>
 								<Right />
 							</button>
@@ -420,7 +424,7 @@ export default function GalleryPackCard({
 							width: "100%",
 							position: "relative",
 							gap: "1rem",
-							overflow: "hidden"
+							overflow: "hidden",
 						}}
 					>
 						<span
@@ -466,7 +470,7 @@ export default function GalleryPackCard({
 							width: displayGallery ? 0 : undefined,
 							height: displayGallery ? 0 : undefined,
 							display: displayGallery ? "none" : undefined,
-							overflow: "hidden"
+							overflow: "hidden",
 						}}
 					>
 						{data?.display.description}
@@ -479,7 +483,7 @@ export default function GalleryPackCard({
 							placeSelf: "end",
 							gridArea: "open",
 							width: "100%",
-							justifyContent: "end"
+							justifyContent: "end",
 						}}
 					>
 						{state === "add" && addWidget}
