@@ -1,8 +1,8 @@
 import Cookie from "cookie"
-import { UserData, PackData, PackMetaData, PackBundle } from "data-types"
+import { UserData, PackData, PackMetaData, PackBundle, HTTPResponses } from "data-types"
 import { sanitize } from "formatters"
 import { BROWSE_SCOPES } from "../../../loaders"
-import { redirect } from "react-router-dom"
+import { redirect, redirectDocument } from "react-router-dom"
 
 async function getUserData(id: string) {
 	const userDataResponse = await fetch(
@@ -71,7 +71,7 @@ export default async function loader({ request, params }: any) {
 	const user = await getUserData(id)
 
 	if (user === undefined) {
-		return { user: undefined, userStats: undefined }
+		throw new Response("", {status: HTTPResponses.NOT_FOUND})
 	}
 
 	const [packs, bundles] = await Promise.all([

@@ -5,11 +5,13 @@ import {
 	StaticRouterProvider,
 	createStaticHandler,
 	createStaticRouter,
+	StaticHandlerContext
 } from "react-router-dom/server"
 import { Request as ExpressRequest, Response as ExpressResponse } from "express"
 import { Headers, Request } from "node-fetch"
 import { Helmet } from "react-helmet"
 import React from "react"
+import { HTTPResponses } from "data-types"
 
 function createFetchRequest(req: ExpressRequest) {
 	let origin = `${req.protocol}://${req.get("host")}`
@@ -62,6 +64,10 @@ export default async function render(
 		[301, 302, 303, 307, 308].includes(context.status)
 	) {
 		return res.redirect(context.status, context.headers.get("Location")!)
+	}
+
+	if (!(context instanceof Response) && context.statusCode == HTTPResponses.NOT_FOUND) {
+		res.status(HTTPResponses.NOT_FOUND);
 	}
 
 	let router = createStaticRouter(handler.dataRoutes, context)

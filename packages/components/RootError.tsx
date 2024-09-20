@@ -7,6 +7,7 @@ export function RootError() {
 
 	console.log(error)
 	// console.log(Object.keys(error))
+	
 	return (
 		<div
 			className="container"

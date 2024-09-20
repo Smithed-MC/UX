@@ -67,6 +67,7 @@ async function createServer() {
 			return next()
 
 		try {
+			res.status(200)
 			let template, render
 
 			if (!isProd) {
@@ -114,7 +115,7 @@ async function createServer() {
 			// console.timeEnd('Replace w/ helmet and ssr')
 
 			// // 6. Send the rendered HTML back.
-			res.status(200).set({ "Content-Type": "text/html" }).end(html)
+			res.set({ "Content-Type": "text/html" }).end(html)
 		} catch (e) {
 			// If an error is caught, let Vite fix the stack trace so it maps back
 			// to your actual source code.

@@ -318,6 +318,8 @@ import { loadPackEdit } from "./pages/packs/id/edit.loader.js"
 
 import User from "./pages/users/id/index.js"
 
+import NotFound from "./pages/not-found.js"
+
 import PackPage from "./pages/packs/id/index.js"
 import loadPackData from "./pages/packs/id/index.loader.js"
 
@@ -376,7 +378,8 @@ export const subRoutes: RouteObject[] = [
 		loader: loadUserData,
 		shouldRevalidate: ({currentParams, nextParams}) => {
 			return currentParams["owner"] !== nextParams["owner"]
-		}
+		},
+		errorElement: <NotFound />
 	},
 	{
 		path: "packs/:id",
