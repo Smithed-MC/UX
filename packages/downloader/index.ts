@@ -59,10 +59,11 @@ export type CollectedPack = {
 }
 
 export async function collectPacks(
+	collectedPacks: CollectedPack[],
 	pack: string | PackReference,
 	gameVersion: MinecraftVersion,
 	dependency: boolean = false
-): Promise<CollectedPack[]> {
+): Promise<void> {
 	const [packId, packVersion] =
 		typeof pack === "string" ? pack.split("@") : [pack.id, pack.version]
 
@@ -70,8 +71,15 @@ export async function collectPacks(
 
 	if (packDoc === undefined) {
 		console.log("Unknown pack", packId)
-		return []
+		return
 	}
+
+	if (
+		collectedPacks.find(
+			(cp) => cp.id === packDoc.id && cp.version.name === packVersion
+		)
+	)
+		return
 
 	const packVersions: PackVersion[] = packDoc.get("data.versions")
 
@@ -96,7 +104,7 @@ export async function collectPacks(
 
 			if (version === undefined) {
 				console.log("No version matches", packVersion)
-				return []
+				return
 			}
 
 			console.log(
@@ -104,21 +112,20 @@ export async function collectPacks(
 			)
 		} else {
 			console.log("No version supports", gameVersion, "for pack", packId)
-			return []
+			return
 		}
 	}
 
-	let packs: CollectedPack[] = [
-		{ id: packDoc.id, version, isDependency: dependency },
-	]
+	collectedPacks.push({ id: packDoc.id, version, isDependency: dependency })
 
 	for (const d of version.dependencies ?? []) {
-		packs = packs.concat(
-			await collectPacks(d.id + "@" + d.version, gameVersion, true)
+		await collectPacks(
+			collectedPacks,
+			d.id + "@" + d.version,
+			gameVersion,
+			true
 		)
 	}
-
-	return packs
 }
 
 export class DownloadRunner {
@@ -220,10 +227,7 @@ export class DownloadRunner {
 
 		let foundPacks: CollectedPack[] = []
 		for (let pack of packs) {
-			foundPacks = [
-				...foundPacks,
-				...(await collectPacks(pack, version, false)),
-			]
+			await collectPacks(foundPacks, pack, version, false)
 		}
 
 		foundPacks = foundPacks.filter(
