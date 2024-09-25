@@ -151,9 +151,7 @@ export async function incrementPacksFromCachedResult(
 ) {
 	let foundPacks: CollectedPack[] = []
 	for (let p of packs)
-		foundPacks = foundPacks.concat(
-			await collectPacks(p, version ?? latestMinecraftVersion, false)
-		)
+		await collectPacks(foundPacks, p, version ?? latestMinecraftVersion, false)
 
 	for (let f of foundPacks)
 		await incrementPackDownloadCount(userHash, f.isDependency ? 1 : 3, f.id)
