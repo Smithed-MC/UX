@@ -92,12 +92,14 @@ export default function SummitPage() {
 			ref={mainRef}
 		>
 			<Helmet>
+				<title>Summit 2024</title>
 				<meta
 					name="description"
-					content="Come explore Smithed's first ever in-game convention! Join us: 11/2 - 11/9"
+					content="Come explore Smithed's first ever in-game convention! Join us: Nov 2 - Nov 9"
 				/>
 
 				<meta name="og:image" content="/summit-logo.png" />
+				<meta name="og:site_name" content="Smithed" />
 			</Helmet>
 
 			<div className="container" style={{ gap: "2rem" }}>
@@ -253,11 +255,15 @@ export default function SummitPage() {
 						style={{ height: "5rem", filter: "saturate(80%)" }}
 					/>
 					<a
-						href="https://bloom.host"
+						href="https://bloom.host/smithed"
 						style={{ color: "var(--subText)" }}
 					>
-						https://bloom.host/
+						https://bloom.host/smithed
 					</a>
+					<br/>
+					<span>
+						Use code <strong>SMITHEDSUMMIT24</strong> at checkout for 20% off your first month!
+					</span>
 				</div>
 			</div>
 			<div
@@ -283,19 +289,6 @@ export default function SummitPage() {
 			>
 				Booths are built by various community members in order to
 				showcase the content they're working on.
-				<br />
-				<br />
-				If you're interested in making your own, head to the application
-				form.
-				<IconTextButton
-					className="lightAccentedButtonLike"
-					text={"Apply for a booth"}
-					icon={Edit}
-					href="/summit/apply"
-					style={{
-						alignSelf: "end",
-					}}
-				/>
 			</SummitSection>
 			<SummitSection
 				id="panels"
@@ -307,18 +300,7 @@ export default function SummitPage() {
 				Panels are live events that happen on various stages around the
 				server. Creators will talk about a given topic, showcase
 				content, and potentionally interact directly with the audience.
-				<br /> <br />
-				Have something you're passionate about and want to share it with
-				the server? Apply down below!
-				<IconTextButton
-					className="successButtonLike"
-					text={"Apply for a panel"}
-					icon={Edit}
-					href="/summit/apply"
-					style={{
-						alignSelf: "end",
-					}}
-				/>
+				
 			</SummitSection>
 			<SummitSection
 				id="collectibles"
