@@ -1,5 +1,5 @@
 import { IconInput, IconTextButton } from "components"
-import { Account, Edit, Right, SummitLogoFull } from "components/svg"
+import { Account, Calendar, Edit, Right, SummitLogoFull } from "components/svg"
 import { Helmet } from "react-helmet"
 import { Divider } from "./home"
 
@@ -300,7 +300,13 @@ export default function SummitPage() {
 				Panels are live events that happen on various stages around the
 				server. Creators will talk about a given topic, showcase
 				content, and potentionally interact directly with the audience.
-				
+				<IconTextButton
+					className="successButtonLike"
+					text={"See the schedule!"}
+					icon={Calendar}
+					href="./schedule"
+					style={{ alignSelf: "end" }}
+				/>
 			</SummitSection>
 			<SummitSection
 				id="collectibles"

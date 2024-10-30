@@ -342,6 +342,7 @@ import {
 	loadRootData,
 } from "./loaders.js"
 import SummitPage from "./pages/summit"
+import SummitSchedulePage from "./pages/summit/schedule"
 
 // Don't reorder these please
 export const subRoutes: RouteObject[] = [
@@ -427,6 +428,10 @@ export const subRoutes: RouteObject[] = [
 		path: "summit/apply",
 		element: <></>,
 		loader: () => redirect("https://forms.gle/sCKjYxUWKngkXxpE9")
+	},
+	{
+		path: "summit/schedule",
+		element: <SummitSchedulePage />
 	}
 ]
 
