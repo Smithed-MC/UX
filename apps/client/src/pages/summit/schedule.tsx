@@ -45,7 +45,8 @@ const EVENTS: Record<string, SummitEvent[]> = {
 			host: "Stoupy51",
 		},
 		{
-			title: "Enhancing Survival Gameplay",
+			title: "Why Mojang Keeps Stealing Our Ideas",
+			tagline: "Designing Datapacks for Survival",
 			startTime: "16:00",
 			length: 1,
 			host: "Gamemode 4",
