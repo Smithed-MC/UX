@@ -23,6 +23,8 @@ import GImg4 from "../assets/summit/gallery/mountain2.webp"
 import GImg5 from "../assets/summit/gallery/spawn_center.webp"
 import GImg6 from "../assets/summit/gallery/spawn_crane.webp"
 
+import SummitMap from "../assets/summit/map.png"
+
 const GALLERY_IMAGES = [GImg1, GImg2, GImg3, GImg4, GImg5, GImg6]
 
 import SmithieHappy from "../assets/smithie/awww.png"
@@ -260,9 +262,10 @@ export default function SummitPage() {
 					>
 						https://bloom.host/smithed
 					</a>
-					<br/>
+					<br />
 					<span>
-						Use code <strong>SMITHEDSUMMIT24</strong> at checkout for 20% off your first month!
+						Use code <strong>SMITHEDSUMMIT24</strong> at checkout
+						for 20% off your first month!
 					</span>
 				</div>
 			</div>
@@ -279,6 +282,17 @@ export default function SummitPage() {
 					Tell me more!
 				</span>
 				<Divider />
+			</div>
+			<div className="container" style={{ gap: "2rem", width: "100%" }}>
+				<span className="header" style={{ alignSelf: "center" }}>
+					Server Map
+				</span>
+				<a href="/summit-map.png" style={{width: "100%"}}>
+					<img
+						src={SummitMap}
+						style={{ imageRendering: "pixelated", width: "100%" }}
+					/>
+				</a>
 			</div>
 			<SummitSection
 				id="booths"
@@ -508,7 +522,7 @@ function MapGallery({ images }: { images: string[] }) {
 		image.style.setProperty("filter", "blur(0.125rem) saturate(50%)")
 		setTimeout(() => setIndex(nextIndex), 150)
 	}
-	
+
 	return (
 		<div className="mapGallery">
 			<span className="header">Take a peek at the world</span>

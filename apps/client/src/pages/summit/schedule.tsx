@@ -89,6 +89,7 @@ const EVENTS: Record<string, SummitEvent[]> = {
 	"11/6/2024": [
 		{
 			title: "15 Years of Note Block Music",
+			tagline: "The History of Note Block Studio",
 			startTime: "21:00",
 			length: 1,
 			host: "Note Block Studio",
@@ -228,9 +229,13 @@ export default function Schedule() {
 				</span>
 			</span>
 			<div id="summit-schedule">
-				{[0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
+				{[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
 					const start = new Date(summitStart)
 					start.setDate(summitStart.getDate() + i)
+
+					if (start.getDate() > EVENTS_BY_DATE.at(-1)!.startDate.getDate())
+						return <></>
+
 					return (
 						<DayColumn key={start + "Column"} startDate={start} />
 					)
