@@ -241,6 +241,11 @@ export default function PackEdit() {
 		const [dependencies, setDependencies] = useState<PackDependency[]>(
 			version.dependencies
 		)
+		const [id, setId] = useState<string>("")
+		const [versionName, setVersionName] = useState<string>("")
+
+		const [validId, setValidId] = useState(true)
+		const [validVersion, setValidVersion] = useState(true)
 
 		async function getResolvedDep(
 			id: string,
@@ -283,25 +288,25 @@ export default function PackEdit() {
 		return (
 			<div className="dependencies">
 				<IconInput
-					className="inputField"
+					className={"inputField" + (validId ? "" : " invalidInput")}
 					id="new_dep_id"
 					icon={At}
 					placeholder="Dependency ID"
+					value={id}
 					onChange={(v) => {
-						v.currentTarget.parentElement!.classList.remove(
-							"invalidInput"
-						)
+						setValidId(true)
+						setId(v.currentTarget.value)
 					}}
 				/>
 				<IconInput
-					className="inputField"
+					className={"inputField" + (validVersion ? "" : " invalidInput")}
 					id="new_dep_version"
 					icon={ColorPicker}
 					placeholder="Version ID"
+					value={versionName}
 					onChange={(v) => {
-						v.currentTarget.parentElement!.classList.remove(
-							"invalidInput"
-						)
+						setValidVersion(true)
+						setVersionName(v.currentTarget.value)
 					}}
 				/>
 				<div />
@@ -350,14 +355,6 @@ export default function PackEdit() {
 						reverse
 						style={{ backgroundColor: "transparent" }}
 						onClick={async () => {
-							const idElement = document.getElementById(
-								"new_dep_id"
-							)! as HTMLInputElement
-							const id = idElement.value
-							const versionElement = document.getElementById(
-								"new_dep_version"
-							)! as HTMLInputElement
-							const versionName = versionElement.value
 
 							if (id === "" || versionName === "") return
 
@@ -365,9 +362,7 @@ export default function PackEdit() {
 								import.meta.env.VITE_API_SERVER + `/packs/${id}`
 							)
 							if (!packDataResp.ok) {
-								idElement.parentElement!.classList.add(
-									"invalidInput"
-								)
+								setValidId(false)
 								return alert(`Invalid pack id ${id}`)
 							}
 							const packData: PackData = await packDataResp.json()
@@ -377,9 +372,7 @@ export default function PackEdit() {
 								.filter((v) => satisfies(v, versionName))
 
 							if (versions.length === 0) {
-								versionElement.parentElement!.classList.add(
-									"invalidInput"
-								)
+								setValidVersion(false)
 								return alert(
 									`Invalid version ${versionName}, does not exist on pack ${id}`
 								)
@@ -399,8 +392,8 @@ export default function PackEdit() {
 
 							setDependencies([...version.dependencies])
 
-							idElement.value = ""
-							versionElement.value = ""
+							setId("")
+							setVersionName("")
 						}}
 					/>
 				</div>
