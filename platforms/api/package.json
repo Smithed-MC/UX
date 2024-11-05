@@ -7,7 +7,7 @@
 	"types": "src/index.ts",
 	"scripts": {
 		"test": "tap",
-		"dev": "ts-node-esm ./src/index.ts",
+		"dev": "tsx --import=./src/instrument.js ./src/index.ts",
 		"lint": "tsc",
 		"build": "tsc"
 	},

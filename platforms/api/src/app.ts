@@ -1,6 +1,10 @@
 import { parseToken, initializeAdmin } from "database"
 
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox"
+
+import * as Sentry from "@sentry/node"
+import { nodeProfilingIntegration } from "@sentry/profiling-node"
+
 import fastify, { FastifyReply } from "fastify"
 import fastifyCaching from "@fastify/caching"
 import fastifyRedis from "@fastify/redis"
@@ -16,7 +20,18 @@ import { Client } from "typesense"
 import { resolve } from "path"
 import { rejects } from "assert"
 
-export let TYPESENSE_APP: Client
+export const TYPESENSE_APP: Client = new Client({
+	apiKey: process.env.TYPESENSE_API_KEY ?? "",
+	nodes: [
+		{
+			host: process.env.TYPESENSE_HOST ?? "typesense.smithed.dev",
+			protocol: process.env.TYPESENSE_PROTOCOL ?? "https",
+			port: process.env.TYPESENSE_PORT
+				? Number.parseInt(process.env.TYPESENSE_PORT)
+				: 443,
+		},
+	],
+})
 
 export const API_APP = fastify({
 	logger: {
@@ -29,6 +44,11 @@ export const API_APP = fastify({
 	bodyLimit: 30 * 1024 * 1024,
 	disableRequestLogging: true,
 }).withTypeProvider<TypeBoxTypeProvider>()
+
+if (process.env.SENTRY_PROFILING === "true") {
+	Sentry.setupFastifyErrorHandler(API_APP as any)
+	Sentry.addIntegration(nodeProfilingIntegration())
+}
 
 API_APP.register(fastifyRequestLogger)
 API_APP.register(fastifyCompress)
@@ -101,21 +121,7 @@ async function registerCacheMemory() {
 export async function setupApp() {
 	await initializeAdmin()
 
-	TYPESENSE_APP = new Client({
-		apiKey: process.env.TYPESENSE_API_KEY ?? "",
-		nodes: [
-			{
-				host: process.env.TYPESENSE_HOST ?? "typesense.smithed.dev",
-				protocol: process.env.TYPESENSE_PROTOCOL ?? "https",
-				port: process.env.TYPESENSE_PORT
-					? Number.parseInt(process.env.TYPESENSE_PORT)
-					: 443,
-			},
-		],
-	})
-
-	if (process.env.REDIS) {
-	}
+	console.log(TYPESENSE_APP.configuration.nodes)
 
 	if (process.env.REDIS !== "false") await registerCacheRedis()
 	else await registerCacheMemory()
@@ -172,11 +178,9 @@ export async function set(
 }
 
 export async function invalidate(pattern: string): Promise<void> {
-	if (REDIS === undefined)
-		return
+	if (REDIS === undefined) return
 
 	const matches = await REDIS.keys(pattern)
-	if (matches.length === 0)
-		return 
+	if (matches.length === 0) return
 	const deleted = await REDIS.del(matches)
 }

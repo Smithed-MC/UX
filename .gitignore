@@ -30,3 +30,6 @@ typesense.ts
 *.code-workspace
 
 .venv/
+
+*.cpuprofile
+*.ts.timestamp*
