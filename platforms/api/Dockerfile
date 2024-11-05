@@ -12,7 +12,7 @@ RUN pip install --break-system-packages git+https://github.com/Smithed-MC/smithe
 
 RUN mkdir /usr/local/nvm
 ENV NVM_DIR /usr/local/nvm
-ENV NODE_VERSION 18.17.1
+ENV NODE_VERSION 18.19.0
 RUN curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash \
     && . $NVM_DIR/nvm.sh \
     && nvm install $NODE_VERSION \
