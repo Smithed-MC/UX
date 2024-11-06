@@ -344,6 +344,22 @@ import {
 import SummitPage from "./pages/summit"
 import SummitSchedulePage from "./pages/summit/schedule"
 
+function didSearchParamsChange({currentUrl, nextUrl}: {currentUrl: URL, nextUrl: URL}) {
+	const currentSearch = currentUrl.searchParams
+	const nextSearch = nextUrl.searchParams
+
+	if (currentSearch.size !== nextSearch.size)
+		return true
+
+	for (const key of currentSearch.keys()) {
+		if (nextSearch.get(key) !== currentSearch.get(key)) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Don't reorder these please
 export const subRoutes: RouteObject[] = [
 	{
@@ -414,11 +430,13 @@ export const subRoutes: RouteObject[] = [
 		path: "packs",
 		element: <PackBrowsePage />,
 		loader: loadPackBrowseData,
+		shouldRevalidate: didSearchParamsChange
 	},
 	{
 		path: "users",
 		element: <UserBrowsePage />,
-		loader: loadUserBrowseData
+		loader: loadUserBrowseData,
+		shouldRevalidate: didSearchParamsChange
 	},
 	{
 		path: "summit",

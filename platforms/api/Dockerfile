@@ -44,5 +44,6 @@ EXPOSE ${PORT}
 ENV ADMIN_CERT=./secret.json
 ENV DOCKER = true
 ENV REDIS = true
+ENV NODE_ENV = production
 
 CMD ["npm", "run", "api:dev"]

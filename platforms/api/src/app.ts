@@ -86,7 +86,7 @@ export let REDIS: IORedis | undefined = undefined
 
 async function registerCacheRedis() {
 	const redis = new IORedis({
-		host: process.env.DOCKER === "true" ? "redis" : "127.0.0.1",
+		host: process.env.DOCKER === "true" ? "redis" : "0.0.0.0",
 	})
 	REDIS = redis
 

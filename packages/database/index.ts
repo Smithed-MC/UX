@@ -7,6 +7,8 @@ import * as jose from "jose"
 import { HTTPResponses, PAToken, PermissionScope } from "data-types"
 import { FastifyReply } from "fastify"
 
+import * as Sentry from "@sentry/node"
+
 export let privateKey: jose.KeyLike
 export let serviceAccount: any
 
@@ -111,8 +113,6 @@ export async function parseToken(
 	else return getFromIdToken(token)
 }
 
-
-
 export async function validateToken(
 	reply: FastifyReply,
 	token: string,
@@ -126,10 +126,10 @@ export async function validateToken(
 		reply.status(HTTPResponses.UNAUTHORIZED).send({
 			statusCode: HTTPResponses.UNAUTHORIZED,
 			error: HTTPResponses[HTTPResponses.UNAUTHORIZED],
-			message: "Invalid token"
+			message: "Invalid token",
 		})
 		return undefined
-	} 
+	}
 
 	if (!options) return tokenData
 
@@ -137,7 +137,7 @@ export async function validateToken(
 		reply.status(HTTPResponses.FORBIDDEN).send({
 			statusCode: HTTPResponses.FORBIDDEN,
 			error: HTTPResponses[HTTPResponses.FORBIDDEN],
-			message: "You do not have ownership of this content"
+			message: "You do not have ownership of this content",
 		})
 		return undefined
 	}
@@ -149,9 +149,10 @@ export async function validateToken(
 		reply.status(HTTPResponses.FORBIDDEN).send({
 			statusCode: HTTPResponses.FORBIDDEN,
 			error: HTTPResponses[HTTPResponses.FORBIDDEN],
-			message: "Your token does not have the required scopes for this operation"
+			message:
+				"Your token does not have the required scopes for this operation",
 		})
-		
+
 		return undefined
 	}
 
@@ -159,15 +160,21 @@ export async function validateToken(
 }
 
 export async function getPackDoc(id: string) {
-	const firestore = getFirestore()
-	const packs = firestore.collection("packs")
+	const packs = Sentry.startSpan({ name: "get packs collection" }, () => {
+		return getFirestore().collection("packs")
+	})
 
-	console.log("Querying for pack", id)
-	const doc = await packs.doc(id).get()
+	const doc = await Sentry.startSpan({ name: "try get pack by uid" }, () =>
+		packs.doc(id).get()
+	)
+
 	if (doc.exists) {
 		return doc
 	}
-	const query = await packs.where("id", "==", id).limit(1).get()
+
+	const query = await Sentry.startSpan({ name: "get pack by slug id" }, () =>
+		packs.where("id", "==", id).limit(1).get()
+	)
 
 	if (query.docs.length == 0) return undefined
 

@@ -112,13 +112,13 @@ async function getPackEntriesForBrowse(
 ): Promise<PackApiInfo[]> {
 	params.set("page", page.toString())
 	params.set("limit", PACKS_PER_PAGE.toString())
-	console.time("Fetch packdata")
+	// console.time("Fetch packdata")
 	const response = await fetch(
 		import.meta.env.VITE_API_SERVER +
 			`/packs?scope=${BROWSE_SCOPES.join("&scope=")}&` +
 			params.toString()
 	)
-	console.timeEnd("Fetch packdata")
+	// console.timeEnd("Fetch packdata")
 	return response.ok ? await response.json() : []
 }
 
@@ -155,8 +155,6 @@ export async function loadPackBrowseData({
 		request.url.split("?")[1]
 	)
 	const params = createBrowseSearchParams(parsedParams)
-
-	// console.log(request.headers)
 
 	const count = await getTotalCount(params)
 

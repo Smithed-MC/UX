@@ -695,7 +695,7 @@ API_APP.route({
 			return Buffer.from(tryCachedResult.item, "base64")
 		}
 
-		console.time("Find pack doc")
+		// console.time("Find pack doc")
 		const doc = await getPackDoc(id)
 		if (doc === undefined)
 			return sendError(
@@ -703,7 +703,7 @@ API_APP.route({
 				HTTPResponses.NOT_FOUND,
 				`Pack with ID ${id} was not found`
 			)
-		console.timeEnd("Find pack doc")
+		// console.timeEnd("Find pack doc")
 		const gallery = await doc.get("data.display.gallery")
 
 		if (!gallery)
