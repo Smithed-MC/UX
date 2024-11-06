@@ -7,6 +7,7 @@ interface SummitEvent {
 	startTime: string
 	length: number
 	host: string
+	vodUrl?: string
 }
 
 const EVENTS: Record<string, SummitEvent[]> = {
@@ -16,12 +17,14 @@ const EVENTS: Record<string, SummitEvent[]> = {
 			startTime: "17:00",
 			length: 1,
 			host: "Smithed Team",
+			vodUrl: "https://youtube.com/live/kCuL1RYJLYI?feature=share",
 		},
 		{
 			title: "How we make data packs for YouTube",
 			startTime: "23:00",
 			length: 1,
 			host: "Logdotzip Studios",
+			vodUrl: "https://youtube.com/live/W56QPMhOMK0?feature=share",
 		},
 	],
 	"11/3/2024": [
@@ -31,18 +34,21 @@ const EVENTS: Record<string, SummitEvent[]> = {
 			startTime: "10:30",
 			length: 1,
 			host: "Moxvallix, Gears",
+			vodUrl: "https://youtube.com/live/S2QSrtmDjD8?feature=share",
 		},
 		{
 			title: "All About DevsCube",
 			startTime: "12:00",
 			length: 1,
 			host: "DevsCube",
+			vodUrl: "https://youtube.com/live/1W3mTJbY2Fo?feature=share",
 		},
 		{
 			title: "Generating Datapacks with Python",
 			startTime: "14:00",
 			length: 1,
 			host: "Stoupy51",
+			vodUrl: "https://youtube.com/live/yMNk2_R_Bvw?feature=share",
 		},
 		{
 			title: "Why Mojang Keeps Stealing Our Ideas",
@@ -50,18 +56,21 @@ const EVENTS: Record<string, SummitEvent[]> = {
 			startTime: "16:00",
 			length: 1,
 			host: "Gamemode 4",
+			vodUrl: "https://youtube.com/live/f6sLyQwWc84?feature=share",
 		},
 		{
 			title: "Designing Vanilla+ Content",
 			startTime: "18:00",
 			length: 1,
 			host: "CreeperMagnet_",
+			vodUrl: "https://youtube.com/live/f6sLyQwWc84?feature=share",
 		},
 		{
 			title: "The Strengths of Datapack Libraries",
 			startTime: "20:00",
 			length: 1,
 			host: "Leirof, theogiraudet, Aksiome",
+			vodUrl: "https://youtube.com/live/skAqER7oJzU?feature=share",
 		},
 	],
 	"11/4/2024": [
@@ -70,12 +79,14 @@ const EVENTS: Record<string, SummitEvent[]> = {
 			startTime: "0:00",
 			length: 1,
 			host: "SuperRed001",
+			vodUrl: "https://youtube.com/live/uWgkpsYrxZw?feature=share",
 		},
 		{
 			title: "Intro to Worldgen",
 			startTime: "19:00",
 			length: 1,
 			host: "Kano, jacobsjo, catter",
+			vodUrl: "https://youtube.com/live/ASB0dnxaQKk?feature=share",
 		},
 	],
 	"11/5/2024": [
@@ -84,6 +95,7 @@ const EVENTS: Record<string, SummitEvent[]> = {
 			startTime: "23:00",
 			length: 1,
 			host: "Mr Pringouin",
+			vodUrl: "https://youtube.com/live/XJL2DdURppY?feature=share",
 		},
 	],
 	"11/6/2024": [
@@ -176,10 +188,14 @@ export function EventCard({
 					{" - "}
 					{endDate.toLocaleString(undefined, { timeStyle: "short" })}
 				</span>
-				<span className="title">{event.title}{event.tagline ? ":" : ""}</span>
+				<span className="title">
+					{event.title}
+					{event.tagline ? ":" : ""}
+				</span>
 				{event.tagline && (
 					<span className="tagline">{event.tagline}</span>
 				)}
+				{event.vodUrl && <a href={event.vodUrl}>View the Recording</a>}
 				<span className="host">Hosted by: {event.host}</span>
 			</div>
 		</div>
@@ -233,7 +249,10 @@ export default function Schedule() {
 					const start = new Date(summitStart)
 					start.setDate(summitStart.getDate() + i)
 
-					if (start.getDate() > EVENTS_BY_DATE.at(-1)!.startDate.getDate())
+					if (
+						start.getDate() >
+						EVENTS_BY_DATE.at(-1)!.startDate.getDate()
+					)
 						return <></>
 
 					return (
