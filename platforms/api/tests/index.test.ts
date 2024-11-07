@@ -7,6 +7,7 @@ import { initializeApp } from "firebase/app"
 
 dotenv.config()
 
+
 initializeApp({
 	databaseURL: "https://mc-smithed-default-rtdb.firebaseio.com",
 	apiKey: "AIzaSyDX-vLCBhO8StKAxnpvQ2EW8lz3kzYn4Qk",

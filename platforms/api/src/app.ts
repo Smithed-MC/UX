@@ -1,4 +1,5 @@
-import { parseToken, initializeAdmin } from "database"
+import { parseToken, initializeAdmin, getPackDoc } from "database"
+import dotenv from 'dotenv'
 
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox"
 
@@ -19,6 +20,8 @@ import IORedis from "ioredis"
 import { Client } from "typesense"
 import { resolve } from "path"
 import { rejects } from "assert"
+
+dotenv.config()
 
 export const TYPESENSE_APP: Client = new Client({
 	apiKey: process.env.TYPESENSE_API_KEY ?? "",
@@ -183,4 +186,30 @@ export async function invalidate(pattern: string): Promise<void> {
 	const matches = await REDIS.keys(pattern)
 	if (matches.length === 0) return
 	const deleted = await REDIS.del(matches)
+}
+
+export async function getCachedPackDoc(id: string): Promise<{id: string, data: any}|undefined> {
+	const identifier = "GET-PACK-DOCUMENT::" + id;
+
+	let cachedDoc = await get(identifier);
+
+	if (cachedDoc) {
+		return cachedDoc.item;
+	}
+
+	const doc = await getPackDoc(id)
+	
+	if (doc === undefined)
+		return undefined
+
+
+	const data = {
+		id: doc.id,
+		data: doc.data()
+	}
+
+	console.log(data)
+
+	await set(identifier, data, 5 * 60 * 1000)
+	return data
 }

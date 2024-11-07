@@ -1,5 +1,12 @@
 import { Static, Type } from "@sinclair/typebox"
-import { API_APP, get, invalidate, sendError, set } from "../../../app.js"
+import {
+	API_APP,
+	get,
+	getCachedPackDoc,
+	invalidate,
+	sendError,
+	set,
+} from "../../../app.js"
 import { getStorage } from "firebase-admin/storage"
 import {
 	HTTPResponses,
@@ -84,7 +91,6 @@ export async function uploadImage(
 		if (!img.startsWith("http")) {
 			const image = await getWebp(img)
 
-
 			if (image.byteLength > 1324 * 1024) {
 				if (reply)
 					sendError(
@@ -145,8 +151,7 @@ export async function updateGalleryData(
 			"Gallery Image " + i
 		)
 
-		if (result == null) 
-			return false
+		if (result == null) return false
 
 		packData.display.gallery[i] = result
 	}
@@ -176,26 +181,35 @@ API_APP.route({
 	},
 	handler: async (request, reply) => {
 		const { id } = request.params
+		const shouldUseCache = request.headers["cache-control"] !== "max-age=0"
 
 		const requestIdentifier = "GET-PACK::" + id
 		const tryCachedResult = await get(requestIdentifier)
-		if (
-			tryCachedResult &&
-			request.headers["cache-control"] !== "max-age=0"
-		) {
+		if (tryCachedResult && shouldUseCache) {
 			request.log.info("served cached /packs/", id)
 			return tryCachedResult.item
 		}
 
-		const doc = await getPackDoc(id)
-		if (doc === undefined)
+
+		let data: PackData | undefined = undefined
+
+		if (shouldUseCache) {
+			const doc = await getCachedPackDoc(id)
+			if (doc)
+				data = doc.data.data
+		} else {
+			const doc = await getPackDoc(id)
+			
+			if (doc)
+				data = await doc.get("data")
+		}
+
+		if (data === undefined)
 			return sendError(
 				reply,
 				HTTPResponses.NOT_FOUND,
 				`Pack with ID ${id} was not found`
 			)
-
-		const data: PackData = await doc.get("data")
 
 		await set(requestIdentifier, data, 60 * 60 * 1000)
 		return data
@@ -215,7 +229,9 @@ async function getWebp(content: string): Promise<Buffer> {
 
 	const buffer = Buffer.from(urlParts.at(-1)!, "base64")
 
-	const webpBuffer = await sharp(buffer, { animated: urlParts[0].includes("image/gif") })
+	const webpBuffer = await sharp(buffer, {
+		animated: urlParts[0].includes("image/gif"),
+	})
 		.webp()
 		.toBuffer()
 
@@ -640,32 +656,40 @@ API_APP.route({
 	},
 	handler: async (request, reply) => {
 		const { id } = request.params
+		const shouldUseCache = request.headers["cache-control"] !== "max-age=0"
 
 		const requestIdentifier = "GET-PACK-META::" + id
 		const tryCachedResult = await get(requestIdentifier)
-		if (
-			tryCachedResult &&
-			request.headers["cache-control"] !== "max-age=0"
-		) {
+		if (tryCachedResult && shouldUseCache) {
 			request.log.info("served cached /packs/", id, "/meta")
 			return tryCachedResult.item
 		}
 
-		const doc = await getPackDoc(id)
-		if (doc === undefined)
+		let data: PackMetaData | undefined = undefined
+
+		const setData = (id: string, data: any) => ({
+			docId: id,
+			rawId: data.id,
+			stats: data.stats,
+			owner: data.owner,
+			contributors: data.contributors,
+		})
+
+		if (shouldUseCache) {
+			const doc = await getCachedPackDoc(id)
+			console.log(doc)
+			if (doc) data = setData(doc.id, doc.data)
+		} else {
+			const doc = await getPackDoc(id)
+			if (doc) data = setData(doc.id, doc.data()!)
+		}
+
+		if (data === undefined)
 			return sendError(
 				reply,
 				HTTPResponses.NOT_FOUND,
 				`Pack with ID ${id} was not found`
 			)
-
-		const data: PackMetaData = {
-			docId: doc.id,
-			rawId: await doc.get("id"),
-			stats: await doc.get("stats"),
-			owner: await doc.get("owner"),
-			contributors: await doc.get("contributors"),
-		}
 
 		await set(requestIdentifier, data, 60 * 60 * 1000)
 		return data
@@ -683,20 +707,32 @@ API_APP.route({
 	},
 	handler: async (request, reply) => {
 		const { id, index } = request.params
+		const shouldUseCache = request.headers["cache-control"] !== "max-age=0"
 
 		const requestIdentifier = "GET-PACK-GALLERY-" + id + "::" + index
 		const tryCachedResult = await get(requestIdentifier)
-		if (
-			tryCachedResult &&
-			request.headers["cache-control"] !== "max-age=0"
-		) {
+		if (tryCachedResult && shouldUseCache) {
 			request.log.info("served cached /packs/", id, "/gallery/", index)
 			reply.header("Content-Type", "image/png")
 			return Buffer.from(tryCachedResult.item, "base64")
 		}
 
 		// console.time("Find pack doc")
-		const doc = await getPackDoc(id)
+		let gallery: Image[]|undefined = undefined;
+		let doc;
+
+		if (shouldUseCache) {
+			doc = await getCachedPackDoc(id)
+			
+			if (doc)
+				gallery = doc.data.data.display.gallery
+		} else {
+			doc = await getPackDoc(id)
+			
+			if (doc)
+				gallery = await doc.get("data.display.gallery")
+		}
+
 		if (doc === undefined)
 			return sendError(
 				reply,
@@ -704,7 +740,6 @@ API_APP.route({
 				`Pack with ID ${id} was not found`
 			)
 		// console.timeEnd("Find pack doc")
-		const gallery = await doc.get("data.display.gallery")
 
 		if (!gallery)
 			return sendError(
@@ -712,6 +747,7 @@ API_APP.route({
 				HTTPResponses.NOT_FOUND,
 				`Not gallery for pack ${id}`
 			)
+
 		if (index >= gallery.length)
 			return sendError(
 				reply,
@@ -732,8 +768,6 @@ API_APP.route({
 })
 
 export function invalidateCachedData(id: string | undefined, docId: string) {
-	if (id !== undefined)
-		invalidate("**" + id + "**")
+	if (id !== undefined) invalidate("**" + id + "**")
 	invalidate("**" + docId + "**")
 }
-
