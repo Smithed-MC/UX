@@ -122,7 +122,6 @@ export function normalizeRelativeLinks(sourceUrl: string, readme: string) {
 
 	sourceUrl = sourceUrl.split("/").slice(0, -1).join("/") + "/"
 
-	console.log(readme)
 	readme = readme.replaceAll("./", sourceUrl)
 	return readme
 }

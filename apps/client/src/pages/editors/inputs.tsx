@@ -5,7 +5,7 @@ import { useEffect, useReducer, useRef, useState } from "react"
 import { useErrorEventHandlers } from "./errorEvents"
 
 export const validUrlRegex =
-	/^http(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#=_]*)?$/gi
+    /^http(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#=_]*)?$/i;
 
 export function getPropertyByPath(obj: any, path: string) {
 	const properties = path.split("/") // Split the path string into an array of property names
