@@ -117,9 +117,15 @@ const EVENTS: Record<string, SummitEvent[]> = {
 	],
 	"11/8/2024": [
 		{
+			title: "Pixelart for Minecraft",
+			startTime: "19:00",
+			length: 1,
+			host: "Kyrius, Jachro"
+		},
+		{
 			title: "Fireside Chats",
 			startTime: "22:00",
-			length: 2.5,
+			length: 3,
 			host: "Smithed Team",
 		},
 	],

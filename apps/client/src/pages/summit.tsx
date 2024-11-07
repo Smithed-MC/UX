@@ -285,9 +285,24 @@ export default function SummitPage() {
 			</div>
 			<div className="container" style={{ gap: "2rem", width: "100%" }}>
 				<span className="header" style={{ alignSelf: "center" }}>
+					Server IP
+				</span>
+				<span
+					style={{
+						fontSize: "1.25rem",
+						backgroundColor: "var(--section)",
+						padding: "0.5rem 1rem",
+						borderRadius: "var(--defaultBorderRadius)"
+					}}
+				>
+					summit.smithed.net
+				</span>
+			</div>
+			<div className="container" style={{ gap: "2rem", width: "100%" }}>
+				<span className="header" style={{ alignSelf: "center" }}>
 					Server Map
 				</span>
-				<a href="/summit-map.png" style={{width: "100%"}}>
+				<a href="/summit-map.png" style={{ width: "100%" }}>
 					<img
 						src={SummitMap}
 						style={{ imageRendering: "pixelated", width: "100%" }}
