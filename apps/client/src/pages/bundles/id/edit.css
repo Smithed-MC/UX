@@ -186,7 +186,7 @@
 }
 
 .editBundleVersions > .versionSelect > .versionChoice.selected {
-	background-color: var(--background);
+	background-color: var(--section);
 }
 
 .editBundleVersions > .versionSelect > .versionChoice:has(> :not(:hover)):hover {

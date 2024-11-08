@@ -920,6 +920,7 @@ export default function PackEdit() {
 								index={i}
 								version={v}
 								setSelectedVersion={setSelectedVersion}
+								selectedVersion={selectedVersion}
 								allVersions={packData.versions}
 								onDelete={updateVersions}
 							/>

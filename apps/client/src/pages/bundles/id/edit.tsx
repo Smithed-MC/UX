@@ -437,6 +437,7 @@ export default function BundleEdit() {
 			)
 		})
 
+		// TODO: Standardize this between packs and bundles
 		function VersionSelect({ data }: { data: PackBundle_v2 }) {
 			const select = (version: BundleVersion) => {
 				const matches = data.versions.filter(
@@ -465,6 +466,7 @@ export default function BundleEdit() {
 								version={v}
 								index={i}
 								setSelectedVersion={setSelectedVersion}
+								selectedVersion={selectedVersion}
 								allVersions={bundleData.versions}
 								onDelete={updateVersions}
 							/>
