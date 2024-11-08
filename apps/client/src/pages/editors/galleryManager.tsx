@@ -61,6 +61,7 @@ export default function GalleryManager({
 						style={{
 							width: "100%",
 							borderRadius: "var(--defaultBorderRadius)",
+							aspectRatio: "16/9"
 						}}
 						src={
 							typeof images[selectedImage] === "string"

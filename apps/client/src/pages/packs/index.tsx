@@ -126,8 +126,8 @@ export default function PacksBrowser(props: any) {
 			}}
 		>
 			<Helmet>
-				<title>Browse Packs</title>
-				<meta name="description" content="Search for datapacks" />
+				<title>Browse Datapacks</title>
+				<meta name="description" content="Search for minecraft datapacks and resourcepacks to improve your game!" />
 			</Helmet>
 			<div
 				className="container"

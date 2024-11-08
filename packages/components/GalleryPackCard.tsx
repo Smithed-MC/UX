@@ -140,7 +140,12 @@ export function GalleryImage({
 }) {
 	return (
 		<div
-			style={{ borderRadius: "var(--borderRadius)", overflow: "hidden" }}
+			style={{
+				borderRadius: "var(--borderRadius)",
+				overflow: "hidden",
+				width: "100%",
+				imageRendering: "pixelated"
+			}}
 		>
 			<img
 				id={"thumbnail"}

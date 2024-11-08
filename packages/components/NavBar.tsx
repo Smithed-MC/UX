@@ -29,53 +29,15 @@ import Link from "./Link"
 import Modal from "./Modal"
 import { getAuth } from "firebase/auth"
 
-interface NavButtonProps {
-	onOpen: () => void
-	onClose: () => void
-	style?: CSSProperties
-}
 
 var previousState = false
 
-interface EditBundleProps {
-	close: () => void
-}
 
 export default function NavBar({ tabs, logoUrl, onSignout }: NavBarProps) {
-	const [open, setOpen] = useState(previousState)
-
-	const [editBundleOpen, setEditBundleOpen] = useState(false)
-
-	const navBarOptions = useRef<HTMLDivElement>(null)
-
 	const user = useSmithedUser()
 
-	function onOpen() {
-		setOpen(true)
-		navBarOptions.current?.style.setProperty(
-			"animation",
-			"navbarPullup 0.5s 1"
-		)
-	}
-
-	function onClose() {
-		const duration = 0.75
-		const animation = `navbarSlidedown ${duration}s 1`
-		navBarOptions.current?.style.setProperty("animation", animation)
-		setTimeout(
-			() => {
-				if (
-					navBarOptions.current?.style.animationName ===
-					"navbarSlidedown"
-				)
-					setOpen(false)
-			},
-			duration * 1000 - 100
-		)
-	}
-
 	return (
-		<div
+		<nav
 			className="container navBarContainer"
 			style={{
 				flexDirection: "row",
@@ -127,7 +89,7 @@ export default function NavBar({ tabs, logoUrl, onSignout }: NavBarProps) {
 			{/* {editBundleOpen && (
 				<EditBundle close={() => setEditBundleOpen(false)} />
 			)} */}
-		</div>
+		</nav>
 	)
 }
 
@@ -228,7 +190,7 @@ function UserButton({
 					/>
 				</span>
 			}
-			content={(ctx) => (
+			content={() => (
 				<div className="container">
 					<NavModalOption
 						text="Open profile"
