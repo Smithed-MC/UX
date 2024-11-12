@@ -27,13 +27,14 @@ import {
 	Picture,
 	CurlyBraces,
 	Jigsaw,
+	Edit,
 } from "components/svg"
 import { prettyTimeDifference } from "formatters"
 import { useContext, useState } from "react"
 import { compare, coerce, SemVer } from "semver"
 import { ClientContext } from "../../../context"
 import BackButton from "../../../widget/BackButton"
-import { useCurrentBundle, useQueryParams } from "hooks"
+import { useCurrentBundle, useFirebaseUser, useQueryParams } from "hooks"
 import { DownloadPackModal } from "../../../widget/downloadPackWidget"
 
 if (
@@ -62,6 +63,7 @@ export default function Packs() {
 	const clientContext = useContext(ClientContext)
 	const navigate = useNavigate()
 	const tab = useQueryParams().tab ?? "readme"
+	const firebaseUser = useFirebaseUser()
 
 	const DownloadButton = clientContext.packDownloadButton
 
@@ -152,43 +154,55 @@ export default function Packs() {
 					/> */}
 							<div
 								className="container"
-								style={{ gap: "0.5rem" }}
+								style={{ flexDirection: "row", gap: "1rem" }}
 							>
-								<DownloadPackModal
-									packData={packData!}
-									packId={id!}
+								{firebaseUser?.uid !== undefined &&
+									metaData.contributors.includes(
+										firebaseUser.uid
+									) && (
+										<a href="./edit" className="buttonLike">
+											<Edit />
+										</a>
+									)}
+								<div
+									className="container"
+									style={{ gap: "0.5rem" }}
 								>
-									<DownloadButton
-										id={id!}
-										openPopup={(element) => {
-											setInjectPopup(element)
-										}}
-										closePopup={() => {
-											setInjectPopup(undefined)
-										}}
-									/>
-								</DownloadPackModal>
-
+									<DownloadPackModal
+										packData={packData!}
+										packId={id!}
+									>
+										<DownloadButton
+											id={id!}
+											openPopup={(element) => {
+												setInjectPopup(element)
+											}}
+											closePopup={() => {
+												setInjectPopup(undefined)
+											}}
+										/>
+									</DownloadPackModal>
 								<label style={{ color: "var(--border)" }}>
 									{(() => {
 										const version = packData?.versions
-											.sort((a, b) =>
-												compare(
-													coerce(a.name) ?? "",
-													coerce(b.name) ?? ""
-												)
+										.sort((a, b) =>
+											compare(
+												coerce(a.name) ?? "",
+												coerce(b.name) ?? ""
 											)
-											.at(-1)
-
+										)
+										.at(-1)
+										
 										if (
 											version?.supports[0] ===
 											version?.supports.at(-1)
 										)
-											return version?.supports[0]
-
+										return version?.supports[0]
+										
 										return `${version?.supports[0]} — ${version?.supports.at(-1)}`
 									})()}
 								</label>
+								</div>
 							</div>
 						</div>
 						<div className="userButtonsContainer">
@@ -249,7 +263,10 @@ export default function Packs() {
 							icon={<Picture />}
 							value="gallery"
 							text="Gallery"
-							hidden={packData.display.gallery === undefined}
+							hidden={
+								packData.display.gallery === undefined ||
+								packData.display.gallery.length === 0
+							}
 						/>
 						<CategoryChoice
 							icon={<Download />}

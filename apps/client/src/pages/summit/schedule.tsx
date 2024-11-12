@@ -105,6 +105,7 @@ const EVENTS: Record<string, SummitEvent[]> = {
 			startTime: "21:00",
 			length: 1,
 			host: "Note Block Studio",
+			vodUrl: "https://www.youtube.com/watch?v=25IwJr7BtgI"
 		},
 	],
 	"11/7/2024": [
@@ -113,6 +114,7 @@ const EVENTS: Record<string, SummitEvent[]> = {
 			startTime: "20:00",
 			length: 1,
 			host: "jacobsjo",
+			vodUrl: "https://www.youtube.com/live/rXdwD88SS4k"
 		},
 	],
 	"11/8/2024": [
@@ -120,13 +122,15 @@ const EVENTS: Record<string, SummitEvent[]> = {
 			title: "Pixelart for Minecraft",
 			startTime: "19:00",
 			length: 1,
-			host: "Kyrius, Jachro"
+			host: "Kyrius, Jachro",
+			vodUrl: "https://www.youtube.com/watch?v=jGpUJRKfRLc"
 		},
 		{
 			title: "Fireside Chats",
 			startTime: "22:00",
 			length: 3,
 			host: "Smithed Team",
+			vodUrl: "https://www.youtube.com/watch?v=0VgXm-IN-l4"
 		},
 	],
 	"11/9/2024": [
@@ -136,18 +140,21 @@ const EVENTS: Record<string, SummitEvent[]> = {
 			startTime: "15:30",
 			length: 1,
 			host: "Neylz",
+			vodUrl: "https://www.youtube.com/watch?v=2bfaBHWWLok"
 		},
 		{
 			title: "Supercharging Datapacking with Beet",
 			startTime: "19:00",
 			length: 1,
 			host: "rx97",
+			vodUrl: "https://www.youtube.com/watch?v=WvuT4bKnfuU"
 		},
 		{
 			title: "Closing Ceremony",
 			startTime: "23:00",
 			length: 1,
 			host: "Smithed Team",
+			vodUrl: "https://youtube.com/live/7mT7NhzGQHQ?feature=share"
 		},
 	],
 }
