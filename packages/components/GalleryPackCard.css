@@ -185,7 +185,7 @@
 		}
 	}
 
-	.galleryImage:has(.thumbnail:hover, .carousel:hover) {
+	.galleryImage:hover {
 		.carousel {
 			opacity: 1;
 		}
