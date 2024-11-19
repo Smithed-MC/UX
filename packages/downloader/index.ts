@@ -4,6 +4,7 @@ import fetch from "node-fetch"
 import semver from "semver"
 
 import {
+	BundleVersion,
 	MinecraftVersion,
 	PackData,
 	PackDownloadOptions,
@@ -16,6 +17,39 @@ import { RUNNER } from "./runner.js"
 import { CompactSign } from "jose"
 
 if (!fs.existsSync("temp")) fs.mkdirSync("temp")
+
+class PackDownloadError extends Error {
+	constructor(
+		id: string,
+		version: string,
+		downloadType: string,
+		downloadUrl: string,
+		error: any
+	) {
+		super(
+			`An Error occured while downloading pack ${id}, version ${version}.\n` +
+				`The ${downloadType} link ${downloadUrl} resulted in\n` +
+				`${error}`
+		)
+	}
+}
+
+class PatchDownloadError extends Error {
+	constructor(
+		id: string,
+		version: string,
+		patchIndex: number,
+		downloadType: string,
+		downloadUrl: string,
+		error: any
+	) {
+		super(
+			`An Error occured while downloading bundle ${id}, version ${version} patch #${patchIndex}.\n` +
+				`The ${downloadType} link ${downloadUrl} resulted in\n` +
+				`${error}`
+		)
+	}
+}
 
 export async function incrementPackDownloadCount(
 	userHash: string,
@@ -163,30 +197,107 @@ export class DownloadRunner {
 	}
 
 	private async downloadDataAndResources(
-		name: string,
-		downloads: PackDownloadOptions
+		id: string,
+		version: PackVersion | BundleVersion
 	): Promise<boolean> {
 		// console.log(pack)
 
 		let successfullyDownloaded = false
 
-		if (downloads.datapack !== undefined && downloads.datapack !== "") {
-			successfullyDownloaded = await this.tryToDownload(
-				name + "-dp",
-				downloads.datapack
-			)
-		}
-		if (
-			downloads.resourcepack !== undefined &&
-			downloads.resourcepack !== ""
-		) {
-			let rpSuccess = await this.tryToDownload(
-				name + "-rp",
-				downloads.resourcepack
-			)
-			successfullyDownloaded ||= rpSuccess
+		if ("downloads" in version) {
+			for (const [downloadType, downloadUrl] of Object.entries(
+				version.downloads
+			)) {
+				successfullyDownloaded ||= await this.downloadPackUrl(
+					successfullyDownloaded,
+					id,
+					version,
+					downloadType,
+					downloadUrl
+				)
+			}
+		} else {
+			const patches = version.patches
+				.map((p, idx) =>
+					Object.entries(p).map(
+						([type, url]) =>
+							[idx, type, url] as [number, string, string]
+					)
+				)
+				.reduce((p, n) => [...p, ...n])
+
+			for (const [idx, downloadType, downloadUrl] of patches) {
+				successfullyDownloaded = await this.downloadPatchUrl(
+					successfullyDownloaded,
+					idx,
+					downloadType,
+					downloadUrl,
+					id,
+					version
+				)
+			}
 		}
 
+		return successfullyDownloaded
+	}
+
+	private async downloadPatchUrl(
+		successfullyDownloaded: boolean,
+		idx: number,
+		downloadType: string,
+		downloadUrl: string,
+		id: string,
+		version: {
+			name: string
+			supports: string[]
+			patches: Partial<{ datapack: string; resourcepack: string }>[]
+			packs: { id: string; version: string }[]
+		}
+	) {
+		try {
+			successfullyDownloaded = await this.tryToDownload(
+				`patch-${idx}-${downloadType}`,
+				downloadUrl
+			)
+		} catch (e) {
+			throw new PatchDownloadError(
+				id,
+				version.name,
+				idx,
+				downloadType,
+				downloadUrl,
+				e
+			)
+		}
+		return successfullyDownloaded
+	}
+
+	private async downloadPackUrl(
+		successfullyDownloaded: boolean,
+		id: string,
+		version: {
+			downloads: Partial<{ datapack: string; resourcepack: string }>
+			dependencies: { id: string; version: string }[]
+			name: string
+			supports: string[]
+		},
+		downloadType: string,
+		downloadUrl: string
+	) {
+		try {
+			successfullyDownloaded = await this.tryToDownload(
+				`${id}-${version.name}-${downloadType}`,
+				downloadUrl
+			)
+		} catch (e) {
+			throw new PackDownloadError(
+				id,
+				version.name,
+				downloadType,
+				downloadUrl,
+				e
+			)
+		}
 		return successfullyDownloaded
 	}
 
@@ -243,12 +354,12 @@ export class DownloadRunner {
 		if (foundPacks.length == 0)
 			throw new Error("No packs found meeting all specified criteria!")
 
-		await Promise.allSettled(
+		await Promise.all(
 			foundPacks.map((pack) =>
 				(async () => {
 					const success = await this.downloadDataAndResources(
-						pack.id + pack.version.name,
-						pack.version.downloads
+						pack.id,
+						pack.version
 					)
 					if (success) {
 						await incrementPackDownloadCount(
@@ -259,7 +370,9 @@ export class DownloadRunner {
 					}
 				})()
 			)
-		)
+		).catch((e) => {
+			throw e
+		})
 
 		return version
 	}
@@ -270,12 +383,13 @@ export class DownloadRunner {
 		const resp = await fetch(url)
 
 		if (!resp.ok) {
-			console.log("Failed to download", filename)
-			return false
+			throw new Error(
+				`${resp.status} - ${resp.headers.get("Content-Type") === "text/plain" ? await resp.text() : resp.statusText}`
+			)
 		}
 		fs.writeFileSync(
 			`temp/${this.id}/${filename}.zip`,
-			Buffer.from(await resp.arrayBuffer())
+			Buffer.from(await resp.arrayBuffer()) as any
 		)
 		return true
 	}
@@ -312,21 +426,20 @@ export class DownloadRunner {
 	}
 
 	async mergePacksAndPatches(
-		packs: (string | PackReference)[],
-		patches: PackDownloadOptions[],
-		version: MinecraftVersion,
+		bundleId: string,
+		bundleVersion: BundleVersion,
 		mode: "datapack" | "resourcepack" | "both"
 	): Promise<fs.ReadStream | undefined> {
 		const path = this.setupTemporaryFolder()
 
 		let activeVersion = await this.collectAndDownloadPacks(
-			packs,
-			version,
+			bundleVersion.packs,
+			bundleVersion.supports[0],
 			mode
 		)
 
 		console.log("Done download packs!\nDownloading patches...")
-		await this.downloadPatches(patches)
+		await this.downloadPatches(bundleId, bundleVersion)
 		console.log("Done downloading patches!\nRunning weld...")
 
 		await this.runWeld(mode, activeVersion)
@@ -335,10 +448,8 @@ export class DownloadRunner {
 		return this.collectResultZip(mode, path)
 	}
 
-	private async downloadPatches(patches: PackDownloadOptions[]) {
-		for (let i = 0; i < patches.length; i++) {
-			await this.downloadDataAndResources("patch-" + i, patches[i])
-		}
+	private async downloadPatches(id: string, version: BundleVersion) {
+		await this.downloadDataAndResources(id, version)
 	}
 
 	private setupTemporaryFolder() {

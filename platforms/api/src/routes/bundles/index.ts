@@ -190,9 +190,8 @@ API_APP.route({
 
 		const runner = new DownloadRunner(userHash)
 		const result = await runner.mergePacksAndPatches(
-			latestBundleVersion.packs,
-			latestBundleVersion.patches,
-			latestBundleVersion.supports[0],
+			bundleData.id,
+			latestBundleVersion,
 			mode
 		)
 
