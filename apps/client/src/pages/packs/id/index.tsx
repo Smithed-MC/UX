@@ -153,56 +153,65 @@ export default function Packs() {
 						id={id}
 					/> */}
 							<div
-								className="container"
-								style={{ flexDirection: "row", gap: "1rem" }}
+								style={{
+									display: "grid",
+									columnGap: "1rem",
+									rowGap: "0.5rem",
+									gridTemplateColumns: "auto auto",
+									gridTemplateRows: "auto auto",
+									placeItems: "center",
+								}}
 							>
-								{firebaseUser?.uid !== undefined &&
+								{(firebaseUser?.uid !== undefined &&
 									metaData.contributors.includes(
 										firebaseUser.uid
 									) && (
-										<a href="./edit" className="buttonLike">
+										<a
+											href={packData.id + "/edit"}
+											className="buttonLike"
+										>
 											<Edit />
 										</a>
-									)}
-								<div
-									className="container"
-									style={{ gap: "0.5rem" }}
+									)) || <span></span>}
+								<DownloadPackModal
+									packData={packData!}
+									packId={id!}
 								>
-									<DownloadPackModal
-										packData={packData!}
-										packId={id!}
-									>
-										<DownloadButton
-											id={id!}
-											openPopup={(element) => {
-												setInjectPopup(element)
-											}}
-											closePopup={() => {
-												setInjectPopup(undefined)
-											}}
-										/>
-									</DownloadPackModal>
-								<label style={{ color: "var(--border)" }}>
+									<DownloadButton
+										id={id!}
+										openPopup={(element) => {
+											setInjectPopup(element)
+										}}
+										closePopup={() => {
+											setInjectPopup(undefined)
+										}}
+									/>
+								</DownloadPackModal>
+								<label
+									style={{
+										color: "var(--border)",
+										gridColumn: "2",
+									}}
+								>
 									{(() => {
 										const version = packData?.versions
-										.sort((a, b) =>
-											compare(
-												coerce(a.name) ?? "",
-												coerce(b.name) ?? ""
+											.sort((a, b) =>
+												compare(
+													coerce(a.name) ?? "",
+													coerce(b.name) ?? ""
+												)
 											)
-										)
-										.at(-1)
-										
+											.at(-1)
+
 										if (
 											version?.supports[0] ===
 											version?.supports.at(-1)
 										)
-										return version?.supports[0]
-										
+											return version?.supports[0]
+
 										return `${version?.supports[0]} — ${version?.supports.at(-1)}`
 									})()}
 								</label>
-								</div>
 							</div>
 						</div>
 						<div className="userButtonsContainer">
