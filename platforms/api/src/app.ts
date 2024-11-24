@@ -132,7 +132,7 @@ async function registerCacheMemory() {
 export async function setupApp() {
 
 	const [serviceAccount, privateKey] = await initializeAdmin(
-		process.env.ADMIN_CERT
+		process.env.ADMIN_CERT ?? './secret.json'
 	)
 	API_APP["serviceAccount"] = serviceAccount
 	API_APP["privateKey"] = privateKey

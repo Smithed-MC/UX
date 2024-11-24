@@ -6,7 +6,7 @@
 	"main": "src/index.ts",
 	"types": "src/index.ts",
 	"scripts": {
-		"test": "tap",
+		"test": "tsx ./tests/index.test.ts",
 		"dev": "tsx --import=./src/instrument.js ./src/index.ts",
 		"lint": "tsc",
 		"build": "tsc"

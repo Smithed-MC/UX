@@ -20,6 +20,7 @@ initializeApp({
 })
 const auth = getAuth()
 
+console.log('setup')
 const user = await signInWithEmailAndPassword(
 	auth,
 	process.env.SMITHED_EMAIL ?? "",
@@ -27,6 +28,7 @@ const user = await signInWithEmailAndPassword(
 )
 
 const TOKEN = await user.user.getIdToken()
+
 const API = await setupApp()
 
 const TEST_PACK_DATA: PackData = {
