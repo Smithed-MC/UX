@@ -65,6 +65,7 @@ export async function incrementPackDownloadCount(
 
 	if ((await todayVal.get(userHash)) === undefined) {
 		const downloads: any = todayVal.data() ?? {}
+		
 		downloads[userHash] = weight
 
 		if (downloads["total"] === undefined) downloads["total"] = 1
@@ -208,13 +209,14 @@ export class DownloadRunner {
 			for (const [downloadType, downloadUrl] of Object.entries(
 				version.downloads
 			)) {
-				successfullyDownloaded ||= await this.downloadPackUrl(
+				console.log([downloadType, downloadUrl])
+				successfullyDownloaded = await this.downloadPackUrl(
 					successfullyDownloaded,
 					id,
 					version,
 					downloadType,
 					downloadUrl
-				)
+				) || successfullyDownloaded
 			}
 		} else {
 			const patches = version.patches
@@ -234,7 +236,7 @@ export class DownloadRunner {
 					downloadUrl,
 					id,
 					version
-				)
+				) || successfullyDownloaded
 			}
 		}
 
@@ -285,6 +287,7 @@ export class DownloadRunner {
 		downloadUrl: string
 	) {
 		try {
+			console.log(downloadType, downloadUrl)
 			successfullyDownloaded = await this.tryToDownload(
 				`${id}-${version.name}-${downloadType}`,
 				downloadUrl
