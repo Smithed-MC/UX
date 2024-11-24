@@ -12,17 +12,18 @@ import * as Sentry from "@sentry/node"
 export let privateKey: jose.KeyLike
 export let serviceAccount: any
 
-export async function initializeAdmin() {
-	if (serviceAccount !== undefined) return
+export async function initializeAdmin(adminCert: any) {
+	if (serviceAccount !== undefined) return [serviceAccount, privateKey]
 
 	serviceAccount =
-		typeof process.env.ADMIN_CERT === "string"
+		typeof adminCert === "string"
 			? JSON.parse(
-					fs.readFileSync(process.env.ADMIN_CERT, {
+					fs.readFileSync(adminCert, {
 						encoding: "utf-8",
 					})
 				)
-			: process.env.ADMIN_CERT
+			: adminCert
+
 	if (serviceAccount.private_key === undefined)
 		throw new Error("Service account does not have a defined private key!")
 
@@ -44,6 +45,8 @@ export async function initializeAdmin() {
 	}
 	initializeApp(firebaseConfig)
 	getAuth()
+
+	return [serviceAccount, privateKey]
 }
 
 type ExtractedTokenData = {

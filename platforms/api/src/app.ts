@@ -1,5 +1,10 @@
-import { parseToken, initializeAdmin, getPackDoc } from "database"
-import dotenv from 'dotenv'
+import {
+	parseToken,
+	initializeAdmin,
+	getPackDoc,
+	serviceAccount,
+} from "database"
+import dotenv from "dotenv"
 
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox"
 
@@ -46,7 +51,10 @@ export const API_APP = fastify({
 	},
 	bodyLimit: 30 * 1024 * 1024,
 	disableRequestLogging: true,
-}).withTypeProvider<TypeBoxTypeProvider>()
+})
+	.withTypeProvider<TypeBoxTypeProvider>()
+	.decorate("serviceAccount", "")
+	.decorate("privateKey", "")
 
 if (process.env.SENTRY_PROFILING === "true") {
 	Sentry.setupFastifyErrorHandler(API_APP as any)
@@ -122,9 +130,12 @@ async function registerCacheMemory() {
 }
 
 export async function setupApp() {
-	await initializeAdmin()
 
-	console.log(TYPESENSE_APP.configuration.nodes)
+	const [serviceAccount, privateKey] = await initializeAdmin(
+		process.env.ADMIN_CERT
+	)
+	API_APP["serviceAccount"] = serviceAccount
+	API_APP["privateKey"] = privateKey
 
 	if (process.env.REDIS !== "false") await registerCacheRedis()
 	else await registerCacheMemory()
@@ -134,8 +145,6 @@ export async function setupApp() {
 		allowedHeaders: "*",
 		methods: ["GET", "PUT", "POST", "PATCH", "DELETE"],
 	})
-
-	console.log(API_APP.cache)
 
 	// API_APP.addHook('preHandler', (request, reply, done) => {
 	//     reply.header("Access-Control-Allow-Origin", "*");
@@ -188,24 +197,24 @@ export async function invalidate(pattern: string): Promise<void> {
 	const deleted = await REDIS.del(matches)
 }
 
-export async function getCachedPackDoc(id: string): Promise<{id: string, data: any}|undefined> {
-	const identifier = "GET-PACK-DOCUMENT::" + id;
+export async function getCachedPackDoc(
+	id: string
+): Promise<{ id: string; data: any } | undefined> {
+	const identifier = "GET-PACK-DOCUMENT::" + id
 
-	let cachedDoc = await get(identifier);
+	let cachedDoc = await get(identifier)
 
 	if (cachedDoc) {
-		return cachedDoc.item;
+		return cachedDoc.item
 	}
 
 	const doc = await getPackDoc(id)
-	
-	if (doc === undefined)
-		return undefined
 
+	if (doc === undefined) return undefined
 
 	const data = {
 		id: doc.id,
-		data: doc.data()
+		data: doc.data(),
 	}
 
 	console.log(data)

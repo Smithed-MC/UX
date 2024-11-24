@@ -8,7 +8,6 @@ import {
 } from "data-types"
 import { getAuth } from "firebase-admin/auth"
 import * as jose from "jose"
-import { privateKey, serviceAccount } from "database"
 import { getFirestore } from "firebase-admin/firestore"
 import { randomUUID } from "crypto"
 
@@ -36,6 +35,9 @@ async function signJWT(
 	tokenDocId: string,
 	expires: string
 ) {
+	const serviceAccount = API_APP["serviceAccount"]
+	const privateKey = API_APP["privateKey"]
+
 	const jwt = await new jose.SignJWT({})
 		.setProtectedHeader({
 			alg: "RS256",
@@ -115,12 +117,9 @@ API_APP.route({
 			await getFirestore().collection("tokens").add(tokenEntry)
 		).id
 
-		try {
-			const jwt = await signJWT(tokenEntry, tokenDocId, expires)
-			return { tokenDocId, tokenEntry, token: jwt }
-		} catch (e) {
-			res.status(500).send((e as Error).message)
-		}
+		const jwt = await signJWT(tokenEntry, tokenDocId, expires)
+		return { tokenDocId, tokenEntry, token: jwt }
+
 	},
 })
 
