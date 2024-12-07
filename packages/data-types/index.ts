@@ -13,6 +13,13 @@ Format.Set("semver", (v) => coerce(v) != null)
 console.log(Format.Has("semver"))
 
 export const supportedMinecraftVersions = [
+	"1.21.4",
+	"1.21.4-rc3",
+	"1.21.4-rc2",
+	"1.21.4-rc1",
+	"1.21.4-pre3",
+	"1.21.4-pre2",
+	"1.21.4-pre1",
 	"1.21.4-24w46a",
 	"1.21.4-24w45a",
 	"1.21.4-24w44a",
