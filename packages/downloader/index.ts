@@ -381,7 +381,8 @@ export class DownloadRunner {
 	}
 
 	private async tryToDownload(filename: string, url: string) {
-		if (fs.existsSync(filename)) return false
+		if (url.length === 0 || !url.startsWith("http")) return false
+  if (fs.existsSync(filename)) return false
 
 		const resp = await fetch(url)
 
