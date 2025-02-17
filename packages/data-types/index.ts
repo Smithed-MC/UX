@@ -198,17 +198,19 @@ export const PackDataSchema = Type.Object({
 	categories: Type.Array(PackCategorySchema),
 })
 
+export const PackStatsSchema = Type.Object({
+	updated: Type.Optional(Type.Number()),
+	added: Type.Number(),
+	downloads: Type.Object({
+		total: Type.Number(),
+		today: Type.Number(),
+	}),
+})
+
 export const MetaDataSchema = Type.Object({
 	docId: Type.String(),
 	rawId: Type.String(),
-	stats: Type.Object({
-		updated: Type.Optional(Type.Number()),
-		added: Type.Number(),
-		downloads: Type.Object({
-			total: Type.Number(),
-			today: Type.Number(),
-		}),
-	}),
+	stats: PackStatsSchema,
 	owner: Type.String(),
 	contributors: Type.Array(Type.String(), { default: [] }),
 })
@@ -335,6 +337,27 @@ export const PATokenSchema = Type.Object({
 	name: Type.String(),
 })
 
+export const ReviewStateSchema = Type.Union(
+	["verified", "pending", "unsubmitted", "rejected"].map((l) =>
+		Type.Literal(l)
+	)
+)
+
+export const ModrinthLinkSchema = Type.Object({
+	linkedProject: Type.String(),
+	linkOwner: Type.Union(["smithed", "modrinth"].map(l => Type.Literal(l)))
+})
+
+export const FirebasePackDocumentSchema = Type.Object({
+	contributors: Type.Array(Type.String()),
+	data: PackDataSchema,
+	id: Type.String(),
+	owner: Type.String(),
+	state: ReviewStateSchema,
+	stats: PackStatsSchema,
+	modrinth: Type.Optional(ModrinthLinkSchema)
+})
+
 export type CommonVersion = Static<typeof CommonVersionSchema>
 
 export type Article = Static<typeof ArticleSchema>
@@ -370,4 +393,7 @@ export enum HTTPResponses {
 	SERVER_ERROR = 500,
 }
 
-export type ReviewState = "verified" | "pending" | "unsubmitted" | "rejected"
+export type ReviewState = Static<typeof ReviewStateSchema>
+
+export type ModrinthLink = Static<typeof ModrinthLinkSchema>
+export type FirebasePackDocument = Static<typeof FirebasePackDocumentSchema>
