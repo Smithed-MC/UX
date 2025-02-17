@@ -219,15 +219,16 @@ export class DownloadRunner {
 				) || successfullyDownloaded
 			}
 		} else {
-			const patches = version.patches
+			let patchDownloads = version.patches
 				.map((p, idx) =>
 					Object.entries(p).map(
 						([type, url]) =>
 							[idx, type, url] as [number, string, string]
 					)
 				)
-				.reduce((p, n) => [...p, ...n])
-
+				
+			let patches = patchDownloads.length > 0 ? patchDownloads.reduce((p, n) => [...p, ...n]) : []
+				
 			for (const [idx, downloadType, downloadUrl] of patches) {
 				successfullyDownloaded = await this.downloadPatchUrl(
 					successfullyDownloaded,
