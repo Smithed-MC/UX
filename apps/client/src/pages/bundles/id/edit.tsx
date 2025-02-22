@@ -228,9 +228,12 @@ export default function BundleEdit() {
 	}
 
 	function SelectedPacks({ version }: { version: BundleVersion }) {
+		const [packs, setPacks] = useState(version.packs)
+
+
 		return (
 			<div className="packs">
-				{version.packs
+				{packs
 					.sort((a, b) =>
 						cachedPackData[a.id].display.name.localeCompare(
 							cachedPackData[b.id].display.name
@@ -238,11 +241,15 @@ export default function BundleEdit() {
 					)
 					.map((p, i) => (
 						<Pack
-							key={"pack_" + i}
+							key={"pack_" + p.id}
 							packData={cachedPackData[p.id]}
 							packRef={p}
 							selectedVersion={selectedVersion}
 							cachedPacks={cachedPackData}
+							onDelete={() => {
+								version.packs.splice(i, 1) 
+								setPacks([...version.packs])
+							}}
 						/>
 					))}
 			</div>

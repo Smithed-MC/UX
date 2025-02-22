@@ -2,6 +2,8 @@ import React, {
 	CSSProperties,
 	MouseEventHandler,
 	createContext,
+	useEffect,
+	useRef,
 	useState,
 } from "react"
 
@@ -34,7 +36,9 @@ export default function Modal({
 	onClose?: () => void
 	onOpen?: () => void
 }) {
+
 	const [open, setOpen] = useState(false)
+	const modalContentRef = useRef<HTMLDivElement>(null)
 
 	trigger = React.createElement(trigger.type, {
 		...trigger.props,
@@ -45,6 +49,21 @@ export default function Modal({
 			setOpen(!open)
 		},
 	})
+
+	function recalculateContentHeight() {
+
+		const bottom = [...document.getElementById("outlet")!.children].map(c => c.getBoundingClientRect().bottom).sort().at(-1)!
+		const rect = modalContentRef.current!.getBoundingClientRect()
+
+		if (rect.bottom > bottom) {
+			modalContentRef.current?.style.setProperty("max-height", `${rect.height - (rect.bottom - bottom)}px`)
+		}
+
+	}
+
+	useEffect(() => {
+		recalculateContentHeight()
+	}, [])
 
 	const frag = (
 		<>
@@ -59,7 +78,10 @@ export default function Modal({
 					opacity: open ? 1 : 0,
 					pointerEvents: open ? "all" : "none",
 					transition: "opacity 0.25s ease-in-out",
+					overflow: "auto"
 				}}
+
+				ref={modalContentRef}
 			>
 				<div style={{ marginBottom: "-0.5rem" }}>
 					<svg
@@ -108,6 +130,7 @@ export default function Modal({
 						border: "0.125rem solid var(--border)",
 						right: "auto",
 						zIndex: -1,
+						overflowY: "auto" 
 					}}
 				>
 					{content &&

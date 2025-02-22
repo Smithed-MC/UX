@@ -146,6 +146,7 @@ export function ClientApplet() {
 
 	return (
 		<div
+			id="outlet"
 			className="container"
 			style={{
 				position: "absolute",
