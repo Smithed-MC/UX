@@ -220,9 +220,11 @@ export const MetaDataSchema = Type.Object({
 	stats: Type.Object({
 		updated: Type.Optional(Type.Number()),
 		added: Type.Number(),
+		score: Type.Number(),
 		downloads: Type.Object({
 			total: Type.Number(),
 			today: Type.Number(),
+			pastWeek: Type.Number(),
 		}),
 	}),
 	owner: Type.String(),
