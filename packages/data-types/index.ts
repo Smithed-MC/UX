@@ -13,6 +13,18 @@ Format.Set("semver", (v) => coerce(v) != null)
 console.log(Format.Has("semver"))
 
 export const supportedMinecraftVersions = [
+	"1.21.6-rc-1",
+	"1.21.6-pre-4",
+	"1.21.6-pre-3",
+	"1.21.6-pre-2",
+	"1.21.6-pre-1",
+	"1.21.6-25w21a",
+	"1.21.6-25w20a",
+	"1.21.6-25w19a",
+	"1.21.6-25w18a",
+	"1.21.6-25w17a",
+	"1.21.6-25w16a",
+	"1.21.6-25w15a",
 	"1.21.5",
 	"1.21.5-rc-2",
 	"1.21.5-rc-1",
@@ -220,9 +232,11 @@ export const MetaDataSchema = Type.Object({
 	stats: Type.Object({
 		updated: Type.Optional(Type.Number()),
 		added: Type.Number(),
+		score: Type.Number(),
 		downloads: Type.Object({
 			total: Type.Number(),
 			today: Type.Number(),
+			pastWeek: Type.Number(),
 		}),
 	}),
 	owner: Type.String(),
