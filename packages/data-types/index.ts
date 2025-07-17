@@ -14,7 +14,7 @@ console.log(Format.Has("semver"))
 
 export const supportedMinecraftVersions = [
 	"1.21.8",
-	"1.21.8-rc1",
+	"1.21.8-rc-1",
  	"1.21.7",
  	"1.21.7-rc-2",
  	"1.21.7-rc-1",
