@@ -277,7 +277,7 @@ export default function Home(props: any) {
 						filtering through tons of incompatible content?
 						<br />
 						<br />
-						The Smithed launcher allows you to play datapacks just
+						Nitrolaunch by CarbonSmasher allows you to play datapacks just
 						like you would mods! By using the launcher, conflicts
 						between datapacks are automatically resolved,
 						resourcepacks are automatically applied, and everything
@@ -295,7 +295,7 @@ export default function Home(props: any) {
 								/>
 							}
 							style={{ width: "fit-content", alignSelf: "end" }}
-							href="https://nightly.link/Smithed-MC/UX/workflows/nightly/main"
+							href="https://github.com/Nitrolaunch/nitrolaunch"
 						/>
 					</div>
 				</div>
