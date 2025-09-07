@@ -14,6 +14,6 @@ API_APP.route({
 	url: "/supported-versions",
 	schema: {},
 	handler: async (request, reply) => {
-		reply.status(HTTPResponses.OK).send(supportedMinecraftVersions)
+		return supportedMinecraftVersions
 	},
 })
