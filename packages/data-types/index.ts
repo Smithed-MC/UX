@@ -13,6 +13,20 @@ Format.Set("semver", (v) => coerce(v) != null)
 console.log(Format.Has("semver"))
 
 export const supportedMinecraftVersions = [
+	"1.21.11",
+	"1.21.11-rc3",
+	"1.21.11-rc2",
+	"1.21.11-rc1",
+	"1.21.11-pre4",
+	"1.21.11-pre3",
+	"1.21.11-pre2",
+	"1.21.11-pre1",
+	"1.21.11-25w46a",
+	"1.21.11-25w45a",
+	"1.21.11-25w44a",
+	"1.21.11-25w43a",
+	"1.21.11-25w42a",
+	"1.21.11-25w41a",
 	"1.21.10",
 	"1.21.10-rc1",
 	"1.21.9",
@@ -139,7 +153,7 @@ export const fullMinecraftVersions = supportedMinecraftVersions.filter(
 	(v) => !v.includes("-")
 )
 
-export const latestMinecraftVersion = "1.21.10"
+export const latestMinecraftVersion = "1.21.11"
 
 export const MinecraftVersionSchema = Type.Union(
 	supportedMinecraftVersions.map((v) => Type.Literal(v))
