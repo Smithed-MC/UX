@@ -1,4 +1,4 @@
-import { Trash } from "components/svg"
+import { Copy, Trash } from "components/svg"
 import { BundleVersion, PackVersion } from "data-types"
 import { useRef, useEffect } from "react"
 import { valid } from "semver"
@@ -11,15 +11,17 @@ export default function VersionSelectOption({
 	setSelectedVersion,
 	selectedVersion,
 	onDelete,
+	onDuplicate,
 }: {
-	readonly version: PackVersion|BundleVersion
+	readonly version: PackVersion | BundleVersion
 	readonly index: number
 	readonly setSelectedVersion: (v: any) => void
 	readonly selectedVersion?: { name: string }
 	allVersions: { name: string }[]
-	onDelete: (removed: {name: string}, versions: {name: string}[]) => void
+	onDelete: (removed: { name: string }, versions: { name: string }[]) => void
+	onDuplicate?: (version: PackVersion | BundleVersion) => void
 }) {
-	const select = (version: PackVersion|BundleVersion) => {
+	const select = (version: PackVersion | BundleVersion) => {
 		const matches = allVersions.filter(
 			(v) => v.name === selectedVersion?.name
 		)
@@ -60,36 +62,53 @@ export default function VersionSelectOption({
 			key={version.name}
 			onClick={(e) => {
 				if (!(e.target instanceof HTMLSpanElement)) return
-				
+
 				select(version)
 			}}
 		>
 			<span id={`packVersionOption${version.name}`}>{version.name}</span>
-			{allVersions.length > 1 && (
-				<div
-					id="trashButton"
-					className="container"
-					style={{
-						position: "absolute",
-						right: "0.75rem",
-						top: 0,
-						height: "100%",
-						transition: "all 0.2s ease-in-out",
-					}}
-				>
+
+			<div
+				id="trashButton"
+				className="container"
+				style={{
+					position: "absolute",
+					right: "0.75rem",
+					top: 0,
+					height: "100%",
+					transition: "all 0.2s ease-in-out",
+					flexDirection: "row"
+				}}
+			>
+				{onDuplicate && (
 					<button
 						style={{
 							backgroundColor: "transparent",
 							width: "2rem",
 							height: "2rem",
 							padding: 0,
-							justifyContent: "center"
+							justifyContent: "center",
+						}}
+						onClick={() => {
+							onDuplicate(version)
+						}}
+					>
+						<Copy />
+					</button>
+				)}
+				{allVersions.length > 1 && (
+					<button
+						style={{
+							backgroundColor: "transparent",
+							width: "2rem",
+							height: "2rem",
+							padding: 0,
+							justifyContent: "center",
 						}}
 						onClick={(e) => {
 							e.preventDefault()
-							
+
 							const removed = allVersions.splice(index, 1)[0]
-							
 
 							if (selectedVersion === version) {
 								setSelectedVersion(
@@ -106,8 +125,8 @@ export default function VersionSelectOption({
 					>
 						<Trash />
 					</button>
-				</div>
-			)}
+				)}
+			</div>
 		</span>
 	)
 }

@@ -146,6 +146,7 @@ export function ClientApplet() {
 
 	return (
 		<div
+			id="outlet"
 			className="container"
 			style={{
 				position: "absolute",
@@ -438,19 +439,19 @@ export const subRoutes: RouteObject[] = [
 		loader: loadUserBrowseData,
 		shouldRevalidate: didSearchParamsChange
 	},
-	{
-		path: "summit",
-		element: <SummitPage />
-	},
-	{
-		path: "summit/apply",
-		element: <></>,
-		loader: () => redirect("https://forms.gle/sCKjYxUWKngkXxpE9")
-	},
-	{
-		path: "summit/schedule",
-		element: <SummitSchedulePage />
-	}
+	// {
+	// 	path: "summit",
+	// 	element: <SummitPage />
+	// },
+	// {
+	// 	path: "summit/apply",
+	// 	element: <></>,
+	// 	loader: () => redirect("https://forms.gle/sCKjYxUWKngkXxpE9")
+	// },
+	// {
+	// 	path: "summit/schedule",
+	// 	element: <SummitSchedulePage />
+	// }
 ]
 
 export const routes = [

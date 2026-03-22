@@ -59,6 +59,7 @@ import SearchPacks from "./edit/searchPacks"
 import VersionSelectOption from "../../editors/versionSelectOption"
 
 import SaveWidget, { SavingState } from "../../editors/saveWidget"
+import { getNextVersion } from "./edit/common"
 
 export default function BundleEdit() {
 	const user = useFirebaseUser()
@@ -108,7 +109,14 @@ export default function BundleEdit() {
 				const path = e.path.slice(1)
 				sendErrorEvent(path, e)
 			}
-			return setSavingState({mode: "error", error: {error: "", statusCode: HTTPResponses.BAD_REQUEST, message: "There are fields that are incomplete!"}})
+			return setSavingState({
+				mode: "error",
+				error: {
+					error: "",
+					statusCode: HTTPResponses.BAD_REQUEST,
+					message: "There are fields that are incomplete!",
+				},
+			})
 		}
 
 		setSavingState({ mode: "saving" })
@@ -228,9 +236,11 @@ export default function BundleEdit() {
 	}
 
 	function SelectedPacks({ version }: { version: BundleVersion }) {
+		const [packs, setPacks] = useState(version.packs)
+
 		return (
 			<div className="packs">
-				{version.packs
+				{packs
 					.sort((a, b) =>
 						cachedPackData[a.id].display.name.localeCompare(
 							cachedPackData[b.id].display.name
@@ -238,11 +248,15 @@ export default function BundleEdit() {
 					)
 					.map((p, i) => (
 						<Pack
-							key={"pack_" + i}
+							key={"pack_" + p.id}
 							packData={cachedPackData[p.id]}
 							packRef={p}
 							selectedVersion={selectedVersion}
 							cachedPacks={cachedPackData}
+							onDelete={() => {
+								version.packs.splice(i, 1)
+								setPacks([...version.packs])
+							}}
 						/>
 					))}
 			</div>
@@ -469,6 +483,14 @@ export default function BundleEdit() {
 								selectedVersion={selectedVersion}
 								allVersions={bundleData.versions}
 								onDelete={updateVersions}
+								onDuplicate={(version) => {
+									data.versions.push({
+										...(version as BundleVersion),
+										name: getNextVersion(versions),
+									})
+
+									updateVersions()
+								}}
 							/>
 						))}
 
@@ -481,15 +503,7 @@ export default function BundleEdit() {
 							reverse
 							style={{ backgroundColor: "transparent" }}
 							onClick={() => {
-								const nextVersion =
-									inc(
-										[...versions]
-											.sort((a, b) =>
-												compare(a.name, b.name)
-											)
-											.at(-1)?.name ?? "0.0.0",
-										"patch"
-									) ?? ""
+								const nextVersion = getNextVersion(versions)
 								data.versions.push({
 									name: nextVersion,
 									patches: [],

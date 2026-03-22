@@ -125,10 +125,10 @@ export default function PacksBrowser(props: any) {
 				gap: 32,
 			}}
 		>
-			<Helmet>
+			{/* <Helmet>
 				<title>Browse Datapacks</title>
 				<meta name="description" content="Search for minecraft datapacks and resourcepacks to improve your game!" />
-			</Helmet>
+			</Helmet> */}
 			<div
 				className="container"
 				style={{ gap: "1rem", width: "100%", maxWidth: "61.875rem" }}
@@ -301,6 +301,7 @@ function CurrentBundleWidget() {
 		`/download?version=${currentBundle.gameVersion}&` +
 		currentBundle.packs.map((p) => `pack=${p.id}@${p.version}`).join("&")
 
+	// return <></>
 	return (
 		<div
 			className="container"

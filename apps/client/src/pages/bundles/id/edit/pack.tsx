@@ -11,11 +11,13 @@ export function Pack({
 	packRef,
 	selectedVersion,
 	cachedPacks,
+	onDelete,
 }: {
 	packData: PackData & { author: string }
 	packRef: { id: string; version?: string }
-	selectedVersion: BundleVersion|undefined
+	selectedVersion: BundleVersion | undefined
 	cachedPacks: Record<string, PackData>
+	onDelete: (id: string) => void
 }) {
 	const [packVersion, setPackVersion] = useState(packRef.version)
 
@@ -138,6 +140,10 @@ export function Pack({
 						className="buttonLike"
 						style={{
 							backgroundColor: "var(--highlight)",
+						}}
+						onClick={() => {
+							setPackVersion(undefined)
+							onDelete(packRef.id)
 						}}
 					>
 						<Trash />

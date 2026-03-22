@@ -696,6 +696,22 @@ API_APP.route({
 	},
 })
 
+/*
+ * @route GET /packs/:id/gallery/:index
+ * Retrieve a pack's gallery image
+ *
+ * @param id
+ * The pack's UID or plaintext id. Using UID is more performant as it is a direct lookup.
+ *
+ * @param index
+ * The index of the gallery image counting from 0
+ *
+ * @return OK: image/webp
+ * @return NOT_FOUND: ApiError
+ *
+ * @example Fetch a packs's first gallery image (if it's present)
+ * fetch('https://api.smithed.dev/v2/packs/bound/gallery/0')
+ */
 API_APP.route({
 	method: "GET",
 	url: "/packs/:id/gallery/:index",
