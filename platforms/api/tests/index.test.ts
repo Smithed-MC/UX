@@ -115,10 +115,10 @@ test("GET /packs/invalid", async (t) => {
 	t.equal(r.statusCode, 404, "NOT FOUND")
 })
 
-test("GET /packs/tcc (Pack w/ friendly ID)", async (t) => {
+test("GET /packs/myriad (Pack w/ friendly ID)", async (t) => {
 	const r = await API.inject({
 		method: "GET",
-		path: "/packs/tcc",
+		path: "/packs/myriad",
 	})
 	t.equal(r.statusCode, 200, "OK")
 })

@@ -14,7 +14,7 @@ import VTLogo from "../assets/summit/vt_logo.png"
 import BeetLogo from "../assets/summit/beet_logo.png"
 import StardustLogo from "../assets/summit/stardust_logo.png"
 import MCCLogo from "../assets/summit/mcc_logo.png"
-import TCCLogo from "../assets/summit/tcc_logo.png"
+import MyriadLogo from "../assets/summit/myriad_logo.png"
 
 import GImg1 from "../assets/summit/gallery/beach_stage.webp"
 import GImg2 from "../assets/summit/gallery/gm4.webp"
@@ -26,8 +26,6 @@ import GImg6 from "../assets/summit/gallery/spawn_crane.webp"
 import SummitMap from "../assets/summit/map.png"
 
 const GALLERY_IMAGES = [GImg1, GImg2, GImg3, GImg4, GImg5, GImg6]
-
-import SmithieHappy from "../assets/smithie/awww.png"
 
 import "./summit.css"
 import { useEffect, useRef, useState } from "react"
@@ -42,8 +40,8 @@ const ATTENDEES = [
 	["Beet", BeetLogo, "https://mcbeet.dev/"],
 	["Stardust Labs", StardustLogo, "https://stardustlabs.net/"],
 	["r/MinecraftCommands", MCCLogo, "https://discord.gg/9wNcfsH"],
-	["The Creeper's Code", TCCLogo, "https://thecreeperscode.com"],
-	["You!", SmithieHappy, ""],
+	["Myriad", MyriadLogo, "https://myriadmc.org"],
+	// ["You!", SmithieHappy, ""],
 ].sort((a, b) => a[0].localeCompare(b[0]))
 
 const SUMMIT_LINK = "smithed.net/summit"
@@ -119,7 +117,7 @@ export default function SummitPage() {
 					creators, map makers, and more!
 					<br />
 					<br />
-					Over the course of a week, you'll be able to explore
+					Throughout the event, you'll be able to explore
 					community made <a href="#booths">booths</a>, live{" "}
 					<a href="#panels">panels</a>, and discover various
 					collectables hidden around the server!
@@ -158,7 +156,7 @@ export default function SummitPage() {
 								fontWeight: 500,
 							}}
 						>
-							Nov. 2
+							{/* Nov. 2
 							<div
 								style={{
 									width: "1rem",
@@ -166,7 +164,8 @@ export default function SummitPage() {
 									backgroundColor: "var(--subText)",
 								}}
 							></div>
-							Nov. 9
+							Nov. 9 */}
+							TBA
 						</div>
 					</div>
 					<div
@@ -250,7 +249,7 @@ export default function SummitPage() {
 						</div>
 					</div>
 				</div>
-				<div className="container" style={{}}>
+				{/* <div className="container" style={{}}>
 					Generously sponsored by
 					<img
 						src={BloomLogo}
@@ -267,7 +266,7 @@ export default function SummitPage() {
 						Use code <strong>SMITHEDSUMMIT24</strong> at checkout
 						for 20% off your first month!
 					</span>
-				</div>
+				</div> */}
 			</div>
 			<div
 				className="container"
@@ -283,7 +282,7 @@ export default function SummitPage() {
 				</span>
 				<Divider />
 			</div>
-			<div className="container" style={{ gap: "2rem", width: "100%" }}>
+			{/* <div className="container" style={{ gap: "2rem", width: "100%" }}>
 				<span className="header" style={{ alignSelf: "center" }}>
 					Server IP
 				</span>
@@ -292,15 +291,15 @@ export default function SummitPage() {
 						fontSize: "1.25rem",
 						backgroundColor: "var(--section)",
 						padding: "0.5rem 1rem",
-						borderRadius: "var(--defaultBorderRadius)"
+						borderRadius: "var(--defaultBorderRadius)",
 					}}
 				>
 					summit.smithed.net
 				</span>
-			</div>
+			</div> */}
 			<div className="container" style={{ gap: "2rem", width: "100%" }}>
 				<span className="header" style={{ alignSelf: "center" }}>
-					Server Map
+					Summit 2024's Server Map
 				</span>
 				<a href="/summit-map.png" style={{ width: "100%" }}>
 					<img
@@ -308,6 +307,27 @@ export default function SummitPage() {
 						style={{ imageRendering: "pixelated", width: "100%" }}
 					/>
 				</a>
+			</div>
+			<MapGallery images={GALLERY_IMAGES} />
+
+			<div
+				className="container"
+				style={{ width: "100%", gap: "2rem" }}
+				id="attendees"
+			>
+				<span className="header" style={{ alignSelf: "center" }}>
+					Some of Summit 2024's Attendees
+				</span>
+				<div className="attendeesContainer">
+					{ATTENDEES.map((attendee) => (
+						<AttendeeCard
+							key={attendee[0]}
+							name={attendee[0]}
+							image={attendee[1]}
+							website={attendee[2]}
+						/>
+					))}
+				</div>
 			</div>
 			<SummitSection
 				id="booths"
@@ -318,7 +338,21 @@ export default function SummitPage() {
 			>
 				Booths are built by various community members in order to
 				showcase the content they're working on.
+				<br />
+				<br />
+				If you're interested in making your own, head to the application
+				form.
+				<IconTextButton
+					className="lightAccentedButtonLike"
+					text={"Apply for a booth"}
+					icon={Edit}
+					href="/summit/apply"
+					style={{
+						alignSelf: "end",
+					}}
+				/>
 			</SummitSection>
+			
 			<SummitSection
 				id="panels"
 				image={MainStage}
@@ -329,12 +363,18 @@ export default function SummitPage() {
 				Panels are live events that happen on various stages around the
 				server. Creators will talk about a given topic, showcase
 				content, and potentionally interact directly with the audience.
+				<br /> <br />
+				Have something you're passionate about and want to share it with
+				the server? Keep an eye out for the application form!
 				<IconTextButton
+					disabled
 					className="successButtonLike"
-					text={"See the schedule!"}
-					icon={Calendar}
-					href="./schedule"
-					style={{ alignSelf: "end" }}
+					text={"Applications coming soon"}
+					icon={Edit}
+					// href="/summit/apply"
+					style={{
+						alignSelf: "end",
+					}}
 				/>
 			</SummitSection>
 			<SummitSection
@@ -359,27 +399,7 @@ export default function SummitPage() {
 				/>
 			</SummitSection>
 
-			<MapGallery images={GALLERY_IMAGES} />
-
-			<div
-				className="container"
-				style={{ width: "100%", gap: "2rem" }}
-				id="attendees"
-			>
-				<span className="header" style={{ alignSelf: "center" }}>
-					Who's coming?
-				</span>
-				<div className="attendeesContainer">
-					{ATTENDEES.map((attendee) => (
-						<AttendeeCard
-							key={attendee[0]}
-							name={attendee[0]}
-							image={attendee[1]}
-							website={attendee[2]}
-						/>
-					))}
-				</div>
-			</div>
+			
 			<div
 				className="container"
 				style={{ width: "100%", gap: "1rem" }}

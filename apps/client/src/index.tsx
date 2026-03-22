@@ -18,11 +18,7 @@ import { getAuth } from "firebase/auth"
 
 import { Provider } from "react-redux"
 
-
-import {
-	setUserData,
-	store,
-} from "store"
+import { setUserData, store } from "store"
 import { useAppDispatch, useAppSelector, useSiteSettings } from "hooks"
 import { PackBundle, UserData } from "data-types"
 import { Helmet } from "react-helmet"
@@ -31,7 +27,6 @@ import { ClientContext, defaultContext, IClientContext } from "./context.js"
 import { Cross, Logo } from "components/svg.js"
 
 import Cookies from "js-cookie"
-
 
 import EditorError from "./pages/editors/error.js"
 import React from "react"
@@ -48,7 +43,9 @@ initializeApp({
 })
 
 if (import.meta.env.VITE_FIREBASE_EMULATOR) {
-	connectAuthEmulator(getAuth(), "http://127.0.0.1:9099", { disableWarnings: false })	
+	connectAuthEmulator(getAuth(), "http://127.0.0.1:9099", {
+		disableWarnings: false,
+	})
 }
 
 export function ClientApplet() {
@@ -58,11 +55,9 @@ export function ClientApplet() {
 	const context = useContext(ClientContext)
 	const [siteSettings, applySettings] = useSiteSettings()
 
-	if (!import.meta.env.SSR)
-		applySettings(siteSettings)
+	if (!import.meta.env.SSR) applySettings(siteSettings)
 
-	function resetBundleData() {
-	}
+	function resetBundleData() {}
 
 	function resetUserData() {
 		dispatch(setUserData({}))
@@ -79,7 +74,6 @@ export function ClientApplet() {
 	// 	if (!resp.ok) return resetBundleData()
 
 	// 	const bundleIds: string[] = await resp.json()
-
 
 	// 	const getData = async (id: string) => {
 	// 		const resp = await fetch(
@@ -125,7 +119,7 @@ export function ClientApplet() {
 					sameSite: "strict",
 				})
 
-				const savedUserJson = Cookies.get("smithedUser") 
+				const savedUserJson = Cookies.get("smithedUser")
 
 				if (savedUserJson && JSON.parse(savedUserJson).uid === user.uid)
 					return
@@ -237,7 +231,11 @@ export function ClientApplet() {
 					paddingBottom: "1rem",
 				}}
 			>
-				<NavBar tabs={context.navbarTabs} logoUrl={context.logoUrl} onSignout={() => resetUserData()} />
+				<NavBar
+					tabs={context.navbarTabs}
+					logoUrl={context.logoUrl}
+					onSignout={() => resetUserData()}
+				/>
 				<Outlet />
 			</div>
 			{context.enableFooter ? <Footer /> : <br />}
@@ -283,10 +281,7 @@ function Footer() {
 				</div>
 				<div className="container footerSmallGroup">
 					<b style={{ fontSize: "1.5rem" }}>SOCIAL</b>
-					<Link
-						className="compactButton"
-						to="/discord"
-					>
+					<Link className="compactButton" to="/discord">
 						Discord
 					</Link>
 					<Link
@@ -345,12 +340,17 @@ import {
 import SummitPage from "./pages/summit"
 import SummitSchedulePage from "./pages/summit/schedule"
 
-function didSearchParamsChange({currentUrl, nextUrl}: {currentUrl: URL, nextUrl: URL}) {
+function didSearchParamsChange({
+	currentUrl,
+	nextUrl,
+}: {
+	currentUrl: URL
+	nextUrl: URL
+}) {
 	const currentSearch = currentUrl.searchParams
 	const nextSearch = nextUrl.searchParams
 
-	if (currentSearch.size !== nextSearch.size)
-		return true
+	if (currentSearch.size !== nextSearch.size) return true
 
 	for (const key of currentSearch.keys()) {
 		if (nextSearch.get(key) !== currentSearch.get(key)) {
@@ -371,7 +371,7 @@ export const subRoutes: RouteObject[] = [
 	{
 		path: "settings",
 		element: <Settings />,
-		loader: loadSettingsData
+		loader: loadSettingsData,
 	},
 	{
 		path: "browse",
@@ -394,18 +394,18 @@ export const subRoutes: RouteObject[] = [
 		path: ":owner",
 		element: <User />,
 		loader: loadUserData,
-		shouldRevalidate: ({currentParams, nextParams}) => {
+		shouldRevalidate: ({ currentParams, nextParams }) => {
 			return currentParams["owner"] !== nextParams["owner"]
 		},
-		errorElement: <NotFound />
+		errorElement: <NotFound />,
 	},
 	{
 		path: "packs/:id",
 		element: <PackPage />,
 		loader: loadPackData,
-		shouldRevalidate: ({currentParams, nextParams}) => {
+		shouldRevalidate: ({ currentParams, nextParams }) => {
 			return currentParams["id"] !== nextParams["id"]
-		}
+		},
 	},
 	{
 		path: "bundles/:bundleId",
@@ -431,23 +431,23 @@ export const subRoutes: RouteObject[] = [
 		path: "packs",
 		element: <PackBrowsePage />,
 		loader: loadPackBrowseData,
-		shouldRevalidate: didSearchParamsChange
+		shouldRevalidate: didSearchParamsChange,
 	},
 	{
 		path: "users",
 		element: <UserBrowsePage />,
 		loader: loadUserBrowseData,
-		shouldRevalidate: didSearchParamsChange
+		shouldRevalidate: didSearchParamsChange,
 	},
-	// {
-	// 	path: "summit",
-	// 	element: <SummitPage />
-	// },
-	// {
-	// 	path: "summit/apply",
-	// 	element: <></>,
-	// 	loader: () => redirect("https://forms.gle/sCKjYxUWKngkXxpE9")
-	// },
+	{
+		path: "summit",
+		element: <SummitPage />,
+	},
+	{
+		path: "summit/apply",
+		element: <></>,
+		loader: () => redirect("https://forms.gle/sCKjYxUWKngkXxpE9"),
+	},
 	// {
 	// 	path: "summit/schedule",
 	// 	element: <SummitSchedulePage />
