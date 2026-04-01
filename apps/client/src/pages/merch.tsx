@@ -1,6 +1,6 @@
-import { IconTextButton, Modal } from "components"
+import { IconTextButton } from "components"
 import { Cross, Plus, ShoppingCart } from "components/svg"
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 
 import NINE_MUG from "../assets/merch/9mug.png"
 import BRAIN_CORAL_DEAD from "../assets/merch/brain_coral_dead.png"
