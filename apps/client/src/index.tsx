@@ -344,7 +344,6 @@ import {
 } from "./loaders.js"
 import SummitPage from "./pages/summit"
 import SummitSchedulePage from "./pages/summit/schedule"
-import MerchPage from "./pages/merch"
 
 function didSearchParamsChange({currentUrl, nextUrl}: {currentUrl: URL, nextUrl: URL}) {
 	const currentSearch = currentUrl.searchParams
@@ -439,10 +438,6 @@ export const subRoutes: RouteObject[] = [
 		element: <UserBrowsePage />,
 		loader: loadUserBrowseData,
 		shouldRevalidate: didSearchParamsChange
-	},
-	{
-		path: "merch",
-		element: <MerchPage />,
 	}
 	// {
 	// 	path: "summit",
