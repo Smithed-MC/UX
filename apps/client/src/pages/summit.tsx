@@ -99,6 +99,9 @@ export default function SummitPage() {
 					the community-made content of vanilla Minecraft
 				</div>
 				<div className="container" style={{}}>
+					<span style={{ fontSize: "1.5rem", fontWeight: 700 }}>
+						EVENT START
+					</span>
 					<span
 						style={{
 							color: "#00D269",
@@ -106,10 +109,7 @@ export default function SummitPage() {
 							fontWeight: 800,
 						}}
 					>
-						SUMMER 2026
-					</span>
-					<span style={{ fontSize: "1.5rem", fontWeight: 700 }}>
-						EVENT START
+						AUGUST 2026
 					</span>
 				</div>
 				<div
@@ -264,7 +264,7 @@ export default function SummitPage() {
 						whiteSpace: "nowrap",
 					}}
 				>
-					RSVP
+					Get Summit updates
 				</span>
 				<Divider />
 			</div>
@@ -346,10 +346,10 @@ function RSVP() {
 						}}
 					>
 						EMAIL
-						<QuestionMark
+						{/* <QuestionMark
 							style={{ width: "1rem", height: "1rem" }}
 							title="We'll use your email to send you updates about the event"
-						/>
+						/> */}
 					</div>
 					<IconInput
 						icon={At}
