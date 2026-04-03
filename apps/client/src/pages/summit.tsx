@@ -301,10 +301,14 @@ export default function SummitPage() {
 					<span style={{ color: "var(--disturbing)" }}>2024</span>'s
 					Attendees & Server Map
 				</span>
-				<a href="/summit-map.png" style={{ width: "100%" }}>
+				<a className="container" href="/summit-map.png" style={{ width: "100%" }}>
 					<img
 						src={SummitMap}
-						style={{ imageRendering: "pixelated", width: "100%" }}
+						style={{
+							imageRendering: "pixelated",
+							width: "100%",
+							maxWidth: "800px",
+						}}
 					/>
 				</a>
 			</div>
@@ -393,35 +397,6 @@ function RSVP() {
 				</span>
 			)}
 		</>
-	)
-}
-
-function AttendeeCard({
-	image,
-	name,
-	website,
-}: {
-	image: string
-	name: string
-	website: string
-}) {
-	return (
-		<div className="attendeeCard" key={name}>
-			<img src={image} />
-			<div
-				className="container"
-				style={{
-					flexDirection: "column",
-					justifyContent: "start",
-					alignItems: "start",
-				}}
-			>
-				<span className="name">{name}</span>
-				<a className="website" href={website}>
-					{website}
-				</a>
-			</div>
-		</div>
 	)
 }
 
