@@ -53,7 +53,7 @@ import { ReactComponent as Flag } from "./assets/flag.svg"
 import { ReactComponent as SummitLogo } from "./assets/summit-logo.svg"
 import { ReactComponent as SummitLogoFull } from "./assets/summit-logo-full.svg"
 import { ReactComponent as Calendar } from "./assets/calendar.svg"
-
+import { ReactComponent as QuestionMark } from "./assets/question-mark.svg"
 export {
 	Account,
 	AddToBundle,
@@ -109,5 +109,6 @@ export {
 	Flag,
 	SummitLogo,
 	SummitLogoFull,
-	Calendar
+	Calendar,
+	QuestionMark
 }

@@ -446,7 +446,7 @@ export const subRoutes: RouteObject[] = [
 	{
 		path: "summit/apply",
 		element: <></>,
-		loader: () => redirect("https://forms.gle/sCKjYxUWKngkXxpE9"),
+		loader: () => redirect("https://forms.gle/DMHC4dXMiL3JCAtY7"),
 	},
 	// {
 	// 	path: "summit/schedule",
