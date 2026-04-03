@@ -1,9 +1,15 @@
 import { IconInput, IconTextButton } from "components"
-import { Account, Calendar, Edit, Right, SummitLogoFull } from "components/svg"
+import {
+	Account,
+	At,
+	Edit,
+	Flag,
+	QuestionMark,
+	Right,
+	SummitLogoFull,
+} from "components/svg"
 import { Helmet } from "react-helmet"
 import { Divider } from "./home"
-
-import BloomLogo from "../assets/summit/bloom_logo.svg"
 
 import GM4Booth from "../assets/summit/gm4_booth.webp"
 import MainStage from "../assets/summit/main_stage.webp"
@@ -14,39 +20,27 @@ import VTLogo from "../assets/summit/vt_logo.png"
 import BeetLogo from "../assets/summit/beet_logo.png"
 import StardustLogo from "../assets/summit/stardust_logo.png"
 import MCCLogo from "../assets/summit/mcc_logo.png"
-import TCCLogo from "../assets/summit/tcc_logo.png"
+import MyriadLogo from "../assets/summit/myriad_logo.png"
 
-import GImg1 from "../assets/summit/gallery/beach_stage.webp"
-import GImg2 from "../assets/summit/gallery/gm4.webp"
-import GImg3 from "../assets/summit/gallery/mountain.webp"
-import GImg4 from "../assets/summit/gallery/mountain2.webp"
-import GImg5 from "../assets/summit/gallery/spawn_center.webp"
-import GImg6 from "../assets/summit/gallery/spawn_crane.webp"
+import GImg1 from "../assets/summit/gallery/anvil.webp"
+import GImg2 from "../assets/summit/gallery/bridge.webp"
+import GImg3 from "../assets/summit/gallery/forest.webp"
+import GImg4 from "../assets/summit/gallery/gondola_station.webp"
+import GImg5 from "../assets/summit/gallery/lighthouse.webp"
+import GImg6 from "../assets/summit/gallery/pine.webp"
 
 import SummitMap from "../assets/summit/map.png"
 
+import { ReactComponent as Artboard } from "../assets/summit/art-board.svg"
+
 const GALLERY_IMAGES = [GImg1, GImg2, GImg3, GImg4, GImg5, GImg6]
 
-import SmithieHappy from "../assets/smithie/awww.png"
-
 import "./summit.css"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useLocation } from "react-router-dom"
 
 const EMAIL_REGEX =
 	/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g
-
-const ATTENDEES = [
-	["Gamemode 4", GM4Logo, "https://gm4.co/"],
-	["Vanilla Tweaks", VTLogo, "https://vanillatweaks.net/"],
-	["Beet", BeetLogo, "https://mcbeet.dev/"],
-	["Stardust Labs", StardustLogo, "https://stardustlabs.net/"],
-	["r/MinecraftCommands", MCCLogo, "https://discord.gg/9wNcfsH"],
-	["The Creeper's Code", TCCLogo, "https://thecreeperscode.com"],
-	["You!", SmithieHappy, ""],
-].sort((a, b) => a[0].localeCompare(b[0]))
-
-const SUMMIT_LINK = "smithed.net/summit"
 
 export default function SummitPage() {
 	const location = useLocation()
@@ -94,179 +88,80 @@ export default function SummitPage() {
 			ref={mainRef}
 		>
 			<Helmet>
-				<title>Summit 2024</title>
+				<title>Summit 2026</title>
 				<meta
 					name="description"
-					content="Come explore Smithed's first ever in-game convention! Join us: Nov 2 - Nov 9"
+					content="Come explore Smithed's second ever in-game convention!"
 				/>
 
 				<meta name="og:image" content="/summit-logo.png" />
 				<meta name="og:site_name" content="Smithed" />
 			</Helmet>
 
-			<div className="container" style={{ gap: "2rem" }}>
-				<span
-					className="header"
-					style={{ alignSelf: "center", textAlign: "center" }}
-				>
-					Introducing
-					<SummitLogoFull
-						style={{ maxHeight: "12rem", color: "var(--accent2)" }}
-					/>
-				</span>
-				<div style={{ textAlign: "center", maxWidth: "48rem" }}>
-					A convention held inside of Minecraft, featuring datapack
-					creators, map makers, and more!
-					<br />
-					<br />
-					Over the course of a week, you'll be able to explore
-					community made <a href="#booths">booths</a>, live{" "}
-					<a href="#panels">panels</a>, and discover various
-					collectables hidden around the server!
-				</div>
+			<div className="container" style={{ gap: "4rem" }}>
 				<div
+					className="container"
 					style={{
-						display: "flex",
-						flexDirection: "row",
-						justifyContent: "center",
-						gap: "2rem",
-						width: "100%",
-						flexWrap: "wrap",
+						alignSelf: "center",
+						textAlign: "center",
+						color: "#BFDCF8",
+						fontWeight: 500,
+						gap: "1rem",
 					}}
 				>
-					<div
-						className="container"
-						style={{
-							gap: "0.5rem",
-							borderRadius: "var(--defaultBorderRadius)",
-							backgroundColor: "var(--section)",
-							width: "100%",
-							padding: "1rem",
-							alignSelf: "center",
-							maxWidth: "14rem",
-						}}
-					>
-						<span style={{ color: "var(--subText)" }}>
-							Save the dates
-						</span>
-						<div
-							className="container"
-							style={{
-								flexDirection: "row",
-								gap: "0.5rem",
-								fontSize: "1.5rem",
-								fontWeight: 500,
-							}}
-						>
-							Nov. 2
-							<div
-								style={{
-									width: "1rem",
-									height: "0.25rem",
-									backgroundColor: "var(--subText)",
-								}}
-							></div>
-							Nov. 9
-						</div>
-					</div>
-					<div
-						className="container"
-						style={{
-							gap: "0.5rem",
-							borderRadius: "var(--defaultBorderRadius)",
-							backgroundColor: "var(--section)",
-							width: "100%",
-							padding: "1rem",
-							alignSelf: "center",
-							maxWidth: "14rem",
-						}}
-					>
-						<span style={{ color: "var(--subText)" }}>
-							Reserve your spot
-						</span>
-						<div
-							className="container compactButton"
-							style={{
-								flexDirection: "row",
-								gap: "0.5rem",
-								fontSize: "1.5rem",
-								fontWeight: 500,
-							}}
-							onClick={() => {
-								scrollTo("rsvp")
-							}}
-						>
-							RSVP
-						</div>
-					</div>
-					<div
-						className="container"
-						style={{
-							gap: "0.5rem",
-							borderRadius: "var(--defaultBorderRadius)",
-							backgroundColor: "var(--section)",
-							width: "100%",
-							padding: "1rem",
-							alignSelf: "center",
-							maxWidth: "14rem",
-							height: "5.625rem",
-						}}
-						onMouseOut={(e) => {
-							document.querySelector("#summitLink")!.innerHTML =
-								SUMMIT_LINK
-						}}
-					>
-						<span style={{ color: "var(--subText)" }}>
-							Share it around!
-						</span>
-						<div
-							className="container"
-							style={{
-								flexDirection: "row",
-								gap: "0.5rem",
-								fontSize: "1rem",
-								fontWeight: 500,
-							}}
-						>
-							<a
-								id="summitLink"
-								href="/summit"
-								style={{ color: "var(--foreground)" }}
-								onClick={(e) => {
-									e.preventDefault()
-									navigator.clipboard.writeText(
-										"https://smithed" +
-											(import.meta.env.DEV
-												? ".dev"
-												: ".net") +
-											"/summit"
-									)
-
-									e.currentTarget.innerText = "Copied!"
-								}}
-							>
-								{SUMMIT_LINK}
-							</a>
-						</div>
-					</div>
+					<Artboard style={{ flexGrow: 1 }} />A convention celebrating
+					the community-made content of vanilla Minecraft
 				</div>
 				<div className="container" style={{}}>
-					Generously sponsored by
-					<img
-						src={BloomLogo}
-						style={{ height: "5rem", filter: "saturate(80%)" }}
-					/>
-					<a
-						href="https://bloom.host/smithed"
-						style={{ color: "var(--subText)" }}
+					<span
+						style={{
+							color: "#00D269",
+							fontSize: "2rem",
+							fontWeight: 800,
+						}}
 					>
-						https://bloom.host/smithed
-					</a>
-					<br />
-					<span>
-						Use code <strong>SMITHEDSUMMIT24</strong> at checkout
-						for 20% off your first month!
+						SUMMER 2026
 					</span>
+					<span style={{ fontSize: "1.5rem", fontWeight: 700 }}>
+						EVENT START
+					</span>
+				</div>
+				<MapGallery images={GALLERY_IMAGES} />
+
+				<div
+					className="container"
+					style={{
+						borderRadius: "var(--defaultBorderRadius)",
+						backgroundColor: "var(--section)",
+						border: "0.125rem solid var(--border)",
+						padding: "1rem",
+						gap: "1rem",
+						maxWidth: "52rem",
+					}}
+				>
+					<div>
+						Summit is a 2-week long in-game event where you will be
+						able to check out handcrafted showcase booths, meet
+						skilled creators from across the community, participate
+						in informative panels, find collectibles and explore the
+						interactive map with the help of our public transit
+						system. <br /> <br />
+						If you work on projects like datapacks, resourcepacks,
+						maps, or development tools, Summit is a great
+						opportunity to get the word out. You can apply to become
+						a booth vendor and have a physical presence at the
+						convention, or to hold a panel sharing your knowledge
+						and experience with others. <br /> <br />
+						Regardless of if you are giving a talk, exhibiting, or
+						just a visitor, the event is entirely free; As long as
+						you have Minecraft Java, you can join!
+					</div>
+					<IconTextButton
+						className="accentedButtonLike"
+						icon={Flag}
+						text={"Reserve your booth"}
+						href="/summit/apply"
+					/>
 				</div>
 			</div>
 			<div
@@ -283,32 +178,6 @@ export default function SummitPage() {
 				</span>
 				<Divider />
 			</div>
-			<div className="container" style={{ gap: "2rem", width: "100%" }}>
-				<span className="header" style={{ alignSelf: "center" }}>
-					Server IP
-				</span>
-				<span
-					style={{
-						fontSize: "1.25rem",
-						backgroundColor: "var(--section)",
-						padding: "0.5rem 1rem",
-						borderRadius: "var(--defaultBorderRadius)"
-					}}
-				>
-					summit.smithed.net
-				</span>
-			</div>
-			<div className="container" style={{ gap: "2rem", width: "100%" }}>
-				<span className="header" style={{ alignSelf: "center" }}>
-					Server Map
-				</span>
-				<a href="/summit-map.png" style={{ width: "100%" }}>
-					<img
-						src={SummitMap}
-						style={{ imageRendering: "pixelated", width: "100%" }}
-					/>
-				</a>
-			</div>
 			<SummitSection
 				id="booths"
 				image={GM4Booth}
@@ -316,9 +185,34 @@ export default function SummitPage() {
 				header={"CHECK OUT THE BOOTHS"}
 				color="accent2"
 			>
-				Booths are built by various community members in order to
-				showcase the content they're working on.
+				Locations found all around the map, created by community members
+				to showcase their work. They can include custom assets and
+				interactive elements, even full gameplay experiences. Booth
+				vendors are equipped with Summit-specific tooling, extending
+				creative possibilities and ensuring the server runs as smoothly
+				as possible.
+				<br />
+				<br />
+				<span style={{ fontWeight: 700, color: "var(--accent2)" }}>
+					Booth applications are now open!
+				</span>
+				<span>
+					If you would like to become a booth vendor, submit an
+					application via the form. We expect to be accepting
+					applicants until May, but spots are limited, so it's best to
+					apply as a soon as possible!
+				</span>
+				<IconTextButton
+					className="lightAccentedButtonLike"
+					text={"Apply for a booth"}
+					icon={Edit}
+					href="/summit/apply"
+					style={{
+						alignSelf: "end",
+					}}
+				/>
 			</SummitSection>
+
 			<SummitSection
 				id="panels"
 				image={MainStage}
@@ -326,75 +220,97 @@ export default function SummitPage() {
 				header={"WATCH THE PANELS"}
 				color="success"
 			>
-				Panels are live events that happen on various stages around the
-				server. Creators will talk about a given topic, showcase
-				content, and potentionally interact directly with the audience.
+				In-game talks given by community members about various topics.
+				In the past, these have revolved around data pack game design,
+				technical deep-dives into hard to learn features like worldgen,
+				and broader looks into content creation among many others.
+				<br /> <br />
+				This year, we'll be opening panel applications at a later time.
+				Look out for an announcement in the Smithed Discord for updates
+				on when we open these applications if you are interested in
+				hosting a panel this Summit.
+				<br /> <br />
+				<span>
+					Check out panels previously held at Smithed Summit on{" "}
+					<a href="https://www.youtube.com/watch?v=7mT7NhzGQHQ">
+						YouTube
+					</a>
+					.
+				</span>
 				<IconTextButton
+					disabled
 					className="successButtonLike"
-					text={"See the schedule!"}
-					icon={Calendar}
-					href="./schedule"
-					style={{ alignSelf: "end" }}
+					text={"Applications coming soon"}
+					icon={Edit}
+					// href="/summit/apply"
+					style={{
+						alignSelf: "end",
+					}}
 				/>
 			</SummitSection>
 			<SummitSection
 				id="collectibles"
 				image={Plushies}
 				imageDescription="Plushies of Smithie found around the world"
-				header={"FIND THE SECRETS"}
+				header={"OTHER EVENTS"}
 				color="disturbing"
 			>
-				While you go between booths, keep your eyes peeled for various
-				secrets! Spread throughout the server are stickers and plushies
-				waiting to be collected.
-				<br />
-				<br />
-				If you're interested in exploring the server, make sure to RSVP!
-				<IconTextButton
-					className="disturbingButtonLike"
-					text={"RSVP now!"}
-					icon={Account}
-					href="#rsvp"
-					style={{ alignSelf: "end" }}
-				/>
+				Besides panels, you can expect additional events to happen
+				throughout the convention, such as 2024's Fireside Chats. Stay
+				tuned for more information as we get closer to summer!
 			</SummitSection>
-
-			<MapGallery images={GALLERY_IMAGES} />
-
 			<div
 				className="container"
-				style={{ width: "100%", gap: "2rem" }}
-				id="attendees"
+				style={{ flexDirection: "row", gap: "1rem", width: "100%" }}
 			>
-				<span className="header" style={{ alignSelf: "center" }}>
-					Who's coming?
+				<Divider />
+				<span
+					style={{
+						whiteSpace: "nowrap",
+					}}
+				>
+					RSVP
 				</span>
-				<div className="attendeesContainer">
-					{ATTENDEES.map((attendee) => (
-						<AttendeeCard
-							key={attendee[0]}
-							name={attendee[0]}
-							image={attendee[1]}
-							website={attendee[2]}
-						/>
-					))}
-				</div>
+				<Divider />
 			</div>
 			<div
 				className="container"
-				style={{ width: "100%", gap: "1rem" }}
+				style={{ width: "100%", gap: "2.5rem" }}
 				id="rsvp"
 			>
-				<span className="header" style={{ alignSelf: "center" }}>
-					Sign me up!
-				</span>
-				<div
-					className="container"
-					style={{ gap: "1rem", width: "100%", textAlign: "center" }}
+				<Artboard style={{ height: "6rem" }} />
+				<RSVP />
+			</div>
+			<div
+				className="container"
+				style={{ flexDirection: "row", gap: "1rem", width: "100%" }}
+			>
+				<Divider />
+				<span
+					style={{
+						whiteSpace: "nowrap",
+					}}
 				>
-					RSVP to reserve a spot!
-					<RSVP />
-				</div>
+					Previous event
+				</span>
+				<Divider />
+			</div>
+			<div className="container" style={{ gap: "2rem", width: "100%" }}>
+				<span className="header" style={{ alignSelf: "center" }}>
+					Summit{" "}
+					<span style={{ color: "var(--disturbing)" }}>2024</span>'s
+					Attendees & Server Map
+				</span>
+				<a className="container" href="/summit-map.png" style={{ width: "100%" }}>
+					<img
+						src={SummitMap}
+						style={{
+							imageRendering: "pixelated",
+							width: "100%",
+							maxWidth: "800px",
+						}}
+					/>
+				</a>
 			</div>
 		</div>
 	)
@@ -416,15 +332,38 @@ function RSVP() {
 					flexWrap: "wrap",
 				}}
 			>
-				<IconInput
-					icon={Account}
-					placeholder="Email"
-					defaultValue={email}
-					onChange={(e) => setEmail(e.currentTarget.value)}
-					style={{ width: "100%", maxWidth: "24rem" }}
-				/>
+				<div style={{ position: "relative" }}>
+					<div
+						className="container"
+						style={{
+							flexDirection: "row",
+							gap: "0.5rem",
+							fontWeight: 500,
+							fontSize: "0.75rem",
+							position: "absolute",
+							bottom: "100%",
+							marginBottom: "0.5rem",
+							left: 0,
+						}}
+					>
+						EMAIL
+						<QuestionMark
+							style={{ width: "1rem", height: "1rem" }}
+							title="We'll use your email to send you updates about the event"
+						/>
+					</div>
+					<IconInput
+						icon={At}
+						placeholder="example@smithed.net"
+						defaultValue={email}
+						onChange={(e) => setEmail(e.currentTarget.value)}
+						style={{ width: "100%", maxWidth: "24rem" }}
+					/>
+				</div>
 				<IconTextButton
-					icon={Edit}
+					className="accentedButtonLike"
+					icon={Right}
+					reverse
 					text={"RSVP"}
 					disabled={!email.match(EMAIL_REGEX)}
 					onClick={async () => {
@@ -435,7 +374,7 @@ function RSVP() {
 
 						const resp = await fetch(
 							import.meta.env.VITE_API_SERVER +
-								"/email-lists/summit-24/subscribe?email=" +
+								"/email-lists/summit-26/subscribe?email=" +
 								email,
 							{ method: "POST" }
 						)
@@ -461,35 +400,6 @@ function RSVP() {
 	)
 }
 
-function AttendeeCard({
-	image,
-	name,
-	website,
-}: {
-	image: string
-	name: string
-	website: string
-}) {
-	return (
-		<div className="attendeeCard" key={name}>
-			<img src={image} />
-			<div
-				className="container"
-				style={{
-					flexDirection: "column",
-					justifyContent: "start",
-					alignItems: "start",
-				}}
-			>
-				<span className="name">{name}</span>
-				<a className="website" href={website}>
-					{website}
-				</a>
-			</div>
-		</div>
-	)
-}
-
 function SummitSection({
 	id,
 	image,
@@ -512,7 +422,7 @@ function SummitSection({
 	return (
 		<section key={header} id={id}>
 			<div className="image">
-				<img src={image} style={{ borderColor: `var(--${color})` }} />
+				<img src={image} style={{ borderColor: `white` }} />
 				{imageDescription}
 			</div>
 			<span className="header">
@@ -527,20 +437,41 @@ function SummitSection({
 function MapGallery({ images }: { images: string[] }) {
 	const [index, setIndex] = useState(0)
 	const currentImageRef = useRef<HTMLImageElement>(null)
+	const timeoutRef = useRef<number>()
+	const intervalRef = useRef<number>()
 
 	const mod = (n: number, m: number) => ((n % m) + m) % m
 
-	function CycleImage(direction: number) {
-		const image = currentImageRef.current!
-		const nextIndex = mod(index + direction, images.length)
+	const cycleImage = useCallback(
+		(direction: number) => {
+			const image = currentImageRef.current!
 
-		image.style.setProperty("filter", "blur(0.125rem) saturate(50%)")
-		setTimeout(() => setIndex(nextIndex), 150)
-	}
+			image.style.setProperty("filter", "blur(0.125rem) saturate(50%)")
+			setTimeout(
+				() => setIndex((i) => mod(i + direction, images.length)),
+				150
+			)
+			clearInterval(intervalRef.current!)
+			clearTimeout(timeoutRef.current)
+			timeoutRef.current = setTimeout(startInterval, 1000)
+		},
+		[currentImageRef, intervalRef, timeoutRef]
+	)
+
+	const startInterval = useCallback(() => {
+		intervalRef.current = setInterval(() => cycleImage(1), 5000)
+	}, [intervalRef])
+
+	useEffect(() => {
+		startInterval()
+
+		return () => {
+			clearInterval(intervalRef.current!)
+		}
+	}, [])
 
 	return (
 		<div className="mapGallery">
-			<span className="header">Take a peek at the world</span>
 			<div className="imageHolder">
 				<img
 					ref={currentImageRef}
@@ -551,7 +482,7 @@ function MapGallery({ images }: { images: string[] }) {
 				/>
 			</div>
 			<div className="buttonHolder">
-				<button onClick={() => CycleImage(-1)}>
+				<button onClick={() => cycleImage(-1)}>
 					<Right style={{ transform: "rotate(180deg)" }} />
 				</button>
 				{images.map((_, i) => (
@@ -567,7 +498,7 @@ function MapGallery({ images }: { images: string[] }) {
 						}}
 					/>
 				))}
-				<button onClick={() => CycleImage(1)}>
+				<button onClick={() => cycleImage(1)}>
 					<Right />
 				</button>
 			</div>

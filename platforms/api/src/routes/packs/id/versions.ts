@@ -399,15 +399,18 @@ API_APP.route({
 
 		const versions: PackVersion[] = await doc.get("data.versions")
 
-		const latestVersion = versions
-			.filter((v) =>
-				gameVersion !== undefined
-					? v.supports.includes(gameVersion)
-					: true
-			)
-			.sort((a, b) => compare(a.name, b.name))
-			.reverse()[0]
+		const latestVersion = getLatestVersion(versions, gameVersion)
 
 		return latestVersion
 	},
 })
+export function getLatestVersion(versions: PackVersion[], gameVersion?: string) {
+	return versions
+		.filter((v) => gameVersion !== undefined
+			? v.supports.includes(gameVersion)
+			: true
+		)
+		.sort((a, b) => compare(a.name, b.name))
+		.reverse()[0]
+}
+

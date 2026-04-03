@@ -32,7 +32,7 @@ export default function IconTextButton({
 	disabled,
 	centered,
 }: IconTextButtonProps) {
-	const Element = href || to ? Link : (props: any) => <a {...props}/>
+	const Element = href || to ? Link : (props: any) => <a {...props} />
 
 	return (
 		<Element
@@ -44,7 +44,7 @@ export default function IconTextButton({
 			}}
 			to={href ?? to ?? ""}
 			target={target}
-			onClick={onClick}
+			onClick={!disabled ? onClick : undefined}
 			rel={rel}
 			onMouseEnter={onMouseEnter}
 			onMouseLeave={onMouseLeave}
@@ -78,7 +78,7 @@ export default function IconTextButton({
 					whiteSpace: "nowrap",
 					textOverflow: "ellipsis",
 					overflow: "hidden",
-					flexGrow: centered ? undefined : 1
+					flexGrow: centered ? undefined : 1,
 				}}
 			>
 				{text}

@@ -1,7 +1,7 @@
 import * as fs from "fs"
 import { PythonShell } from "python-shell"
 import fetch from "node-fetch"
-import semver from "semver"
+import semver, { patch } from "semver"
 
 import {
 	BundleVersion,
@@ -15,6 +15,7 @@ import { getFirestore } from "firebase-admin/firestore"
 import { getPackDoc } from "database"
 import { RUNNER } from "./runner.js"
 import { CompactSign } from "jose"
+import { randomUUID } from "crypto"
 
 if (!fs.existsSync("temp")) fs.mkdirSync("temp")
 
@@ -167,7 +168,7 @@ export class DownloadRunner {
 	id: string
 	userHash: string
 	constructor(userHash: string) {
-		this.id = Date.now().toString()
+		this.id = randomUUID()
 		this.userHash = userHash
 	}
 

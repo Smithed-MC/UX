@@ -17,7 +17,7 @@ version = sys.argv[3]
 
 zips = []
 for file in os.listdir(path):
-    zips.append(ZipFile(path / file))
+    zips.append(path / file)
 
 if len(zips) >= 1:
     with run_weld(zips, { "require": ["beet.contrib.unknown_files"]}) as context:
