@@ -1,26 +1,11 @@
 import { IconInput, IconTextButton } from "components"
-import {
-	Account,
-	At,
-	Edit,
-	Flag,
-	QuestionMark,
-	Right,
-	SummitLogoFull,
-} from "components/svg"
+import { At, Edit, Flag, QuestionMark, Right } from "components/svg"
 import { Helmet } from "react-helmet"
 import { Divider } from "./home"
 
 import GM4Booth from "../assets/summit/gm4_booth.webp"
 import MainStage from "../assets/summit/main_stage.webp"
 import Plushies from "../assets/summit/plushies.webp"
-
-import GM4Logo from "../assets/summit/gm4_logo.svg"
-import VTLogo from "../assets/summit/vt_logo.png"
-import BeetLogo from "../assets/summit/beet_logo.png"
-import StardustLogo from "../assets/summit/stardust_logo.png"
-import MCCLogo from "../assets/summit/mcc_logo.png"
-import MyriadLogo from "../assets/summit/myriad_logo.png"
 
 import GImg1 from "../assets/summit/gallery/anvil.webp"
 import GImg2 from "../assets/summit/gallery/bridge.webp"
@@ -32,6 +17,7 @@ import GImg6 from "../assets/summit/gallery/pine.webp"
 import SummitMap from "../assets/summit/map.png"
 
 import { ReactComponent as Artboard } from "../assets/summit/art-board.svg"
+import { ReactComponent as Modrinth } from "../assets/summit/modrinth.svg"
 
 const GALLERY_IMAGES = [GImg1, GImg2, GImg3, GImg4, GImg5, GImg6]
 
@@ -125,6 +111,15 @@ export default function SummitPage() {
 					<span style={{ fontSize: "1.5rem", fontWeight: 700 }}>
 						EVENT START
 					</span>
+				</div>
+				<div
+					className="container"
+					style={{ gap: "0.5rem", fontWeight: 600 }}
+				>
+					Powered by
+					<a href="https://modrinth.com">
+						<Modrinth style={{ height: "3rem" }} />
+					</a>
 				</div>
 				<MapGallery images={GALLERY_IMAGES} />
 
@@ -301,7 +296,11 @@ export default function SummitPage() {
 					<span style={{ color: "var(--disturbing)" }}>2024</span>'s
 					Attendees & Server Map
 				</span>
-				<a className="container" href="/summit-map.png" style={{ width: "100%" }}>
+				<a
+					className="container"
+					href="/summit-map.png"
+					style={{ width: "100%" }}
+				>
 					<img
 						src={SummitMap}
 						style={{
