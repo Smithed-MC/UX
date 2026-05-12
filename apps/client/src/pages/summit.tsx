@@ -1,5 +1,5 @@
 import { IconInput, IconTextButton } from "components"
-import { At, Edit, Flag, QuestionMark, Right } from "components/svg"
+import { Account, At, Edit, QuestionMark, Right } from "components/svg"
 import { Helmet } from "react-helmet"
 import { Divider } from "./home"
 
@@ -22,11 +22,13 @@ import { ReactComponent as Modrinth } from "../assets/summit/modrinth.svg"
 const GALLERY_IMAGES = [GImg1, GImg2, GImg3, GImg4, GImg5, GImg6]
 
 import "./summit.css"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useLocation } from "react-router-dom"
 
 const EMAIL_REGEX =
 	/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g
+
+const MC_REGEX = /^[A-Za-z0-9_]{3,16}$/g
 
 export default function SummitPage() {
 	const location = useLocation()
@@ -41,8 +43,6 @@ export default function SummitPage() {
 		const rect = mainRef
 			.current!.querySelector("#" + id)
 			?.getBoundingClientRect()
-
-		console.log(rect)
 
 		if (rect == null) return
 
@@ -143,20 +143,19 @@ export default function SummitPage() {
 						system. <br /> <br />
 						If you work on projects like datapacks, resourcepacks,
 						maps, or development tools, Summit is a great
-						opportunity to get the word out. You can apply to become
-						a booth vendor and have a physical presence at the
-						convention, or to hold a panel sharing your knowledge
-						and experience with others. <br /> <br />
+						opportunity to get the word out. Soon, you can apply to
+						hold a panel sharing your knowledge and experience with
+						others. <br /> <br />
 						Regardless of if you are giving a talk, exhibiting, or
 						just a visitor, the event is entirely free; As long as
 						you have Minecraft Java, you can join!
 					</div>
-					<IconTextButton
+					{/* <IconTextButton
 						className="accentedButtonLike"
 						icon={Flag}
 						text={"Reserve your booth"}
 						href="/summit/apply"
-					/>
+					/> */}
 				</div>
 			</div>
 			<div
@@ -186,18 +185,7 @@ export default function SummitPage() {
 				vendors are equipped with Summit-specific tooling, extending
 				creative possibilities and ensuring the server runs as smoothly
 				as possible.
-				<br />
-				<br />
-				<span style={{ fontWeight: 700, color: "var(--accent2)" }}>
-					Booth applications are now open!
-				</span>
-				<span>
-					If you would like to become a booth vendor, submit an
-					application via the form. We expect to be accepting
-					applicants until May, but spots are limited, so it's best to
-					apply as a soon as possible!
-				</span>
-				<IconTextButton
+				{/* <IconTextButton
 					className="lightAccentedButtonLike"
 					text={"Apply for a booth"}
 					icon={Edit}
@@ -205,7 +193,7 @@ export default function SummitPage() {
 					style={{
 						alignSelf: "end",
 					}}
-				/>
+				/> */}
 			</SummitSection>
 
 			<SummitSection
@@ -317,21 +305,92 @@ export default function SummitPage() {
 
 function RSVP() {
 	const [email, setEmail] = useState("")
+	const [minecraftUsername, setMinecraftUsername] = useState("")
 	const [error, setError] = useState("")
 	const [success, setSuccess] = useState(false)
+
+	// New states to handle the magic link flow
+	const [isEmailTaken, setIsEmailTaken] = useState(false)
+	const [managementSent, setManagementSent] = useState(false)
+	const [isRequestingManagement, setIsRequestingManagement] = useState(false)
+
+	const isEmailValid = useMemo(
+		() => email.match(EMAIL_REGEX) !== null,
+		[email]
+	)
+
+	const isMcNameValid = useMemo(
+		() => minecraftUsername.match(MC_REGEX) !== null,
+		[minecraftUsername]
+	)
+
+	console.log(isEmailValid, isMcNameValid)
+
+	// Resets the error states if the user starts typing a new email
+	const handleEmailChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			setEmail(e.currentTarget.value)
+			setIsEmailTaken(false)
+			setManagementSent(false)
+			setError("")
+		},
+		[]
+	)
+
+	const handleMcNameChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			setMinecraftUsername(e.currentTarget.value)
+			setManagementSent(false)
+			setError("")
+		},
+		[]
+	)
+
+	const handleRequestManagement = useCallback(async () => {
+		setIsRequestingManagement(true)
+		setError("")
+
+		try {
+			const resp = await fetch(
+				`${import.meta.env.VITE_API_SERVER}/email-lists/summit-26/request-management`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						email: email,
+						redirectUrl: window.location.origin + "/manage-emails",
+					}),
+				}
+			)
+
+			if (!resp.ok) {
+				const errorData = await resp.json()
+				throw new Error(errorData.message || "Failed to send link")
+			}
+
+			setManagementSent(true)
+		} catch (err: any) {
+			setError(err.message || "Network error. Try again.")
+		} finally {
+			setIsRequestingManagement(false)
+		}
+	}, [email])
 
 	return (
 		<>
 			<div
 				className="container"
 				style={{
-					gap: "1rem",
-					flexDirection: "row",
+					gap: "2rem",
+					flexDirection: "column",
 					width: "100%",
+					maxWidth: "24rem",
 					flexWrap: "wrap",
+					alignItems: "center",
+					justifyContent: "center",
 				}}
 			>
-				<div style={{ position: "relative" }}>
+				<div style={{ position: "relative", width: "100%" }}>
 					<div
 						className="container"
 						style={{
@@ -354,45 +413,146 @@ function RSVP() {
 					<IconInput
 						icon={At}
 						placeholder="example@smithed.net"
-						defaultValue={email}
-						onChange={(e) => setEmail(e.currentTarget.value)}
+						value={email}
+						onChange={handleEmailChange}
 						style={{ width: "100%", maxWidth: "24rem" }}
+						disabled={success || managementSent}
+					/>
+				</div>
+				<div style={{ position: "relative", width: "100%" }}>
+					<div
+						className="container"
+						style={{
+							flexDirection: "row",
+							gap: "0.5rem",
+							fontWeight: 500,
+							fontSize: "0.75rem",
+							position: "absolute",
+							bottom: "100%",
+							marginBottom: "0.5rem",
+							left: 0,
+						}}
+					>
+						MINECRAFT USERNAME
+						<QuestionMark
+							style={{ width: "1rem", height: "1rem" }}
+							title="We'll use this to identify your account in-game"
+						/>
+					</div>
+					<IconInput
+						icon={Account}
+						placeholder="SmithedBot"
+						value={minecraftUsername}
+						onChange={handleMcNameChange}
+						style={{ width: "100%", maxWidth: "24rem" }}
+						disabled={success || managementSent}
 					/>
 				</div>
 				<IconTextButton
 					className="accentedButtonLike"
 					icon={Right}
 					reverse
-					text={"RSVP"}
-					disabled={!email.match(EMAIL_REGEX)}
+					text={success ? "RSVP'd!" : "RSVP"}
+					disabled={
+						!isEmailValid ||
+						!isMcNameValid ||
+						success ||
+						managementSent
+					}
 					onClick={async () => {
-						if (!email.match(EMAIL_REGEX)) return
+						if (!isEmailValid) return setError("Invalid email")
+						if (!isMcNameValid)
+							return setError("Invalid Minecraft username")
 
 						setError("")
 						setSuccess(false)
+						setIsEmailTaken(false)
 
-						const resp = await fetch(
-							import.meta.env.VITE_API_SERVER +
-								"/email-lists/summit-26/subscribe?email=" +
-								email,
-							{ method: "POST" }
-						)
+						const queryParams = new URLSearchParams({
+							email,
+							minecraftUsername: minecraftUsername.trim(),
+						})
 
-						if (!resp.ok) {
-							const error = await resp.json()
-							return setError("Failed to RSVP\n" + error.message)
+						try {
+							const resp = await fetch(
+								`${import.meta.env.VITE_API_SERVER}/email-lists/summit-26/subscribe?${queryParams.toString()}`,
+								{ method: "POST" }
+							)
+
+							if (!resp.ok) {
+								const errorData = await resp.json()
+
+								// Check for the exact error message we defined in the Fastify route
+								if (
+									errorData.message ===
+									"Email already registered!"
+								) {
+									setIsEmailTaken(true)
+									return setError(
+										"This email is already registered."
+									)
+								}
+
+								return setError(
+									"Failed to RSVP\n" +
+										(errorData.message || "Unknown error")
+								)
+							}
+
+							setSuccess(true)
+						} catch (err) {
+							setError(
+								"Failed to reach the server. Please try again later."
+							)
 						}
-
-						setSuccess(true)
 					}}
 				/>
 			</div>
+
 			{error !== "" && (
-				<span style={{ color: "var(--disturbing)" }}>{error}</span>
+				<span
+					style={{
+						color: "var(--disturbing)",
+						whiteSpace: "pre-wrap",
+					}}
+				>
+					{error}
+				</span>
 			)}
+
+			{/* Magic Link Prompt State */}
+			{isEmailTaken && !managementSent && (
+				<span style={{ color: "var(--subText)", fontSize: "0.9rem" }}>
+					Need to update your Minecraft username or unsubscribe?{" "}
+					<a
+						href="#"
+						onClick={(e) => {
+							e.preventDefault()
+							if (!isRequestingManagement)
+								handleRequestManagement()
+						}}
+						style={{
+							color: "var(--accent2)",
+							cursor: "pointer",
+							textDecoration: "none",
+						}}
+					>
+						{isRequestingManagement
+							? "Sending link..."
+							: "Click here to receive a management link."}
+					</a>
+				</span>
+			)}
+
+			{managementSent && (
+				<span style={{ color: "var(--success)" }}>
+					Management link sent! Please check your inbox.
+				</span>
+			)}
+
 			{success && (
 				<span style={{ color: "var(--success)" }}>
-					You have been RSVP'd
+					You have been RSVP'd!
 				</span>
 			)}
 		</>

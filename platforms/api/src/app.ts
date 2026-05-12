@@ -1,9 +1,4 @@
-import {
-	parseToken,
-	initializeAdmin,
-	getPackDoc,
-	serviceAccount,
-} from "database"
+import { initializeAdmin, getPackDoc } from "database"
 import dotenv from "dotenv"
 
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox"
@@ -17,14 +12,13 @@ import fastifyRedis from "@fastify/redis"
 import fastifyCors from "@fastify/cors"
 import fastifyRequestLogger from "@mgcrea/fastify-request-logger"
 import fastifyCompress from "@fastify/compress"
+import fastifyRateLimit from "@fastify/rate-limit"
 
 import * as fs from "fs"
 import { HTTPResponses } from "data-types"
 import abCache from "abstract-cache"
 import IORedis from "ioredis"
 import { Client } from "typesense"
-import { resolve } from "path"
-import { rejects } from "assert"
 
 dotenv.config()
 
@@ -63,6 +57,11 @@ if (process.env.SENTRY_PROFILING === "true") {
 
 API_APP.register(fastifyRequestLogger)
 API_APP.register(fastifyCompress)
+API_APP.register(fastifyRateLimit, {
+	global: false, 
+	max: 100,
+	timeWindow: "1 minute",
+})
 
 export function sendError(
 	reply: FastifyReply,
@@ -130,9 +129,8 @@ async function registerCacheMemory() {
 }
 
 export async function setupApp() {
-
 	const [serviceAccount, privateKey] = await initializeAdmin(
-		process.env.ADMIN_CERT ?? './secret.json'
+		process.env.ADMIN_CERT ?? "./secret.json"
 	)
 	API_APP["serviceAccount"] = serviceAccount
 	API_APP["privateKey"] = privateKey
