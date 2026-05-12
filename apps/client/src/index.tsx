@@ -340,6 +340,8 @@ import {
 import SummitPage from "./pages/summit"
 import SummitSchedulePage from "./pages/summit/schedule"
 
+import ManageEmails from "./pages/manage-emails"
+
 function didSearchParamsChange({
 	currentUrl,
 	nextUrl,
@@ -448,6 +450,10 @@ export const subRoutes: RouteObject[] = [
 		element: <></>,
 		loader: () => redirect("https://forms.gle/DMHC4dXMiL3JCAtY7"),
 	},
+	{
+		path: "manage-emails",
+		element: <ManageEmails />
+	}
 	// {
 	// 	path: "summit/schedule",
 	// 	element: <SummitSchedulePage />
