@@ -434,10 +434,10 @@ function RSVP() {
 						}}
 					>
 						MINECRAFT USERNAME
-						<QuestionMark
+						{/* <QuestionMark
 							style={{ width: "1rem", height: "1rem" }}
 							title="We'll use this to identify your account in-game"
-						/>
+						/> */}
 					</div>
 					<IconInput
 						icon={Account}
