@@ -267,7 +267,7 @@ export default function SummitPage() {
 			<SummitSection
 				id="panels"
 				image={MainStage}
-				imageDescription="Summit's largest stage out of the 3 on the server."
+				imageDescription="The stage located in the Welded Woodlands"
 				header={"WATCH ^PANELS AND OTHER ^EVENTS"}
 				color="success"
 			>
