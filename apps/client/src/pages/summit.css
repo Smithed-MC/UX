@@ -25,10 +25,10 @@
 		flex-direction: column;
 		gap: 0.5rem;
 		grid-area: image;
+		position: relative;
 
 		text-align: center;
 		color: var(--subText);
-
 		img {
 			border-radius: var(--defaultBorderRadius);
 			overflow: hidden;
@@ -36,6 +36,14 @@
 			border-width: 0.125rem;
 			border-style: solid;
 		}
+	}
+
+	.caption {
+		position: absolute;
+		top: calc(100% + 0.5rem);
+		left: 50%;
+		transform: translateX(-50%);
+		width: max-content;
 	}
 
 	.header {
@@ -93,73 +101,58 @@
 		}
 	}
 
-	.mapGallery {
-		display: flex;
-		flex-direction: column;
+	.dateAndSponsor {
+		flex-direction: row;
 		gap: 1rem;
+		width: 100%;
+		max-width: 52rem;
+	}
 
-		.header {
-			justify-self: center;
-			place-self: center;
-		}
+	.modrinthLogo {
+		height: 3rem;
+	}
 
-		.imageHolder {
-			aspect-ratio: 16/9;
+	.summitLogo {
+		flex-grow: 1;
+		height: 100%;
+		width: 100%;
 
-			display: flex;
-			flex-direction: row;
+		max-height: 8rem;
+	}
 
-			overflow: hidden;
-			justify-content: center;
-			box-sizing: border-box;
+	.summitLogo.small {
+		max-height: 6rem;
+	}
 
-			background-color: var(--section);
-			border-radius: var(--defaultBorderRadius);
-			border: 0.125rem solid var(--border);
-		}
+	.eventsAnnouncement {
+		padding: 1rem 3rem;
+		border: 0.125rem solid var(--success);
+		background-color: color-mix(
+			in srgb,
+			transparent 80%,
+			var(--success) 20%
+		);
+		border-radius: var(--defaultBorderRadius);
+		gap: 1rem;
+		flex-direction: row;
+		color: var(--success);
+		font-size: 1.5rem;
+		font-weight: 600;
+		margin-top: 1rem;
 
-		.buttonHolder {
-			display: flex;
-			gap: 1rem;
-			
-			width: 100%;
-			
-			justify-content: center;
-			align-items: center;
+		cursor: pointer;
 
-			button {
-				aspect-ratio: 1/1;
-				box-sizing: border-box;
-				justify-content: center;
+		transition: opacity 0.2s ease-in-out;
+	}
 
-				svg {
-					position: absolute;
-				}
-			}
-		}
+	.eventsAnnouncement:hover {
+		text-decoration: underline;
+	}
 
-		img {
-			width: 100%;
-			border-radius: var(--defaultBorderRadius);
-			box-sizing: border-box;
-
-			position: relative;
-
-			transition: all 0.2s ease-in-out;
-		}
+	.eventsAnnouncement:active {
+		opacity: 80%;
 	}
 }
-
-@keyframes mapGalFadeIn {
-	0% {
-		opacity: 0.5;
-	}
-	100% {
-		opacity: 1;
-	}
-}
-
-
 
 @media screen and (max-width: 48rem) {
 	.summitPage {
@@ -176,6 +169,20 @@
 		.header {
 			place-self: center;
 			text-align: center;
+		}
+
+		.dateAndSponsor {
+			flex-direction: column;
+		}
+
+		.caption {
+			position: static;
+			transform: none;
+			width: 100%;
+		}
+
+		.eventsAnnouncement {
+			font-size: 1rem;
 		}
 	}
 }

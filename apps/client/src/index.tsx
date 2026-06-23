@@ -51,43 +51,17 @@ if (import.meta.env.VITE_FIREBASE_EMULATOR) {
 export function ClientApplet() {
 	const dispatch = useAppDispatch()
 	const [hideWarning, setHideWarning] = useState(false)
+	const [hideSummit, setHideSummit] = useState(true)
+
 	const location = useLocation()
 	const context = useContext(ClientContext)
 	const [siteSettings, applySettings] = useSiteSettings()
 
 	if (!import.meta.env.SSR) applySettings(siteSettings)
 
-	function resetBundleData() {}
-
 	function resetUserData() {
 		dispatch(setUserData({}))
 	}
-
-	// async function loadBundles(user: FirebaseUser | null) {
-	// 	if (user == null) {
-	// 		return resetBundleData()
-	// 	}
-
-	// 	const resp = await fetch(
-	// 		import.meta.env.VITE_API_SERVER + `/users/${user.uid}/bundles`
-	// 	)
-	// 	if (!resp.ok) return resetBundleData()
-
-	// 	const bundleIds: string[] = await resp.json()
-
-	// 	const getData = async (id: string) => {
-	// 		const resp = await fetch(
-	// 			import.meta.env.VITE_API_SERVER + `/bundles/${id}?token=` + await user.getIdToken()
-	// 		)
-
-	// 		if (!resp.ok) return undefined
-
-	// 		return (await resp.json()) as PackBundle
-	// 	}
-	// 	const bundles = (
-	// 		await Promise.all(bundleIds.map((id) => getData(id)))
-	// 	).filter((b) => b !== undefined)
-	// }
 
 	async function loadUserData(user: FirebaseUser | null) {
 		if (user == null) return resetUserData()
@@ -112,6 +86,7 @@ export function ClientApplet() {
 		if (import.meta.env.SSR) return
 
 		setHideWarning(!!sessionStorage.getItem("hereBeDragons"))
+		setHideSummit(!!sessionStorage.getItem("dismissSummit"))
 
 		const unsub = getAuth().onAuthStateChanged(async (user) => {
 			if (user) {
@@ -165,6 +140,52 @@ export function ClientApplet() {
 				/>
 				<meta name="og:image" content="/icon.png" />
 			</Helmet>
+
+			<div
+				id="nightlyWarningBar"
+				style={{
+					width: "100%",
+					borderBottom: "0.125rem solid #BFDCF8",
+					backgroundColor:
+						"color-mix(in srgb, transparent 50%, #BFDCF8 50%)",
+					padding: "0.5rem 1rem",
+					boxSizing: "border-box",
+					display: "flex",
+					flexDirection: "row",
+					position: "relative",
+					height: "2.5rem",
+					marginTop: hideSummit ? "-2.5rem" : "0",
+					transition: "margin-top 0.2s ease-in-out",
+				}}
+			>
+				<span>
+					{"Smithed Summit is back! "}
+					<Link
+						to={
+							"/summit"
+						}
+						onClick={() => {
+							sessionStorage.setItem("dismissSummit", "true")
+							setHideSummit(true)
+						}}
+					>
+						Check it out here!
+					</Link>
+				</span>
+				<Cross
+					style={{
+						alignSelf: "center",
+						position: "absolute",
+						right: "1rem",
+						cursor: "pointer",
+					}}
+					onClick={() => {
+						sessionStorage.setItem("dismissSummit", "true")
+						setHideSummit(true)
+					}}
+				/>
+			</div>
+
 			{import.meta.env.VITE_NIGHTLY && !hideWarning && (
 				<div
 					id="nightlyWarningBar"
@@ -452,8 +473,8 @@ export const subRoutes: RouteObject[] = [
 	},
 	{
 		path: "manage-emails",
-		element: <ManageEmails />
-	}
+		element: <ManageEmails />,
+	},
 	// {
 	// 	path: "summit/schedule",
 	// 	element: <SummitSchedulePage />

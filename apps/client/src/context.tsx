@@ -1,18 +1,12 @@
 import {
 	DownloadButton,
-	IconInput,
 	IconTextButton,
-	Link,
 	NavButton,
 } from "components"
-import { svg } from "components"
 import {
-	Browse,
 	Download,
 	Popout,
 	Right,
-	Search,
-	SummitLogo,
 } from "components/svg"
 import { getAuth } from "firebase/auth"
 import { createContext } from "react"
@@ -32,9 +26,9 @@ export const defaultContext: IClientContext = {
 		<NavButton className="navBarOption start" to="/packs" key="browse">
 			Packs
 		</NavButton>,
-		// <NavButton className="navBarOption" to="/summit" key="summit">
-		// 	Summit
-		// </NavButton>,
+		<NavButton className="navBarOption" to="/summit" key="summit">
+			Summit
+		</NavButton>,
 		<NavButton
 			className="navBarOption"
 			to="https://weld.smithed.dev"
