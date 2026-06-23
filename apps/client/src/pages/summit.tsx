@@ -114,8 +114,8 @@ export default function SummitPage() {
 								height: "1.5rem",
 								width: "1.5rem",
 							}}
-						/>{" "}
-						EVENT APPLICATIONS NOW OPEN!{" "}
+						/>
+						EVENT APPLICATIONS NOW OPEN!
 						<Right
 							style={{
 								transform: "rotate(90deg)",

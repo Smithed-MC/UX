@@ -180,5 +180,9 @@
 			transform: none;
 			width: 100%;
 		}
+
+		.eventsAnnouncement {
+			font-size: 1rem;
+		}
 	}
 }

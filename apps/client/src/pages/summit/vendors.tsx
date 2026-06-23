@@ -35,6 +35,7 @@ import Misode from "../../assets/summit/vendors/Misode.png"
 import Mixedbag from "../../assets/summit/vendors/Mixedbag.png"
 import Modrinth from "../../assets/summit/vendors/Modrinth.png"
 import Need_Cooler_Shoes from "../../assets/summit/vendors/Need Cooler Shoes.png"
+import Nitrolaunch from "../../assets/summit/vendors/Nitrolaunch.png"
 import Not_Undertale from "../../assets/summit/vendors/Not Undertale.png"
 import Omega_Flowey from "../../assets/summit/vendors/Omega Flowey.png"
 import OpenNBS from "../../assets/summit/vendors/OpenNBS.png"
@@ -46,7 +47,7 @@ import Raftblock from "../../assets/summit/vendors/Raftblock.png"
 import Recolorful_Containers from "../../assets/summit/vendors/Recolorful Containers.png"
 import Ride_And_Dash_Airbikes from "../../assets/summit/vendors/Ride & Dash Airbikes.png"
 import Roguecraft from "../../assets/summit/vendors/Roguecraft.png"
-import Sandstone from "../../assets/summit/vendors/Sandstone.webp"
+import Sandstone from "../../assets/summit/vendors/Sandstone.png"
 import Shadowforms from "../../assets/summit/vendors/Shadowforms.png"
 import Shardgate_Studios from "../../assets/summit/vendors/Shardgate Studios.png"
 import Shingeki_No_Craft from "../../assets/summit/vendors/Shingeki No Craft.png"
@@ -65,6 +66,7 @@ import The_Shulker_Box from "../../assets/summit/vendors/The Shulker Box.png"
 import Thorax from "../../assets/summit/vendors/Thorax.png"
 import Unbound_Items from "../../assets/summit/vendors/Unbound Items.png"
 import Untitled_Rocket_Project from "../../assets/summit/vendors/Untitled Rocket Project.png"
+import Vanilla_Ride_Studios from "../../assets/summit/vendors/Vanilla Ride Studios.png"
 import Vanilla_Tweaks from "../../assets/summit/vendors/Vanilla Tweaks.png"
 import Williams_Battleground from "../../assets/summit/vendors/William's Battleground.png"
 import Wilozyx from "../../assets/summit/vendors/Wilozyx.jpg"
@@ -110,6 +112,7 @@ const VENDORS = [
 	{ name: "Mixedbag", icon: Mixedbag },
 	{ name: "Modrinth", icon: Modrinth },
 	{ name: "Need Cooler Shoes", icon: Need_Cooler_Shoes },
+	{ name: "Nitrolaunch", icon: Nitrolaunch },
 	{ name: "Not Undertale", icon: Not_Undertale },
 	{ name: "Omega Flowey Remastered", icon: Omega_Flowey },
 	{ name: "OpenNBS", icon: OpenNBS },
@@ -140,6 +143,7 @@ const VENDORS = [
 	{ name: "Thorax", icon: Thorax },
 	{ name: "Unbound Items", icon: Unbound_Items },
 	{ name: "Untitled Rocket Project", icon: Untitled_Rocket_Project },
+	{ name: "Vanilla Ride Studios", icon: Vanilla_Ride_Studios },
 	{ name: "Vanilla Tweaks", icon: Vanilla_Tweaks },
 	{ name: "William's Battleground", icon: Williams_Battleground },
 	{ name: "Wilozyx", icon: Wilozyx },

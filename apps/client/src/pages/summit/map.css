@@ -21,16 +21,20 @@
 }
 
 .mapGallery .carouselTrack {
+	position: absolute;
+	left: 50%;
+	top: 0;
 	display: flex;
 	flex-direction: row;
 	height: 100%;
+	width: max-content;
 	align-items: center;
 	transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
 	will-change: transform;
 	
 	/* Desktop slide width */
 	--slide-width: 50vw;
-	transform: translateX(calc(50vw - (var(--slide-width) * (var(--index) + 2.5))));
+	transform: translateX(calc(-1 * var(--slide-width) * (var(--index) + 2.5)));
 }
 
 .mapGallery .carouselSlide {
@@ -132,6 +136,11 @@
 
 /* Responsive adjustment: 1 slide focused (80vw) on mobile */
 @media screen and (max-width: 48rem) {
+	.mapGallery {
+		width: 100%;
+		margin-left: 0;
+		margin-right: 0;
+	}
 	.mapGallery .imageHolder {
 		height: 55vw;
 		min-height: 180px;
