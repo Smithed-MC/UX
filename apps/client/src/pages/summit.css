@@ -93,6 +93,28 @@
 		}
 	}
 
+	.dateAndSponsor {
+		flex-direction: row;
+		gap: 1rem;
+		width: 100%;
+		max-width: 52rem;
+	}
+
+	.modrinthLogo {
+		height: 3rem;
+	}
+
+	.summitLogo {
+		flex-grow: 1;
+		height: 100%;
+		width: 100%;
+
+		max-height: 8rem;
+	}
+
+	.summitLogo.small {
+		max-height: 6rem;
+	}
 }
 
 
@@ -114,6 +136,10 @@
 		.header {
 			place-self: center;
 			text-align: center;
+		}
+
+		.dateAndSponsor {
+			flex-direction: column;
 		}
 	}
 }

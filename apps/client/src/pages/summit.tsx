@@ -95,7 +95,7 @@ export default function SummitPage() {
 						gap: "1rem",
 					}}
 				>
-					<Artboard style={{ flexGrow: 1 }} />A convention celebrating
+					<Artboard className="summitLogo" />A convention celebrating
 					the community-made content of vanilla Minecraft
 					<div
 						className="container"
@@ -110,7 +110,7 @@ export default function SummitPage() {
 							color: "var(--success)",
 							fontSize: "1.5rem",
 							fontWeight: 600,
-							marginTop: "1rem"
+							marginTop: "1rem",
 						}}
 					>
 						<Right
@@ -133,15 +133,7 @@ export default function SummitPage() {
 
 				<MapGallery images={GALLERY_IMAGES} />
 
-				<div
-					className="container"
-					style={{
-						flexDirection: "row",
-						gap: "1rem",
-						width: "100%",
-						maxWidth: "52rem",
-					}}
-				>
+				<div className="container dateAndSponsor">
 					<div
 						className="container"
 						style={{
@@ -175,11 +167,12 @@ export default function SummitPage() {
 							border: "0.125rem solid var(--border)",
 							padding: "1rem",
 							borderRadius: "var(--defaultBorderRadius)",
+							height: "100%",
 						}}
 					>
 						Powered by
 						<a href="https://modrinth.com">
-							<Modrinth style={{ height: "3rem" }} />
+							<Modrinth className="modrinthLogo" />
 						</a>
 					</div>
 				</div>
@@ -266,7 +259,9 @@ export default function SummitPage() {
 				<span className="header" style={{ alignSelf: "center" }}>
 					THIS YEAR'S VENDORS
 				</span>
-				<VendorGallery />
+				<div style={{ height: "6rem", width: "100%" }}>
+					<VendorGallery />
+				</div>
 			</div>
 
 			<SummitSection
@@ -359,7 +354,7 @@ export default function SummitPage() {
 				style={{ width: "100%", gap: "2.5rem" }}
 				id="rsvp"
 			>
-				<Artboard style={{ height: "6rem" }} />
+				<Artboard className="summitLogo small" />
 				<RSVP />
 			</div>
 		</div>
