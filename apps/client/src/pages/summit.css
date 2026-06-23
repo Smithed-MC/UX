@@ -125,10 +125,6 @@
 	}
 }
 
-
-
-
-
 @media screen and (max-width: 48rem) {
 	.summitPage {
 		section {
@@ -148,6 +144,12 @@
 
 		.dateAndSponsor {
 			flex-direction: column;
+		}
+
+		.caption {
+			position: static;
+			transform: none;
+			width: 100%;
 		}
 	}
 }
