@@ -98,19 +98,14 @@ export default function SummitPage() {
 					<Artboard className="summitLogo" />A convention celebrating
 					the community-made content of vanilla Minecraft
 					<div
-						className="container"
-						style={{
-							padding: "1rem 3rem",
-							border: "0.125rem solid var(--success)",
-							backgroundColor:
-								"color-mix(in srgb, transparent 80%, var(--success) 20%)",
-							borderRadius: "var(--defaultBorderRadius)",
-							gap: "1rem",
-							flexDirection: "row",
-							color: "var(--success)",
-							fontSize: "1.5rem",
-							fontWeight: 600,
-							marginTop: "1rem",
+						className="container eventsAnnouncement"
+						onClick={() => {
+							document
+								.getElementById("eventForm")
+								?.scrollIntoView({
+									behavior: "smooth",
+									block: "center",
+								})
 						}}
 					>
 						<Right
@@ -290,6 +285,7 @@ export default function SummitPage() {
 				workshops, or even multiplayer map playtests.
 			</SummitSection>
 			<div
+				id="eventForm"
 				className="container"
 				style={{
 					padding: "1.5rem",

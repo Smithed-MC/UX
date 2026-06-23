@@ -123,6 +123,35 @@
 	.summitLogo.small {
 		max-height: 6rem;
 	}
+
+	.eventsAnnouncement {
+		padding: 1rem 3rem;
+		border: 0.125rem solid var(--success);
+		background-color: color-mix(
+			in srgb,
+			transparent 80%,
+			var(--success) 20%
+		);
+		border-radius: var(--defaultBorderRadius);
+		gap: 1rem;
+		flex-direction: row;
+		color: var(--success);
+		font-size: 1.5rem;
+		font-weight: 600;
+		margin-top: 1rem;
+
+		cursor: pointer;
+
+		transition: opacity 0.2s ease-in-out;
+	}
+
+	.eventsAnnouncement:hover {
+		text-decoration: underline;
+	}
+
+	.eventsAnnouncement:active {
+		opacity: 80%;
+	}
 }
 
 @media screen and (max-width: 48rem) {
