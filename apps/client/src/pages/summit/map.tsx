@@ -34,17 +34,41 @@ export function MapGallery({ images }: { images: string[] }) {
 		}
 	}, [startInterval])
 
+	// Prepend the last 2 slides, and append the first 2 slides for seamless previewing
+	const displayImages = [
+		...images.slice(-2),
+		...images,
+		...images.slice(0, 2),
+	]
+
 	return (
 		<div className="mapGallery">
 			<div className="imageHolder">
-				{images.map((imgSrc, i) => (
-					<img
-						key={imgSrc}
-						src={imgSrc}
-						className={i === index ? "active" : ""}
-						alt={`Summit Gallery ${i + 1}`}
-					/>
-				))}
+				<div
+					className="carouselTrack"
+					style={{
+						"--index": index,
+					} as React.CSSProperties}
+				>
+					{displayImages.map((imgSrc, i) => {
+						const isActive = i === index + 2
+						return (
+							<div
+								className={`carouselSlide ${isActive ? "active" : ""}`}
+								key={`${imgSrc}-${i}`}
+								onClick={() => {
+									if (i === index + 1) {
+										cycleImage(-1)
+									} else if (i === index + 3) {
+										cycleImage(1)
+									}
+								}}
+							>
+								<img src={imgSrc} alt={`Summit Gallery ${i}`} />
+							</div>
+						)
+					})}
+				</div>
 			</div>
 			<div className="buttonHolder">
 				<button onClick={() => cycleImage(-1)}>

@@ -1,42 +1,78 @@
 .mapGallery {
 	display: flex;
 	flex-direction: column;
-	gap: 1rem;
-	width: 100%;
-	max-width: 52rem;
-	margin: 0 auto;
+	gap: 1.5rem;
+	width: 100vw;
+	margin-left: calc(50% - 50vw);
+	margin-right: calc(50% - 50vw);
+	overflow: hidden;
+	padding: 1rem 0;
 }
 
 .mapGallery .imageHolder {
-	aspect-ratio: 16/9;
+	height: 32vw;
+	max-height: 480px;
+	min-height: 250px;
 	display: flex;
 	position: relative;
 	overflow: hidden;
 	box-sizing: border-box;
-	background-color: var(--section);
-	border-radius: var(--defaultBorderRadius);
-	border: 0.125rem solid var(--border);
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+	background-color: transparent;
 }
 
-.mapGallery .imageHolder img {
-	position: absolute;
-	top: 0;
-	left: 0;
+.mapGallery .carouselTrack {
+	display: flex;
+	flex-direction: row;
+	height: 100%;
+	align-items: center;
+	transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+	will-change: transform;
+	
+	/* Desktop slide width */
+	--slide-width: 50vw;
+	transform: translateX(calc(50vw - (var(--slide-width) * (var(--index) + 2.5))));
+}
+
+.mapGallery .carouselSlide {
+	flex: 0 0 var(--slide-width);
+	box-sizing: border-box;
+	height: 90%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	
+	/* Scale and opacity transition for 3D centered depth effect */
+	transform: scale(0.82);
+	opacity: 0.75;
+	transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1),
+	            opacity 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+	cursor: pointer;
+}
+
+.mapGallery .carouselSlide.active {
+	transform: scale(1);
+	opacity: 1;
+	cursor: default;
+}
+
+.mapGallery .carouselSlide img {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	opacity: 0;
-	transform: scale(1.04);
-	transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-	            transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-	pointer-events: none;
+	border-radius: var(--defaultBorderRadius);
+	border: 0.125rem solid var(--border);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+	transition: all 0.3s ease;
 }
 
-.mapGallery .imageHolder img.active {
-	opacity: 1;
-	transform: scale(1);
-	pointer-events: auto;
+.mapGallery .carouselSlide.active img,
+.mapGallery .carouselSlide:hover img {
+	border-color: #BFDCF8;
+	box-shadow: 0 6px 12px rgba(31, 174, 255, 0.18);
+}
+
+.mapGallery .carouselSlide.active img:hover {
+	transform: scale(1.015);
 }
 
 .mapGallery .buttonHolder {
@@ -92,4 +128,23 @@
 	opacity: 1;
 	transform: scale(1.2);
 	background-color: #BFDCF8;
+}
+
+/* Responsive adjustment: 1 slide focused (80vw) on mobile */
+@media screen and (max-width: 48rem) {
+	.mapGallery .imageHolder {
+		height: 55vw;
+		min-height: 180px;
+	}
+	.mapGallery .carouselTrack {
+		--slide-width: 80vw;
+	}
+	.mapGallery .carouselSlide {
+		transform: scale(0.85);
+		opacity: 0.5;
+	}
+	.mapGallery .carouselSlide.active {
+		transform: scale(1);
+		opacity: 1;
+	}
 }
