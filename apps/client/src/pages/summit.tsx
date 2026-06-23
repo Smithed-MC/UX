@@ -5,7 +5,7 @@ import { Divider } from "./home"
 import { VendorGallery } from "./summit/vendors"
 import { MapGallery } from "./summit/map"
 
-import GM4Booth from "../assets/summit/gm4_booth.webp"
+import SurenaBooth from "../assets/summit/surena.webp"
 import MainStage from "../assets/summit/main_stage.webp"
 import Plushies from "../assets/summit/plushies.webp"
 
@@ -233,8 +233,8 @@ export default function SummitPage() {
 			</div>
 			<SummitSection
 				id="booths"
-				image={GM4Booth}
-				imageDescription="Gamemode 4's booth on the Summit server"
+				image={SurenaBooth}
+				imageDescription="Surena Studios' booth on the Summit server"
 				header={"CHECK OUT THE ^BOOTHS"}
 				color="accent2"
 			>
@@ -630,7 +630,7 @@ function SummitSection({
 		<section key={header} id={id}>
 			<div className="image">
 				<img src={image} style={{ borderColor: `white` }} />
-				{imageDescription}
+				<span className="caption">{imageDescription}</span>
 			</div>
 			<span className="header">
 				{headerParts.map((word, i, arr) => (

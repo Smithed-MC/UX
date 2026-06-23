@@ -25,10 +25,10 @@
 		flex-direction: column;
 		gap: 0.5rem;
 		grid-area: image;
+		position: relative;
 
 		text-align: center;
 		color: var(--subText);
-
 		img {
 			border-radius: var(--defaultBorderRadius);
 			overflow: hidden;
@@ -36,6 +36,14 @@
 			border-width: 0.125rem;
 			border-style: solid;
 		}
+	}
+
+	.caption {
+		position: absolute;
+		top: calc(100% + 0.5rem);
+		left: 50%;
+		transform: translateX(-50%);
+		width: max-content;
 	}
 
 	.header {
