@@ -1,0 +1,118 @@
+.vendorMarquee {
+	overflow: hidden;
+	width: 100%;
+	display: flex;
+	position: relative;
+	padding: 1.5rem 0;
+	/* Seamless edge fading mask */
+	mask-image: linear-gradient(
+		to right,
+		rgba(0, 0, 0, 0) 0%,
+		rgba(0, 0, 0, 1) 15%,
+		rgba(0, 0, 0, 1) 85%,
+		rgba(0, 0, 0, 0) 100%
+	);
+	-webkit-mask-image: linear-gradient(
+		to right,
+		rgba(0, 0, 0, 0) 0%,
+		rgba(0, 0, 0, 1) 15%,
+		rgba(0, 0, 0, 1) 85%,
+		rgba(0, 0, 0, 0) 100%
+	);
+}
+
+.vendorTrack {
+	display: flex;
+	width: max-content;
+	animation: scrollMarquee 90s linear infinite;
+	will-change: transform;
+}
+
+/* Pause animation on hover to allow users to interact/inspect */
+.vendorMarquee:hover .vendorTrack {
+	animation-play-state: paused;
+}
+
+.vendorItem {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 1.25rem;
+	flex-shrink: 0;
+}
+
+.vendorCard {
+	display: flex;
+	align-items: center;
+	flex-direction: row;
+	border-radius: var(--defaultBorderRadius);
+	background: var(--section);
+	border: 0.125rem solid var(--border);
+	padding: 0.5rem;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.vendorCard:hover {
+	transform: scale(1.08) translateY(-4px);
+	border-color: #BFDCF8;
+	box-shadow: 0 6px 12px rgba(31, 174, 255, 0.18);
+	background-color: var(--highlight);
+}
+
+.vendorIcon {
+	height: 4.5rem;
+	width: auto;
+	object-fit: contain;
+	flex-shrink: 0;
+	border-radius: calc(var(--defaultBorderRadius) * 0.5);
+}
+
+.vendorName {
+	max-width: 0;
+	opacity: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	font-weight: 600;
+	font-size: 1.1rem;
+	color: var(--foreground);
+	transition: max-width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+	            opacity 0.2s ease,
+	            margin-left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+	            margin-right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+	will-change: max-width, opacity;
+}
+
+.vendorCard:hover .vendorName {
+	max-width: 15rem;
+	opacity: 1;
+	margin-left: 0.75rem;
+	margin-right: 0.5rem;
+}
+
+@keyframes scrollMarquee {
+	0% {
+		transform: translateX(0);
+	}
+	100% {
+		transform: translateX(-50%);
+	}
+}
+
+/* Responsive adjustment for smaller screens */
+@media screen and (max-width: 48rem) {
+	.vendorIcon {
+		height: 3.25rem;
+	}
+	.vendorCard {
+		padding: 0.35rem;
+	}
+	.vendorItem {
+		padding: 0 0.8rem;
+	}
+	.vendorName {
+		font-size: 0.95rem;
+	}
+}

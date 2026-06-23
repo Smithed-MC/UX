@@ -1,7 +1,9 @@
 import { IconInput, IconTextButton } from "components"
-import { Account, At, Edit, QuestionMark, Right } from "components/svg"
+import { Account, At, Right } from "components/svg"
 import { Helmet } from "react-helmet"
 import { Divider } from "./home"
+import { VendorGallery } from "./summit/vendors"
+import { MapGallery } from "./summit/map"
 
 import GM4Booth from "../assets/summit/gm4_booth.webp"
 import MainStage from "../assets/summit/main_stage.webp"
@@ -13,8 +15,6 @@ import GImg3 from "../assets/summit/gallery/forest.webp"
 import GImg4 from "../assets/summit/gallery/gondola_station.webp"
 import GImg5 from "../assets/summit/gallery/lighthouse.webp"
 import GImg6 from "../assets/summit/gallery/pine.webp"
-
-import SummitMap from "../assets/summit/map.png"
 
 import { ReactComponent as Artboard } from "../assets/summit/art-board.svg"
 import { ReactComponent as Modrinth } from "../assets/summit/modrinth.svg"
@@ -97,31 +97,92 @@ export default function SummitPage() {
 				>
 					<Artboard style={{ flexGrow: 1 }} />A convention celebrating
 					the community-made content of vanilla Minecraft
-				</div>
-				<div className="container" style={{}}>
-					<span style={{ fontSize: "1.5rem", fontWeight: 700 }}>
-						EVENT START
-					</span>
-					<span
+					<div
+						className="container"
 						style={{
-							color: "#00D269",
-							fontSize: "2rem",
-							fontWeight: 800,
+							padding: "1rem 3rem",
+							border: "0.125rem solid var(--success)",
+							backgroundColor:
+								"color-mix(in srgb, transparent 80%, var(--success) 20%)",
+							borderRadius: "var(--defaultBorderRadius)",
+							gap: "1rem",
+							flexDirection: "row",
+							color: "var(--success)",
+							fontSize: "1.5rem",
+							fontWeight: 600,
+							marginTop: "1rem"
 						}}
 					>
-						AUGUST 2026
-					</span>
+						<Right
+							style={{
+								transform: "rotate(90deg)",
+								height: "1.5rem",
+								width: "1.5rem",
+							}}
+						/>{" "}
+						EVENT APPLICATIONS NOW OPEN!{" "}
+						<Right
+							style={{
+								transform: "rotate(90deg)",
+								height: "1.5rem",
+								width: "1.5rem",
+							}}
+						/>
+					</div>
 				</div>
+
+				<MapGallery images={GALLERY_IMAGES} />
+
 				<div
 					className="container"
-					style={{ gap: "0.5rem", fontWeight: 600 }}
+					style={{
+						flexDirection: "row",
+						gap: "1rem",
+						width: "100%",
+						maxWidth: "52rem",
+					}}
 				>
-					Powered by
-					<a href="https://modrinth.com">
-						<Modrinth style={{ height: "3rem" }} />
-					</a>
+					<div
+						className="container"
+						style={{
+							backgroundColor: "var(--section)",
+							border: "0.125rem solid var(--border)",
+							padding: "1rem",
+							borderRadius: "var(--defaultBorderRadius)",
+							flexGrow: 1,
+							height: "100%",
+						}}
+					>
+						<span style={{ fontSize: "1.5rem", fontWeight: 700 }}>
+							EVENT START
+						</span>
+						<span
+							style={{
+								color: "#A0C4F9",
+								fontSize: "2rem",
+								fontWeight: 800,
+							}}
+						>
+							AUGUST 8TH, 2026
+						</span>
+					</div>
+					<div
+						className="container"
+						style={{
+							gap: "0.5rem",
+							fontWeight: 600,
+							backgroundColor: "var(--section)",
+							border: "0.125rem solid var(--border)",
+							padding: "1rem",
+							borderRadius: "var(--defaultBorderRadius)",
+						}}
+					>
+						Powered by
+						<a href="https://modrinth.com">
+							<Modrinth style={{ height: "3rem" }} />
+						</a>
+					</div>
 				</div>
-				<MapGallery images={GALLERY_IMAGES} />
 
 				<div
 					className="container"
@@ -135,17 +196,22 @@ export default function SummitPage() {
 					}}
 				>
 					<div>
-						Summit is a 2-week long in-game event where you will be
-						able to check out handcrafted showcase booths, meet
-						skilled creators from across the community, participate
-						in informative panels, find collectibles and explore the
-						interactive map with the help of our public transit
-						system. <br /> <br />
+						Smithed Summit is a 2-week long convention held on a
+						Minecraft server. During the event you will be able to
+						check out handcrafted showcase booths, meet skilled
+						creators from various communities, participate in
+						informative panels, playtest maps, find collectibles,
+						and explore the interactive world.
+						<br />
+						<br />
 						If you work on projects like datapacks, resourcepacks,
 						maps, or development tools, Summit is a great
-						opportunity to get the word out. Soon, you can apply to
-						hold a panel sharing your knowledge and experience with
-						others. <br /> <br />
+						opportunity to get the word out. You can now apply to
+						host an event at Summit, including panels, meet and
+						greets, playtests, and the like. Look below for more
+						information.
+						<br />
+						<br />
 						Regardless of if you are giving a talk, exhibiting, or
 						just a visitor, the event is entirely free; As long as
 						you have Minecraft Java, you can join!
@@ -176,7 +242,7 @@ export default function SummitPage() {
 				id="booths"
 				image={GM4Booth}
 				imageDescription="Gamemode 4's booth on the Summit server"
-				header={"CHECK OUT THE BOOTHS"}
+				header={"CHECK OUT THE ^BOOTHS"}
 				color="accent2"
 			>
 				Locations found all around the map, created by community members
@@ -196,51 +262,83 @@ export default function SummitPage() {
 				/> */}
 			</SummitSection>
 
+			<div className="container" style={{ gap: "1rem", width: "100%" }}>
+				<span className="header" style={{ alignSelf: "center" }}>
+					THIS YEAR'S VENDORS
+				</span>
+				<VendorGallery />
+			</div>
+
 			<SummitSection
 				id="panels"
 				image={MainStage}
 				imageDescription="Summit's largest stage out of the 3 on the server."
-				header={"WATCH THE PANELS"}
+				header={"WATCH ^PANELS AND OTHER ^EVENTS"}
 				color="success"
 			>
-				In-game talks given by community members about various topics.
-				In the past, these have revolved around data pack game design,
-				technical deep-dives into hard to learn features like worldgen,
-				and broader looks into content creation among many others.
-				<br /> <br />
-				This year, we'll be opening panel applications at a later time.
-				Look out for an announcement in the Smithed Discord for updates
-				on when we open these applications if you are interested in
-				hosting a panel this Summit.
-				<br /> <br />
 				<span>
-					Check out panels previously held at Smithed Summit on{" "}
+					Panels are in-game talks given by community members, with
+					the goal of sharing knowledge and experience. In the past,
+					these have revolved around data pack game design, technical
+					deep-dives into hard to learn features like worldgen, and
+					broader looks into content creation, among many other
+					topics. You can check out panels from Smithed Summit 2024 on
+					our{" "}
 					<a href="https://www.youtube.com/watch?v=7mT7NhzGQHQ">
-						YouTube
+						YouTube channel
 					</a>
 					.
 				</span>
-				<IconTextButton
-					disabled
-					className="successButtonLike"
-					text={"Applications coming soon"}
-					icon={Edit}
-					// href="/summit/apply"
-					style={{
-						alignSelf: "end",
-					}}
-				/>
+				<br />
+				This year we are also hosting events other than panels. These
+				could range anywhere from small meet and greets, to creative
+				workshops, or even multiplayer map playtests.
 			</SummitSection>
+			<div
+				className="container"
+				style={{
+					padding: "1.5rem",
+					border: "0.125rem solid var(--success)",
+					backgroundColor:
+						"color-mix(in srgb, transparent 80%, var(--success) 20%)",
+					borderRadius: "var(--defaultBorderRadius)",
+					width: "100%",
+					maxWidth: "56rem",
+					gap: "1rem",
+				}}
+			>
+				<div
+					style={{
+						color: "var(--success)",
+						fontSize: "2rem",
+						fontWeight: 600,
+					}}
+				>
+					EVENT APPLICATIONS NOW OPEN!
+				</div>
+				<div style={{ maxWidth: "46rem" }}>
+					If you would like to hold a panel or another event, you can
+					apply via{" "}
+					<a href="https://forms.gle/xQwMnkbumWYmvUuW8">this form</a>.
+					We are open to anyone, as long as you have a fun, or
+					interesting idea we would love to have you at Summit. Please
+					keep in mind{" "}
+					<span style={{ fontWeight: 600 }}>spots are limited</span>,
+					so it's best to apply as soon as possible.
+				</div>
+			</div>
 			<SummitSection
 				id="collectibles"
 				image={Plushies}
 				imageDescription="Plushies of Smithie found around the world"
-				header={"OTHER EVENTS"}
+				header={"SEE THE ^SIGHTS"}
 				color="disturbing"
 			>
-				Besides panels, you can expect additional events to happen
-				throughout the convention, such as 2024's Fireside Chats. Stay
-				tuned for more information as we get closer to summer!
+				Besides the beautiful hand-built landscapes, Summit Island is
+				full of interactive curios, and collectibles for all the
+				completionists out there. Attendees can get around swiftly
+				thanks to our custom public transit system. What could lay
+				hidden in the far reaches of this place?
 			</SummitSection>
 			<div
 				className="container"
@@ -263,41 +361,6 @@ export default function SummitPage() {
 			>
 				<Artboard style={{ height: "6rem" }} />
 				<RSVP />
-			</div>
-			<div
-				className="container"
-				style={{ flexDirection: "row", gap: "1rem", width: "100%" }}
-			>
-				<Divider />
-				<span
-					style={{
-						whiteSpace: "nowrap",
-					}}
-				>
-					Previous event
-				</span>
-				<Divider />
-			</div>
-			<div className="container" style={{ gap: "2rem", width: "100%" }}>
-				<span className="header" style={{ alignSelf: "center" }}>
-					Summit{" "}
-					<span style={{ color: "var(--disturbing)" }}>2024</span>'s
-					Attendees & Server Map
-				</span>
-				<a
-					className="container"
-					href="/summit-map.png"
-					style={{ width: "100%" }}
-				>
-					<img
-						src={SummitMap}
-						style={{
-							imageRendering: "pixelated",
-							width: "100%",
-							maxWidth: "800px",
-						}}
-					/>
-				</a>
 			</div>
 		</div>
 	)
@@ -405,10 +468,6 @@ function RSVP() {
 						}}
 					>
 						EMAIL
-						{/* <QuestionMark
-							style={{ width: "1rem", height: "1rem" }}
-							title="We'll use your email to send you updates about the event"
-						/> */}
 					</div>
 					<IconInput
 						icon={At}
@@ -434,10 +493,6 @@ function RSVP() {
 						}}
 					>
 						MINECRAFT USERNAME
-						{/* <QuestionMark
-							style={{ width: "1rem", height: "1rem" }}
-							title="We'll use this to identify your account in-game"
-						/> */}
 					</div>
 					<IconInput
 						icon={Account}
@@ -575,8 +630,6 @@ function SummitSection({
 	color: string
 }) {
 	const headerParts = header.split(" ")
-	const headerStart = headerParts.slice(0, -1).join(" ")
-	const headerEnd = headerParts.at(-1)
 
 	return (
 		<section key={header} id={id}>
@@ -585,82 +638,20 @@ function SummitSection({
 				{imageDescription}
 			</div>
 			<span className="header">
-				{headerStart + " "}
-				<span style={{ color: `var(--${color})` }}>{headerEnd}</span>
+				{headerParts.map((word, i, arr) => (
+					<span
+						style={{
+							color: word.startsWith("^")
+								? `var(--${color})`
+								: undefined,
+						}}
+					>
+						{word.replace("^", "") +
+							(i < arr.length - 1 ? " " : "")}
+					</span>
+				))}
 			</span>
 			<div className="text">{children}</div>
 		</section>
-	)
-}
-
-function MapGallery({ images }: { images: string[] }) {
-	const [index, setIndex] = useState(0)
-	const currentImageRef = useRef<HTMLImageElement>(null)
-	const timeoutRef = useRef<number>()
-	const intervalRef = useRef<number>()
-
-	const mod = (n: number, m: number) => ((n % m) + m) % m
-
-	const cycleImage = useCallback(
-		(direction: number) => {
-			const image = currentImageRef.current!
-
-			image.style.setProperty("filter", "blur(0.125rem) saturate(50%)")
-			setTimeout(
-				() => setIndex((i) => mod(i + direction, images.length)),
-				150
-			)
-			clearInterval(intervalRef.current!)
-			clearTimeout(timeoutRef.current)
-			timeoutRef.current = setTimeout(startInterval, 1000)
-		},
-		[currentImageRef, intervalRef, timeoutRef]
-	)
-
-	const startInterval = useCallback(() => {
-		intervalRef.current = setInterval(() => cycleImage(1), 5000)
-	}, [intervalRef])
-
-	useEffect(() => {
-		startInterval()
-
-		return () => {
-			clearInterval(intervalRef.current!)
-		}
-	}, [])
-
-	return (
-		<div className="mapGallery">
-			<div className="imageHolder">
-				<img
-					ref={currentImageRef}
-					src={images[index]}
-					onLoad={(e) => {
-						e.currentTarget.style.setProperty("filter", "blur(0px)")
-					}}
-				/>
-			</div>
-			<div className="buttonHolder">
-				<button onClick={() => cycleImage(-1)}>
-					<Right style={{ transform: "rotate(180deg)" }} />
-				</button>
-				{images.map((_, i) => (
-					<div
-						key={i}
-						style={{
-							width: "0.5rem",
-							height: "0.5rem",
-							borderRadius: "50%",
-							backgroundColor: "var(--foreground)",
-							opacity: i == index ? 1 : 0.2,
-							transition: "all 0.2s ease-in-out",
-						}}
-					/>
-				))}
-				<button onClick={() => cycleImage(1)}>
-					<Right />
-				</button>
-			</div>
-		</div>
 	)
 }
