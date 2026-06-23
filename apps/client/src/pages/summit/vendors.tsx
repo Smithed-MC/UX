@@ -17,6 +17,7 @@ import Datapack_Toolkit from "../../assets/summit/vendors/Datapack Toolkit.png"
 import Enter_The_Bungeon from "../../assets/summit/vendors/Enter The Bungeon.png"
 import Error_404_Studio from "../../assets/summit/vendors/Error 404 Studio.png"
 import Fingermaps from "../../assets/summit/vendors/Fingermaps.webp"
+import Gamemode_4 from "../../assets/summit/vendors/Gamemode 4.png"
 import Geophilic from "../../assets/summit/vendors/Geophilic.png"
 import Gneiss from "../../assets/summit/vendors/Gneiss.jpg"
 import Grimwart from "../../assets/summit/vendors/Grimwart.png"
@@ -82,6 +83,7 @@ const VENDORS = [
 	{ name: "Datapack Hub", icon: Datapack_Hub },
 	{ name: "Datapack Toolkit", icon: Datapack_Toolkit },
 	{ name: "Error 404 Studio", icon: Error_404_Studio },
+	{ name: "Gamemode 4", icon: Gamemode_4 },
 	{ name: "Geophilic", icon: Geophilic },
 	{ name: "Gneiss Name", icon: Gneiss },
 	{ name: "Iconic Tooltips", icon: Iconic_Tooltips },
