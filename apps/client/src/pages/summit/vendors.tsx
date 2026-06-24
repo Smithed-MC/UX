@@ -26,6 +26,7 @@ import Kangawooo from "../../assets/summit/vendors/Kangawooo.png"
 import Kanokarob from "../../assets/summit/vendors/Kanokarob.jpg"
 import Legitimoose from "../../assets/summit/vendors/Legitimoose.png"
 import Logdotzip_Studios from "../../assets/summit/vendors/Logdotzip Studios.jpg"
+import Machines_Of_Steam from "../../assets/summit/vendors/Machines of Steam.png"
 import Mapverse from "../../assets/summit/vendors/Mapverse.png"
 import MCPaint from "../../assets/summit/vendors/MCPaint.png"
 import Mechanization from "../../assets/summit/vendors/Mechanization.png"
@@ -33,6 +34,7 @@ import Minecraft_Commands from "../../assets/summit/vendors/Minecraft Commands.p
 import Minecraft_Middle_Earth from "../../assets/summit/vendors/Minecraft Middle-Earth.png"
 import Misode from "../../assets/summit/vendors/Misode.png"
 import Mixedbag from "../../assets/summit/vendors/Mixedbag.png"
+import Model_Resolver from "../../assets/summit/vendors/Model Resolver.png"
 import Modrinth from "../../assets/summit/vendors/Modrinth.png"
 import Need_Cooler_Shoes from "../../assets/summit/vendors/Need Cooler Shoes.png"
 import Nitrolaunch from "../../assets/summit/vendors/Nitrolaunch.png"
@@ -48,6 +50,7 @@ import Recolorful_Containers from "../../assets/summit/vendors/Recolorful Contai
 import Ride_And_Dash_Airbikes from "../../assets/summit/vendors/Ride & Dash Airbikes.png"
 import Roguecraft from "../../assets/summit/vendors/Roguecraft.png"
 import Sandstone from "../../assets/summit/vendors/Sandstone.png"
+import Scythe_Datapack_Editor from "../../assets/summit/vendors/Scythe Datapack Editor.png"
 import Shadowforms from "../../assets/summit/vendors/Shadowforms.png"
 import Shardgate_Studios from "../../assets/summit/vendors/Shardgate Studios.png"
 import Shingeki_No_Craft from "../../assets/summit/vendors/Shingeki No Craft.png"
@@ -57,6 +60,7 @@ import Smashing from "../../assets/summit/vendors/Smashing.png"
 import Soulings from "../../assets/summit/vendors/Soulings.png"
 import Spindle from "../../assets/summit/vendors/Spindle.png"
 import Stardust_Labs from "../../assets/summit/vendors/Stardust Labs.png"
+import Stardust_Showdown from "../../assets/summit/vendors/Stardust Showdown.png"
 import Stewbeet from "../../assets/summit/vendors/Stewbeet.png"
 import Super_Smash_Bros_Re_Crafted from "../../assets/summit/vendors/Super Smash Bros. Re Crafted.png"
 import Surena_Studio from "../../assets/summit/vendors/Surena Studio.png"
@@ -104,12 +108,14 @@ const VENDORS = [
 	{ name: "Legitimoose", icon: Legitimoose },
 	{ name: "Logdotzip Studios", icon: Logdotzip_Studios },
 	{ name: "Mapverse", icon: Mapverse },
+	{ name: "Machines of Steam", icon: Machines_Of_Steam },
 	{ name: "MCPaint", icon: MCPaint },
 	{ name: "Mechanization", icon: Mechanization },
 	{ name: "Minecraft Commands", icon: Minecraft_Commands },
 	{ name: "Minecraft Middle-Earth", icon: Minecraft_Middle_Earth },
 	{ name: "Misode", icon: Misode },
 	{ name: "Mixedbag", icon: Mixedbag },
+	{ name: "Model Resolver", icon: Model_Resolver },
 	{ name: "Modrinth", icon: Modrinth },
 	{ name: "Need Cooler Shoes", icon: Need_Cooler_Shoes },
 	{ name: "Nitrolaunch", icon: Nitrolaunch },
@@ -125,6 +131,7 @@ const VENDORS = [
 	{ name: "Ride & Dash: Airbikes", icon: Ride_And_Dash_Airbikes },
 	{ name: "Roguecraft", icon: Roguecraft },
 	{ name: "Sandstone", icon: Sandstone },
+	{ name: "Scythe Datapack Editor", icon: Scythe_Datapack_Editor },
 	{ name: "Shadowforms", icon: Shadowforms },
 	{ name: "Shardgate Studios", icon: Shardgate_Studios },
 	{ name: "Shingeki No Craft", icon: Shingeki_No_Craft },
@@ -134,6 +141,7 @@ const VENDORS = [
 	{ name: "Soulings", icon: Soulings },
 	{ name: "Spindle", icon: Spindle },
 	{ name: "Stardust Labs", icon: Stardust_Labs },
+	{ name: "Stardust Showdown", icon: Stardust_Showdown },
 	{ name: "Stewbeet", icon: Stewbeet },
 	{ name: "Super Smash Bros. Re:Crafted", icon: Super_Smash_Bros_Re_Crafted },
 	{ name: "Surena Studio", icon: Surena_Studio },
