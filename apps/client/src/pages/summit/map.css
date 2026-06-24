@@ -38,6 +38,7 @@
 }
 
 .mapGallery .carouselSlide {
+	position: relative;
 	flex: 0 0 var(--slide-width);
 	box-sizing: border-box;
 	height: 90%;
@@ -59,7 +60,8 @@
 	cursor: default;
 }
 
-.mapGallery .carouselSlide img {
+.mapGallery .carouselSlide img,
+.mapGallery .carouselSlide iframe {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
@@ -70,13 +72,26 @@
 }
 
 .mapGallery .carouselSlide.active img,
-.mapGallery .carouselSlide:hover img {
+.mapGallery .carouselSlide.active iframe,
+.mapGallery .carouselSlide:hover img,
+.mapGallery .carouselSlide:hover iframe {
 	border-color: #BFDCF8;
 	box-shadow: 0 6px 12px rgba(31, 174, 255, 0.18);
 }
 
-.mapGallery .carouselSlide.active img:hover {
+.mapGallery .carouselSlide.active img:hover,
+.mapGallery .carouselSlide.active iframe:hover {
 	transform: scale(1.015);
+}
+
+.mapGallery .carouselSlide .videoOverlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: transparent;
+	z-index: 2;
 }
 
 .mapGallery .buttonHolder {

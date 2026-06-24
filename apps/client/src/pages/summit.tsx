@@ -19,7 +19,7 @@ import GImg6 from "../assets/summit/gallery/pine.webp"
 import { ReactComponent as Artboard } from "../assets/summit/art-board.svg"
 import { ReactComponent as Modrinth } from "../assets/summit/modrinth.svg"
 
-const GALLERY_IMAGES = [GImg1, GImg2, GImg3, GImg4, GImg5, GImg6]
+const GALLERY_CONTENT = ["https://youtu.be/bpwh5BLSvWo", GImg1, GImg2, GImg3, GImg4, GImg5, GImg6]
 
 import "./summit.css"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -126,7 +126,7 @@ export default function SummitPage() {
 					</div>
 				</div>
 
-				<MapGallery images={GALLERY_IMAGES} />
+				<MapGallery images={GALLERY_CONTENT} />
 
 				<div className="container dateAndSponsor">
 					<div

@@ -168,6 +168,7 @@ export function VendorGallery() {
 								src={vendor.icon}
 								alt={vendor.name}
 								className="vendorIcon"
+								loading="lazy"
 							/>
 							<span className="vendorName">{vendor.name}</span>
 						</div>
@@ -183,6 +184,7 @@ export function VendorGallery() {
 								src={vendor.icon}
 								alt={vendor.name}
 								className="vendorIcon"
+								loading="lazy"
 							/>
 							<span className="vendorName">{vendor.name}</span>
 						</div>
