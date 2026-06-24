@@ -86,7 +86,7 @@ export function ClientApplet() {
 		if (import.meta.env.SSR) return
 
 		setHideWarning(!!sessionStorage.getItem("hereBeDragons"))
-		setHideSummit(!!sessionStorage.getItem("dismissSummit"))
+		setHideSummit(!!localStorage.getItem("dismissSummit"))
 
 		const unsub = getAuth().onAuthStateChanged(async (user) => {
 			if (user) {
@@ -165,7 +165,7 @@ export function ClientApplet() {
 							"/summit"
 						}
 						onClick={() => {
-							sessionStorage.setItem("dismissSummit", "true")
+							localStorage.setItem("dismissSummit", "true")
 							setHideSummit(true)
 						}}
 					>
@@ -180,7 +180,7 @@ export function ClientApplet() {
 						cursor: "pointer",
 					}}
 					onClick={() => {
-						sessionStorage.setItem("dismissSummit", "true")
+						localStorage.setItem("dismissSummit", "true")
 						setHideSummit(true)
 					}}
 				/>
