@@ -362,6 +362,7 @@ import SummitPage from "./pages/summit"
 import SummitSchedulePage from "./pages/summit/schedule"
 
 import ManageEmails from "./pages/manage-emails"
+import ManageEmailRequest from "./pages/manage-email-request"
 
 function didSearchParamsChange({
 	currentUrl,
@@ -474,6 +475,10 @@ export const subRoutes: RouteObject[] = [
 	{
 		path: "manage-emails",
 		element: <ManageEmails />,
+	},
+	{
+		path: "manage-email-request",
+		element: <ManageEmailRequest />,
 	},
 	// {
 	// 	path: "summit/schedule",
