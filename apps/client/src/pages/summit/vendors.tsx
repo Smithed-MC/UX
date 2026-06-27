@@ -5,7 +5,7 @@ import AtlasPlays from "../../assets/summit/vendors/AtlasPlays.png"
 import Beet from "../../assets/summit/vendors/Beet.png"
 import BigSTy_Team from "../../assets/summit/vendors/BigSTy Team.png"
 import Bundle_Group from "../../assets/summit/vendors/Bundle Group.png"
-import Catenary from "../../assets/summit/vendors/Catenary.png"
+import Cartographer from "../../assets/summit/vendors/Cartographer.png"
 import CliffTree from "../../assets/summit/vendors/CliffTree.png"
 import CNK_Spiced from "../../assets/summit/vendors/CNK_Spiced.png"
 import Crop_And_Kettle from "../../assets/summit/vendors/Crop And Kettle.png"
@@ -22,6 +22,7 @@ import Geophilic from "../../assets/summit/vendors/Geophilic.png"
 import Gneiss from "../../assets/summit/vendors/Gneiss.jpg"
 import Grimwart from "../../assets/summit/vendors/Grimwart.png"
 import Iconic_Tooltips from "../../assets/summit/vendors/Iconic Tooltips.png"
+import Imperium_Mundi from "../../assets/summit/vendors/Imperium Mundi.png"
 import Kangawooo from "../../assets/summit/vendors/Kangawooo.png"
 import Kanokarob from "../../assets/summit/vendors/Kanokarob.jpg"
 import Legitimoose from "../../assets/summit/vendors/Legitimoose.png"
@@ -42,7 +43,6 @@ import Not_Undertale from "../../assets/summit/vendors/Not Undertale.png"
 import Omega_Flowey from "../../assets/summit/vendors/Omega Flowey.png"
 import OpenNBS from "../../assets/summit/vendors/OpenNBS.png"
 import Petrichor from "../../assets/summit/vendors/Petrichor.png"
-import Pumpkin_Carving from "../../assets/summit/vendors/Pumpkin Carving.png"
 import Quasar from "../../assets/summit/vendors/Quasar.png"
 import Quinns_Better_Noteblocks from "../../assets/summit/vendors/Quinns Better Noteblocks.webp"
 import Raftblock from "../../assets/summit/vendors/Raftblock.png"
@@ -86,7 +86,7 @@ const VENDORS = [
 	{ name: "Beet", icon: Beet },
 	{ name: "BigSTy Team", icon: BigSTy_Team },
 	{ name: "Bundle Group", icon: Bundle_Group },
-	{ name: "Catenary", icon: Catenary },
+	{ name: "Cartographer", icon: Cartographer },
 	{ name: "Cliff Tree", icon: CliffTree },
 	{ name: "CNK: Spiced", icon: CNK_Spiced },
 	{ name: "Crop And Kettle", icon: Crop_And_Kettle },
@@ -103,6 +103,7 @@ const VENDORS = [
 	{ name: "Gneiss Name", icon: Gneiss },
 	{ name: "Grimwart", icon: Grimwart },
 	{ name: "Iconic Tooltips", icon: Iconic_Tooltips },
+	{ name: "Imperium Mundi", icon: Imperium_Mundi },
 	{ name: "Kangawooo", icon: Kangawooo },
 	{ name: "Kanokarob", icon: Kanokarob },
 	{ name: "Legitimoose", icon: Legitimoose },
@@ -123,7 +124,6 @@ const VENDORS = [
 	{ name: "Omega Flowey Remastered", icon: Omega_Flowey },
 	{ name: "OpenNBS", icon: OpenNBS },
 	{ name: "Petrichor", icon: Petrichor },
-	{ name: "Pumpkin Carving", icon: Pumpkin_Carving },
 	{ name: "Quasar", icon: Quasar },
 	{ name: "Quinn's Better Noteblocks", icon: Quinns_Better_Noteblocks },
 	{ name: "Raftblock", icon: Raftblock },
