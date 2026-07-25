@@ -5,7 +5,6 @@ import AtlasPlays from "../../assets/summit/vendors/AtlasPlays.png"
 import Beet from "../../assets/summit/vendors/Beet.png"
 import BigSTy_Team from "../../assets/summit/vendors/BigSTy Team.png"
 import Bundle_Group from "../../assets/summit/vendors/Bundle Group.png"
-import Cartographer from "../../assets/summit/vendors/Cartographer.png"
 import CliffTree from "../../assets/summit/vendors/CliffTree.png"
 import CNK_Spiced from "../../assets/summit/vendors/CNK_Spiced.png"
 import Crop_And_Kettle from "../../assets/summit/vendors/Crop And Kettle.png"
@@ -43,7 +42,6 @@ import Not_Undertale from "../../assets/summit/vendors/Not Undertale.png"
 import Omega_Flowey from "../../assets/summit/vendors/Omega Flowey.png"
 import OpenNBS from "../../assets/summit/vendors/OpenNBS.png"
 import Petrichor from "../../assets/summit/vendors/Petrichor.png"
-import Quasar from "../../assets/summit/vendors/Quasar.png"
 import Quinns_Better_Noteblocks from "../../assets/summit/vendors/Quinns Better Noteblocks.webp"
 import Raftblock from "../../assets/summit/vendors/Raftblock.png"
 import Recolorful_Containers from "../../assets/summit/vendors/Recolorful Containers.png"
@@ -86,7 +84,6 @@ const VENDORS = [
 	{ name: "Beet", icon: Beet },
 	{ name: "BigSTy Team", icon: BigSTy_Team },
 	{ name: "Bundle Group", icon: Bundle_Group },
-	{ name: "Cartographer", icon: Cartographer },
 	{ name: "Cliff Tree", icon: CliffTree },
 	{ name: "CNK: Spiced", icon: CNK_Spiced },
 	{ name: "Crop And Kettle", icon: Crop_And_Kettle },
@@ -124,7 +121,6 @@ const VENDORS = [
 	{ name: "Omega Flowey Remastered", icon: Omega_Flowey },
 	{ name: "OpenNBS", icon: OpenNBS },
 	{ name: "Petrichor", icon: Petrichor },
-	{ name: "Quasar", icon: Quasar },
 	{ name: "Quinn's Better Noteblocks", icon: Quinns_Better_Noteblocks },
 	{ name: "Raftblock", icon: Raftblock },
 	{ name: "Recolorful Containers", icon: Recolorful_Containers },
