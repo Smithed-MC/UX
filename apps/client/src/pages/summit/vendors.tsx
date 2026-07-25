@@ -1,6 +1,6 @@
 import Alpine from "../../assets/summit/vendors/Alpine.png"
 import Animated_Java from "../../assets/summit/vendors/Animated Java.png"
-import Aspects from "../../assets/summit/vendors/Aspects.gif"
+import Aspects from "../../assets/summit/vendors/Aspects.webp"
 import AtlasPlays from "../../assets/summit/vendors/AtlasPlays.png"
 import Beet from "../../assets/summit/vendors/Beet.png"
 import BigSTy_Team from "../../assets/summit/vendors/BigSTy Team.png"
