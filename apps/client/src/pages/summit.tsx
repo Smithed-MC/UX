@@ -1,5 +1,5 @@
 import { IconInput, IconTextButton } from "components"
-import { Account, At, Right } from "components/svg"
+import { Account, At, Right, Discord, YouTube, Instagram, Github } from "components/svg"
 import { Helmet } from "react-helmet"
 import { Divider } from "./home"
 import { VendorGallery } from "./summit/vendors"
@@ -29,6 +29,125 @@ const EMAIL_REGEX =
 	/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g
 
 const MC_REGEX = /^[A-Za-z0-9_]{3,16}$/g
+
+function SocialLinks() {
+	return (
+		<div className="socialLinksGroup">
+			<IconTextButton
+				className="highlightButtonLike"
+				icon={Discord}
+				text="Discord"
+				href="/discord"
+				target="_blank"
+				rel="noreferrer"
+			/>
+			<IconTextButton
+				className="highlightButtonLike"
+				icon={YouTube}
+				text="YouTube"
+				href="https://www.youtube.com/@smithedmc"
+				target="_blank"
+				rel="noreferrer"
+			/>
+			<IconTextButton
+				className="highlightButtonLike"
+				icon={Instagram}
+				text="Instagram"
+				href="https://www.instagram.com/smithedmc"
+				target="_blank"
+				rel="noreferrer"
+			/>
+			<IconTextButton
+				className="highlightButtonLike"
+				icon={Github}
+				text="GitHub"
+				href="https://github.com/Smithed-MC"
+				target="_blank"
+				rel="noreferrer"
+			/>
+		</div>
+	)
+}
+
+const TARGET_DATE_TIME = new Date("2026-08-08T13:00:00-04:00")
+const TARGET_DATE = TARGET_DATE_TIME.getTime()
+
+function LocalizedStartDate() {
+	const formattedDate = useMemo(() => {
+		try {
+			const options: Intl.DateTimeFormatOptions = {
+				month: "long",
+				day: "numeric",
+				year: "numeric",
+				hour: "numeric",
+				minute: "2-digit",
+				timeZoneName: "short",
+			}
+			return TARGET_DATE_TIME.toLocaleString(undefined, options).toUpperCase()
+		} catch (e) {
+			return "AUGUST 8TH, 2026 @ 1:00 PM EDT"
+		}
+	}, [])
+
+	return (
+		<span
+			style={{
+				color: "var(--subText)",
+				fontSize: "1.15rem",
+				fontWeight: 700,
+			}}
+		>
+			{formattedDate}
+		</span>
+	)
+}
+
+function CountdownTimer() {
+	const [timeLeft, setTimeLeft] = useState(() => {
+		const diff = Math.max(0, TARGET_DATE - Date.now())
+		return {
+			days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+			hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+			minutes: Math.floor((diff / 1000 / 60) % 60),
+			seconds: Math.floor((diff / 1000) % 60),
+		}
+	})
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			const diff = Math.max(0, TARGET_DATE - Date.now())
+			setTimeLeft({
+				days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+				hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+				minutes: Math.floor((diff / 1000 / 60) % 60),
+				seconds: Math.floor((diff / 1000) % 60),
+			})
+		}, 1000)
+
+		return () => clearInterval(interval)
+	}, [])
+
+	return (
+		<div
+			style={{
+				display: "flex",
+				gap: "0.5rem",
+				alignItems: "center",
+				justifyContent: "center",
+				fontFamily: "monospace",
+				fontWeight: 800,
+				fontSize: "2.5rem",
+				color: "#A0C4F9",
+				marginTop: "0.25rem",
+			}}
+		>
+			<span>{String(timeLeft.days).padStart(2, "0")}d</span>:
+			<span>{String(timeLeft.hours).padStart(2, "0")}h</span>:
+			<span>{String(timeLeft.minutes).padStart(2, "0")}m</span>:
+			<span>{String(timeLeft.seconds).padStart(2, "0")}s</span>
+		</div>
+	)
+}
 
 export default function SummitPage() {
 	const location = useLocation()
@@ -84,7 +203,7 @@ export default function SummitPage() {
 				<meta name="og:site_name" content="Smithed" />
 			</Helmet>
 
-			<div className="container" style={{ gap: "4rem" }}>
+			<div className="container" style={{ gap: "3rem" }}>
 				<div
 					className="container"
 					style={{
@@ -97,33 +216,6 @@ export default function SummitPage() {
 				>
 					<Artboard className="summitLogo" />A convention celebrating
 					the community-made content of vanilla Minecraft
-					<div
-						className="container eventsAnnouncement"
-						onClick={() => {
-							document
-								.getElementById("eventForm")
-								?.scrollIntoView({
-									behavior: "smooth",
-									block: "center",
-								})
-						}}
-					>
-						<Right
-							style={{
-								transform: "rotate(90deg)",
-								height: "1.5rem",
-								width: "1.5rem",
-							}}
-						/>
-						EVENT APPLICATIONS NOW OPEN!
-						<Right
-							style={{
-								transform: "rotate(90deg)",
-								height: "1.5rem",
-								width: "1.5rem",
-							}}
-						/>
-					</div>
 				</div>
 
 				<MapGallery images={GALLERY_CONTENT} />
@@ -138,20 +230,14 @@ export default function SummitPage() {
 							borderRadius: "var(--defaultBorderRadius)",
 							flexGrow: 1,
 							height: "100%",
+							gap: "0.25rem",
 						}}
 					>
-						<span style={{ fontSize: "1.5rem", fontWeight: 700 }}>
-							EVENT START
+						<span style={{ fontSize: "1.1rem", fontWeight: 700 }}>
+							OPENING CEREMONY
 						</span>
-						<span
-							style={{
-								color: "#A0C4F9",
-								fontSize: "2rem",
-								fontWeight: 800,
-							}}
-						>
-							AUGUST 8TH, 2026
-						</span>
+						<CountdownTimer />
+						<LocalizedStartDate />
 					</div>
 					<div
 						className="container"
@@ -204,12 +290,30 @@ export default function SummitPage() {
 						just a visitor, the event is entirely free; As long as
 						you have Minecraft Java, you can join!
 					</div>
-					{/* <IconTextButton
-						className="accentedButtonLike"
-						icon={Flag}
-						text={"Reserve your booth"}
-						href="/summit/apply"
-					/> */}
+				</div>
+
+				<div
+					className="container growthContainer"
+					id="rsvp"
+					style={{ alignSelf: "center" }}
+				>
+					<div style={{ textAlign: "center", gap: "0.5rem" }} className="container">
+						<span style={{ fontSize: "1.75rem", fontWeight: 700 }}>
+							RSVP & JOIN THE COMMUNITY
+						</span>
+						<span style={{ color: "var(--subText)", fontSize: "0.95rem", maxWidth: "32rem" }}>
+							Get event updates, launch reminders, and connect with other creators!
+						</span>
+					</div>
+
+					<RSVP />
+
+					<div className="container" style={{ gap: "0.75rem", alignItems: "center", width: "100%", marginTop: "0.5rem" }}>
+						<span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--subText)", letterSpacing: "0.05em" }}>
+							JOIN OUR COMMUNITY & FOLLOW FOR UPDATES
+						</span>
+						<SocialLinks />
+					</div>
 				</div>
 			</div>
 			<div
@@ -239,15 +343,6 @@ export default function SummitPage() {
 				vendors are equipped with Summit-specific tooling, extending
 				creative possibilities and ensuring the server runs as smoothly
 				as possible.
-				{/* <IconTextButton
-					className="lightAccentedButtonLike"
-					text={"Apply for a booth"}
-					icon={Edit}
-					href="/summit/apply"
-					style={{
-						alignSelf: "end",
-					}}
-				/> */}
 			</SummitSection>
 
 			<div className="container" style={{ gap: "1rem", width: "100%" }}>
@@ -284,40 +379,7 @@ export default function SummitPage() {
 				could range anywhere from small meet and greets, to creative
 				workshops, or even multiplayer map playtests.
 			</SummitSection>
-			<div
-				id="eventForm"
-				className="container"
-				style={{
-					padding: "1.5rem",
-					border: "0.125rem solid var(--success)",
-					backgroundColor:
-						"color-mix(in srgb, transparent 80%, var(--success) 20%)",
-					borderRadius: "var(--defaultBorderRadius)",
-					width: "100%",
-					maxWidth: "56rem",
-					gap: "1rem",
-				}}
-			>
-				<div
-					style={{
-						color: "var(--success)",
-						fontSize: "2rem",
-						fontWeight: 600,
-					}}
-				>
-					EVENT APPLICATIONS NOW OPEN!
-				</div>
-				<div style={{ maxWidth: "46rem" }}>
-					If you would like to hold a panel or another event, you can
-					apply via{" "}
-					<a href="https://forms.gle/xQwMnkbumWYmvUuW8">this form</a>.
-					We are open to anyone, as long as you have a fun, or
-					interesting idea we would love to have you at Summit. Please
-					keep in mind{" "}
-					<span style={{ fontWeight: 600 }}>spots are limited</span>,
-					so it's best to apply as soon as possible.
-				</div>
-			</div>
+
 			<SummitSection
 				id="collectibles"
 				image={Plushies}
@@ -331,28 +393,6 @@ export default function SummitPage() {
 				thanks to our custom public transit system. What could lay
 				hidden in the far reaches of this place?
 			</SummitSection>
-			<div
-				className="container"
-				style={{ flexDirection: "row", gap: "1rem", width: "100%" }}
-			>
-				<Divider />
-				<span
-					style={{
-						whiteSpace: "nowrap",
-					}}
-				>
-					Get Summit updates
-				</span>
-				<Divider />
-			</div>
-			<div
-				className="container"
-				style={{ width: "100%", gap: "2.5rem" }}
-				id="rsvp"
-			>
-				<Artboard className="summitLogo small" />
-				<RSVP />
-			</div>
 		</div>
 	)
 }

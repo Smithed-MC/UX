@@ -27,6 +27,8 @@ import { ReactComponent as LauncherGraphic } from "../assets/launcher_graphic.sv
 import libraries_box from "../assets/libraries_box.png"
 import wiki_books from "../assets/wiki_books.png"
 
+import { ReactComponent as Artboard } from "../assets/summit/art-board.svg"
+
 import "./home.css"
 
 import { useLoaderData, useNavigate } from "react-router-dom"
@@ -242,6 +244,44 @@ export default function Home(props: any) {
 				style={{ marginTop: "-2rem" }}
 				href="/packs"
 			/>
+
+			<div className="container homeSectionContainer" style={{ width: "100%", maxWidth: "56rem" }}>
+				<div
+					className="container"
+					style={{
+						flexDirection: "row",
+						gap: "2rem",
+						width: "100%",
+						backgroundColor: "var(--section)",
+						border: "0.125rem solid #A0C4F9",
+						borderRadius: "var(--defaultBorderRadius)",
+						padding: "1.5rem",
+						alignItems: "center",
+						boxSizing: "border-box",
+					}}
+				>
+					<div className="homeImageContainer" style={{ flexShrink: 0, maxWidth: "16rem", display: "flex", justifyContent: "center" }}>
+						<Artboard style={{ width: "100%", height: "auto", maxHeight: "8rem" }} />
+					</div>
+					<div className="container homeTextContainer" style={{ gap: "0.75rem", flex: 1 }}>
+						<span className="homeSectionHeader">
+							SMITHED <span style={{ color: "#A0C4F9" }}>SUMMIT 2026</span>
+						</span>
+						<span>
+							Explore project showcase booths, watch community panels, playtest maps, and RSVP to get live event updates for Smithed's second in-game convention!
+						</span>
+						<IconTextButton
+							className="accentedButtonLike"
+							text={"Check out Summit 2026"}
+							iconElement={<Right style={{ fill: "#111827", color: "#111827", width: 12, height: 12 }} />}
+							reverse
+							style={{ width: "fit-content", alignSelf: "end", backgroundColor: "#A0C4F9", color: "#111827", fill: "#111827" }}
+							href="/summit"
+						/>
+					</div>
+				</div>
+			</div>
+
 			<div
 				className="container"
 				style={{ flexDirection: "row", gap: "1rem", width: "100%" }}

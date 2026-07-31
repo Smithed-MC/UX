@@ -56,6 +56,8 @@ import { ReactComponent as Calendar } from "./assets/calendar.svg"
 import { ReactComponent as ShoppingCart } from "./assets/shopping-cart.svg"
 import { ReactComponent as QuestionMark } from "./assets/question-mark.svg"
 
+import { ReactComponent as Instagram } from "./assets/instagram.svg"
+
 export {
 	Account,
 	AddToBundle,
@@ -68,6 +70,7 @@ export {
 	Edit,
 	Home,
 	Info,
+	Instagram,
 	Left,
 	MenuBars,
 	RemoveFromBundle,
