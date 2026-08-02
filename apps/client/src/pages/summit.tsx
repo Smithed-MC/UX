@@ -278,14 +278,6 @@ export default function SummitPage() {
 						and explore the interactive world.
 						<br />
 						<br />
-						If you work on projects like datapacks, resourcepacks,
-						maps, or development tools, Summit is a great
-						opportunity to get the word out. You can now apply to
-						host an event at Summit, including panels, meet and
-						greets, playtests, and the like. Look below for more
-						information.
-						<br />
-						<br />
 						Regardless of if you are giving a talk, exhibiting, or
 						just a visitor, the event is entirely free; As long as
 						you have Minecraft Java, you can join!
