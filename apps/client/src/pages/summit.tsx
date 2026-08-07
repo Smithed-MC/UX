@@ -18,8 +18,9 @@ import GImg6 from "../assets/summit/gallery/pine.webp"
 
 import { ReactComponent as Artboard } from "../assets/summit/art-board.svg"
 import { ReactComponent as Modrinth } from "../assets/summit/modrinth.svg"
+import Schedule from "./summit/schedule"
 
-const GALLERY_CONTENT = ["https://youtu.be/20XrdyKwLZA", GImg1, GImg2, GImg3, GImg4, GImg5, GImg6]
+const GALLERY_CONTENT = ["https://youtu.be/bpwh5BLSvWo", GImg1, GImg2, GImg3, GImg4, GImg5, GImg6]
 
 import "./summit.css"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -379,6 +380,10 @@ export default function SummitPage() {
 				could range anywhere from small meet and greets, to creative
 				workshops, or even multiplayer map playtests.
 			</SummitSection>
+
+			<div className="container" style={{ width: "100%", margin: "1rem 0" }}>
+				<Schedule />
+			</div>
 
 			<SummitSection
 				id="collectibles"
