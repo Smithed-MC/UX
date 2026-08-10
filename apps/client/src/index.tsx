@@ -480,10 +480,10 @@ export const subRoutes: RouteObject[] = [
 		path: "manage-email-request",
 		element: <ManageEmailRequest />,
 	},
-	// {
-	// 	path: "summit/schedule",
-	// 	element: <SummitSchedulePage />
-	// }
+	{
+		path: "summit/schedule",
+		element: <SummitSchedulePage />,
+	},
 ]
 
 export const routes = [
