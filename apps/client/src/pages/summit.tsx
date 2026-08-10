@@ -70,86 +70,6 @@ function SocialLinks() {
 	)
 }
 
-const TARGET_DATE_TIME = new Date("2026-08-08T13:00:00-04:00")
-const TARGET_DATE = TARGET_DATE_TIME.getTime()
-
-function LocalizedStartDate() {
-	const formattedDate = useMemo(() => {
-		try {
-			const options: Intl.DateTimeFormatOptions = {
-				month: "long",
-				day: "numeric",
-				year: "numeric",
-				hour: "numeric",
-				minute: "2-digit",
-				timeZoneName: "short",
-			}
-			return TARGET_DATE_TIME.toLocaleString(undefined, options).toUpperCase()
-		} catch (e) {
-			return "AUGUST 8TH, 2026 @ 1:00 PM EDT"
-		}
-	}, [])
-
-	return (
-		<span
-			style={{
-				color: "var(--subText)",
-				fontSize: "1.15rem",
-				fontWeight: 700,
-			}}
-		>
-			{formattedDate}
-		</span>
-	)
-}
-
-function CountdownTimer() {
-	const [timeLeft, setTimeLeft] = useState(() => {
-		const diff = Math.max(0, TARGET_DATE - Date.now())
-		return {
-			days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-			hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-			minutes: Math.floor((diff / 1000 / 60) % 60),
-			seconds: Math.floor((diff / 1000) % 60),
-		}
-	})
-
-	useEffect(() => {
-		const interval = setInterval(() => {
-			const diff = Math.max(0, TARGET_DATE - Date.now())
-			setTimeLeft({
-				days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-				hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-				minutes: Math.floor((diff / 1000 / 60) % 60),
-				seconds: Math.floor((diff / 1000) % 60),
-			})
-		}, 1000)
-
-		return () => clearInterval(interval)
-	}, [])
-
-	return (
-		<div
-			style={{
-				display: "flex",
-				gap: "0.5rem",
-				alignItems: "center",
-				justifyContent: "center",
-				fontFamily: "monospace",
-				fontWeight: 800,
-				fontSize: "2.5rem",
-				color: "#A0C4F9",
-				marginTop: "0.25rem",
-			}}
-		>
-			<span>{String(timeLeft.days).padStart(2, "0")}d</span>:
-			<span>{String(timeLeft.hours).padStart(2, "0")}h</span>:
-			<span>{String(timeLeft.minutes).padStart(2, "0")}m</span>:
-			<span>{String(timeLeft.seconds).padStart(2, "0")}s</span>
-		</div>
-	)
-}
-
 export default function SummitPage() {
 	const location = useLocation()
 	const mainRef = useRef<HTMLDivElement | null>(null)
@@ -235,10 +155,19 @@ export default function SummitPage() {
 						}}
 					>
 						<span style={{ fontSize: "1.1rem", fontWeight: 700 }}>
-							OPENING CEREMONY
+							SERVER IP
 						</span>
-						<CountdownTimer />
-						<LocalizedStartDate />
+						<span
+							style={{
+								fontFamily: "monospace",
+								fontWeight: 800,
+								fontSize: "2.5rem",
+								color: "#A0C4F9",
+								marginTop: "0.25rem",
+							}}
+						>
+							summit.smithed.net
+						</span>
 					</div>
 					<div
 						className="container"
@@ -277,14 +206,6 @@ export default function SummitPage() {
 						creators from various communities, participate in
 						informative panels, playtest maps, find collectibles,
 						and explore the interactive world.
-						<br />
-						<br />
-						If you work on projects like datapacks, resourcepacks,
-						maps, or development tools, Summit is a great
-						opportunity to get the word out. You can now apply to
-						host an event at Summit, including panels, meet and
-						greets, playtests, and the like. Look below for more
-						information.
 						<br />
 						<br />
 						Regardless of if you are giving a talk, exhibiting, or
