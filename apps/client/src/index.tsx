@@ -298,6 +298,13 @@ function Footer() {
 						<br />
 						Not an official Minecraft product. Not approved by or
 						associated with Mojang Studios
+						{import.meta.env.VITE_NIGHTLY &&
+							import.meta.env.VITE_BUILD_HASH && (
+								<>
+									<br />
+									Nightly: {import.meta.env.VITE_BUILD_HASH}
+								</>
+							)}
 					</p>
 				</div>
 				<div className="container footerSmallGroup">
