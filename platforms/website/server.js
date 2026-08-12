@@ -8,6 +8,7 @@ import dotenv from "dotenv"
 import { generateSitemap } from "./generate-sitemap.js"
 import compression from "compression"
 import Cookie from "cookie"
+import { getSummitCalendar } from "./summit-calendar.js"
 
 dotenv.config()
 
@@ -33,6 +34,22 @@ async function createServer() {
 
 	const app = express()
 	app.use(compression())
+
+	app.get("/api/summit-calendar", async (_req, res) => {
+		try {
+			const calendar = await getSummitCalendar(fetch)
+			res.set(
+				"Cache-Control",
+				"public, max-age=60, stale-while-revalidate=300"
+			)
+			res.json(calendar)
+		} catch (error) {
+			console.error("Unable to sync the Summit Google Calendar", error)
+			res.status(502).json({
+				error: "Unable to sync the Summit calendar",
+			})
+		}
+	})
 
 	let vite
 	if (!isProd) {

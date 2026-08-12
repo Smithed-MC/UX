@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react"
+import { IconTextButton } from "components"
 import { Calendar, Pin } from "components/svg"
 import "./schedule.css"
+
+const GOOGLE_CALENDAR_URL =
+	"https://calendar.google.com/calendar/u/1?cid=bWNzbWl0aGVkbWNAZ21haWwuY29t"
+const CALENDAR_SYNC_INTERVAL_MS = 5 * 60 * 1000
 
 export interface SummitRawEvent {
 	id: string
@@ -19,6 +24,12 @@ export interface ProcessedEvent extends SummitRawEvent {
 	isLive: boolean
 	isNext: boolean
 	isPast: boolean
+}
+
+interface SummitCalendarResponse {
+	events: SummitRawEvent[]
+	syncedAt: string
+	stale?: boolean
 }
 
 export const SUMMIT_2026_EVENTS: SummitRawEvent[] = [
@@ -368,31 +379,72 @@ export function DayColumn({
 export default function Schedule() {
 	const [now, setNow] = useState(() => Date.now())
 	const [selectedType, setSelectedType] = useState<string>("All")
+	const [events, setEvents] = useState<SummitRawEvent[]>(SUMMIT_2026_EVENTS)
+	const [syncState, setSyncState] = useState<"syncing" | "synced" | "stale">(
+		"syncing"
+	)
 
 	useEffect(() => {
 		const interval = setInterval(() => setNow(Date.now()), 30000)
 		return () => clearInterval(interval)
 	}, [])
 
-	const processedEvents = useMemo(() => {
-		const parsed = SUMMIT_2026_EVENTS.map((e) => {
-			const startDate = new Date(e.startISO)
-			const endDate = new Date(e.endISO)
-			const startMs = startDate.getTime()
-			const endMs = endDate.getTime()
+	useEffect(() => {
+		const controller = new AbortController()
 
-			const isLive = now >= startMs && now < endMs
-			const isPast = now >= endMs
+		async function syncCalendar() {
+			try {
+				const response = await fetch("/api/summit-calendar", {
+					signal: controller.signal,
+				})
+				if (!response.ok) throw new Error("Unable to sync calendar")
 
-			return {
-				...e,
-				startDate,
-				endDate,
-				isLive,
-				isNext: false,
-				isPast,
+				const calendar =
+					(await response.json()) as SummitCalendarResponse
+				if (
+					!Array.isArray(calendar.events) ||
+					calendar.events.length === 0
+				) {
+					throw new Error("Calendar contained no events")
+				}
+
+				setEvents(calendar.events)
+				setSyncState(calendar.stale ? "stale" : "synced")
+			} catch (error) {
+				if (!controller.signal.aborted) setSyncState("stale")
 			}
-		}).sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
+		}
+
+		syncCalendar()
+		const interval = setInterval(syncCalendar, CALENDAR_SYNC_INTERVAL_MS)
+
+		return () => {
+			controller.abort()
+			clearInterval(interval)
+		}
+	}, [])
+
+	const processedEvents = useMemo(() => {
+		const parsed = events
+			.map((e) => {
+				const startDate = new Date(e.startISO)
+				const endDate = new Date(e.endISO)
+				const startMs = startDate.getTime()
+				const endMs = endDate.getTime()
+
+				const isLive = now >= startMs && now < endMs
+				const isPast = now >= endMs
+
+				return {
+					...e,
+					startDate,
+					endDate,
+					isLive,
+					isNext: false,
+					isPast,
+				}
+			})
+			.sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
 
 		// Mark first upcoming event as next
 		const nextEvent = parsed.find((e) => e.startDate.getTime() > now)
@@ -401,7 +453,7 @@ export default function Schedule() {
 		}
 
 		return parsed
-	}, [now])
+	}, [events, now])
 
 	const filteredEvents = useMemo(() => {
 		if (selectedType === "All") return processedEvents
@@ -442,7 +494,17 @@ export default function Schedule() {
 		}
 	}, [])
 
-	const eventTypes = ["All", "Panel", "Meet and Greet / QnA", "Play Session", "Live show"]
+	const eventTypes = useMemo(
+		() => [
+			"All",
+			...Array.from(new Set(events.map((event) => event.type))),
+		],
+		[events]
+	)
+
+	useEffect(() => {
+		if (!eventTypes.includes(selectedType)) setSelectedType("All")
+	}, [eventTypes, selectedType])
 
 	return (
 		<div className="container" style={{ width: "100%", gap: "2rem" }}>
@@ -450,10 +512,37 @@ export default function Schedule() {
 				<span className="header" style={{ alignSelf: "center" }}>
 					EVENT & PANEL SCHEDULE
 				</span>
-				<span style={{ color: "var(--subText)", fontSize: "0.95rem", display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
+				<span
+					style={{
+						color: "var(--subText)",
+						fontSize: "0.95rem",
+						display: "inline-flex",
+						alignItems: "center",
+						gap: "0.4rem",
+					}}
+				>
 					<Calendar style={{ width: "1rem", height: "1rem", color: "#A0C4F9" }} />
 					All times adjusted to your local timezone: <strong style={{ color: "#A0C4F9" }}>{clientTimeZone}</strong>
 				</span>
+
+				<div className="calendarSync">
+					<span className={`calendarSyncStatus ${syncState}`}>
+						{syncState === "syncing" &&
+							"Syncing with Google Calendar…"}
+						{syncState === "synced" &&
+							"Synced with Google Calendar · refreshes automatically"}
+						{syncState === "stale" &&
+							"Live sync is temporarily unavailable · retrying automatically"}
+					</span>
+					<IconTextButton
+						className="highlightButtonLike calendarLink"
+						icon={Calendar}
+						text="Open official Google Calendar"
+						href={GOOGLE_CALENDAR_URL}
+						target="_blank"
+						rel="noreferrer"
+					/>
+				</div>
 
 				<div
 					style={{
