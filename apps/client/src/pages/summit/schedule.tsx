@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react"
-import { IconTextButton } from "components"
 import { Calendar, Pin } from "components/svg"
 import "./schedule.css"
 
@@ -380,9 +379,6 @@ export default function Schedule() {
 	const [now, setNow] = useState(() => Date.now())
 	const [selectedType, setSelectedType] = useState<string>("All")
 	const [events, setEvents] = useState<SummitRawEvent[]>(SUMMIT_2026_EVENTS)
-	const [syncState, setSyncState] = useState<"syncing" | "synced" | "stale">(
-		"syncing"
-	)
 
 	useEffect(() => {
 		const interval = setInterval(() => setNow(Date.now()), 30000)
@@ -409,9 +405,8 @@ export default function Schedule() {
 				}
 
 				setEvents(calendar.events)
-				setSyncState(calendar.stale ? "stale" : "synced")
 			} catch (error) {
-				if (!controller.signal.aborted) setSyncState("stale")
+				// Keep the last successfully synced (or bundled fallback) schedule.
 			}
 		}
 
@@ -523,26 +518,16 @@ export default function Schedule() {
 				>
 					<Calendar style={{ width: "1rem", height: "1rem", color: "#A0C4F9" }} />
 					All times adjusted to your local timezone: <strong style={{ color: "#A0C4F9" }}>{clientTimeZone}</strong>
-				</span>
-
-				<div className="calendarSync">
-					<span className={`calendarSyncStatus ${syncState}`}>
-						{syncState === "syncing" &&
-							"Syncing with Google Calendar…"}
-						{syncState === "synced" &&
-							"Synced with Google Calendar · refreshes automatically"}
-						{syncState === "stale" &&
-							"Live sync is temporarily unavailable · retrying automatically"}
-					</span>
-					<IconTextButton
-						className="highlightButtonLike calendarLink"
-						icon={Calendar}
-						text="Open official Google Calendar"
+					<span aria-hidden="true">·</span>
+					<a
+						className="calendarLink"
 						href={GOOGLE_CALENDAR_URL}
 						target="_blank"
 						rel="noreferrer"
-					/>
-				</div>
+					>
+						Open with Google Calendar
+					</a>
+				</span>
 
 				<div
 					style={{

@@ -7,6 +7,7 @@ export default ({ mode }) => {
 	process.env = { ...process.env, ...loadEnv(mode, process.cwd()) } // <-
 	console.log("VITE_NIGHTLY", process.env.VITE_NIGHTLY)
 	console.log("VITE_API_SERVER", process.env.VITE_API_SERVER)
+	console.log("VITE_BUILD_HASH", process.env.VITE_BUILD_HASH)
 
 	return defineConfig({
 		plugins: [svgr(), react()],
@@ -23,7 +24,10 @@ export default ({ mode }) => {
 				process.env.VITE_NIGHTLY && process.env.VITE_NIGHTLY === "true"
 					? true
 					: false,
-			},
+			"import.meta.env.VITE_BUILD_HASH": JSON.stringify(
+				process.env.VITE_BUILD_HASH ?? ""
+			),
+		},
 		build: {
 			ssrEmitAssets: true,
 			ssrManifest: true,
