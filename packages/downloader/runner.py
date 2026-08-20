@@ -7,7 +7,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 
 from pathlib import Path
-from zipfile import ZipFile
+from zipfile import BadZipFile, ZipFile
 from smithed.weld import run_weld
 
 path = Path('temp') / sys.argv[1]
@@ -17,7 +17,12 @@ version = sys.argv[3]
 
 zips = []
 for file in os.listdir(path):
-    zips.append(ZipFile(path / file))
+    try:
+        zip = ZipFile(path / file)
+        zips.append(zip)
+    except BadZipFile:
+        raise Exception(f"Failed to load {file}, bad zip")
+
 
 if len(zips) >= 1:
     with run_weld(zips, { "require": ["beet.contrib.unknown_files"]}) as context:

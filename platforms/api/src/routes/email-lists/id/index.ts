@@ -298,6 +298,74 @@ API_APP.route({
 	},
 })
 
+/**
+ * Dump all non-null Minecraft UUIDs for an email list
+ */
+API_APP.route({
+	method: "GET",
+	url: "/email-lists/:listId/uuids",
+	schema: {
+		params: Type.Object({ listId: Type.String() }),
+		querystring: Type.Object({
+			token: Type.String(),
+		}),
+		response: {
+			200: Type.Object({
+				uuids: Type.Array(Type.String()),
+			}),
+		},
+	},
+	handler: async (request, reply) => {
+		const { token } = request.query
+
+		const tokenData = await validateToken(reply, token)
+		if (tokenData === undefined) return
+
+		const user = (await getUserDoc(tokenData.uid))?.data() as
+			| UserData
+			| undefined
+		if (!user || user.role !== "admin")
+			return sendError(
+				reply,
+				HTTPResponses.UNAUTHORIZED,
+				"Unauthorized"
+			)
+
+		const { listId } = request.params
+
+		const db = getFirestore()
+		const listRef = db.collection("email-lists").doc(listId)
+		const listDoc = await listRef.get()
+
+		if (!listDoc.exists)
+			return sendError(reply, HTTPResponses.BAD_REQUEST, "List not found")
+
+		const subscribersRef = listRef.collection("subscribers")
+
+		await migrateLegacyEmailList(listDoc, db, subscribersRef, listRef)
+
+		const subscribersSnap = await subscribersRef.get()
+
+		const uuids: string[] = []
+
+		subscribersSnap.forEach((doc) => {
+			const sub = doc.data()
+			if (sub.minecraftUuid) {
+				uuids.push(formatUuid(sub.minecraftUuid))
+			}
+		})
+
+		return reply.status(200).send({ uuids })
+	},
+})
+
+function formatUuid(uuid: string): string {
+	if (uuid.length === 32 && !uuid.includes("-")) {
+		return `${uuid.slice(0, 8)}-${uuid.slice(8, 12)}-${uuid.slice(12, 16)}-${uuid.slice(16, 20)}-${uuid.slice(20)}`
+	}
+	return uuid
+}
+
 async function migrateLegacyEmailList(
 	listDoc: FirebaseFirestore.DocumentSnapshot,
 	db: FirebaseFirestore.Firestore,

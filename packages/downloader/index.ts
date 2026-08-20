@@ -1,20 +1,18 @@
 import * as fs from "fs"
 import { PythonShell } from "python-shell"
 import fetch from "node-fetch"
-import semver, { patch } from "semver"
+import semver from "semver"
 
 import {
 	BundleVersion,
 	MinecraftVersion,
 	PackData,
-	PackDownloadOptions,
 	PackReference,
 	PackVersion,
 } from "data-types"
 import { getFirestore } from "firebase-admin/firestore"
 import { getPackDoc } from "database"
 import { RUNNER } from "./runner.js"
-import { CompactSign } from "jose"
 import { randomUUID } from "crypto"
 
 if (!fs.existsSync("temp")) fs.mkdirSync("temp")
@@ -384,15 +382,21 @@ export class DownloadRunner {
 
 	private async tryToDownload(filename: string, url: string) {
 		if (url.length === 0 || !url.startsWith("http")) return false
-  if (fs.existsSync(filename)) return false
+  		if (fs.existsSync(filename)) return false
 
 		const resp = await fetch(url)
 
+		const contentType = resp.headers.get("Content-Type")
 		if (!resp.ok) {
 			throw new Error(
-				`${resp.status} - ${resp.headers.get("Content-Type") === "text/plain" ? await resp.text() : resp.statusText}`
+				`${resp.status} - ${contentType === "text/plain" ? await resp.text() : resp.statusText}`
 			)
 		}
+		
+		if (!contentType || !["application/zip", "application/octet-stream"].includes(contentType)) {
+			throw new Error(`Not a zip file!`)
+		}
+
 		fs.writeFileSync(
 			`temp/${this.id}/${filename}.zip`,
 			Buffer.from(await resp.arrayBuffer()) as any
