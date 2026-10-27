@@ -1,0 +1,203 @@
+:root {
+	--version-selector-bg: #1a1a1a;
+	--version-selector-search-bg: #222;
+	--version-selector-group-bg: #2a2a2a;
+	--version-selector-header-bg: #252525;
+	--version-selector-hover-bg: #333;
+	--version-selector-selected-bg: #2d5016;
+	--version-selector-selected-text: #a3d977;
+	--version-selector-anchor-bg: #3d2e5e;
+	--version-selector-anchor-text: #b8a6ff;
+}
+
+.versionSelector {
+	background-color: var(--version-selector-bg);
+	font-family: "Inconsolata", monospace;
+	width: min(560px, 80vw);
+	height: 70vh;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.versionSelectorContent {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.versionSelectorHeader {
+	background-color: var(--version-selector-header-bg);
+	padding: 0.75rem 1rem;
+	border-bottom: 1px solid var(--border);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+
+.searchContainer {
+	position: relative;
+	height: 2rem;
+	flex-grow: 1;
+	max-width: 300px;
+}
+
+.searchIcon {
+	position: absolute;
+	left: 0.75rem;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 1rem;
+	height: 1rem;
+	fill: var(--subText);
+	pointer-events: none;
+}
+
+.versionSearchInput {
+	width: 100%;
+	height: 100%;
+	background-color: var(--version-selector-search-bg);
+	border: 1px solid var(--border);
+	border-radius: var(--defaultBorderRadius);
+	color: var(--foreground);
+	padding: 0 0.75rem 0 2.25rem;
+	font-family: "Inconsolata", monospace;
+	font-size: 0.9rem;
+	display: flex;
+	align-items: center;
+}
+
+.versionSearchInput:focus {
+	outline: none;
+	border-color: var(--border);
+}
+
+.toggleContainer {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	white-space: nowrap;
+}
+
+.filterButton {
+    background-color: var(--background) !important;
+}
+
+.filterButton:hover {
+    background-color: var(--version-selector-hover-bg) !important;
+    border-color: var(--accent) !important;
+}
+
+.filterButton.selected {
+    background-color: var(--accent) !important;
+    border-color: var(--accent) !important;
+}
+
+.versionSelectorBody {
+	flex-grow: 1;
+	overflow-y: auto;
+	padding: 1rem;
+}
+
+.versionGroups {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.versionGroup {
+	background-color: var(--version-selector-header-bg);
+	border-radius: var(--defaultBorderRadius);
+	border: 1px solid var(--border);
+	overflow: hidden;
+}
+
+.groupLabel {
+	background-color: var(--version-selector-group-bg);
+	padding: 0.5rem 1rem;
+	font-weight: bold;
+	font-size: 1rem;
+	border-bottom: 1px solid var(--border);
+}
+
+.versionGrid {
+  padding: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.versionButton {
+  background-color: #2a2a2a;
+  border: 1px solid var(--border);
+  border-radius: var(--defaultBorderRadius);
+  font-family: "Inconsolata", monospace;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  position: relative;
+  width: max-content;
+  height: auto;
+  white-space: nowrap;
+}
+
+.versionButton:hover {
+  background-color: var(--version-selector-hover-bg);
+  border-color: var(--border);
+}
+
+.versionButton.selected {
+  background-color: var(--version-selector-selected-bg);
+  border-color: var(--version-selector-selected-text);
+  color: var(--version-selector-selected-text);
+  font-weight: bold;
+}
+
+.versionButton.anchor {
+  background-color: var(--version-selector-anchor-bg);
+  border-color: var(--version-selector-anchor-text);
+  color: var(--version-selector-anchor-text);
+}
+
+.versionButton.selected.anchor {
+  background-color: var(--version-selector-anchor-bg);
+  border-color: var(--version-selector-anchor-text);
+  color: var(--version-selector-anchor-text);
+}
+
+.versionText {
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.noVersionsFound {
+	text-align: center;
+	color: var(--subText);
+	padding: 2rem;
+	font-style: italic;
+}
+
+.versionSelectorFooter {
+	padding: 0.75rem 1rem;
+	border-top: 1px solid var(--border);
+	background-color: var(--version-selector-header-bg);
+	font-size: 0.85rem;
+	color: var(--subText);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.selectedCount {
+	font-weight: 500;
+}
+
+.anchorInfo {
+	font-style: italic;
+	color: var(--version-selector-anchor-text);
+}

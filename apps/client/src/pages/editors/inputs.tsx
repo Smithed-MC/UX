@@ -1,11 +1,11 @@
 import { ValueError, ValueErrorType } from "@sinclair/typebox/errors"
-import { ChooseBox, IconInput } from "components"
-import { CommonVersion, supportedMinecraftVersions } from "data-types"
-import { useEffect, useReducer, useRef, useState } from "react"
-import { useErrorEventHandlers } from "./errorEvents"
+import { IconInput } from "components"
+import { CommonVersion } from "data-types"
+import { useEffect, useRef, useState } from "react"
+import VersionSelector from "../../widget/VersionSelector"
 
 export const validUrlRegex =
-    /^http(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#=_]*)?$/i;
+	/^http(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#=_]*)?$/i;
 
 export function getPropertyByPath(obj: any, path: string) {
 	const properties = path.split("/") // Split the path string into an array of property names
@@ -273,41 +273,34 @@ export function SupportedVersionSelect({
 			className="inputField"
 			id={path}
 		>
-			<ChooseBox
-				triggerStyle={
+			<VersionSelector
+				versions={version.supports ?? []}
+				placeholder="Supported Versions"
+				className={error ? "invalidInput hasError" : ""}
+				style={
 					error
 						? {
 								borderColor: "var(--disturbing)",
-								borderRadius:
-									"var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0",
+								borderRadius: "var(--defaultBorderRadius) var(--defaultBorderRadius) 0 0",
 								transition: "all 0.15s ease-in-out",
+								width: "100%",
 							}
-						: undefined
+						: {
+								width: "100%",
+							}
 				}
-				placeholder="Supported Versions"
-				choices={supportedMinecraftVersions.map((version) => ({
-					value: version,
-					content: version,
-				}))}
-				onChange={(v) => {
-					version.supports = typeof v === "string" ? [v] : v
+				onChange={(selected: string[]) => {
+					version.supports = selected
 
-					if (version.supports.length === 0) {
+					if (selected.length === 0) {
 						setErrorMessage(ValueErrorType.ArrayMinItems, "")
-						dispatchError(ref.current!)
+						ref.current && dispatchError(ref.current)
 					} else {
 						setError(undefined)
-						dispatchErrorCleared(ref.current!)
+						ref.current && dispatchErrorCleared(ref.current)
 					}
 				}}
-				beforeOpen={() => {
-					setError(undefined)
-					dispatchErrorCleared(ref.current!)
-				}}
-				defaultValue={version.supports ?? []}
-				multiselect
 			/>
-
 			<div
 				style={{
 					position: "absolute",
@@ -315,8 +308,7 @@ export function SupportedVersionSelect({
 					top: "calc(100% - 0.125rem)",
 					width: "100%",
 					textAlign: "center",
-					borderRadius:
-						"0 0 var(--defaultBorderRadius) var(--defaultBorderRadius)",
+					borderRadius: "0 0 var(--defaultBorderRadius) var(--defaultBorderRadius)",
 					padding: "0.5rem",
 					boxSizing: "border-box",
 					zIndex: error ? 1 : -1,

@@ -5,6 +5,7 @@ import ErrorPage from "./PageError"
 import MarkdownRenderer, { markdownComponents } from "./MarkdownRenderer"
 import { RootError } from "./RootError"
 import FilterButton from "./FilterButton"
+import FullscreenModal from "./FullscreenModal"
 import SvgButton from "./SvgButton"
 import CategoryBar, { CategoryChoice } from "./CategoryBar"
 import { DownloadButton } from "./DownloadButton"
@@ -35,6 +36,7 @@ export {
 	markdownComponents as markdownOptions,
 	RootError,
 	FilterButton,
+	FullscreenModal,
 	SvgButton,
 	CategoryBar,
 	CategoryChoice,

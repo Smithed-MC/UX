@@ -43,6 +43,7 @@ import {
 	GameVersionPage,
 	PackVersionPage,
 } from "../../widget/downloadPackWidget"
+import VersionSelector from "../../widget/VersionSelector"
 
 export default function PacksBrowser(props: any) {
 	const params = useQueryParams()
@@ -193,19 +194,14 @@ export default function PacksBrowser(props: any) {
 								)
 							}}
 						/>
-						<ChooseBox
-							placeholder="Version"
-							style={{ flexGrow: 1 }}
-							defaultValue={Array.from(versions.values())
+						<VersionSelector
+							versions={Array.from(versions.values())
 								.filter((c) => c != null)
 								.map((c) => c as string)}
-							choices={fullMinecraftVersions.map((v) => {
-								return { value: v, content: v }
-							})}
-							multiselect
-							onChange={(v) => {
+							style={{ flexGrow: 1, width: "100%" }}
+							onClose={(v) => {
 								setVersions(
-									new Set(typeof v === "string" ? [v] : v)
+									new Set(v)
 								)
 							}}
 						/>
