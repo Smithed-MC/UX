@@ -208,7 +208,7 @@ export default function Home(props: any) {
 							Smithed is an open-source platform for exploring,
 							sharing
 							<br />
-							and supercharging minecraft data & resource packs.
+							and supercharging Minecraft data & resource packs.
 						</span>
 					</div>
 				</div>
@@ -373,7 +373,7 @@ export default function Home(props: any) {
 						</span>
 						The fastest pack merger in the west. Merge all your data
 						and resource packs into a single zip easily droppable
-						into any world or minecraft instance. <br />
+						into any world or Minecraft instance. <br />
 						<IconTextButton
 							text={"weld.smithed.dev"}
 							icon={Globe}
